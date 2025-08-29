@@ -6,6 +6,13 @@ import {
   createIOC,
   updateIOC,
   deleteIOC,
+  analyzeIOC,
+  enrichIOC,
+  batchValidateIOCs,
+  getIOCStatistics,
+  getDashboardStats,
+  getTrendAnalysis,
+  getQualityReport,
 } from '../controllers/iocController';
 import { authMiddleware, requireRole } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
@@ -42,6 +49,11 @@ const updateIOCValidation = [
 
 // Routes
 router.get('/', authMiddleware, getIOCs);
+router.get('/statistics', authMiddleware, getIOCStatistics);
+router.get('/dashboard', authMiddleware, getDashboardStats);
+router.get('/trends', authMiddleware, getTrendAnalysis);
+router.get('/quality-report', authMiddleware, requireRole(['admin', 'analyst']), getQualityReport);
+
 router.get(
   '/:id',
   authMiddleware,
@@ -49,6 +61,7 @@ router.get(
   validateRequest,
   getIOCById
 );
+
 router.post(
   '/',
   authMiddleware,
@@ -57,6 +70,34 @@ router.post(
   validateRequest,
   createIOC
 );
+
+router.post(
+  '/batch/validate',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  body('iocs').isArray().withMessage('IOCs array is required'),
+  validateRequest,
+  batchValidateIOCs
+);
+
+router.post(
+  '/:id/analyze',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  param('id').isMongoId(),
+  validateRequest,
+  analyzeIOC
+);
+
+router.post(
+  '/:id/enrich',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  param('id').isMongoId(),
+  validateRequest,
+  enrichIOC
+);
+
 router.put(
   '/:id',
   authMiddleware,
@@ -65,6 +106,7 @@ router.put(
   validateRequest,
   updateIOC
 );
+
 router.delete(
   '/:id',
   authMiddleware,
