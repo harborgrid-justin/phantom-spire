@@ -8,7 +8,8 @@ import { MitreDataSource } from '../models/MitreDataSource';
 import { logger } from '../utils/logger';
 
 // MITRE ATT&CK STIX data source URL
-const MITRE_ATTACK_STIX_URL = 'https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json';
+const MITRE_ATTACK_STIX_URL =
+  'https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json';
 
 export class MitreService {
   private systemUserId: string;
@@ -30,7 +31,7 @@ export class MitreService {
   }> {
     try {
       logger.info('Starting MITRE ATT&CK data sync from official source...');
-      
+
       // Fetch STIX data from MITRE's official repository
       const response = await axios.get(MITRE_ATTACK_STIX_URL);
       const stixData: any = response.data;
@@ -109,7 +110,9 @@ export class MitreService {
       modified: new Date(stixObj.modified),
       platforms: stixObj.x_mitre_platforms || [],
       killChainPhases: stixObj.kill_chain_phases || [],
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         revoked: stixObj.revoked || false,
@@ -118,11 +121,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreTactic.findOneAndUpdate(
-      { mitreId },
-      tacticData,
-      { upsert: true, new: true }
-    );
+    await MitreTactic.findOneAndUpdate({ mitreId }, tacticData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -156,7 +158,9 @@ export class MitreService {
       killChainPhases: stixObj.kill_chain_phases || [],
       detection: stixObj.x_mitre_detection || '',
       mitigations: [], // Will be populated after mitigations are processed
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         revoked: stixObj.revoked || false,
@@ -167,11 +171,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreTechnique.findOneAndUpdate(
-      { mitreId },
-      techniqueData,
-      { upsert: true, new: true }
-    );
+    await MitreTechnique.findOneAndUpdate({ mitreId }, techniqueData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -192,7 +195,9 @@ export class MitreService {
       modified: new Date(stixObj.modified),
       techniques: [], // Will be populated from relationships
       software: [], // Will be populated from relationships
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         revoked: stixObj.revoked || false,
@@ -202,11 +207,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreGroup.findOneAndUpdate(
-      { mitreId },
-      groupData,
-      { upsert: true, new: true }
-    );
+    await MitreGroup.findOneAndUpdate({ mitreId }, groupData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -229,7 +233,9 @@ export class MitreService {
       techniques: [], // Will be populated from relationships
       groups: [], // Will be populated from relationships
       aliases: stixObj.x_mitre_aliases || [],
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         type: stixObj.type,
@@ -240,11 +246,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreSoftware.findOneAndUpdate(
-      { mitreId },
-      softwareData,
-      { upsert: true, new: true }
-    );
+    await MitreSoftware.findOneAndUpdate({ mitreId }, softwareData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -263,7 +268,9 @@ export class MitreService {
       created: new Date(stixObj.created),
       modified: new Date(stixObj.modified),
       techniques: [], // Will be populated from relationships
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         revoked: stixObj.revoked || false,
@@ -272,11 +279,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreMitigation.findOneAndUpdate(
-      { mitreId },
-      mitigationData,
-      { upsert: true, new: true }
-    );
+    await MitreMitigation.findOneAndUpdate({ mitreId }, mitigationData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -296,8 +302,12 @@ export class MitreService {
       modified: new Date(stixObj.modified),
       platforms: stixObj.x_mitre_platforms || [],
       collectionLayers: stixObj.x_mitre_collection_layers || '',
-      dataComponents: this.processDataComponents(stixObj.x_mitre_data_source_collection || []),
-      externalReferences: this.processExternalReferences(stixObj.external_references),
+      dataComponents: this.processDataComponents(
+        stixObj.x_mitre_data_source_collection || []
+      ),
+      externalReferences: this.processExternalReferences(
+        stixObj.external_references
+      ),
       metadata: {
         stixId: stixObj.id,
         revoked: stixObj.revoked || false,
@@ -306,11 +316,10 @@ export class MitreService {
       createdBy: this.systemUserId,
     };
 
-    await MitreDataSource.findOneAndUpdate(
-      { mitreId },
-      dataSourceData,
-      { upsert: true, new: true }
-    );
+    await MitreDataSource.findOneAndUpdate({ mitreId }, dataSourceData, {
+      upsert: true,
+      new: true,
+    });
   }
 
   /**
@@ -318,8 +327,10 @@ export class MitreService {
    */
   private extractMitreId(externalRefs: any[]): string | null {
     if (!externalRefs) return null;
-    
-    const mitreRef = externalRefs.find(ref => ref.source_name === 'mitre-attack');
+
+    const mitreRef = externalRefs.find(
+      ref => ref.source_name === 'mitre-attack'
+    );
     return mitreRef?.external_id || null;
   }
 
@@ -328,7 +339,7 @@ export class MitreService {
    */
   private getExternalUrl(externalRefs: any[], sourceName: string): string {
     if (!externalRefs) return '';
-    
+
     const ref = externalRefs.find(ref => ref.source_name === sourceName);
     return ref?.url || '';
   }
@@ -338,7 +349,7 @@ export class MitreService {
    */
   private extractTacticNames(killChainPhases: any[]): string[] {
     if (!killChainPhases) return [];
-    
+
     return killChainPhases
       .filter(phase => phase.kill_chain_name === 'mitre-attack')
       .map(phase => phase.phase_name);
@@ -349,7 +360,7 @@ export class MitreService {
    */
   private processExternalReferences(externalRefs: any[]): any[] {
     if (!externalRefs) return [];
-    
+
     return externalRefs.map(ref => ({
       sourceName: ref.source_name,
       url: ref.url,
@@ -363,7 +374,7 @@ export class MitreService {
    */
   private processDataComponents(components: any[]): any[] {
     if (!components) return [];
-    
+
     return components.map(comp => ({
       name: comp.name || '',
       description: comp.description || '',
@@ -384,7 +395,15 @@ export class MitreService {
     dataSources: number;
     lastSync?: Date;
   }> {
-    const [tactics, techniques, subTechniques, groups, software, mitigations, dataSources] = await Promise.all([
+    const [
+      tactics,
+      techniques,
+      subTechniques,
+      groups,
+      software,
+      mitigations,
+      dataSources,
+    ] = await Promise.all([
       MitreTactic.countDocuments(),
       MitreTechnique.countDocuments({ isSubTechnique: false }),
       MitreTechnique.countDocuments({ isSubTechnique: true }),
@@ -395,7 +414,11 @@ export class MitreService {
     ]);
 
     // Get last sync date from most recently updated tactic
-    const lastTactic = await MitreTactic.findOne({}, {}, { sort: { updatedAt: -1 } });
+    const lastTactic = await MitreTactic.findOne(
+      {},
+      {},
+      { sort: { updatedAt: -1 } }
+    );
 
     const result: {
       tactics: number;
