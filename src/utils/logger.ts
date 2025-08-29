@@ -1,0 +1,38 @@
+import winston from 'winston';
+import { config } from '../config/config';
+
+const { combine, timestamp, printf, colorize, json } = winston.format;
+
+// Custom log format
+const logFormat = printf(({ level, message, timestamp, ...meta }) => {
+  return `${timestamp} [${level}]: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+});
+
+// Create logger instance
+export const logger = winston.createLogger({
+  level: config.LOG_LEVEL,
+  format: combine(
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    config.NODE_ENV === 'production' ? json() : combine(colorize(), logFormat)
+  ),
+  transports: [new winston.transports.Console()],
+  ...(config.NODE_ENV === 'production' && {
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({
+        filename: 'logs/error.log',
+        level: 'error',
+      }),
+      new winston.transports.File({
+        filename: 'logs/combined.log',
+      }),
+    ],
+  }),
+});
+
+// Stream for HTTP request logging
+export const logStream = {
+  write: (message: string): void => {
+    logger.info(message.trim());
+  },
+};
