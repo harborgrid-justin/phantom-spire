@@ -180,7 +180,7 @@ export const createIOC = asyncHandler(
 
     // Validate IOC with business logic
     const validationResult = await IOCValidationService.validateIOC(iocData);
-    
+
     if (!validationResult.isValid) {
       res.status(400).json({
         success: false,
@@ -195,11 +195,13 @@ export const createIOC = asyncHandler(
 
     // Use normalized value if available
     const iocValue = validationResult.normalizedValue || iocData.value;
-    
+
     // Auto-detect IOC type if not specified correctly
     const detectedType = IOCValidationService.detectIOCType(iocValue);
     if (detectedType !== 'unknown' && detectedType !== iocData.type) {
-      logger.warn(`IOC type mismatch detected: ${iocData.type} vs ${detectedType} for ${iocValue}`);
+      logger.warn(
+        `IOC type mismatch detected: ${iocData.type} vs ${detectedType} for ${iocValue}`
+      );
     }
 
     const ioc: IIOC = new IOC({
@@ -231,7 +233,9 @@ export const createIOC = asyncHandler(
               'metadata.enrichmentSources': enrichmentResult.sources,
               'metadata.enrichedAt': enrichmentResult.enrichedAt,
             },
-          }).catch(err => logger.error('Failed to update IOC with enrichment data', err));
+          }).catch(err =>
+            logger.error('Failed to update IOC with enrichment data', err)
+          );
         }
       })
       .catch(err => logger.error('IOC enrichment failed', err));
@@ -512,7 +516,8 @@ export const batchValidateIOCs = asyncHandler(
       return;
     }
 
-    const validationResults = await IOCValidationService.batchValidateIOCs(iocs);
+    const validationResults =
+      await IOCValidationService.batchValidateIOCs(iocs);
 
     const summary = {
       total: validationResults.length,
@@ -565,15 +570,15 @@ export const batchValidateIOCs = asyncHandler(
 export const getIOCStatistics = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { startDate, endDate, useCache = 'true' } = req.query;
-    
+
     let dateRange: { start: Date; end: Date } | undefined;
-    
+
     if (startDate && endDate) {
       dateRange = {
         start: new Date(startDate as string),
         end: new Date(endDate as string),
       };
-      
+
       if (isNaN(dateRange.start.getTime()) || isNaN(dateRange.end.getTime())) {
         res.status(400).json({
           success: false,
@@ -647,10 +652,10 @@ export const getDashboardStats = asyncHandler(
 export const getTrendAnalysis = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { period = 'daily', days = '30' } = req.query;
-    
+
     const periodValue = period as 'daily' | 'weekly' | 'monthly';
     const daysValue = parseInt(days as string, 10);
-    
+
     if (isNaN(daysValue) || daysValue < 1 || daysValue > 365) {
       res.status(400).json({
         success: false,

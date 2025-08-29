@@ -17,7 +17,11 @@ export interface IOCStatistics {
   temporal: {
     creationTrend: Array<{ date: string; count: number }>;
     activityTrend: Array<{ date: string; active: number; inactive: number }>;
-    ageDistribution: Array<{ range: string; count: number; percentage: number }>;
+    ageDistribution: Array<{
+      range: string;
+      count: number;
+      percentage: number;
+    }>;
   };
   quality: {
     averageConfidence: number;
@@ -31,7 +35,13 @@ export interface IOCStatistics {
     highRiskCount: number;
     mediumRiskCount: number;
     lowRiskCount: number;
-    riskTrend: Array<{ date: string; critical: number; high: number; medium: number; low: number }>;
+    riskTrend: Array<{
+      date: string;
+      critical: number;
+      high: number;
+      medium: number;
+      low: number;
+    }>;
   };
   tags: {
     mostUsedTags: Array<{ tag: string; count: number; percentage: number }>;
@@ -174,7 +184,6 @@ export class IOCStatisticsService {
       });
 
       return statistics;
-
     } catch (error) {
       logger.error('Error generating IOC statistics', error);
       throw error;
@@ -190,7 +199,9 @@ export class IOCStatisticsService {
   ): Promise<IOCTrendAnalysis> {
     try {
       const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+      const startDate = new Date(
+        endDate.getTime() - days * 24 * 60 * 60 * 1000
+      );
 
       // Determine grouping format based on period
       let dateFormat: string;
@@ -216,7 +227,9 @@ export class IOCStatisticsService {
         {
           $group: {
             _id: {
-              date: { $dateToString: { format: dateFormat, date: '$createdAt' } },
+              date: {
+                $dateToString: { format: dateFormat, date: '$createdAt' },
+              },
             },
             newIOCs: { $sum: 1 },
             totalActive: {
@@ -235,7 +248,7 @@ export class IOCStatisticsService {
 
       const analysis: IOCTrendAnalysis = {
         period,
-        data: trendData.map((item) => ({
+        data: trendData.map(item => ({
           date: item._id.date,
           newIOCs: item.newIOCs,
           updatedIOCs: 0, // Would need to track updates separately
@@ -252,7 +265,6 @@ export class IOCStatisticsService {
       });
 
       return analysis;
-
     } catch (error) {
       logger.error('Error generating trend analysis', error);
       throw error;
@@ -278,8 +290,9 @@ export class IOCStatisticsService {
           type: 'warning',
           description: 'IOCs with low confidence scores',
           count: lowConfidenceIOCs.length,
-          affectedIOCs: lowConfidenceIOCs.map((ioc) => ioc.value),
-          recommendation: 'Review and validate these IOCs or update confidence scores',
+          affectedIOCs: lowConfidenceIOCs.map(ioc => ioc.value),
+          recommendation:
+            'Review and validate these IOCs or update confidence scores',
         });
       }
 
@@ -309,7 +322,8 @@ export class IOCStatisticsService {
           description: 'IOCs without tags',
           count: noTagsCount,
           affectedIOCs: [],
-          recommendation: 'Add relevant tags for better categorization and searching',
+          recommendation:
+            'Add relevant tags for better categorization and searching',
         });
       }
 
@@ -328,8 +342,9 @@ export class IOCStatisticsService {
           type: 'warning',
           description: 'Active IOCs not seen in over a year',
           count: oldActiveIOCs.length,
-          affectedIOCs: oldActiveIOCs.map((ioc) => ioc.value),
-          recommendation: 'Review these IOCs and consider deactivating outdated ones',
+          affectedIOCs: oldActiveIOCs.map(ioc => ioc.value),
+          recommendation:
+            'Review these IOCs and consider deactivating outdated ones',
         });
       }
 
@@ -351,14 +366,16 @@ export class IOCStatisticsService {
           type: 'error',
           description: 'Duplicate IOCs detected',
           count: duplicates.length,
-          affectedIOCs: duplicates.map((dup) => dup._id.value),
-          recommendation: 'Merge or remove duplicate IOCs to maintain data integrity',
+          affectedIOCs: duplicates.map(dup => dup._id.value),
+          recommendation:
+            'Merge or remove duplicate IOCs to maintain data integrity',
         });
       }
 
       // Generate improvement recommendations
       improvements.push({
-        action: 'Implement automated confidence scoring based on source reliability',
+        action:
+          'Implement automated confidence scoring based on source reliability',
         priority: 'high',
         estimatedImpact: 'Improved accuracy and reduced false positives',
       });
@@ -392,7 +409,6 @@ export class IOCStatisticsService {
       });
 
       return report;
-
     } catch (error) {
       logger.error('Error generating quality report', error);
       throw error;
@@ -460,7 +476,10 @@ export class IOCStatisticsService {
     };
   }
 
-  private static getCacheKey(prefix: string, dateRange?: { start: Date; end: Date }): string {
+  private static getCacheKey(
+    prefix: string,
+    dateRange?: { start: Date; end: Date }
+  ): string {
     const rangeKey = dateRange
       ? `${dateRange.start.getTime()}-${dateRange.end.getTime()}`
       : 'all';
@@ -490,7 +509,7 @@ export class IOCStatisticsService {
 
     const total = distribution.reduce((sum, item) => sum + item.count, 0);
 
-    return distribution.map((item) => ({
+    return distribution.map(item => ({
       type: item._id,
       count: item.count,
       percentage: Math.round((item.count / total) * 100),
@@ -506,7 +525,7 @@ export class IOCStatisticsService {
 
     const total = distribution.reduce((sum, item) => sum + item.count, 0);
 
-    return distribution.map((item) => ({
+    return distribution.map(item => ({
       severity: item._id,
       count: item.count,
       percentage: Math.round((item.count / total) * 100),
@@ -546,7 +565,7 @@ export class IOCStatisticsService {
 
     const total = await IOC.countDocuments(filter);
 
-    return distribution.map((item) => ({
+    return distribution.map(item => ({
       source: item._id,
       count: item.count,
       percentage: Math.round((item.count / total) * 100),
@@ -566,7 +585,7 @@ export class IOCStatisticsService {
       { $limit: 30 },
     ]);
 
-    return trend.map((item) => ({
+    return trend.map(item => ({
       date: item._id,
       count: item.count,
     }));
@@ -586,7 +605,7 @@ export class IOCStatisticsService {
       { $limit: 30 },
     ]);
 
-    return trend.map((item) => ({
+    return trend.map(item => ({
       date: item._id,
       active: item.active,
       inactive: item.inactive,
@@ -608,8 +627,10 @@ export class IOCStatisticsService {
 
     for (const range of ranges) {
       const minDate = new Date(now.getTime() - range.max * 24 * 60 * 60 * 1000);
-      const maxDate = range.min === 0 ? now :
-        new Date(now.getTime() - range.min * 24 * 60 * 60 * 1000);
+      const maxDate =
+        range.min === 0
+          ? now
+          : new Date(now.getTime() - range.min * 24 * 60 * 60 * 1000);
 
       const query = { ...filter };
       if (range.max === Infinity) {
@@ -623,7 +644,7 @@ export class IOCStatisticsService {
       total += count;
     }
 
-    return distribution.map((item) => ({
+    return distribution.map(item => ({
       ...item,
       percentage: total > 0 ? Math.round((item.count / total) * 100) : 0,
     }));
@@ -675,7 +696,7 @@ export class IOCStatisticsService {
       lowRiskCount: 0,
     };
 
-    distribution.forEach((item) => {
+    distribution.forEach(item => {
       switch (item._id) {
         case 'critical':
           counts.criticalCount = item.count;
@@ -713,7 +734,7 @@ export class IOCStatisticsService {
 
     // Group by date
     const dateMap = new Map();
-    trend.forEach((item) => {
+    trend.forEach(item => {
       const date = item._id.date;
       if (!dateMap.has(date)) {
         dateMap.set(date, { date, critical: 0, high: 0, medium: 0, low: 0 });
@@ -750,12 +771,12 @@ export class IOCStatisticsService {
     const totalIOCs = await IOC.countDocuments(filter);
 
     return {
-      mostUsedTags: mostUsedTags.map((item) => ({
+      mostUsedTags: mostUsedTags.map(item => ({
         tag: item._id,
         count: item.count,
         percentage: Math.round((item.count / totalIOCs) * 100),
       })),
-      tagDistribution: tagDistribution.map((item) => ({
+      tagDistribution: tagDistribution.map(item => ({
         tagCount: item._id,
         iocCount: item.count,
       })),
@@ -781,11 +802,14 @@ export class IOCStatisticsService {
     }
 
     // Check for spikes
-    const avgNewIOCs = trendData.reduce((sum, item) => sum + item.newIOCs, 0) / trendData.length;
-    const hasSpike = trendData.some((item) => item.newIOCs > avgNewIOCs * 2);
+    const avgNewIOCs =
+      trendData.reduce((sum, item) => sum + item.newIOCs, 0) / trendData.length;
+    const hasSpike = trendData.some(item => item.newIOCs > avgNewIOCs * 2);
 
     if (hasSpike) {
-      insights.push('Unusual spikes in IOC creation detected - investigate potential incidents');
+      insights.push(
+        'Unusual spikes in IOC creation detected - investigate potential incidents'
+      );
     }
 
     return insights;
@@ -797,7 +821,7 @@ export class IOCStatisticsService {
     }
 
     // Simple linear trend calculation
-    const values = trendData.map((item) => item.newIOCs);
+    const values = trendData.map(item => item.newIOCs);
     const n = values.length;
     const sumX = (n * (n + 1)) / 2;
     const sumY = values.reduce((sum, val) => sum + val, 0);
@@ -808,7 +832,8 @@ export class IOCStatisticsService {
     const intercept = (sumY - slope * sumX) / n;
 
     const nextPeriodForecast = Math.round(intercept + slope * (n + 1));
-    const trend = slope > 0.1 ? 'increasing' : slope < -0.1 ? 'decreasing' : 'stable';
+    const trend =
+      slope > 0.1 ? 'increasing' : slope < -0.1 ? 'decreasing' : 'stable';
 
     return {
       nextPeriodForecast: Math.max(0, nextPeriodForecast),
@@ -817,10 +842,13 @@ export class IOCStatisticsService {
     };
   }
 
-  private static calculateQualityScore(issues: any[], totalIOCs: number): number {
+  private static calculateQualityScore(
+    issues: any[],
+    totalIOCs: number
+  ): number {
     let score = 100;
 
-    issues.forEach((issue) => {
+    issues.forEach(issue => {
       const percentage = (issue.count / totalIOCs) * 100;
       switch (issue.type) {
         case 'error':

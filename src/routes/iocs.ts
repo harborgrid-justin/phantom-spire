@@ -52,7 +52,12 @@ router.get('/', authMiddleware, getIOCs);
 router.get('/statistics', authMiddleware, getIOCStatistics);
 router.get('/dashboard', authMiddleware, getDashboardStats);
 router.get('/trends', authMiddleware, getTrendAnalysis);
-router.get('/quality-report', authMiddleware, requireRole(['admin', 'analyst']), getQualityReport);
+router.get(
+  '/quality-report',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  getQualityReport
+);
 
 router.get(
   '/:id',

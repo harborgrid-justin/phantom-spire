@@ -19,7 +19,9 @@ describe('IOCValidationService', () => {
       expect(result.normalizedValue).toBe('192.168.1.1');
       expect(result.metadata?.ipVersion).toBe('IPv4');
       expect(result.metadata?.isPrivateRange).toBe(true);
-      expect(result.warnings).toContain('IP address is in private/reserved range');
+      expect(result.warnings).toContain(
+        'IP address is in private/reserved range'
+      );
     });
 
     it('should validate valid domain', async () => {
@@ -58,7 +60,8 @@ describe('IOCValidationService', () => {
 
     it('should validate valid hash', async () => {
       const iocData: CreateIOCRequest = {
-        value: 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456',
+        value:
+          'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456',
         type: 'hash',
         confidence: 100,
         severity: 'critical',
@@ -103,7 +106,9 @@ describe('IOCValidationService', () => {
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.errors).toContain('Invalid IP address format');
       expect(result.errors).toContain('Confidence must be between 0 and 100');
-      expect(result.errors).toContain('Source must be specified and at least 3 characters');
+      expect(result.errors).toContain(
+        'Source must be specified and at least 3 characters'
+      );
     });
 
     it('should warn about confidence/severity misalignment', async () => {
@@ -118,7 +123,9 @@ describe('IOCValidationService', () => {
       const result = await IOCValidationService.validateIOC(iocData);
 
       expect(result.isValid).toBe(true);
-      expect(result.warnings).toContain('Critical severity with low confidence - review recommended');
+      expect(result.warnings).toContain(
+        'Critical severity with low confidence - review recommended'
+      );
     });
   });
 
@@ -130,23 +137,43 @@ describe('IOCValidationService', () => {
 
     it('should detect domains', () => {
       expect(IOCValidationService.detectIOCType('example.com')).toBe('domain');
-      expect(IOCValidationService.detectIOCType('sub.domain.org')).toBe('domain');
+      expect(IOCValidationService.detectIOCType('sub.domain.org')).toBe(
+        'domain'
+      );
     });
 
     it('should detect URLs', () => {
-      expect(IOCValidationService.detectIOCType('http://example.com')).toBe('url');
-      expect(IOCValidationService.detectIOCType('https://malware.site/evil.exe')).toBe('url');
+      expect(IOCValidationService.detectIOCType('http://example.com')).toBe(
+        'url'
+      );
+      expect(
+        IOCValidationService.detectIOCType('https://malware.site/evil.exe')
+      ).toBe('url');
     });
 
     it('should detect hashes', () => {
-      expect(IOCValidationService.detectIOCType('d41d8cd98f00b204e9800998ecf8427e')).toBe('hash'); // MD5
-      expect(IOCValidationService.detectIOCType('da39a3ee5e6b4b0d3255bfef95601890afd80709')).toBe('hash'); // SHA1
-      expect(IOCValidationService.detectIOCType('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')).toBe('hash'); // SHA256
+      expect(
+        IOCValidationService.detectIOCType('d41d8cd98f00b204e9800998ecf8427e')
+      ).toBe('hash'); // MD5
+      expect(
+        IOCValidationService.detectIOCType(
+          'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+        )
+      ).toBe('hash'); // SHA1
+      expect(
+        IOCValidationService.detectIOCType(
+          'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+        )
+      ).toBe('hash'); // SHA256
     });
 
     it('should detect emails', () => {
-      expect(IOCValidationService.detectIOCType('user@example.com')).toBe('email');
-      expect(IOCValidationService.detectIOCType('test.email+tag@domain.org')).toBe('email');
+      expect(IOCValidationService.detectIOCType('user@example.com')).toBe(
+        'email'
+      );
+      expect(
+        IOCValidationService.detectIOCType('test.email+tag@domain.org')
+      ).toBe('email');
     });
 
     it('should return unknown for unrecognized patterns', () => {

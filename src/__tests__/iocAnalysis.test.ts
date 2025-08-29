@@ -80,7 +80,9 @@ describe('IOCAnalysisService', () => {
 
       expect(result.overallRisk).toBeGreaterThan(70);
       expect(result.riskCategory).toMatch(/^(high|critical)$/);
-      expect(result.contributingFactors).toContain('High-risk contextual indicators detected');
+      expect(result.contributingFactors).toContain(
+        'High-risk contextual indicators detected'
+      );
     });
 
     it('should assess lower risk for old inactive IOCs', async () => {
@@ -159,9 +161,12 @@ describe('IOCAnalysisService', () => {
         confidence: 40,
       });
 
-      const result = await IOCAnalysisService.calculatePriority(lowConfidenceIOC);
+      const result =
+        await IOCAnalysisService.calculatePriority(lowConfidenceIOC);
 
-      expect(result.suggestedActions).toContain('Verify IOC through additional sources');
+      expect(result.suggestedActions).toContain(
+        'Verify IOC through additional sources'
+      );
       expect(result.suggestedActions).toContain('Conduct manual analysis');
     });
   });
@@ -174,7 +179,7 @@ describe('IOCAnalysisService', () => {
 
     it('should find correlated IOCs', async () => {
       const mockFind = require('../models/IOC').IOC.find;
-      
+
       // Mock chain methods properly
       mockFind.mockReturnValue({
         limit: jest.fn().mockResolvedValue([]),
@@ -267,16 +272,21 @@ describe('IOCAnalysisService', () => {
         { confidence: 20, severity: 'low', expectedCategory: 'low' },
       ];
 
-      testCases.forEach(async (testCase) => {
+      testCases.forEach(async testCase => {
         const testIOC = createMockIOC({
           confidence: testCase.confidence,
           severity: testCase.severity as any,
-          tags: testCase.severity === 'critical' ? ['malware', 'apt'] : ['suspicious'],
+          tags:
+            testCase.severity === 'critical'
+              ? ['malware', 'apt']
+              : ['suspicious'],
         });
 
         const result = await IOCAnalysisService.assessRisk(testIOC);
         // Risk category should align with expectations based on input
-        expect(['low', 'medium', 'high', 'critical']).toContain(result.riskCategory);
+        expect(['low', 'medium', 'high', 'critical']).toContain(
+          result.riskCategory
+        );
       });
     });
   });

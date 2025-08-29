@@ -24,7 +24,12 @@ export interface IOCPriority {
 
 export interface IOCCorrelation {
   relatedIOCs: IIOC[];
-  relationshipType: 'duplicate' | 'similar' | 'campaign' | 'infrastructure' | 'behavioral';
+  relationshipType:
+    | 'duplicate'
+    | 'similar'
+    | 'campaign'
+    | 'infrastructure'
+    | 'behavioral';
   confidenceScore: number;
   evidence: string[];
 }
@@ -53,20 +58,24 @@ export class IOCAnalysisService {
 
     // Calculate risk components
     assessment.analysis.typeRisk = this.calculateTypeBasedRisk(ioc);
-    assessment.analysis.contextualRisk = await this.calculateContextualRisk(ioc);
+    assessment.analysis.contextualRisk =
+      await this.calculateContextualRisk(ioc);
     assessment.analysis.temporalRisk = this.calculateTemporalRisk(ioc);
-    assessment.analysis.sourceReliability = this.calculateSourceReliability(ioc);
+    assessment.analysis.sourceReliability =
+      this.calculateSourceReliability(ioc);
 
     // Calculate overall risk (weighted average)
     assessment.overallRisk = Math.round(
-      (assessment.analysis.typeRisk * 0.3 +
+      assessment.analysis.typeRisk * 0.3 +
         assessment.analysis.contextualRisk * 0.4 +
         assessment.analysis.temporalRisk * 0.2 +
-        assessment.analysis.sourceReliability * 0.1)
+        assessment.analysis.sourceReliability * 0.1
     );
 
     // Determine risk category
-    assessment.riskCategory = this.determineRiskCategory(assessment.overallRisk);
+    assessment.riskCategory = this.determineRiskCategory(
+      assessment.overallRisk
+    );
 
     // Generate contributing factors and recommendations
     this.generateRiskAnalysis(ioc, assessment);
@@ -84,7 +93,7 @@ export class IOCAnalysisService {
    */
   static async calculatePriority(ioc: IIOC): Promise<IOCPriority> {
     const riskAssessment = await this.assessRisk(ioc);
-    
+
     const priority: IOCPriority = {
       priority: 1,
       urgency: 'low',
@@ -166,7 +175,8 @@ export class IOCAnalysisService {
       }
 
       // Find infrastructure-related IOCs (domains, IPs in same network)
-      const infrastructureRelated = await this.findInfrastructureRelatedIOCs(ioc);
+      const infrastructureRelated =
+        await this.findInfrastructureRelatedIOCs(ioc);
       if (infrastructureRelated.length > 0) {
         correlations.push({
           relatedIOCs: infrastructureRelated,
@@ -178,11 +188,16 @@ export class IOCAnalysisService {
 
       logger.info(`Correlation analysis completed for IOC: ${ioc.value}`, {
         correlationCount: correlations.length,
-        totalRelatedIOCs: correlations.reduce((sum, c) => sum + c.relatedIOCs.length, 0),
+        totalRelatedIOCs: correlations.reduce(
+          (sum, c) => sum + c.relatedIOCs.length,
+          0
+        ),
       });
-
     } catch (error) {
-      logger.error(`Error during correlation analysis for IOC: ${ioc.value}`, error);
+      logger.error(
+        `Error during correlation analysis for IOC: ${ioc.value}`,
+        error
+      );
     }
 
     return correlations;
@@ -221,8 +236,22 @@ export class IOCAnalysisService {
     let contextRisk = 50; // Base contextual risk
 
     // High-risk tags increase the score
-    const highRiskTags = ['malware', 'ransomware', 'apt', 'c2', 'botnet', 'phishing', 'exploit'];
-    const mediumRiskTags = ['suspicious', 'trojan', 'backdoor', 'rat', 'keylogger'];
+    const highRiskTags = [
+      'malware',
+      'ransomware',
+      'apt',
+      'c2',
+      'botnet',
+      'phishing',
+      'exploit',
+    ];
+    const mediumRiskTags = [
+      'suspicious',
+      'trojan',
+      'backdoor',
+      'rat',
+      'keylogger',
+    ];
     const lowRiskTags = ['tracking', 'advertising', 'pup', 'greyware'];
 
     if (ioc.tags) {
@@ -241,15 +270,25 @@ export class IOCAnalysisService {
     // Analyze description for risk keywords
     if (ioc.description) {
       const description = ioc.description.toLowerCase();
-      const criticalKeywords = ['zero-day', 'rce', 'privilege escalation', 'data exfiltration'];
-      const highKeywords = ['exploit', 'vulnerability', 'backdoor', 'command and control'];
-      
+      const criticalKeywords = [
+        'zero-day',
+        'rce',
+        'privilege escalation',
+        'data exfiltration',
+      ];
+      const highKeywords = [
+        'exploit',
+        'vulnerability',
+        'backdoor',
+        'command and control',
+      ];
+
       for (const keyword of criticalKeywords) {
         if (description.includes(keyword)) {
           contextRisk += 25;
         }
       }
-      
+
       for (const keyword of highKeywords) {
         if (description.includes(keyword)) {
           contextRisk += 15;
@@ -265,8 +304,10 @@ export class IOCAnalysisService {
    */
   private static calculateTemporalRisk(ioc: IIOC): number {
     const now = new Date();
-    const daysSinceFirst = (now.getTime() - ioc.firstSeen.getTime()) / (1000 * 60 * 60 * 24);
-    const daysSinceLast = (now.getTime() - ioc.lastSeen.getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceFirst =
+      (now.getTime() - ioc.firstSeen.getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceLast =
+      (now.getTime() - ioc.lastSeen.getTime()) / (1000 * 60 * 60 * 24);
 
     let temporalRisk = 50;
 
@@ -300,9 +341,14 @@ export class IOCAnalysisService {
    */
   private static calculateSourceReliability(ioc: IIOC): number {
     const source = ioc.source.toLowerCase();
-    
+
     // Known reliable sources get higher scores
-    const reliableSources = ['virustotal', 'abuse.ch', 'malwaredomainlist', 'emergingthreats'];
+    const reliableSources = [
+      'virustotal',
+      'abuse.ch',
+      'malwaredomainlist',
+      'emergingthreats',
+    ];
     const moderatelyReliableSources = ['openphish', 'phishtank', 'urlvoid'];
     const internalSources = ['internal', 'analyst', 'honeypot', 'ids'];
 
@@ -326,7 +372,9 @@ export class IOCAnalysisService {
   /**
    * Determine risk category from numeric score
    */
-  private static determineRiskCategory(riskScore: number): 'low' | 'medium' | 'high' | 'critical' {
+  private static determineRiskCategory(
+    riskScore: number
+  ): 'low' | 'medium' | 'high' | 'critical' {
     if (riskScore >= 80) return 'critical';
     if (riskScore >= 60) return 'high';
     if (riskScore >= 40) return 'medium';
@@ -336,7 +384,10 @@ export class IOCAnalysisService {
   /**
    * Generate risk analysis details
    */
-  private static generateRiskAnalysis(ioc: IIOC, assessment: RiskAssessment): void {
+  private static generateRiskAnalysis(
+    ioc: IIOC,
+    assessment: RiskAssessment
+  ): void {
     const { analysis } = assessment;
 
     // Type-based factors
@@ -346,12 +397,16 @@ export class IOCAnalysisService {
 
     // Contextual factors
     if (analysis.contextualRisk > 70) {
-      assessment.contributingFactors.push('High-risk contextual indicators detected');
+      assessment.contributingFactors.push(
+        'High-risk contextual indicators detected'
+      );
     }
 
     // Temporal factors
     if (analysis.temporalRisk > 70) {
-      assessment.contributingFactors.push('Recently active or persistent threat');
+      assessment.contributingFactors.push(
+        'Recently active or persistent threat'
+      );
     }
 
     // Source reliability
@@ -362,7 +417,9 @@ export class IOCAnalysisService {
 
     // Generate recommendations based on risk level
     if (assessment.overallRisk >= 80) {
-      assessment.recommendations.push('Immediate action required - block/quarantine');
+      assessment.recommendations.push(
+        'Immediate action required - block/quarantine'
+      );
       assessment.recommendations.push('Escalate to security team');
       assessment.recommendations.push('Check for related indicators');
     } else if (assessment.overallRisk >= 60) {
@@ -394,7 +451,8 @@ export class IOCAnalysisService {
     }
 
     // Recently created IOCs might need immediate attention
-    const hoursSinceCreated = (new Date().getTime() - ioc.createdAt.getTime()) / (1000 * 60 * 60);
+    const hoursSinceCreated =
+      (new Date().getTime() - ioc.createdAt.getTime()) / (1000 * 60 * 60);
     if (hoursSinceCreated <= 2) {
       priority.priority = Math.min(10, priority.priority + 1);
       priority.reasoning.push('Recently discovered threat');
@@ -411,8 +469,8 @@ export class IOCAnalysisService {
    * Generate suggested actions based on analysis
    */
   private static generateSuggestedActions(
-    ioc: IIOC, 
-    _riskAssessment: RiskAssessment, 
+    ioc: IIOC,
+    _riskAssessment: RiskAssessment,
     priority: IOCPriority
   ): void {
     // High priority actions
@@ -422,7 +480,7 @@ export class IOCAnalysisService {
       priority.suggestedActions.push('Alert security team');
     }
 
-    // Medium priority actions  
+    // Medium priority actions
     if (priority.priority >= 5) {
       priority.suggestedActions.push('Add IOC to monitoring systems');
       priority.suggestedActions.push('Review related alerts');
@@ -522,7 +580,9 @@ export class IOCAnalysisService {
   /**
    * Find infrastructure-related IOCs
    */
-  private static async findInfrastructureRelatedIOCs(ioc: IIOC): Promise<IIOC[]> {
+  private static async findInfrastructureRelatedIOCs(
+    ioc: IIOC
+  ): Promise<IIOC[]> {
     const relatedIOCs: IIOC[] = [];
 
     try {
@@ -533,13 +593,13 @@ export class IOCAnalysisService {
         if (parts.length >= 2) {
           const baseDomain = parts.slice(-2).join('.');
           const domainPattern = new RegExp(baseDomain.replace('.', '\\.'), 'i');
-          
+
           const related = await IOC.find({
             _id: { $ne: ioc._id },
             type: 'domain',
             value: { $regex: domainPattern },
           }).limit(5);
-          
+
           relatedIOCs.push(...related);
         }
       }
@@ -551,19 +611,20 @@ export class IOCAnalysisService {
           const parts = ip.split('.');
           if (parts.length === 4) {
             const subnet = `${parts[0]}.${parts[1]}.${parts[2]}.`;
-            const subnetPattern = new RegExp(`^${subnet.replace(/\./g, '\\.')}`);
-            
+            const subnetPattern = new RegExp(
+              `^${subnet.replace(/\./g, '\\.')}`
+            );
+
             const related = await IOC.find({
               _id: { $ne: ioc._id },
               type: 'ip',
               value: { $regex: subnetPattern },
             }).limit(10);
-            
+
             relatedIOCs.push(...related);
           }
         }
       }
-
     } catch (error) {
       logger.error('Error finding infrastructure-related IOCs', error);
     }
@@ -576,11 +637,11 @@ export class IOCAnalysisService {
    */
   static async generateAnalytics(dateRange?: { start: Date; end: Date }) {
     const filter: any = {};
-    
+
     if (dateRange) {
-      filter.createdAt = { 
-        $gte: dateRange.start, 
-        $lte: dateRange.end 
+      filter.createdAt = {
+        $gte: dateRange.start,
+        $lte: dateRange.end,
       };
     }
 
@@ -590,52 +651,58 @@ export class IOCAnalysisService {
       severityDistribution,
       riskDistribution,
       topSources,
-      recentActivity
+      recentActivity,
     ] = await Promise.all([
       IOC.countDocuments(filter),
-      
+
       IOC.aggregate([
         { $match: filter },
         { $group: { _id: '$type', count: { $sum: 1 } } },
-        { $sort: { count: -1 } }
+        { $sort: { count: -1 } },
       ]),
-      
+
       IOC.aggregate([
         { $match: filter },
         { $group: { _id: '$severity', count: { $sum: 1 } } },
-        { $sort: { count: -1 } }
+        { $sort: { count: -1 } },
       ]),
-      
+
       IOC.aggregate([
         { $match: filter },
-        { $bucket: {
-          groupBy: '$confidence',
-          boundaries: [0, 25, 50, 75, 100],
-          default: 'other',
-          output: { count: { $sum: 1 } }
-        }}
+        {
+          $bucket: {
+            groupBy: '$confidence',
+            boundaries: [0, 25, 50, 75, 100],
+            default: 'other',
+            output: { count: { $sum: 1 } },
+          },
+        },
       ]),
-      
+
       IOC.aggregate([
         { $match: filter },
         { $group: { _id: '$source', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
-        { $limit: 10 }
+        { $limit: 10 },
       ]),
-      
+
       IOC.aggregate([
-        { $match: { 
-          ...filter,
-          createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-        }},
-        { $group: { 
-          _id: { 
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
-          }, 
-          count: { $sum: 1 } 
-        }},
-        { $sort: { _id: 1 } }
-      ])
+        {
+          $match: {
+            ...filter,
+            createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
     ]);
 
     return {

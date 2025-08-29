@@ -97,9 +97,10 @@ export class IOCEnrichmentService {
         sourcesCount: result.sources.length,
         errorsCount: result.errors.length,
       });
-
     } catch (error) {
-      result.errors.push(`Enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `Enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       logger.error(`IOC enrichment error for ${ioc.value}`, error);
     }
 
@@ -109,7 +110,10 @@ export class IOCEnrichmentService {
   /**
    * Enrich IP address with geolocation and reputation data
    */
-  private static async enrichIPAddress(ioc: IIOC, result: EnrichmentResult): Promise<void> {
+  private static async enrichIPAddress(
+    ioc: IIOC,
+    result: EnrichmentResult
+  ): Promise<void> {
     const ipAddress = ioc.value;
 
     try {
@@ -148,16 +152,20 @@ export class IOCEnrichmentService {
         result.metadata.threatIntelligence = threatIntel;
         result.sources.push('threat_intelligence');
       }
-
     } catch (error) {
-      result.errors.push(`IP enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `IP enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * Enrich domain with WHOIS and DNS information
    */
-  private static async enrichDomain(ioc: IIOC, result: EnrichmentResult): Promise<void> {
+  private static async enrichDomain(
+    ioc: IIOC,
+    result: EnrichmentResult
+  ): Promise<void> {
     const domain = ioc.value;
 
     try {
@@ -195,16 +203,20 @@ export class IOCEnrichmentService {
         result.metadata.threatIntelligence = threatIntel;
         result.sources.push('threat_intelligence');
       }
-
     } catch (error) {
-      result.errors.push(`Domain enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `Domain enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * Enrich URL with content analysis and reputation
    */
-  private static async enrichURL(ioc: IIOC, result: EnrichmentResult): Promise<void> {
+  private static async enrichURL(
+    ioc: IIOC,
+    result: EnrichmentResult
+  ): Promise<void> {
     const url = ioc.value;
 
     try {
@@ -230,9 +242,12 @@ export class IOCEnrichmentService {
           confidence: 0,
           enrichedAt: new Date(),
         };
-        
-        await this.enrichDomain({ value: urlObj.hostname, type: 'domain' } as IIOC, domainResult);
-        
+
+        await this.enrichDomain(
+          { value: urlObj.hostname, type: 'domain' } as IIOC,
+          domainResult
+        );
+
         if (domainResult.success) {
           result.metadata.domainInfo = domainResult.metadata;
           result.sources.push(...domainResult.sources.map(s => `domain_${s}`));
@@ -252,16 +267,20 @@ export class IOCEnrichmentService {
         result.metadata.suspiciousPatterns = suspiciousPatterns;
         result.sources.push('pattern_analysis');
       }
-
     } catch (error) {
-      result.errors.push(`URL enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `URL enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * Enrich hash with malware analysis
    */
-  private static async enrichHash(ioc: IIOC, result: EnrichmentResult): Promise<void> {
+  private static async enrichHash(
+    ioc: IIOC,
+    result: EnrichmentResult
+  ): Promise<void> {
     const hash = ioc.value;
 
     try {
@@ -292,16 +311,20 @@ export class IOCEnrichmentService {
         result.metadata.threatIntelligence = threatIntel;
         result.sources.push('threat_intelligence');
       }
-
     } catch (error) {
-      result.errors.push(`Hash enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `Hash enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * Enrich email address with domain and reputation analysis
    */
-  private static async enrichEmail(ioc: IIOC, result: EnrichmentResult): Promise<void> {
+  private static async enrichEmail(
+    ioc: IIOC,
+    result: EnrichmentResult
+  ): Promise<void> {
     const email = ioc.value;
 
     try {
@@ -323,12 +346,17 @@ export class IOCEnrichmentService {
           confidence: 0,
           enrichedAt: new Date(),
         };
-        
-        await this.enrichDomain({ value: domain, type: 'domain' } as IIOC, domainResult);
-        
+
+        await this.enrichDomain(
+          { value: domain, type: 'domain' } as IIOC,
+          domainResult
+        );
+
         if (domainResult.success) {
           result.metadata.domainInfo = domainResult.metadata;
-          result.sources.push(...domainResult.sources.map(s => `email_domain_${s}`));
+          result.sources.push(
+            ...domainResult.sources.map(s => `email_domain_${s}`)
+          );
         }
       }
 
@@ -348,16 +376,19 @@ export class IOCEnrichmentService {
         result.metadata.reputation = reputation;
         result.sources.push('email_reputation');
       }
-
     } catch (error) {
-      result.errors.push(`Email enrichment failed: ${error instanceof Error ? error.message : String(error)}`);
+      result.errors.push(
+        `Email enrichment failed: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
   /**
    * Calculate enrichment confidence based on sources and data quality
    */
-  private static calculateEnrichmentConfidence(result: EnrichmentResult): number {
+  private static calculateEnrichmentConfidence(
+    result: EnrichmentResult
+  ): number {
     let confidence = 0;
     const maxConfidence = 100;
 
@@ -367,8 +398,15 @@ export class IOCEnrichmentService {
     }
 
     // Add confidence for each reliable source
-    const reliableSources = ['geolocation_service', 'reputation_service', 'threat_intelligence', 'malware_analysis'];
-    const reliableSourceCount = result.sources.filter(s => reliableSources.some(rs => s.includes(rs))).length;
+    const reliableSources = [
+      'geolocation_service',
+      'reputation_service',
+      'threat_intelligence',
+      'malware_analysis',
+    ];
+    const reliableSourceCount = result.sources.filter(s =>
+      reliableSources.some(rs => s.includes(rs))
+    ).length;
     confidence += Math.min(50, reliableSourceCount * 15);
 
     // Reduce confidence for errors
@@ -384,9 +422,11 @@ export class IOCEnrichmentService {
   /**
    * Batch enrichment for multiple IOCs
    */
-  static async batchEnrichIOCs(iocs: IIOC[]): Promise<Map<string, EnrichmentResult>> {
+  static async batchEnrichIOCs(
+    iocs: IIOC[]
+  ): Promise<Map<string, EnrichmentResult>> {
     const results = new Map<string, EnrichmentResult>();
-    
+
     // Process IOCs in parallel but with rate limiting
     const batchSize = 5;
     for (let i = 0; i < iocs.length; i += batchSize) {
@@ -395,9 +435,9 @@ export class IOCEnrichmentService {
         const result = await this.enrichIOC(ioc);
         results.set(ioc._id?.toString() || ioc.value, result);
       });
-      
+
       await Promise.all(batchPromises);
-      
+
       // Rate limiting delay
       if (i + batchSize < iocs.length) {
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -420,14 +460,19 @@ export class IOCEnrichmentService {
     if (parts.length !== 4) return false;
 
     return (
-      (parts[0] === 10) ||
-      (parts[0] === 172 && parts[1] !== undefined && parts[1] >= 16 && parts[1] <= 31) ||
+      parts[0] === 10 ||
+      (parts[0] === 172 &&
+        parts[1] !== undefined &&
+        parts[1] >= 16 &&
+        parts[1] <= 31) ||
       (parts[0] === 192 && parts[1] === 168) ||
-      (parts[0] === 127)
+      parts[0] === 127
     );
   }
 
-  private static async mockGeolocationLookup(ip: string): Promise<GeolocationData | null> {
+  private static async mockGeolocationLookup(
+    ip: string
+  ): Promise<GeolocationData | null> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -451,7 +496,7 @@ export class IOCEnrichmentService {
 
   private static async mockIPReputationLookup(ip: string): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 150));
-    
+
     const hash = ip.split('.').reduce((sum, octet) => sum + parseInt(octet), 0);
     const isMalicious = hash % 10 < 3; // 30% chance of being malicious
 
@@ -472,10 +517,15 @@ export class IOCEnrichmentService {
     };
   }
 
-  private static async mockThreatIntelLookup(value: string, _type: string): Promise<any> {
+  private static async mockThreatIntelLookup(
+    value: string,
+    _type: string
+  ): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 200));
-    
-    const hash = value.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+    const hash = value
+      .split('')
+      .reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const hasIntel = hash % 5 === 0; // 20% chance of having threat intel
 
     if (!hasIntel) return null;
@@ -483,18 +533,26 @@ export class IOCEnrichmentService {
     return {
       threatTypes: ['malware', 'phishing'],
       campaigns: [`Campaign-${hash % 1000}`],
-      firstSeen: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000),
+      firstSeen: new Date(
+        Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000
+      ),
       confidence: 75 + (hash % 25),
     };
   }
 
-  private static async mockWhoisLookup(_domain: string): Promise<DomainInfo | null> {
+  private static async mockWhoisLookup(
+    _domain: string
+  ): Promise<DomainInfo | null> {
     await new Promise(resolve => setTimeout(resolve, 300));
 
     return {
       registrar: 'Example Registrar Inc.',
-      registrationDate: new Date(Date.now() - Math.random() * 365 * 5 * 24 * 60 * 60 * 1000),
-      expirationDate: new Date(Date.now() + Math.random() * 365 * 2 * 24 * 60 * 60 * 1000),
+      registrationDate: new Date(
+        Date.now() - Math.random() * 365 * 5 * 24 * 60 * 60 * 1000
+      ),
+      expirationDate: new Date(
+        Date.now() + Math.random() * 365 * 2 * 24 * 60 * 60 * 1000
+      ),
       nameservers: ['ns1.example.com', 'ns2.example.com'],
     };
   }
@@ -516,10 +574,14 @@ export class IOCEnrichmentService {
     return [`www.${domain}`, `mail.${domain}`, `api.${domain}`];
   }
 
-  private static async mockDomainReputationLookup(domain: string): Promise<any> {
+  private static async mockDomainReputationLookup(
+    domain: string
+  ): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 150));
 
-    const hash = domain.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const hash = domain
+      .split('')
+      .reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const isMalicious = hash % 8 < 2; // 25% chance of being malicious
 
     return {
@@ -532,20 +594,28 @@ export class IOCEnrichmentService {
   private static async mockURLReputationLookup(url: string): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 200));
 
-    const hash = url.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const hash = url
+      .split('')
+      .reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const isMalicious = hash % 6 < 2; // 33% chance of being malicious
 
     return {
       isMalicious,
       riskScore: isMalicious ? 90 : 10,
-      categories: isMalicious ? ['phishing', 'malware distribution'] : ['benign'],
+      categories: isMalicious
+        ? ['phishing', 'malware distribution']
+        : ['benign'],
     };
   }
 
   private static analyzeURLPatterns(url: string): string[] {
     const patterns: string[] = [];
 
-    if (url.includes('bit.ly') || url.includes('tinyurl') || url.includes('t.co')) {
+    if (
+      url.includes('bit.ly') ||
+      url.includes('tinyurl') ||
+      url.includes('t.co')
+    ) {
       patterns.push('URL shortener');
     }
 
@@ -566,15 +636,22 @@ export class IOCEnrichmentService {
 
   private static detectHashType(hash: string): string {
     switch (hash.length) {
-      case 32: return 'MD5';
-      case 40: return 'SHA1';
-      case 64: return 'SHA256';
-      case 128: return 'SHA512';
-      default: return 'Unknown';
+      case 32:
+        return 'MD5';
+      case 40:
+        return 'SHA1';
+      case 64:
+        return 'SHA256';
+      case 128:
+        return 'SHA512';
+      default:
+        return 'Unknown';
     }
   }
 
-  private static async mockMalwareAnalysisLookup(hash: string): Promise<HashReputation | null> {
+  private static async mockMalwareAnalysisLookup(
+    hash: string
+  ): Promise<HashReputation | null> {
     await new Promise(resolve => setTimeout(resolve, 400));
 
     const hashNum = parseInt(hash.substring(0, 8), 16);
@@ -605,15 +682,20 @@ export class IOCEnrichmentService {
     const hashNum = parseInt(hash.substring(0, 8), 16);
     return {
       prevalence: hashNum % 1000,
-      firstSeen: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
+      firstSeen: new Date(
+        Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000
+      ),
       submissionNames: ['suspicious_file.exe', 'malware_sample.bin'],
     };
   }
 
   private static checkDisposableEmail(domain: string): boolean {
     const disposableDomains = [
-      '10minutemail.com', 'tempmail.org', 'guerrillamail.com', 
-      'mailinator.com', 'temp-mail.org'
+      '10minutemail.com',
+      'tempmail.org',
+      'guerrillamail.com',
+      'mailinator.com',
+      'temp-mail.org',
     ];
     return disposableDomains.some(d => domain.toLowerCase().includes(d));
   }
@@ -621,7 +703,9 @@ export class IOCEnrichmentService {
   private static async mockEmailReputationLookup(email: string): Promise<any> {
     await new Promise(resolve => setTimeout(resolve, 150));
 
-    const hash = email.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const hash = email
+      .split('')
+      .reduce((sum, char) => sum + char.charCodeAt(0), 0);
     const isMalicious = hash % 10 < 2; // 20% chance of being malicious
 
     return {
