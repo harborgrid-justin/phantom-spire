@@ -9,7 +9,7 @@ export interface IMitreDataSource extends Document {
   created: Date;
   modified: Date;
   platforms: string[]; // e.g., ["Windows", "Linux", "macOS"]
-  collection: string; // Collection method description
+  collectionLayers: string; // Collection method description
   dataComponents: {
     name: string;
     description: string;
@@ -71,7 +71,7 @@ const mitreDataSourceSchema = new Schema<IMitreDataSource>(
         trim: true,
       },
     ],
-    collection: {
+    collectionLayers: {
       type: String,
       trim: true,
     },

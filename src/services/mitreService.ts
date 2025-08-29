@@ -33,7 +33,7 @@ export class MitreService {
       
       // Fetch STIX data from MITRE's official repository
       const response = await axios.get(MITRE_ATTACK_STIX_URL);
-      const stixData = response.data;
+      const stixData: any = response.data;
 
       if (!stixData.objects || !Array.isArray(stixData.objects)) {
         throw new Error('Invalid STIX data format received from MITRE');
@@ -295,7 +295,7 @@ export class MitreService {
       created: new Date(stixObj.created),
       modified: new Date(stixObj.modified),
       platforms: stixObj.x_mitre_platforms || [],
-      collection: stixObj.x_mitre_collection_layers || '',
+      collectionLayers: stixObj.x_mitre_collection_layers || '',
       dataComponents: this.processDataComponents(stixObj.x_mitre_data_source_collection || []),
       externalReferences: this.processExternalReferences(stixObj.external_references),
       metadata: {
@@ -397,7 +397,16 @@ export class MitreService {
     // Get last sync date from most recently updated tactic
     const lastTactic = await MitreTactic.findOne({}, {}, { sort: { updatedAt: -1 } });
 
-    return {
+    const result: {
+      tactics: number;
+      techniques: number;
+      subTechniques: number;
+      groups: number;
+      software: number;
+      mitigations: number;
+      dataSources: number;
+      lastSync?: Date;
+    } = {
       tactics,
       techniques,
       subTechniques,
@@ -405,7 +414,12 @@ export class MitreService {
       software,
       mitigations,
       dataSources,
-      lastSync: lastTactic?.updatedAt,
     };
+
+    if (lastTactic?.updatedAt) {
+      result.lastSync = lastTactic.updatedAt;
+    }
+
+    return result;
   }
 }

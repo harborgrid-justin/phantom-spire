@@ -15,7 +15,7 @@ import { logger } from '../utils/logger';
  */
 export const syncMitreData = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
   // Only admin users can sync data
-  if (req.user.role !== 'admin') {
+  if (!req.user || req.user.role !== 'admin') {
     res.status(403).json({ message: 'Admin access required' });
     return;
   }
@@ -44,6 +44,11 @@ export const syncMitreData = asyncHandler(async (req: AuthRequest, res: Response
  * Get MITRE ATT&CK statistics
  */
 export const getMitreStats = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+  if (!req.user) {
+    res.status(401).json({ message: 'Authentication required' });
+    return;
+  }
+
   try {
     const mitreService = new MitreService(req.user.id);
     const stats = await mitreService.getStats();
@@ -167,7 +172,7 @@ export const getTechnique = asyncHandler(async (req: AuthRequest, res: Response)
   }
 
   // Get sub-techniques if this is a parent technique
-  let subTechniques = [];
+  let subTechniques: any[] = [];
   if (!technique.isSubTechnique) {
     subTechniques = await MitreTechnique.find({ 
       parentTechnique: mitreId,
