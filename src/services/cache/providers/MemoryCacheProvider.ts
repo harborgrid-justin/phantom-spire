@@ -70,11 +70,14 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
     const effectiveTTL = ttl || this.defaultTTL;
     const entry: MemoryCacheEntry<T> = {
       value,
-      expiresAt: effectiveTTL > 0 ? Date.now() + effectiveTTL : undefined,
       createdAt: Date.now(),
       lastAccessed: Date.now(),
       accessCount: 0
     };
+
+    if (effectiveTTL > 0) {
+      entry.expiresAt = Date.now() + effectiveTTL;
+    }
 
     this.cache.set(key, entry);
     this.metrics.sets++;

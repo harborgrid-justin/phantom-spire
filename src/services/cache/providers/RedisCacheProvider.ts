@@ -184,7 +184,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
         // Get approximate memory usage from Redis info
         const info = await this.client.info('memory');
         const memoryMatch = info.match(/used_memory:(\d+)/);
-        if (memoryMatch) {
+        if (memoryMatch && memoryMatch[1]) {
           memoryUsage = parseInt(memoryMatch[1], 10);
         }
       } catch (error) {
@@ -268,12 +268,13 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
       
       for (let i = 0; i < keys.length; i++) {
         const value = values[i];
-        if (value !== null) {
+        const key = keys[i];
+        if (value !== null && key && value !== undefined) {
           try {
-            result.set(keys[i], JSON.parse(value) as T);
+            result.set(key, JSON.parse(value) as T);
             this.metrics.hits++;
           } catch {
-            result.set(keys[i], value as unknown as T);
+            result.set(key, value as unknown as T);
             this.metrics.hits++;
           }
         } else {
@@ -297,7 +298,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
 
     try {
       const result = await this.client.expire(this.getKey(key), Math.floor(ttl / 1000));
-      return result;
+      return result === 1;
     } catch (error) {
       this.metrics.errors++;
       logger.error('Redis expire error:', error);

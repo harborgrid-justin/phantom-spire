@@ -2,10 +2,9 @@
  * Tests for Fortune 100-Grade Cache and State Management
  */
 
-import { cacheManager } from '../../../services/cache/core/EnterpriseCacheManager';
-import { stateManager } from '../../../services/state/core/EnterpriseStateManager';
-import { StateScope } from '../../../services/state/interfaces/IStateManager';
-import { CacheLayer } from '../../../services/cache/interfaces/ICacheManager';
+import { cacheManager } from '../../services/cache/core/EnterpriseCacheManager';
+import { stateManager } from '../../services/state/core/EnterpriseStateManager';
+import { StateScope } from '../../services/state/interfaces/IStateManager';
 
 describe('Enterprise Cache and State Management', () => {
   beforeAll(async () => {

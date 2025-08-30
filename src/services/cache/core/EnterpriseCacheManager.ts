@@ -22,7 +22,7 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
   private redisProvider: RedisCacheProvider;
   private configuration: ICacheConfiguration;
   private isStarted: boolean = false;
-  private metricsInterval: NodeJS.Timer | null = null;
+  private metricsInterval: NodeJS.Timeout | null = null;
 
   constructor(customConfig?: Partial<ICacheConfiguration>) {
     super();
@@ -257,10 +257,14 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     try {
       // Try memory cache first
       if (this.configuration.layers.memory.enabled) {
-        for (let i = 0; i < namespacedKeys.length; i++) {
-          const value = await this.memoryProvider.get<T>(namespacedKeys[i]);
-          if (value !== null) {
-            result.set(keys[i], value);
+        for (let i = 0; i < namespacedKeys.length && i < keys.length; i++) {
+          const namespacedKey = namespacedKeys[i];
+          const key = keys[i];
+          if (namespacedKey && key) {
+            const value = await this.memoryProvider.get<T>(namespacedKey);
+            if (value !== null) {
+              result.set(key, value);
+            }
           }
         }
       }
@@ -272,14 +276,18 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
         const redisResults = await this.redisProvider.getMultiple<T>(remainingNamespacedKeys);
 
         // Process Redis results
+        let index = 0;
         for (const [namespacedKey, value] of redisResults) {
           const originalKey = namespacedKey.replace(`${namespace}:`, '');
-          result.set(originalKey, value);
+          if (originalKey && value !== undefined) {
+            result.set(originalKey, value);
 
-          // Backfill memory cache
-          if (this.configuration.layers.memory.enabled) {
-            await this.memoryProvider.set(namespacedKey, value, this.configuration.layers.memory.ttl);
+            // Backfill memory cache
+            if (this.configuration.layers.memory.enabled) {
+              await this.memoryProvider.set(namespacedKey, value, this.configuration.layers.memory.ttl);
+            }
           }
+          index++;
         }
       }
 
@@ -326,7 +334,6 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
   }
 
   async deleteMultiple(keys: string[], options?: ICacheOptions): Promise<number> {
-    const namespace = options?.namespace || 'default';
     let deletedCount = 0;
 
     try {
@@ -361,9 +368,11 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
       // Get values for matching keys
       for (const namespacedKey of allKeys) {
         const originalKey = namespacedKey.replace(`${namespace}:`, '');
-        const value = await this.get<T>(originalKey, options);
-        if (value !== null) {
-          result.set(originalKey, value);
+        if (originalKey) {
+          const value = await this.get<T>(originalKey, options);
+          if (value !== null) {
+            result.set(originalKey, value);
+          }
         }
       }
 
@@ -427,7 +436,7 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async getHitRate(timeWindow?: number): Promise<number> {
+  async getHitRate(_timeWindow?: number): Promise<number> {
     const metrics = await this.getMetrics();
     return metrics.hitRate;
   }
