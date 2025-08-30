@@ -12,6 +12,7 @@ import swaggerSpec from './config/swagger';
 import swaggerUi from 'swagger-ui-express';
 import { WorkflowBPMOrchestrator } from './workflow-bpm';
 import workflowRoutes from './routes/workflow/workflowRoutes';
+import { initializeEnterpriseManagement, shutdownEnterpriseManagement } from './services';
 
 const app = express();
 
@@ -67,6 +68,47 @@ async function startServer(): Promise<void> {
     // Connect to database
     await connectDatabase();
     
+    // Initialize Fortune 100-grade Cache and State Management
+    logger.info('🚀 Initializing Fortune 100-Grade Cache and State Management...');
+    await initializeEnterpriseManagement({
+      cache: {
+        enabled: config.CACHE_ENABLED,
+        layers: {
+          memory: {
+            enabled: true,
+            maxSize: config.CACHE_MEMORY_MAX_SIZE,
+            ttl: config.CACHE_MEMORY_TTL
+          },
+          redis: {
+            enabled: true,
+            ttl: config.CACHE_REDIS_TTL,
+            keyPrefix: config.CACHE_REDIS_PREFIX
+          }
+        },
+        monitoring: {
+          enabled: config.CACHE_MONITORING_ENABLED,
+          metricsInterval: config.CACHE_MONITORING_INTERVAL
+        }
+      },
+      state: {
+        enabled: config.STATE_ENABLED,
+        persistence: {
+          enabled: config.STATE_PERSISTENCE_ENABLED,
+          strategy: config.STATE_PERSISTENCE_STRATEGY as any,
+          syncInterval: config.STATE_SYNC_INTERVAL
+        },
+        versioning: {
+          enabled: config.STATE_VERSIONING_ENABLED,
+          maxVersions: config.STATE_VERSIONING_MAX_VERSIONS
+        },
+        monitoring: {
+          enabled: config.STATE_MONITORING_ENABLED,
+          trackChanges: true,
+          metricsInterval: config.STATE_MONITORING_INTERVAL
+        }
+      }
+    });
+    
     // Initialize Workflow BPM Orchestrator
     logger.info('🔧 Initializing Fortune 100-Grade Workflow BPM System...');
     const workflowOrchestrator = new WorkflowBPMOrchestrator({
@@ -114,6 +156,13 @@ async function startServer(): Promise<void> {
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
   
+  // Shutdown enterprise management systems
+  try {
+    await shutdownEnterpriseManagement();
+  } catch (error) {
+    logger.error('Error shutting down enterprise management:', error);
+  }
+  
   // Shutdown workflow orchestrator if it exists
   if (app.locals.workflowOrchestrator) {
     try {
@@ -128,6 +177,13 @@ process.on('SIGTERM', async () => {
 
 process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
+  
+  // Shutdown enterprise management systems
+  try {
+    await shutdownEnterpriseManagement();
+  } catch (error) {
+    logger.error('Error shutting down enterprise management:', error);
+  }
   
   // Shutdown workflow orchestrator if it exists
   if (app.locals.workflowOrchestrator) {
