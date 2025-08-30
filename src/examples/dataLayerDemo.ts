@@ -33,12 +33,12 @@ export class DataLayerIntegrationExample {
           name: 'OpenThreatIntel',
           type: 'rest-api',
           connection: {
-            baseUrl: 'https://api.openthreatintel.com',
-            timeout: 30000,
+            url: 'https://api.openthreatintel.com',
             headers: {
               'X-API-Source': 'phantom-spire'
             }
           },
+          timeout: 30000,
           authentication: {
             type: 'bearer',
             credentials: {

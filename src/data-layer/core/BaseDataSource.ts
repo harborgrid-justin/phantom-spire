@@ -86,7 +86,7 @@ export abstract class BaseDataSource implements IDataSource {
     } catch (error) {
       const executionTime = Date.now() - startTime;
       logger.error(`Query failed on ${this.name}`, {
-        error: error.message,
+        error: (error as Error).message,
         executionTime,
         query: JSON.stringify(query)
       });
@@ -130,7 +130,7 @@ export abstract class BaseDataSource implements IDataSource {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: error.message
+        message: (error as Error).message
       };
       
       this.lastHealthCheck = status;

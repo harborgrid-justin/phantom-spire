@@ -2,7 +2,8 @@
  * Data Connector Interfaces for Multi-Source Integration
  */
 
-import { IDataRecord, IQuery, IQueryContext, IQueryResult, IHealthStatus } from './IDataSource';
+import { IDataRecord, IHealthStatus } from './IDataSource';
+import type { IQuery } from './IDataSource';
 
 export interface IDataConnector {
   readonly name: string;

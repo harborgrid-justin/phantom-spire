@@ -2,7 +2,10 @@
  * REST API Data Connector - For connecting to REST-based threat intelligence feeds
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios from 'axios';
+// Local types for Axios to avoid import issues
+type AxiosInstance = any;
+type AxiosRequestConfig = any;
 import { BaseDataConnector } from './BaseDataConnector';
 import {
   IConnectorConfig,
@@ -156,7 +159,7 @@ export class RestApiConnector extends BaseDataConnector {
         total: data.total || data.count || extractedRecords.length,
         extracted: extractedRecords.length,
         hasMore,
-        nextToken,
+        ...(nextToken && { nextToken }),
         executionTime: Date.now() - startTime
       },
       errors: []
@@ -192,7 +195,7 @@ export class RestApiConnector extends BaseDataConnector {
         }
       } catch (error) {
         failed += batch.length;
-        errors.push(`Batch failed: ${error.message}`);
+        errors.push(`Batch failed: ${(error as Error).message}`);
         logger.error(`Failed to load batch`, error);
       }
     }
@@ -237,12 +240,12 @@ export class RestApiConnector extends BaseDataConnector {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: 0,
-        message: error.message
+        message: (error as Error).message
       };
     }
   }
 
-  protected async validateConnection(connection: any): Promise<IValidationResult> {
+  protected override async validateConnection(connection: any): Promise<IValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -263,7 +266,7 @@ export class RestApiConnector extends BaseDataConnector {
     return { isValid: errors.length === 0, errors, warnings };
   }
 
-  protected async validateAuthentication(auth: any): Promise<IValidationResult> {
+  protected override async validateAuthentication(auth: any): Promise<IValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -328,7 +331,7 @@ export class RestApiConnector extends BaseDataConnector {
   /**
    * Setup rate limiting
    */
-  private setupRateLimit(rateLimit: NonNullable<IRestApiConfig['rateLimit']>): void {
+  private setupRateLimit(_rateLimit: NonNullable<IRestApiConfig['rateLimit']>): void {
     this.rateLimiter = {
       lastRequest: 0,
       requestCount: 0,
@@ -344,7 +347,7 @@ export class RestApiConnector extends BaseDataConnector {
 
     // Request interceptor for logging and rate limiting
     this.httpClient.interceptors.request.use(
-      (config) => {
+      (config: any) => {
         logger.debug(`Making HTTP request`, {
           method: config.method?.toUpperCase(),
           url: config.url,
@@ -352,7 +355,7 @@ export class RestApiConnector extends BaseDataConnector {
         });
         return config;
       },
-      (error) => {
+      (error: any) => {
         logger.error(`HTTP request failed`, error);
         return Promise.reject(error);
       }
@@ -360,7 +363,7 @@ export class RestApiConnector extends BaseDataConnector {
 
     // Response interceptor for logging and error handling
     this.httpClient.interceptors.response.use(
-      (response) => {
+      (response: any) => {
         logger.debug(`HTTP response received`, {
           status: response.status,
           statusText: response.statusText,
@@ -368,7 +371,7 @@ export class RestApiConnector extends BaseDataConnector {
         });
         return response;
       },
-      (error) => {
+      (error: any) => {
         logger.error(`HTTP response error`, {
           status: error.response?.status,
           statusText: error.response?.statusText,

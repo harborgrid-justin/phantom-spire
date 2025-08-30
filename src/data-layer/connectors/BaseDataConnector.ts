@@ -239,7 +239,7 @@ export abstract class BaseDataConnector implements IDataConnector {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: error.message
+        message: (error as Error).message
       };
     }
   }
@@ -256,7 +256,7 @@ export abstract class BaseDataConnector implements IDataConnector {
   } {
     return {
       connected: this.connected,
-      lastError: this.lastError?.message,
+      ...(this.lastError?.message && { lastError: this.lastError.message }),
       extractionCount: 0, // Would be tracked in production
       transformationCount: 0,
       loadCount: 0
@@ -272,15 +272,15 @@ export abstract class BaseDataConnector implements IDataConnector {
   protected abstract performHealthCheck(): Promise<IHealthStatus>;
 
   // Virtual methods that can be overridden
-  protected async validateConnection(connection: any): Promise<IValidationResult> {
+  protected async validateConnection(_connection: any): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
-  protected async validateAuthentication(auth: any): Promise<IValidationResult> {
+  protected async validateAuthentication(_auth: any): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
-  protected async performCustomValidation(config: IConnectorConfig): Promise<IValidationResult> {
+  protected async performCustomValidation(_config: IConnectorConfig): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
@@ -328,7 +328,7 @@ export abstract class BaseDataConnector implements IDataConnector {
             name: rule.name,
             version: '1.0',
             appliedAt: new Date(),
-            parameters: rule.parameters
+            ...(rule.parameters && { parameters: rule.parameters })
           })),
           quality: {
             completeness: this.calculateCompleteness(transformedData),
@@ -376,7 +376,7 @@ export abstract class BaseDataConnector implements IDataConnector {
       return {
         success: false,
         data,
-        error: error.message
+        error: (error as Error).message
       };
     }
   }
@@ -462,7 +462,7 @@ export abstract class BaseDataConnector implements IDataConnector {
     return {
       success: isValid,
       data,
-      error: isValid ? undefined : `Validation failed for rule: ${rule.name}`
+      ...(isValid ? {} : { error: `Validation failed for rule: ${rule.name}` })
     };
   }
 

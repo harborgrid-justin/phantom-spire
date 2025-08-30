@@ -119,7 +119,7 @@ export class AdvancedAnalyticsEngine {
     }
 
     // Behavioral analysis
-    const behavioralFindings = await this.analyzeBehavior(data, relationships);
+    const behavioralFindings = await this.analyzeBehavior(data);
     findings.push(...behavioralFindings);
     algorithmsUsed.push('behavioral-analysis');
 
@@ -194,7 +194,7 @@ export class AdvancedAnalyticsEngine {
       return [];
     }
 
-    const anomalies: Array<{ point: ITimeSeriesPoint; anomaly: IAnomalyDetectionResult }> = [];
+    // Removed unused variable
     
     switch (method) {
       case 'statistical':
@@ -329,8 +329,7 @@ export class AdvancedAnalyticsEngine {
    * Analyze behavioral patterns
    */
   private async analyzeBehavior(
-    data: IDataRecord[],
-    relationships: IRelationship[]
+    data: IDataRecord[]
   ): Promise<IAnalyticsResult['findings']> {
     const findings: IAnalyticsResult['findings'] = [];
     
@@ -769,8 +768,9 @@ export class AdvancedAnalyticsEngine {
     const anomalies: IDataRecord[] = [];
     
     intervals.forEach((interval, i) => {
-      if (interval > threshold && entities[i + 1]) {
-        anomalies.push(entities[i + 1]);
+      const nextEntity = entities[i + 1];
+      if (interval > threshold && nextEntity) {
+        anomalies.push(nextEntity);
       }
     });
     
@@ -993,7 +993,7 @@ export class AdvancedAnalyticsEngine {
     const lowerBound = q1 - 1.5 * iqr;
     const upperBound = q3 + 1.5 * iqr;
     
-    return records.filter((record, i) => {
+    return records.filter((record) => {
       const value = (record.data.confidence || 50) + 
                    (record.data.severity === 'critical' ? 100 : 
                     record.data.severity === 'high' ? 75 : 
@@ -1129,7 +1129,10 @@ export class AdvancedAnalyticsEngine {
     const meanX = x.reduce((sum, val) => sum + val, 0) / n;
     const meanY = values.reduce((sum, val) => sum + val, 0) / n;
     
-    const numerator = x.reduce((sum, xi, i) => sum + (xi - meanX) * (values[i] - meanY), 0);
+    const numerator = x.reduce((sum, xi, i) => {
+      const value = values[i];
+      return value !== undefined ? sum + (xi - meanX) * (value - meanY) : sum;
+    }, 0);
     const denominator = x.reduce((sum, xi) => sum + Math.pow(xi - meanX, 2), 0);
     
     const slope = denominator !== 0 ? numerator / denominator : 0;
@@ -1174,6 +1177,7 @@ export class AdvancedAnalyticsEngine {
     if (!trend) return [];
     
     const lastPoint = series[series.length - 1];
+    if (!lastPoint) return [];
     const predictions: Array<{
       date: Date;
       predicted: number;

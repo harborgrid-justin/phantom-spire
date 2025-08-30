@@ -155,7 +155,7 @@ export class DataFederationEngine {
           status: 'unhealthy',
           lastCheck: new Date(),
           responseTime: 5000,
-          message: error.message
+          message: (error as Error).message
         }];
       }
     });
@@ -202,7 +202,7 @@ export class DataFederationEngine {
       traversal: {
         startNodes: entityIds,
         maxDepth,
-        relationships: options.relationshipTypes
+        ...(options.relationshipTypes && { relationships: options.relationshipTypes })
       }
     };
     
@@ -331,6 +331,9 @@ export class DataFederationEngine {
     }
 
     const [first, ...rest] = sourceResults;
+    if (!first) {
+      return this.createEmptyResult();
+    }
     let joinedData = first.result.data;
 
     for (const { result } of rest) {
@@ -360,6 +363,9 @@ export class DataFederationEngine {
     }
 
     const [first, ...rest] = sourceResults;
+    if (!first) {
+      return this.createEmptyResult();
+    }
     let intersectionData = first.result.data;
 
     for (const { result } of rest) {
@@ -489,7 +495,7 @@ export class DataFederationEngine {
       if (!acc[entity.source]) {
         acc[entity.source] = [];
       }
-      acc[entity.source].push(entity);
+      acc[entity.source]!.push(entity);
       return acc;
     }, {} as Record<string, IDataRecord[]>);
 
@@ -501,8 +507,15 @@ export class DataFederationEngine {
         const source1 = sources[i];
         const source2 = sources[j];
         
-        for (const entity1 of entitiesBySource[source1]) {
-          for (const entity2 of entitiesBySource[source2]) {
+        if (!source1 || !source2) continue;
+        
+        const entities1 = entitiesBySource[source1];
+        const entities2 = entitiesBySource[source2];
+        
+        if (!entities1 || !entities2) continue;
+        
+        for (const entity1 of entities1) {
+          for (const entity2 of entities2) {
             const similarity = this.calculateSimilarity(entity1, entity2);
             
             if (similarity >= threshold) {
@@ -556,7 +569,7 @@ export class DataFederationEngine {
       breakdown[source.name] = {
         count: result.data.length,
         executionTime: result.metadata.executionTime,
-        errors: error ? [error.message] : undefined
+        ...(error && { errors: [error.message] })
       };
     }
     
