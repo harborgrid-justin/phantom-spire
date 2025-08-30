@@ -6,10 +6,24 @@
 import { logger } from '../utils/logger';
 import { ErrorHandler, PerformanceMonitor } from '../utils/serviceUtils';
 import { MessageQueueManager } from '../message-queue/core/MessageQueueManager';
-import { 
-  DataIngestionMessageProducer, 
-  AnalyticsPipelineMessageProducer 
+import {
+  DataIngestionMessageProducer,
+  AnalyticsPipelineMessageProducer,
 } from '../message-queue/producers/MessageProducers';
+import {
+  TaskManagerEngine,
+  ITaskManager,
+  ITask,
+  TaskType,
+  TaskStatus,
+  TaskPriority,
+  ITaskQuery,
+  ITaskQueryResult,
+  TaskManagementSystemFactory,
+  CTI_TASK_TEMPLATES,
+  TaskManagementUtils,
+  DEFAULT_TASK_MANAGER_CONFIG,
+} from './tasks';
 import {
   DataIngestionEngine,
   IngestionPipelineManager,
@@ -33,14 +47,18 @@ import {
 import { RestApiConnector } from './connectors/RestApiConnector';
 import { EvidenceManagementService } from './evidence/services/EvidenceManagementService';
 import { EvidenceAnalyticsEngine } from './evidence/services/EvidenceAnalyticsEngine';
-import { 
-  IEvidenceManager, 
-  IEvidenceContext, 
+import {
+  IEvidenceManager,
+  IEvidenceContext,
   ICreateEvidenceRequest,
   IEvidenceQuery,
-  IEvidenceSearchResult 
+  IEvidenceSearchResult,
 } from './evidence/interfaces/IEvidenceManager';
-import { IEvidence, EvidenceType, ClassificationLevel } from './evidence/interfaces/IEvidence';
+import {
+  IEvidence,
+  EvidenceType,
+  ClassificationLevel,
+} from './evidence/interfaces/IEvidence';
 import {
   IDataSource,
   IDataRecord,
@@ -116,12 +134,15 @@ export class DataLayerOrchestrator {
   private analyticsEngine: AdvancedAnalyticsEngine;
   private evidenceManager: EvidenceManagementService;
   private evidenceAnalyticsEngine: EvidenceAnalyticsEngine;
+  private taskManager: ITaskManager;
   private dataSources: Map<string, IDataSource> = new Map();
   private connectors: Map<string, IDataConnector> = new Map();
   private pipelines: Map<string, IDataPipeline> = new Map();
   private config: IDataLayerConfig;
   private metrics: IDataLayerMetrics;
-  
+  private errorHandler: ErrorHandler;
+  private performanceMonitor: PerformanceMonitor;
+
   // Message Queue Integration
   private messageQueueManager?: MessageQueueManager;
   private dataIngestionProducer?: DataIngestionMessageProducer;
@@ -132,22 +153,42 @@ export class DataLayerOrchestrator {
   private pipelineManager?: IngestionPipelineManager;
   private streamProcessor?: StreamProcessor;
 
-  constructor(config: IDataLayerConfig, messageQueueManager?: MessageQueueManager) {
+  constructor(
+    config: IDataLayerConfig,
+    messageQueueManager?: MessageQueueManager
+  ) {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
     this.analyticsEngine = new AdvancedAnalyticsEngine();
-    
+    this.errorHandler = new ErrorHandler();
+    this.performanceMonitor = new PerformanceMonitor();
+
     // Initialize Fortune 100-Grade Evidence Management
     this.evidenceManager = new EvidenceManagementService();
-    this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(this.evidenceManager);
-    
+    this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(
+      this.evidenceManager
+    );
+
+    // Initialize Fortune 100-Grade Task Management
+    this.taskManager = TaskManagementSystemFactory.createTaskManagerEngine(
+      {
+        ...DEFAULT_TASK_MANAGER_CONFIG,
+        ...config.taskManagement,
+      },
+      messageQueueManager
+    );
+
     this.metrics = this.initializeMetrics();
-    
+
     // Initialize message queue integration if provided
     if (messageQueueManager && config.messageQueue?.enabled) {
       this.messageQueueManager = messageQueueManager;
-      this.dataIngestionProducer = new DataIngestionMessageProducer(messageQueueManager);
-      this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(messageQueueManager);
+      this.dataIngestionProducer = new DataIngestionMessageProducer(
+        messageQueueManager
+      );
+      this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(
+        messageQueueManager
+      );
       logger.info('Message queue integration enabled for data layer');
     }
 
@@ -156,7 +197,9 @@ export class DataLayerOrchestrator {
       this.initializeIngestionEngine(messageQueueManager);
     }
 
-    logger.info('Data Layer Orchestrator initialized with Fortune 100-Grade Evidence Management');
+    logger.info(
+      'Data Layer Orchestrator initialized with Fortune 100-Grade Evidence Management'
+    );
   }
 
   /**
@@ -174,6 +217,12 @@ export class DataLayerOrchestrator {
       // Initialize connectors if configured
       if (this.config.connectors) {
         await this.initializeConnectors();
+      }
+
+      // Initialize task management system
+      if (this.taskManager) {
+        await this.taskManager.initialize();
+        logger.info('Fortune 100 task management system started');
       }
 
       // Initialize analytics models
@@ -196,7 +245,9 @@ export class DataLayerOrchestrator {
         connectors: this.connectors.size,
         analyticsEnabled: this.config.analytics?.enableAdvancedAnalytics,
         ingestionEnabled: this.config.ingestion?.enabled,
-        streamProcessingEnabled: this.config.ingestion?.enableRealTimeProcessing,
+        streamProcessingEnabled:
+          this.config.ingestion?.enableRealTimeProcessing,
+        taskManagementEnabled: !!this.taskManager,
       });
     } catch (error) {
       logger.error('Failed to initialize data layer', error);
@@ -211,11 +262,14 @@ export class DataLayerOrchestrator {
     query: IFederatedQuery,
     context: IQueryContext
   ): Promise<IFederatedResult> {
-    const measurement = PerformanceMonitor.startMeasurement('data_layer_query', {
-      queryType: query.type,
-      sources: query.sources,
-      userId: context.userId,
-    });
+    const measurement = PerformanceMonitor.startMeasurement(
+      'data_layer_query',
+      {
+        queryType: query.type,
+        sources: query.sources,
+        userId: context.userId,
+      }
+    );
 
     const operationResult = await ErrorHandler.executeWithHandling(
       () => this.federationEngine.federatedQuery(query, context),
@@ -236,8 +290,11 @@ export class DataLayerOrchestrator {
     );
 
     // Update metrics
-    this.updateQueryMetrics(operationResult.executionTime, operationResult.success);
-    
+    this.updateQueryMetrics(
+      operationResult.executionTime,
+      operationResult.success
+    );
+
     measurement.end({
       success: operationResult.success,
       resultCount: operationResult.result?.data.length || 0,
@@ -481,6 +538,424 @@ export class DataLayerOrchestrator {
     return { ...this.metrics };
   }
 
+  // ============================================================================
+  // FORTUNE 100-GRADE TASK MANAGEMENT INTEGRATION
+  // ============================================================================
+
+  /**
+   * Create and execute a CTI task using predefined templates
+   */
+  public async createAndExecuteCTITask(
+    templateName: keyof typeof CTI_TASK_TEMPLATES,
+    parameters: Record<string, any> = {},
+    context: IQueryContext,
+    overrides: any = {}
+  ): Promise<{ task: ITask; execution: any }> {
+    const measurement = this.performanceMonitor.startMeasurement('createAndExecuteCTITask');
+    
+    try {
+      // Create task from template
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        templateName,
+        {
+          ...overrides,
+          definition: {
+            ...overrides.definition,
+            parameters: {
+              ...parameters,
+              ...overrides.definition?.parameters,
+            },
+          },
+          createdBy: context.userId,
+          permissions: context.permissions || [],
+        }
+      );
+
+      // Create the task
+      const task = await this.taskManager.createTask(taskDefinition);
+
+      // Execute the task
+      const execution = await this.taskManager.executeTask(task.id, {
+        userId: context.userId,
+        permissions: context.permissions || [],
+        environment: 'production',
+        securityLevel: 'internal',
+        debug: false,
+        tracing: true,
+        profiling: true,
+      });
+
+      logger.info('CTI task created and executed', {
+        taskId: task.id,
+        template: templateName,
+        executionId: execution.id,
+        userId: context.userId,
+      });
+
+      measurement.end({ success: true });
+      return { task, execution };
+
+    } catch (error) {
+      measurement.end({ success: false });
+      throw this.errorHandler.handleError(error, 'createAndExecuteCTITask');
+    }
+  }
+
+  /**
+   * Execute data ingestion task with pipeline integration
+   */
+  public async executeDataIngestionTask(
+    sourceId: string,
+    pipeline: string,
+    parameters: Record<string, any>,
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'THREAT_INTELLIGENCE_INGESTION',
+        {
+          definition: {
+            parameters: {
+              sourceId,
+              pipeline,
+              ...parameters,
+            },
+          },
+          priority: TaskManagementUtils.calculateTaskPriority({
+            severity: parameters.severity,
+            urgency: parameters.urgency,
+            impact: parameters.impact,
+          }),
+        }
+      );
+
+      // Integrate with existing ingestion engine if available
+      if (this.ingestionEngine) {
+        taskDefinition.definition.parameters.ingestionEngineId = this.ingestionEngine.constructor.name;
+      }
+
+      return await this.createAndExecuteCTITask(
+        'THREAT_INTELLIGENCE_INGESTION',
+        parameters,
+        context,
+        taskDefinition
+      );
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeDataIngestionTask');
+    }
+  }
+
+  /**
+   * Execute evidence collection task with evidence management integration
+   */
+  public async executeEvidenceCollectionTask(
+    sources: string[],
+    incidentId: string,
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any; evidenceIds: string[] }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'INCIDENT_EVIDENCE_COLLECTION',
+        {
+          definition: {
+            parameters: {
+              sources,
+              incidentId,
+              evidenceManagerId: this.evidenceManager.constructor.name,
+            },
+          },
+          priority: 'critical' as TaskPriority,
+        }
+      );
+
+      const { task, execution } = await this.createAndExecuteCTITask(
+        'INCIDENT_EVIDENCE_COLLECTION',
+        { sources, incidentId },
+        context,
+        taskDefinition
+      );
+
+      // Create evidence entries for tracking
+      const evidenceIds: string[] = [];
+      for (const source of sources) {
+        const evidence = await this.evidenceManager.createEvidence({
+          type: 'IOC Evidence' as EvidenceType,
+          title: `Evidence from ${source}`,
+          description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
+          classification: 'internal' as ClassificationLevel,
+          source,
+          data: { taskId: task.id, executionId: execution.id },
+          metadata: { collectionTaskId: task.id, incidentId },
+        }, {
+          userId: context.userId,
+          permissions: context.permissions || [],
+        });
+
+        evidenceIds.push(evidence.id);
+      }
+
+      logger.info('Evidence collection task created with evidence tracking', {
+        taskId: task.id,
+        evidenceCount: evidenceIds.length,
+        incidentId,
+      });
+
+      return { task, execution, evidenceIds };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeEvidenceCollectionTask');
+    }
+  }
+
+  /**
+   * Execute threat analysis task with analytics integration
+   */
+  public async executeThreatAnalysisTask(
+    indicators: any[],
+    analysisType: string = 'comprehensive',
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any; analysisResult?: IAnalyticsResult }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'DATA_CORRELATION_ANALYSIS',
+        {
+          definition: {
+            parameters: {
+              indicators,
+              analysisType,
+              analyticsEngineId: this.analyticsEngine.constructor.name,
+            },
+          },
+        }
+      );
+
+      const { task, execution } = await this.createAndExecuteCTITask(
+        'DATA_CORRELATION_ANALYSIS',
+        { indicators, analysisType },
+        context,
+        taskDefinition
+      );
+
+      // Optionally integrate with existing analytics engine
+      let analysisResult: IAnalyticsResult | undefined;
+      if (this.analyticsEngine && indicators.length > 0) {
+        try {
+          // Create a federated query for threat analysis
+          const query: IFederatedQuery = {
+            entity: 'threat_indicators',
+            filters: { indicators: indicators.map(i => i.value || i) },
+            type: 'search',
+          };
+
+          analysisResult = await this.analyticsEngine.analyzeThreats(
+            query,
+            context,
+            { includeAnomalies: true, includePredictions: true }
+          );
+        } catch (analyticsError) {
+          logger.warn('Analytics integration failed for task', {
+            taskId: task.id,
+            error: analyticsError,
+          });
+        }
+      }
+
+      return { task, execution, analysisResult };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeThreatAnalysisTask');
+    }
+  }
+
+  /**
+   * Create automated task workflow for incident response
+   */
+  public async createIncidentResponseWorkflow(
+    incidentId: string,
+    severity: string,
+    affectedSystems: string[],
+    context: IQueryContext
+  ): Promise<{ tasks: ITask[]; workflowId: string }> {
+    try {
+      const workflowId = `incident-response-${incidentId}-${Date.now()}`;
+      const tasks: ITask[] = [];
+
+      const priority = TaskManagementUtils.calculateTaskPriority({
+        severity,
+        urgency: 'urgent',
+        impact: affectedSystems.length > 5 ? 'high' : 'medium',
+      });
+
+      // 1. Evidence Collection Task
+      const evidenceTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('INCIDENT_EVIDENCE_COLLECTION', {
+          name: `Evidence Collection - ${incidentId}`,
+          priority,
+          definition: {
+            parameters: {
+              sources: affectedSystems,
+              incidentId,
+              preservationLevel: severity === 'critical' ? 'forensic' : 'standard',
+            },
+          },
+          metadata: { workflowId, incidentId, step: 1 },
+        })
+      );
+      tasks.push(evidenceTask);
+
+      // 2. Threat Analysis Task (depends on evidence collection)
+      const analysisTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('DATA_CORRELATION_ANALYSIS', {
+          name: `Threat Analysis - ${incidentId}`,
+          priority,
+          dependencies: [evidenceTask.id],
+          definition: {
+            parameters: {
+              datasets: [{ source: 'incident_evidence', incidentId }],
+              correlationTypes: ['temporal', 'attributional', 'behavioral'],
+              threshold: severity === 'critical' ? 0.6 : 0.75,
+            },
+          },
+          metadata: { workflowId, incidentId, step: 2 },
+        })
+      );
+      tasks.push(analysisTask);
+
+      // 3. Alert Task (immediate for critical incidents)
+      if (severity === 'critical') {
+        const alertTask = await this.taskManager.createTask(
+          TaskManagementUtils.createTaskFromTemplate('REAL_TIME_ALERT', {
+            name: `Critical Alert - ${incidentId}`,
+            priority: 'critical' as TaskPriority,
+            definition: {
+              parameters: {
+                alertType: 'critical_incident',
+                severity: 'critical',
+                incidentId,
+                affectedSystems,
+                channels: ['email', 'sms', 'webhook'],
+              },
+            },
+            metadata: { workflowId, incidentId, step: 3 },
+          })
+        );
+        tasks.push(alertTask);
+
+        // Execute alert task immediately
+        await this.taskManager.executeTask(alertTask.id, {
+          userId: context.userId,
+          permissions: context.permissions || [],
+          environment: 'production',
+          securityLevel: 'restricted',
+        });
+      }
+
+      // 4. Report Generation Task (depends on analysis)
+      const reportTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('WEEKLY_THREAT_REPORT', {
+          name: `Incident Report - ${incidentId}`,
+          priority,
+          dependencies: [analysisTask.id],
+          definition: {
+            parameters: {
+              template: 'incident-response-report',
+              format: 'pdf',
+              incidentId,
+              includeEvidence: true,
+              includeAnalysis: true,
+            },
+          },
+          metadata: { workflowId, incidentId, step: 4 },
+        })
+      );
+      tasks.push(reportTask);
+
+      // Execute the workflow (evidence collection first)
+      await this.taskManager.executeTask(evidenceTask.id, {
+        userId: context.userId,
+        permissions: context.permissions || [],
+        environment: 'production',
+        securityLevel: 'restricted',
+      });
+
+      logger.info('Incident response workflow created', {
+        workflowId,
+        incidentId,
+        taskCount: tasks.length,
+        severity,
+        affectedSystems: affectedSystems.length,
+      });
+
+      return { tasks, workflowId };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'createIncidentResponseWorkflow');
+    }
+  }
+
+  /**
+   * Query tasks with CTI-specific filters
+   */
+  public async queryCTITasks(
+    filters: Partial<ITaskQuery> = {},
+    context: IQueryContext
+  ): Promise<ITaskQueryResult> {
+    try {
+      // Apply security filtering based on user context
+      const secureFilters: ITaskQuery = {
+        ...filters,
+        // Only show tasks the user has permission to see
+        createdBy: context.permissions?.includes('admin') ? filters.createdBy : context.userId,
+      };
+
+      return await this.taskManager.queryTasks(secureFilters);
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'queryCTITasks');
+    }
+  }
+
+  /**
+   * Get task management system health and metrics
+   */
+  public async getTaskManagementHealth(): Promise<{
+    health: any;
+    metrics: any;
+    integration: {
+      evidenceManagement: boolean;
+      dataIngestion: boolean;
+      analytics: boolean;
+      messageQueue: boolean;
+    };
+  }> {
+    try {
+      const health = await this.taskManager.healthCheck();
+      const metrics = await this.taskManager.getSystemMetrics();
+
+      return {
+        health,
+        metrics,
+        integration: {
+          evidenceManagement: !!this.evidenceManager,
+          dataIngestion: !!this.ingestionEngine,
+          analytics: !!this.analyticsEngine,
+          messageQueue: !!this.messageQueueManager,
+        },
+      };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'getTaskManagementHealth');
+    }
+  }
+
+  /**
+   * Get the task manager instance for direct access
+   */
+  public getTaskManager(): ITaskManager {
+    return this.taskManager;
+  }
+
   /**
    * Gracefully shutdown the data layer
    */
@@ -695,7 +1170,9 @@ export class DataLayerOrchestrator {
   /**
    * Initialize Fortune 100-grade ingestion engine
    */
-  private initializeIngestionEngine(messageQueueManager: MessageQueueManager): void {
+  private initializeIngestionEngine(
+    messageQueueManager: MessageQueueManager
+  ): void {
     const ingestionConfig = {
       ...DEFAULT_INGESTION_CONFIG,
       ...this.config.ingestion?.engineConfig,
@@ -712,11 +1189,14 @@ export class DataLayerOrchestrator {
     };
 
     // Initialize ingestion engine
-    this.ingestionEngine = new DataIngestionEngine(ingestionConfig, messageQueueManager);
-    
+    this.ingestionEngine = new DataIngestionEngine(
+      ingestionConfig,
+      messageQueueManager
+    );
+
     // Initialize pipeline manager
     this.pipelineManager = new IngestionPipelineManager(pipelineConfig);
-    
+
     // Initialize stream processor if real-time processing is enabled
     if (this.config.ingestion?.enableRealTimeProcessing) {
       this.streamProcessor = new StreamProcessor(streamConfig);
@@ -726,7 +1206,7 @@ export class DataLayerOrchestrator {
     IngestionIntegration.integrateWithOrchestrator(this, this.ingestionEngine);
 
     // Set up monitoring and alerting
-    IngestionIntegration.setupMonitoring(this.ingestionEngine, (alert) => {
+    IngestionIntegration.setupMonitoring(this.ingestionEngine, alert => {
       logger.warn('Ingestion engine alert', alert);
       // In production, this would trigger appropriate alerting mechanisms
     });
@@ -775,7 +1255,11 @@ export class DataLayerOrchestrator {
     }
 
     try {
-      const jobId = await this.ingestionEngine.submitJob(sourceId, pipeline, priority);
+      const jobId = await this.ingestionEngine.submitJob(
+        sourceId,
+        pipeline,
+        priority
+      );
       logger.info('Ingestion job submitted via orchestrator', {
         jobId,
         sourceId,
@@ -824,28 +1308,31 @@ export class DataLayerOrchestrator {
    * Create new evidence with full chain of custody tracking
    */
   public async createEvidence(
-    request: ICreateEvidenceRequest, 
+    request: ICreateEvidenceRequest,
     context: IEvidenceContext
   ): Promise<IEvidence> {
     try {
-      const evidence = await this.evidenceManager.createEvidence(request, context);
-      
+      const evidence = await this.evidenceManager.createEvidence(
+        request,
+        context
+      );
+
       // Update metrics
       this.metrics.analytics.threatsAnalyzed++;
-      
+
       logger.info('Evidence created via data layer orchestrator', {
         evidenceId: evidence.id,
         type: evidence.type,
         classification: evidence.classification,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return evidence;
     } catch (error) {
       logger.error('Failed to create evidence', {
         sourceType: request.sourceType,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -855,27 +1342,27 @@ export class DataLayerOrchestrator {
    * Search evidence with advanced filtering and access control
    */
   public async searchEvidence(
-    query: IEvidenceQuery, 
+    query: IEvidenceQuery,
     context: IEvidenceContext
   ): Promise<IEvidenceSearchResult> {
     try {
       const result = await this.evidenceManager.searchEvidence(query, context);
-      
+
       // Update metrics
       this.metrics.queries.totalExecuted++;
-      
+
       logger.info('Evidence search completed via data layer orchestrator', {
         resultCount: result.totalCount,
         hasMore: result.hasMore,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       this.metrics.queries.errorRate++;
       logger.error('Failed to search evidence', {
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -891,30 +1378,32 @@ export class DataLayerOrchestrator {
   ): Promise<any> {
     try {
       const result = await this.evidenceAnalyticsEngine.analyzeEvidence(
-        evidenceIds, 
-        context, 
+        evidenceIds,
+        context,
         options
       );
-      
+
       // Update metrics
       this.metrics.analytics.patternsDetected += result.patterns.length;
-      this.metrics.analytics.anomaliesFound += result.findings.filter(f => f.type === 'anomaly').length;
-      
+      this.metrics.analytics.anomaliesFound += result.findings.filter(
+        f => f.type === 'anomaly'
+      ).length;
+
       logger.info('Evidence analysis completed via data layer orchestrator', {
         analysisId: result.analysisId,
         evidenceAnalyzed: result.evidenceAnalyzed,
         findingsCount: result.findings.length,
         correlationsCount: result.correlations.length,
         overallRisk: result.riskAssessment.overall_risk,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to analyze evidence', {
         evidenceIds,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -929,7 +1418,7 @@ export class DataLayerOrchestrator {
   ): Promise<IEvidence> {
     const request: ICreateEvidenceRequest = {
       type: EvidenceType.IOC_EVIDENCE,
-      sourceType: iocData.sourceType || 'internal_detection' as any,
+      sourceType: iocData.sourceType || ('internal_detection' as any),
       sourceId: iocData.id || iocData.value,
       sourceSystem: iocData.source || 'phantom-spire',
       data: {
@@ -940,22 +1429,24 @@ export class DataLayerOrchestrator {
         tags: iocData.tags,
         sources: iocData.sources,
         firstSeen: iocData.firstSeen,
-        lastSeen: iocData.lastSeen
+        lastSeen: iocData.lastSeen,
       },
       metadata: {
         title: `IOC Evidence: ${iocData.value}`,
         description: `Evidence for IOC ${iocData.type}: ${iocData.value}`,
         severity: iocData.severity || 'medium',
         confidence: iocData.confidence || 50,
-        format: 'json'
+        format: 'json',
       },
       classification: this.mapSeverityToClassification(iocData.severity),
       tags: iocData.tags || [],
-      handling: [{
-        type: 'retention',
-        instruction: 'Retain for threat intelligence purposes',
-        authority: 'system'
-      }]
+      handling: [
+        {
+          type: 'retention',
+          instruction: 'Retain for threat intelligence purposes',
+          authority: 'system',
+        },
+      ],
     };
 
     return this.createEvidence(request, context);
@@ -967,17 +1458,17 @@ export class DataLayerOrchestrator {
   public async getEvidenceMetrics(timeRange?: { start: Date; end: Date }) {
     try {
       const metrics = await this.evidenceManager.getEvidenceMetrics(timeRange);
-      
+
       logger.info('Evidence metrics retrieved', {
         totalEvidence: metrics.totalEvidence,
         averageConfidence: metrics.averageConfidence,
-        integrityViolations: metrics.custodyMetrics.integrityViolations
+        integrityViolations: metrics.custodyMetrics.integrityViolations,
       });
-      
+
       return metrics;
     } catch (error) {
       logger.error('Failed to retrieve evidence metrics', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -991,19 +1482,22 @@ export class DataLayerOrchestrator {
     context: IEvidenceContext
   ): Promise<any> {
     try {
-      const report = await this.evidenceManager.generateEvidenceReport(query, context);
-      
+      const report = await this.evidenceManager.generateEvidenceReport(
+        query,
+        context
+      );
+
       logger.info('Evidence report generated', {
         title: report.title,
         evidenceCount: report.evidence.length,
-        generatedBy: context.userId
+        generatedBy: context.userId,
       });
-      
+
       return report;
     } catch (error) {
       logger.error('Failed to generate evidence report', {
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -1017,21 +1511,24 @@ export class DataLayerOrchestrator {
     context: IEvidenceContext
   ) {
     try {
-      const result = await this.evidenceManager.verifyIntegrity(evidenceId, context);
-      
+      const result = await this.evidenceManager.verifyIntegrity(
+        evidenceId,
+        context
+      );
+
       logger.info('Evidence integrity verification completed', {
         evidenceId,
         isValid: result.isValid,
         algorithm: result.algorithm,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to verify evidence integrity', {
         evidenceId,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }

@@ -44,12 +44,17 @@ export class EnterpriseIngestionDemo {
    * Demonstrate high-volume threat intelligence ingestion
    */
   public async demonstrateHighVolumeIngestion(): Promise<void> {
-    logger.info('=== Fortune 100 High-Volume Threat Intelligence Ingestion Demo ===');
+    logger.info(
+      '=== Fortune 100 High-Volume Threat Intelligence Ingestion Demo ==='
+    );
 
     try {
       // Create high-performance ingestion engine
       const config = IngestionConfigBuilder.createHighVolumeConfig();
-      this.ingestionEngine = new DataIngestionEngine(config, this.messageQueueManager);
+      this.ingestionEngine = new DataIngestionEngine(
+        config,
+        this.messageQueueManager
+      );
 
       // Start the ingestion engine
       await this.ingestionEngine.start();
@@ -106,8 +111,16 @@ export class EnterpriseIngestionDemo {
       const pipeline = this.createThreatIntelligencePipeline();
 
       // Submit ingestion jobs
-      const stixJobId = await this.ingestionEngine.submitJob('stix-primary-001', pipeline, 9);
-      const mispJobId = await this.ingestionEngine.submitJob('misp-primary-001', pipeline, 8);
+      const stixJobId = await this.ingestionEngine.submitJob(
+        'stix-primary-001',
+        pipeline,
+        9
+      );
+      const mispJobId = await this.ingestionEngine.submitJob(
+        'misp-primary-001',
+        pipeline,
+        8
+      );
 
       logger.info('Ingestion jobs submitted', { stixJobId, mispJobId });
 
@@ -122,7 +135,6 @@ export class EnterpriseIngestionDemo {
         recordsPerSecond: metrics.recordsPerSecond,
         errorRate: metrics.errorRate,
       });
-
     } catch (error) {
       logger.error('High-volume ingestion demo failed', error);
       throw error;
@@ -186,7 +198,6 @@ export class EnterpriseIngestionDemo {
         backpressureEvents: streamMetrics.backpressureEvents,
         duplicatesFiltered: streamMetrics.duplicatesFiltered,
       });
-
     } catch (error) {
       logger.error('Real-time processing demo failed', error);
       throw error;
@@ -202,10 +213,13 @@ export class EnterpriseIngestionDemo {
     try {
       // Create secure configuration
       const config = IngestionConfigBuilder.createSecureConfig();
-      const secureEngine = new DataIngestionEngine(config, this.messageQueueManager);
+      const secureEngine = new DataIngestionEngine(
+        config,
+        this.messageQueueManager
+      );
 
       // Set up comprehensive audit logging
-      secureEngine.on('jobSubmitted', (job) => {
+      secureEngine.on('jobSubmitted', job => {
         logger.info('AUDIT: Ingestion job submitted', {
           jobId: job.id,
           sourceId: job.sourceId,
@@ -214,7 +228,7 @@ export class EnterpriseIngestionDemo {
         });
       });
 
-      secureEngine.on('jobCompleted', (job) => {
+      secureEngine.on('jobCompleted', job => {
         logger.info('AUDIT: Ingestion job completed', {
           jobId: job.id,
           sourceId: job.sourceId,
@@ -224,7 +238,7 @@ export class EnterpriseIngestionDemo {
       });
 
       // Set up security alerts
-      secureEngine.on('alert', (alert) => {
+      secureEngine.on('alert', alert => {
         logger.warn('SECURITY ALERT', {
           type: alert.type,
           message: alert.message,
@@ -240,7 +254,6 @@ export class EnterpriseIngestionDemo {
         auditLevel: config.auditLevel,
         dataValidationEnabled: config.enableDataValidation,
       });
-
     } catch (error) {
       logger.error('Security features demo failed', error);
       throw error;
@@ -397,7 +410,9 @@ export class EnterpriseIngestionDemo {
     }, monitoringInterval);
 
     // Wait for monitoring to complete
-    await new Promise(resolve => setTimeout(resolve, monitoringInterval * maxRounds));
+    await new Promise(resolve =>
+      setTimeout(resolve, monitoringInterval * maxRounds)
+    );
   }
 
   /**
@@ -417,7 +432,6 @@ export class EnterpriseIngestionDemo {
 
       // Note: MessageQueueManager cleanup would be handled by the application
       logger.info('Ingestion demo cleanup completed');
-
     } catch (error) {
       logger.error('Error during ingestion demo cleanup', error);
     }
@@ -428,7 +442,9 @@ export class EnterpriseIngestionDemo {
  * Run the complete Fortune 100 ingestion demonstration
  */
 export async function runEnterpriseIngestionDemo(): Promise<void> {
-  logger.info('🚀 Starting Fortune 100-Grade Data Ingestion Engine Demonstration');
+  logger.info(
+    '🚀 Starting Fortune 100-Grade Data Ingestion Engine Demonstration'
+  );
 
   const demo = new EnterpriseIngestionDemo();
 
@@ -444,12 +460,12 @@ export async function runEnterpriseIngestionDemo(): Promise<void> {
     // Demonstrate enterprise security features
     await demo.demonstrateSecurityFeatures();
 
-    logger.info('✅ Fortune 100 ingestion demonstration completed successfully');
-
+    logger.info(
+      '✅ Fortune 100 ingestion demonstration completed successfully'
+    );
   } catch (error) {
     logger.error('❌ Fortune 100 ingestion demonstration failed', error);
     throw error;
-
   } finally {
     await demo.cleanup();
   }
@@ -541,7 +557,7 @@ if (require.main === module) {
       logger.info('Demo completed successfully');
       process.exit(0);
     })
-    .catch((error) => {
+    .catch(error => {
       logger.error('Demo failed', error);
       process.exit(1);
     });
