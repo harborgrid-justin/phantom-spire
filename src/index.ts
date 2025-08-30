@@ -13,6 +13,7 @@ import swaggerUi from 'swagger-ui-express';
 import { WorkflowBPMOrchestrator } from './workflow-bpm';
 import workflowRoutes from './routes/workflow/workflowRoutes';
 import { initializeEnterpriseManagement, shutdownEnterpriseManagement } from './services';
+import { EnterprisePlatformIntegration } from './enterprise-integration';
 
 const app = express();
 
@@ -139,12 +140,23 @@ async function startServer(): Promise<void> {
     // Add workflow routes
     app.use('/api/v1/workflow', workflowRoutes);
     
+    // Initialize Fortune 100-Grade Enterprise Integration Platform
+    logger.info('🏢 Initializing Fortune 100-Grade Enterprise Integration Platform...');
+    const enterpriseIntegration = new EnterprisePlatformIntegration();
+    await enterpriseIntegration.start();
+    
+    // Make enterprise integration available to the application
+    app.locals.enterpriseIntegration = enterpriseIntegration;
+    
+    logger.info('✅ Enterprise Service Bus and Service Mesh initialized successfully');
+    
     const PORT = config.PORT || 3000;
     app.listen(PORT, () => {
       logger.info(`🚀 Phantom Spire CTI Platform started on port ${PORT}`);
       logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
       logger.info(`🏥 Health Check: http://localhost:${PORT}/health`);
       logger.info(`🔄 Workflow BPM API: http://localhost:${PORT}/api/v1/workflow`);
+      logger.info(`🏢 Enterprise Integration: Service Bus and Service Mesh operational`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
@@ -172,6 +184,15 @@ process.on('SIGTERM', async () => {
     }
   }
   
+  // Shutdown enterprise integration platform if it exists
+  if (app.locals.enterpriseIntegration) {
+    try {
+      await app.locals.enterpriseIntegration.stop();
+    } catch (error) {
+      logger.error('Error shutting down enterprise integration:', error);
+    }
+  }
+  
   process.exit(0);
 });
 
@@ -191,6 +212,15 @@ process.on('SIGINT', async () => {
       await app.locals.workflowOrchestrator.shutdown();
     } catch (error) {
       logger.error('Error shutting down workflow orchestrator:', error);
+    }
+  }
+  
+  // Shutdown enterprise integration platform if it exists
+  if (app.locals.enterpriseIntegration) {
+    try {
+      await app.locals.enterpriseIntegration.stop();
+    } catch (error) {
+      logger.error('Error shutting down enterprise integration:', error);
     }
   }
   
