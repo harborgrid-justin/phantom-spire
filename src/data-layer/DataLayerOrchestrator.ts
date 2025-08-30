@@ -4,6 +4,12 @@
  */
 
 import { logger } from '../utils/logger';
+import { ErrorHandler, PerformanceMonitor } from '../utils/serviceUtils';
+import { MessageQueueManager } from '../message-queue/core/MessageQueueManager';
+import { 
+  DataIngestionMessageProducer, 
+  AnalyticsPipelineMessageProducer 
+} from '../message-queue/producers/MessageProducers';
 import {
   DataFederationEngine,
   IFederatedQuery,
@@ -47,6 +53,10 @@ export interface IDataLayerConfig {
   connectors?: {
     [name: string]: IConnectorConfig;
   };
+  messageQueue?: {
+    enabled: boolean;
+    asyncProcessing: boolean;
+  };
 }
 
 export interface IDataLayerMetrics {
@@ -80,12 +90,25 @@ export class DataLayerOrchestrator {
   private pipelines: Map<string, IDataPipeline> = new Map();
   private config: IDataLayerConfig;
   private metrics: IDataLayerMetrics;
+  
+  // Message Queue Integration
+  private messageQueueManager?: MessageQueueManager;
+  private dataIngestionProducer?: DataIngestionMessageProducer;
+  private analyticsPipelineProducer?: AnalyticsPipelineMessageProducer;
 
-  constructor(config: IDataLayerConfig) {
+  constructor(config: IDataLayerConfig, messageQueueManager?: MessageQueueManager) {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
     this.analyticsEngine = new AdvancedAnalyticsEngine();
     this.metrics = this.initializeMetrics();
+    
+    // Initialize message queue integration if provided
+    if (messageQueueManager && config.messageQueue?.enabled) {
+      this.messageQueueManager = messageQueueManager;
+      this.dataIngestionProducer = new DataIngestionMessageProducer(messageQueueManager);
+      this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(messageQueueManager);
+      logger.info('Message queue integration enabled for data layer');
+    }
 
     logger.info('Data Layer Orchestrator initialized');
   }
@@ -128,27 +151,43 @@ export class DataLayerOrchestrator {
     query: IFederatedQuery,
     context: IQueryContext
   ): Promise<IFederatedResult> {
-    const startTime = Date.now();
+    const measurement = PerformanceMonitor.startMeasurement('data_layer_query', {
+      queryType: query.type,
+      sources: query.sources,
+      userId: context.userId,
+    });
 
-    try {
-      logger.debug('Executing unified query', {
-        type: query.type,
-        sources: query.sources,
-        userId: context.userId,
-      });
+    const operationResult = await ErrorHandler.executeWithHandling(
+      () => this.federationEngine.federatedQuery(query, context),
+      {
+        operationName: 'unified_query',
+        entityType: 'query',
+        entityId: `${query.type}-${query.sources?.join(',')}`,
+        additionalData: {
+          queryType: query.type,
+          sourcesCount: query.sources?.length || 0,
+          userId: context.userId,
+        },
+      },
+      {
+        retryable: false,
+        logLevel: 'debug',
+      }
+    );
 
-      // Execute federated query
-      const result = await this.federationEngine.federatedQuery(query, context);
+    // Update metrics
+    this.updateQueryMetrics(operationResult.executionTime, operationResult.success);
+    
+    measurement.end({
+      success: operationResult.success,
+      resultCount: operationResult.result?.data.length || 0,
+    });
 
-      // Update metrics
-      this.updateQueryMetrics(Date.now() - startTime, true);
-
-      return result;
-    } catch (error) {
-      logger.error('Query execution failed', error);
-      this.updateQueryMetrics(Date.now() - startTime, false);
-      throw error;
+    if (!operationResult.success) {
+      throw operationResult.error;
     }
+
+    return operationResult.result!;
   }
 
   /**

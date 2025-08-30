@@ -40,9 +40,12 @@ class EnterpriseIOCDemo {
       // 6. Performance Metrics
       await this.demonstratePerformanceMetrics();
 
-      console.log('\n✅ Enterprise IOC Engine demonstration completed successfully');
-      console.log('🎯 Phantom Spire provides Palantir-level capabilities at a fraction of the cost\n');
-
+      console.log(
+        '\n✅ Enterprise IOC Engine demonstration completed successfully'
+      );
+      console.log(
+        '🎯 Phantom Spire provides Palantir-level capabilities at a fraction of the cost\n'
+      );
     } catch (error) {
       logger.error('Demo failed', error);
       console.error('❌ Demonstration failed:', (error as Error).message);
@@ -51,23 +54,29 @@ class EnterpriseIOCDemo {
 
   private async initializeDataLayer(): Promise<void> {
     console.log('📊 Initializing Enterprise Data Layer...');
-    
+
     // Would normally initialize real data sources
     // For demo, we'll simulate the initialization
     console.log('  ✓ MongoDB connection established');
     console.log('  ✓ MISP threat feed connector ready');
-    console.log('  ✓ VirusTotal API connector ready'); 
+    console.log('  ✓ VirusTotal API connector ready');
     console.log('  ✓ Advanced analytics engine loaded');
     console.log('  ✓ Federation engine ready for cross-source queries\n');
   }
 
   private async demonstrateFederatedIntelligence(): Promise<void> {
     console.log('🔍 1. FEDERATED INTELLIGENCE QUERY');
-    console.log('   Querying IOCs across multiple threat intelligence sources...\n');
+    console.log(
+      '   Querying IOCs across multiple threat intelligence sources...\n'
+    );
 
-    console.log('   Query: Find all high-confidence IOCs related to APT28 campaign');
+    console.log(
+      '   Query: Find all high-confidence IOCs related to APT28 campaign'
+    );
     console.log('   Sources: MongoDB, MISP Feed, VirusTotal API');
-    console.log('   Filters: tags:apt28, confidence:>80, severity:high|critical\n');
+    console.log(
+      '   Filters: tags:apt28, confidence:>80, severity:high|critical\n'
+    );
 
     // Simulate results
     console.log('   📈 RESULTS:');
@@ -79,14 +88,16 @@ class EnterpriseIOCDemo {
 
     console.log('   🎯 IOC Breakdown:');
     console.log('   ├─ IP Addresses: 18 (38%)');
-    console.log('   ├─ Domains: 15 (32%)'); 
+    console.log('   ├─ Domains: 15 (32%)');
     console.log('   ├─ File Hashes: 12 (26%)');
     console.log('   └─ Email Addresses: 2 (4%)\n');
   }
 
   private async demonstrateAdvancedAnalytics(): Promise<void> {
     console.log('🧠 2. ADVANCED THREAT ANALYTICS');
-    console.log('   AI-powered threat pattern analysis and risk assessment...\n');
+    console.log(
+      '   AI-powered threat pattern analysis and risk assessment...\n'
+    );
 
     console.log('   🔬 Analytics Pipeline:');
     console.log('   ├─ Behavioral pattern analysis');
@@ -112,7 +123,9 @@ class EnterpriseIOCDemo {
 
   private async demonstrateRelationshipDiscovery(): Promise<void> {
     console.log('🕸️  3. CROSS-SOURCE RELATIONSHIP DISCOVERY');
-    console.log('   Intelligent entity linking across disparate data sources...\n');
+    console.log(
+      '   Intelligent entity linking across disparate data sources...\n'
+    );
 
     console.log('   🔗 Relationship Discovery Algorithm:');
     console.log('   ├─ Graph traversal depth: 3 levels');
@@ -177,13 +190,13 @@ class EnterpriseIOCDemo {
     console.log('   └─ Multi-channel notifications\n');
 
     console.log('   📡 LIVE STREAM SIMULATION (10 seconds):');
-    
+
     const streamEvents = [
       'New IOC detected: malicious-domain-xyz.com (Critical)',
       'Relationship discovered: APT28 infrastructure expansion',
       'Anomaly alert: Unusual C2 communication pattern',
       'Campaign update: Operation Stealth - new indicators',
-      'Threat prediction: High probability attack in 48h'
+      'Threat prediction: High probability attack in 48h',
     ];
 
     for (let i = 0; i < streamEvents.length; i++) {
@@ -191,7 +204,7 @@ class EnterpriseIOCDemo {
       const timestamp = new Date().toISOString().substring(11, 19);
       console.log(`   [${timestamp}] 🔔 ${streamEvents[i]}`);
     }
-    
+
     console.log('\n   ✓ Real-time streaming demonstration complete\n');
   }
 
@@ -201,7 +214,7 @@ class EnterpriseIOCDemo {
 
     console.log('   🏗️  INFRASTRUCTURE STATUS:');
     console.log('   ├─ Data Sources: 3/3 healthy (100%)');
-    console.log('   ├─ Connectors: 2/2 connected (100%)');  
+    console.log('   ├─ Connectors: 2/2 connected (100%)');
     console.log('   ├─ Analytics Engine: Healthy');
     console.log('   ├─ Federation Engine: Healthy');
     console.log('   └─ Overall Status: 🟢 Excellent\n');
