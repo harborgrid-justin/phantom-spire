@@ -12,7 +12,7 @@ import {
   IHealthStatus,
   IRelationship
 } from '../interfaces/IDataSource';
-import { logger } from '../../utils/logger';
+// logger imported for future use
 
 export class MongoDataSource extends BaseDataSource {
   public readonly name = 'MongoDB';
@@ -41,7 +41,7 @@ export class MongoDataSource extends BaseDataSource {
   protected async performDisconnect(): Promise<void> {
     if (this.database) {
       await mongoose.disconnect();
-      this.database = undefined;
+      this.database = undefined as any;
     }
   }
 
@@ -83,6 +83,9 @@ export class MongoDataSource extends BaseDataSource {
 
     try {
       const startTime = Date.now();
+      if (!this.database?.db) {
+        throw new Error('Database not connected');
+      }
       await this.database.db.admin().ping();
       const responseTime = Date.now() - startTime;
       
@@ -104,7 +107,7 @@ export class MongoDataSource extends BaseDataSource {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: 0,
-        message: error.message
+        message: (error as Error).message
       };
     }
   }
@@ -186,7 +189,7 @@ export class MongoDataSource extends BaseDataSource {
   /**
    * Execute a full-text search query
    */
-  private async executeSearchQuery(query: IQuery, context: IQueryContext): Promise<IQueryResult> {
+  private async executeSearchQuery(query: IQuery, _context: IQueryContext): Promise<IQueryResult> {
     if (!query.searchTerm) {
       throw new Error('Search query requires search term');
     }
@@ -204,9 +207,7 @@ export class MongoDataSource extends BaseDataSource {
     }
 
     const documents = await collection
-      .find(searchQuery, {
-        score: { $meta: 'textScore' }
-      })
+      .find(searchQuery)
       .sort({ score: { $meta: 'textScore' } })
       .limit(query.limit || 100)
       .skip(query.offset || 0)
@@ -229,7 +230,7 @@ export class MongoDataSource extends BaseDataSource {
   /**
    * Find relationships between entities
    */
-  private async findRelationships(query: IQuery, context: IQueryContext): Promise<IRelationship[]> {
+  private async findRelationships(query: IQuery, _context: IQueryContext): Promise<IRelationship[]> {
     const relationshipsCollection = this.getCollection('relationships');
     
     const filter: any = {};
@@ -266,7 +267,7 @@ export class MongoDataSource extends BaseDataSource {
     startNodes: string[],
     relationships: IRelationship[],
     query: IQuery,
-    context: IQueryContext
+    _context: IQueryContext
   ): Promise<IDataRecord[]> {
     const nodeIds = new Set(startNodes);
     const maxDepth = query.traversal?.maxDepth || 2;
@@ -293,7 +294,7 @@ export class MongoDataSource extends BaseDataSource {
     // Fetch actual node data
     const collection = this.getCollection(query.entity || 'data');
     const nodes = await collection.find({
-      _id: { $in: Array.from(nodeIds) }
+      id: { $in: Array.from(nodeIds) }  // Use string id instead of MongoDB _id
     }).toArray();
 
     return nodes.map(node => this.transformToDataRecord(node, this.name));
@@ -302,7 +303,7 @@ export class MongoDataSource extends BaseDataSource {
   /**
    * Build MongoDB query from abstract query
    */
-  private buildMongoQuery(query: IQuery, context: IQueryContext): { filter: any; options: any } {
+  private buildMongoQuery(query: IQuery, _context: IQueryContext): { filter: any; options: any } {
     const filter = { ...query.filters };
     const options: any = {};
 
@@ -331,7 +332,7 @@ export class MongoDataSource extends BaseDataSource {
   /**
    * Build aggregation pipeline
    */
-  private buildAggregationPipeline(query: IQuery, context: IQueryContext): any[] {
+  private buildAggregationPipeline(query: IQuery, _context: IQueryContext): any[] {
     const pipeline: any[] = [];
 
     // Match stage
@@ -365,7 +366,7 @@ export class MongoDataSource extends BaseDataSource {
    * Get collection by name
    */
   private getCollection(name: string): mongoose.mongo.Collection {
-    if (!this.database) {
+    if (!this.database?.db) {
       throw new Error('Database not connected');
     }
     return this.database.db.collection(name);

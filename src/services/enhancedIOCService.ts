@@ -533,7 +533,7 @@ export class EnhancedIOCService {
 
   private async findIOCRelationships(
     iocs: IIOC[],
-    context: IQueryContext
+    _context: IQueryContext
   ): Promise<Array<{
     source: IIOC;
     target: IIOC;
