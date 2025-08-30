@@ -1,5 +1,6 @@
 import { IOC } from '../models/IOC';
 import { logger } from '../utils/logger';
+import { cacheManager } from './cache/core/EnterpriseCacheManager';
 
 export interface IOCStatistics {
   overview: {
@@ -91,8 +92,8 @@ export interface IOCQualityReport {
  * IOC Statistics and Analytics Service - Business intelligence for IOC data
  */
 export class IOCStatisticsService {
-  private static cache: Map<string, { data: any; expiry: Date }> = new Map();
-  private static readonly CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+  private static readonly CACHE_NAMESPACE = 'ioc-statistics';
+  private static readonly DEFAULT_CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
   /**
    * Generate comprehensive IOC statistics
@@ -104,12 +105,15 @@ export class IOCStatisticsService {
     const startTime = Date.now();
     const cacheKey = this.getCacheKey('stats', dateRange);
 
-    // Check cache first
-    if (useCache && this.cache.has(cacheKey)) {
-      const cached = this.cache.get(cacheKey)!;
-      if (cached.expiry > new Date()) {
-        logger.info('Returning cached IOC statistics');
-        return cached.data;
+    // Check enterprise cache first
+    if (useCache) {
+      const cached = await cacheManager.get<IOCStatistics>(cacheKey, {
+        namespace: this.CACHE_NAMESPACE
+      });
+      
+      if (cached) {
+        logger.info('Returning cached IOC statistics from enterprise cache');
+        return cached;
       }
     }
 
@@ -170,11 +174,12 @@ export class IOCStatisticsService {
         },
       };
 
-      // Cache the results
+      // Cache the results using enterprise cache
       if (useCache) {
-        this.cache.set(cacheKey, {
-          data: statistics,
-          expiry: new Date(Date.now() + this.CACHE_TTL),
+        await cacheManager.set(cacheKey, statistics, {
+          namespace: this.CACHE_NAMESPACE,
+          ttl: this.DEFAULT_CACHE_TTL,
+          tags: ['ioc-statistics']
         });
       }
 
@@ -197,6 +202,18 @@ export class IOCStatisticsService {
     period: 'daily' | 'weekly' | 'monthly' = 'daily',
     days: number = 30
   ): Promise<IOCTrendAnalysis> {
+    const cacheKey = `trend-${period}-${days}`;
+    
+    // Check enterprise cache first
+    const cached = await cacheManager.get<IOCTrendAnalysis>(cacheKey, {
+      namespace: this.CACHE_NAMESPACE
+    });
+    
+    if (cached) {
+      logger.info('Returning cached IOC trend analysis');
+      return cached;
+    }
+
     try {
       const endDate = new Date();
       const startDate = new Date(
@@ -275,6 +292,18 @@ export class IOCStatisticsService {
    * Generate IOC quality report
    */
   static async generateQualityReport(): Promise<IOCQualityReport> {
+    const cacheKey = 'quality-report';
+    
+    // Check enterprise cache first
+    const cached = await cacheManager.get<IOCQualityReport>(cacheKey, {
+      namespace: this.CACHE_NAMESPACE
+    });
+    
+    if (cached) {
+      logger.info('Returning cached IOC quality report');
+      return cached;
+    }
+
     try {
       const issues: IOCQualityReport['issues'] = [];
       const improvements: IOCQualityReport['improvements'] = [];
@@ -402,6 +431,13 @@ export class IOCStatisticsService {
         improvements,
       };
 
+      // Cache the report
+      await cacheManager.set(cacheKey, report, {
+        namespace: this.CACHE_NAMESPACE,
+        ttl: this.DEFAULT_CACHE_TTL,
+        tags: ['ioc-quality', 'reports']
+      });
+
       logger.info('IOC quality report generated', {
         overallScore: qualityScore,
         issueCount: issues.length,
@@ -419,6 +455,19 @@ export class IOCStatisticsService {
    * Get IOC statistics for dashboard
    */
   static async getDashboardStats(): Promise<any> {
+    const cacheKey = 'dashboard-stats';
+    
+    // Check enterprise cache first  
+    const cached = await cacheManager.get(cacheKey, {
+      namespace: this.CACHE_NAMESPACE,
+      ttl: 5 * 60 * 1000 // 5 minutes for dashboard stats
+    });
+    
+    if (cached) {
+      logger.debug('Returning cached dashboard stats');
+      return cached;
+    }
+
     try {
       const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -869,8 +918,22 @@ export class IOCStatisticsService {
   /**
    * Clear cache
    */
-  static clearCache(): void {
-    this.cache.clear();
-    logger.info('IOC statistics cache cleared');
+  static async clearCache(): Promise<void> {
+    await cacheManager.clearNamespace(this.CACHE_NAMESPACE);
+    logger.info('IOC statistics enterprise cache cleared');
+  }
+
+  /**
+   * Get cache metrics for monitoring
+   */
+  static async getCacheMetrics() {
+    return await cacheManager.getMetrics();
+  }
+
+  /**
+   * Invalidate specific cache entries by pattern
+   */
+  static async invalidateCache(pattern?: string, tags?: string[]): Promise<number> {
+    return await cacheManager.invalidate(pattern, tags);
   }
 }
