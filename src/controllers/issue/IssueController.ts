@@ -13,11 +13,11 @@ import {
   IAddCommentRequest,
   IIssueContext,
 } from '../../services/issue/interfaces/IIssueManager';
-import { Logger } from '../../utils/logger';
+import { logger } from '../../utils/logger';
 
 export class IssueController {
   private issueService: IssueManagementService;
-  private logger = Logger.getInstance();
+  private logger = logger;
 
   constructor() {
     this.issueService = new IssueManagementService();
@@ -70,6 +70,14 @@ export class IssueController {
       const { issueId } = req.params;
       const context = this.buildContext(req);
 
+      if (!issueId) {
+        res.status(400).json({
+          success: false,
+          message: 'Issue ID is required',
+        });
+        return;
+      }
+
       const issue = await this.issueService.getIssue(issueId, context);
 
       if (!issue) {
@@ -113,6 +121,14 @@ export class IssueController {
       const context = this.buildContext(req);
       const updates: IUpdateIssueRequest = req.body;
 
+      if (!issueId) {
+        res.status(400).json({
+          success: false,
+          message: 'Issue ID is required',
+        });
+        return;
+      }
+
       const issue = await this.issueService.updateIssue(issueId, updates, context);
 
       res.json({
@@ -137,6 +153,14 @@ export class IssueController {
     try {
       const { issueId } = req.params;
       const context = this.buildContext(req);
+
+      if (!issueId) {
+        res.status(400).json({
+          success: false,
+          message: 'Issue ID is required',
+        });
+        return;
+      }
 
       const deleted = await this.issueService.deleteIssue(issueId, context);
 
@@ -199,7 +223,7 @@ export class IssueController {
    */
   public transitionStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { issueId } = req.params;
+      const issueId = this.validateParam(req.params.issueId, 'Issue ID');
       const { status, notes } = req.body;
       const context = this.buildContext(req);
 
@@ -860,6 +884,16 @@ export class IssueController {
       permissions: user?.permissions || [],
       organizationId: user?.organizationId,
     };
+  }
+
+  /**
+   * Validate required parameter exists
+   */
+  private validateParam(value: string | undefined, name: string): string {
+    if (!value) {
+      throw new Error(`${name} is required`);
+    }
+    return value;
   }
 
   /**

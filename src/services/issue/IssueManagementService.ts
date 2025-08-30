@@ -20,10 +20,10 @@ import {
   IIssueAnalytics,
   IIssueNotification
 } from './interfaces/IIssueManager';
-import { Logger } from '../../utils/logger';
+import { logger } from '../../utils/logger';
 
 export class IssueManagementService implements IIssueManager {
-  private logger = Logger.getInstance();
+  private logger = logger;
   
   // Workflow transitions configuration
   private workflowTransitions: IWorkflowTransition[] = [
@@ -105,7 +105,7 @@ export class IssueManagementService implements IIssueManager {
       // Send notification
       await this.sendNotification({
         type: 'created',
-        issueId: savedIssue._id.toString(),
+        issueId: savedIssue._id?.toString() || savedIssue.id,
         recipientIds: this.getNotificationRecipients(savedIssue, 'created'),
         content: `Issue ${savedIssue.ticketId} has been created`,
         timestamp: new Date()

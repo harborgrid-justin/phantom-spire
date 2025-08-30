@@ -6,13 +6,13 @@
 import { Router } from 'express';
 import { body, param, query } from 'express-validator';
 import { IssueController } from '../../controllers/issue/IssueController';
-import { authenticateToken } from '../../middleware/auth';
+import { authMiddleware } from '../../middleware/auth';
 
 const router = Router();
 const issueController = new IssueController();
 
 // Apply authentication to all issue routes
-router.use(authenticateToken);
+router.use(authMiddleware);
 
 /**
  * @swagger

@@ -3,7 +3,7 @@ import authRoutes from './auth';
 import iocRoutes from './iocs';
 import mitreRoutes from './mitre';
 import evidenceRoutes from './evidence/evidenceRoutes';
-import issueRoutes from './issue/issueRoutes';
+import issueRoutes from './issue/issueRoutesSimplified';
 import { createTaskRoutes } from './tasks/taskRoutes';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator';
 

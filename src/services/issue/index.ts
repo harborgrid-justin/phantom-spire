@@ -7,16 +7,10 @@
 export { Issue, IIssue } from '../models/Issue';
 
 // Service interfaces
-export * from '../services/issue/interfaces/IIssueManager';
+export * from './interfaces/IIssueManager';
 
 // Core service implementation
-export { IssueManagementService } from '../services/issue/IssueManagementService';
-
-// Controller
-export { IssueController } from '../controllers/issue/IssueController';
-
-// Routes
-export { default as issueRoutes } from '../routes/issue/issueRoutes';
+export { IssueManagementService } from './IssueManagementService';
 
 // Default configuration for common issue types
 export const DEFAULT_ISSUE_CONFIGURATIONS = {
