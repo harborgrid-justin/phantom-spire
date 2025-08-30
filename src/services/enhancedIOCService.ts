@@ -6,8 +6,14 @@
 import { IIOC, IOC } from '../models/IOC';
 import { logger } from '../utils/logger';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator';
-import { IFederatedQuery, IFederatedResult } from '../data-layer/core/DataFederationEngine';
-import { IQueryContext, IDataRecord } from '../data-layer/interfaces/IDataSource';
+import {
+  IFederatedQuery,
+  IFederatedResult,
+} from '../data-layer/core/DataFederationEngine';
+import {
+  IQueryContext,
+  IDataRecord,
+} from '../data-layer/interfaces/IDataSource';
 import { IAnalyticsResult } from '../data-layer/analytics/AdvancedAnalyticsEngine';
 
 export interface IEnhancedIOCQuery {
@@ -86,7 +92,7 @@ export class EnhancedIOCService {
       logger.info('Executing enhanced IOC intelligence query', {
         filters: query.filters,
         sources: query.sources,
-        includeAnalytics: query.includeAnalytics
+        includeAnalytics: query.includeAnalytics,
       });
 
       // Build federated query
@@ -98,16 +104,19 @@ export class EnhancedIOCService {
           ...(query.timeRange && {
             timestamp: {
               $gte: query.timeRange.start,
-              $lte: query.timeRange.end
-            }
-          })
+              $lte: query.timeRange.end,
+            },
+          }),
         },
         sources: query.sources || [],
-        fusion: 'union'
+        fusion: 'union',
       };
 
       // Execute query across all data sources
-      const federatedResult = await this.dataLayer.query(federatedQuery, context);
+      const federatedResult = await this.dataLayer.query(
+        federatedQuery,
+        context
+      );
 
       // Convert data records to IOCs
       const iocs = await this.convertToIOCs(federatedResult.data);
@@ -119,22 +128,26 @@ export class EnhancedIOCService {
           total: federatedResult.metadata.total,
           sources: Object.keys(federatedResult.sourceBreakdown || {}),
           executionTime: Date.now() - startTime,
-          confidence: this.calculateQueryConfidence(federatedResult)
-        }
+          confidence: this.calculateQueryConfidence(federatedResult),
+        },
       };
 
       // Add relationships if requested
       if (query.includeRelationships) {
         result.relationships = await this.findIOCRelationships(iocs, context);
-        
-        // Add cross-source relationship discovery
-        const crossSourceRelationships = await this.dataLayer.discoverRelationships(
-          iocs.map(ioc => ioc._id?.toString() || ioc.value),
-          context,
-          { similarityThreshold: 0.7 }
-        );
 
-        result.crossSourceLinks = this.mapCrossSourceLinks(iocs, crossSourceRelationships.crossSourceLinks);
+        // Add cross-source relationship discovery
+        const crossSourceRelationships =
+          await this.dataLayer.discoverRelationships(
+            iocs.map(ioc => ioc._id?.toString() || ioc.value),
+            context,
+            { similarityThreshold: 0.7 }
+          );
+
+        result.crossSourceLinks = this.mapCrossSourceLinks(
+          iocs,
+          crossSourceRelationships.crossSourceLinks
+        );
       }
 
       // Add analytics if requested
@@ -144,7 +157,7 @@ export class EnhancedIOCService {
           context,
           {
             includeAnomalies: true,
-            includePredictions: query.includePredictions || false
+            includePredictions: query.includePredictions || false,
           }
         );
       }
@@ -153,7 +166,7 @@ export class EnhancedIOCService {
         iocsFound: result.iocs.length,
         relationships: result.relationships?.length || 0,
         crossSourceLinks: result.crossSourceLinks?.length || 0,
-        executionTime: result.metadata.executionTime
+        executionTime: result.metadata.executionTime,
       });
 
       return result;
@@ -182,7 +195,7 @@ export class EnhancedIOCService {
     try {
       logger.info(`Enriching IOC: ${ioc.value}`, {
         type: ioc.type,
-        sources: options.sources
+        sources: options.sources,
       });
 
       const enrichments: IIOCEnrichmentResult['enrichments'] = [];
@@ -192,10 +205,13 @@ export class EnhancedIOCService {
         type: 'search',
         searchTerm: ioc.value,
         sources: options.sources || [],
-        fusion: 'union'
+        fusion: 'union',
       };
 
-      const enrichmentData = await this.dataLayer.query(enrichmentQuery, context);
+      const enrichmentData = await this.dataLayer.query(
+        enrichmentQuery,
+        context
+      );
 
       // Process enrichment data
       for (const record of enrichmentData.data) {
@@ -224,7 +240,10 @@ export class EnhancedIOCService {
       }
 
       if (options.includeMalwareAnalysis && ioc.type === 'hash') {
-        const malwareEnrichment = await this.getMalwareAnalysisData(ioc, context);
+        const malwareEnrichment = await this.getMalwareAnalysisData(
+          ioc,
+          context
+        );
         if (malwareEnrichment) {
           enrichments.push(malwareEnrichment);
         }
@@ -233,13 +252,13 @@ export class EnhancedIOCService {
       const result: IIOCEnrichmentResult = {
         ioc,
         enrichments: enrichments.sort((a, b) => b.confidence - a.confidence),
-        riskScore
+        riskScore,
       };
 
       logger.info(`IOC enrichment completed for ${ioc.value}`, {
         enrichments: enrichments.length,
         overallRisk: riskScore.overall,
-        executionTime: Date.now() - startTime
+        executionTime: Date.now() - startTime,
       });
 
       return result;
@@ -260,29 +279,31 @@ export class EnhancedIOCService {
       similarityThreshold?: number;
       includeAttribution?: boolean;
     } = {}
-  ): Promise<Array<{
-    campaignId: string;
-    name: string;
-    iocs: IIOC[];
-    confidence: number;
-    attribution?: {
-      actor: string;
+  ): Promise<
+    Array<{
+      campaignId: string;
+      name: string;
+      iocs: IIOC[];
       confidence: number;
-      evidence: string[];
-    };
-    timeline: Array<{
-      date: Date;
-      activity: string;
-      iocs: string[];
-    }>;
-    techniques: string[];
-    infrastructure: Array<{
-      type: string;
-      value: string;
-      role: string;
-      confidence: number;
-    }>;
-  }>> {
+      attribution?: {
+        actor: string;
+        confidence: number;
+        evidence: string[];
+      };
+      timeline: Array<{
+        date: Date;
+        activity: string;
+        iocs: string[];
+      }>;
+      techniques: string[];
+      infrastructure: Array<{
+        type: string;
+        value: string;
+        role: string;
+        confidence: number;
+      }>;
+    }>
+  > {
     logger.info('Discovering IOC campaigns and patterns');
 
     try {
@@ -294,24 +315,20 @@ export class EnhancedIOCService {
           ...(options.timeRange && {
             timestamp: {
               $gte: options.timeRange.start,
-              $lte: options.timeRange.end
-            }
-          })
-        }
+              $lte: options.timeRange.end,
+            },
+          }),
+        },
       };
 
       const iocResult = await this.dataLayer.query(iocQuery, context);
       const iocs = await this.convertToIOCs(iocResult.data);
 
       // Use analytics engine to discover patterns
-      const analytics = await this.dataLayer.analyzeThreats(
-        iocQuery,
-        context,
-        {
-          patterns: ['apt-campaign', 'botnet-activity', 'data-exfiltration'],
-          includeAnomalies: false
-        }
-      );
+      const analytics = await this.dataLayer.analyzeThreats(iocQuery, context, {
+        patterns: ['apt-campaign', 'botnet-activity', 'data-exfiltration'],
+        includeAnomalies: false,
+      });
 
       // Convert analytics findings to campaign structure
       const campaigns = this.extractCampaigns(analytics, iocs, options);
@@ -340,29 +357,29 @@ export class EnhancedIOCService {
       type: 'select',
       entity: 'iocs',
       filters: query.filters || {},
-      sources: query.sources || []
+      sources: query.sources || [],
     };
 
     for await (const record of this.dataLayer.stream(federatedQuery, context)) {
       // Convert to IOC if possible
       const ioc = await this.convertSingleRecordToIOC(record);
-      
+
       if (ioc) {
         yield {
           type: 'new_ioc',
           data: ioc,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
 
         // If relationships are requested, check for new relationships
         if (query.includeRelationships) {
           const relationships = await this.findIOCRelationships([ioc], context);
-          
+
           for (const relationship of relationships) {
             yield {
               type: 'relationship',
               data: relationship,
-              timestamp: new Date()
+              timestamp: new Date(),
             };
           }
         }
@@ -376,17 +393,19 @@ export class EnhancedIOCService {
   public async getThreatHuntingRecommendations(
     ioc: IIOC,
     context: IQueryContext
-  ): Promise<Array<{
-    technique: string;
-    description: string;
-    queries: Array<{
-      source: string;
-      query: string;
+  ): Promise<
+    Array<{
+      technique: string;
       description: string;
-    }>;
-    indicators: string[];
-    priority: 'low' | 'medium' | 'high' | 'critical';
-  }>> {
+      queries: Array<{
+        source: string;
+        query: string;
+        description: string;
+      }>;
+      indicators: string[];
+      priority: 'low' | 'medium' | 'high' | 'critical';
+    }>
+  > {
     logger.info(`Generating threat hunting recommendations for ${ioc.value}`);
 
     try {
@@ -396,9 +415,9 @@ export class EnhancedIOCService {
         traversal: {
           startNodes: [ioc._id?.toString() || ioc.value],
           maxDepth: 2,
-          direction: 'both'
+          direction: 'both',
         },
-        sources: []
+        sources: [],
       };
 
       const relatedResult = await this.dataLayer.query(relatedQuery, context);
@@ -411,13 +430,22 @@ export class EnhancedIOCService {
       );
 
       // Convert analytics findings to hunting recommendations
-      const recommendations = this.generateHuntingRecommendations(ioc, analytics, relatedResult);
+      const recommendations = this.generateHuntingRecommendations(
+        ioc,
+        analytics,
+        relatedResult
+      );
 
-      logger.info(`Generated ${recommendations.length} hunting recommendations for ${ioc.value}`);
+      logger.info(
+        `Generated ${recommendations.length} hunting recommendations for ${ioc.value}`
+      );
 
       return recommendations;
     } catch (error) {
-      logger.error(`Failed to generate hunting recommendations for ${ioc.value}`, error);
+      logger.error(
+        `Failed to generate hunting recommendations for ${ioc.value}`,
+        error
+      );
       throw error;
     }
   }
@@ -426,18 +454,20 @@ export class EnhancedIOCService {
 
   private async convertToIOCs(dataRecords: IDataRecord[]): Promise<IIOC[]> {
     const iocs: IIOC[] = [];
-    
+
     for (const record of dataRecords) {
       const ioc = await this.convertSingleRecordToIOC(record);
       if (ioc) {
         iocs.push(ioc);
       }
     }
-    
+
     return iocs;
   }
 
-  private async convertSingleRecordToIOC(record: IDataRecord): Promise<IIOC | null> {
+  private async convertSingleRecordToIOC(
+    record: IDataRecord
+  ): Promise<IIOC | null> {
     try {
       // If record is already an IOC from MongoDB
       if (record.source === 'MongoDB' && record.type === 'ioc') {
@@ -459,20 +489,20 @@ export class EnhancedIOCService {
         metadata: {
           ...record.metadata,
           originalSource: record.source,
-          provenance: record.provenance
+          provenance: record.provenance,
         },
-        createdBy: record.data.createdBy || 'system' // Would map to actual user
+        createdBy: record.data.createdBy || 'system', // Would map to actual user
       };
 
       // Create IOC in database if it's new
       const existingIOC = await IOC.findOne({
         value: iocData.value,
-        type: iocData.type
+        type: iocData.type,
       });
 
       if (existingIOC) {
         // Update with new information
-        return await IOC.findByIdAndUpdate(
+        return (await IOC.findByIdAndUpdate(
           existingIOC._id,
           {
             $set: {
@@ -480,15 +510,15 @@ export class EnhancedIOCService {
               isActive: iocData.isActive,
               metadata: {
                 ...existingIOC.metadata,
-                ...iocData.metadata
-              }
-            }
+                ...iocData.metadata,
+              },
+            },
           },
           { new: true }
-        ) as IIOC;
+        )) as IIOC;
       } else {
         // Create new IOC
-        return await IOC.create(iocData) as IIOC;
+        return (await IOC.create(iocData)) as IIOC;
       }
     } catch (error) {
       logger.error('Failed to convert record to IOC', { record, error });
@@ -498,49 +528,64 @@ export class EnhancedIOCService {
 
   private mapIOCType(type: string): 'ip' | 'domain' | 'url' | 'hash' | 'email' {
     const lowerType = type.toLowerCase();
-    
-    if (lowerType.includes('ip') || lowerType === 'ipv4' || lowerType === 'ipv6') {
+
+    if (
+      lowerType.includes('ip') ||
+      lowerType === 'ipv4' ||
+      lowerType === 'ipv6'
+    ) {
       return 'ip';
     } else if (lowerType.includes('domain') || lowerType === 'fqdn') {
       return 'domain';
     } else if (lowerType.includes('url') || lowerType === 'uri') {
       return 'url';
-    } else if (lowerType.includes('hash') || lowerType.includes('md5') || 
-               lowerType.includes('sha') || lowerType === 'file') {
+    } else if (
+      lowerType.includes('hash') ||
+      lowerType.includes('md5') ||
+      lowerType.includes('sha') ||
+      lowerType === 'file'
+    ) {
       return 'hash';
     } else if (lowerType.includes('email') || lowerType.includes('mail')) {
       return 'email';
     }
-    
+
     return 'hash'; // Default fallback
   }
 
-  private mapSeverity(severity: string): 'low' | 'medium' | 'high' | 'critical' {
+  private mapSeverity(
+    severity: string
+  ): 'low' | 'medium' | 'high' | 'critical' {
     if (!severity) return 'medium';
-    
+
     const lowerSeverity = severity.toLowerCase();
-    
-    if (lowerSeverity.includes('critical') || lowerSeverity.includes('very high')) {
+
+    if (
+      lowerSeverity.includes('critical') ||
+      lowerSeverity.includes('very high')
+    ) {
       return 'critical';
     } else if (lowerSeverity.includes('high')) {
       return 'high';
     } else if (lowerSeverity.includes('low')) {
       return 'low';
     }
-    
+
     return 'medium';
   }
 
   private async findIOCRelationships(
     iocs: IIOC[],
     _context: IQueryContext
-  ): Promise<Array<{
-    source: IIOC;
-    target: IIOC;
-    type: string;
-    confidence: number;
-    metadata?: Record<string, any>;
-  }>> {
+  ): Promise<
+    Array<{
+      source: IIOC;
+      target: IIOC;
+      type: string;
+      confidence: number;
+      metadata?: Record<string, any>;
+    }>
+  > {
     const relationships: Array<{
       source: IIOC;
       target: IIOC;
@@ -554,7 +599,7 @@ export class EnhancedIOCService {
       for (let j = i + 1; j < iocs.length; j++) {
         const ioc1 = iocs[i];
         const ioc2 = iocs[j];
-        
+
         if (ioc1 && ioc2) {
           const relationship = this.findRelationshipBetweenIOCs(ioc1, ioc2);
           if (relationship) {
@@ -570,7 +615,13 @@ export class EnhancedIOCService {
   private findRelationshipBetweenIOCs(
     ioc1: IIOC,
     ioc2: IIOC
-  ): { source: IIOC; target: IIOC; type: string; confidence: number; metadata?: Record<string, any> } | null {
+  ): {
+    source: IIOC;
+    target: IIOC;
+    type: string;
+    confidence: number;
+    metadata?: Record<string, any>;
+  } | null {
     // Same source relationship
     if (ioc1.source === ioc2.source && ioc1.source !== 'internal') {
       return {
@@ -578,7 +629,7 @@ export class EnhancedIOCService {
         target: ioc2,
         type: 'same_source',
         confidence: 0.7,
-        metadata: { commonSource: ioc1.source }
+        metadata: { commonSource: ioc1.source },
       };
     }
 
@@ -589,32 +640,37 @@ export class EnhancedIOCService {
         source: ioc1,
         target: ioc2,
         type: 'common_tags',
-        confidence: Math.min(0.9, 0.3 + (commonTags.length * 0.2)),
-        metadata: { commonTags }
+        confidence: Math.min(0.9, 0.3 + commonTags.length * 0.2),
+        metadata: { commonTags },
       };
     }
 
     // Temporal relationship (seen around the same time)
-    const timeDiff = Math.abs(ioc1.firstSeen.getTime() - ioc2.firstSeen.getTime());
-    if (timeDiff < 86400000) { // 24 hours
+    const timeDiff = Math.abs(
+      ioc1.firstSeen.getTime() - ioc2.firstSeen.getTime()
+    );
+    if (timeDiff < 86400000) {
+      // 24 hours
       return {
         source: ioc1,
         target: ioc2,
         type: 'temporal',
         confidence: 0.5,
-        metadata: { timeDifferenceMs: timeDiff }
+        metadata: { timeDifferenceMs: timeDiff },
       };
     }
 
     // Infrastructure relationship (IP and domain)
-    if ((ioc1.type === 'ip' && ioc2.type === 'domain') ||
-        (ioc1.type === 'domain' && ioc2.type === 'ip')) {
+    if (
+      (ioc1.type === 'ip' && ioc2.type === 'domain') ||
+      (ioc1.type === 'domain' && ioc2.type === 'ip')
+    ) {
       return {
         source: ioc1,
         target: ioc2,
         type: 'infrastructure',
         confidence: 0.8,
-        metadata: { relationship: 'ip_domain' }
+        metadata: { relationship: 'ip_domain' },
       };
     }
 
@@ -626,15 +682,32 @@ export class EnhancedIOCService {
     ioc: IIOC
   ): IIOCEnrichmentResult['enrichments'][0] | null {
     // Determine enrichment type based on record content
-    let enrichmentType: 'reputation' | 'geolocation' | 'malware' | 'attribution' | 'context' = 'context';
-    
+    let enrichmentType:
+      | 'reputation'
+      | 'geolocation'
+      | 'malware'
+      | 'attribution'
+      | 'context' = 'context';
+
     if (record.data.reputation || record.data.score) {
       enrichmentType = 'reputation';
-    } else if (record.data.country || record.data.latitude || record.data.longitude) {
+    } else if (
+      record.data.country ||
+      record.data.latitude ||
+      record.data.longitude
+    ) {
       enrichmentType = 'geolocation';
-    } else if (record.data.malware || record.data.family || record.data.detection) {
+    } else if (
+      record.data.malware ||
+      record.data.family ||
+      record.data.detection
+    ) {
       enrichmentType = 'malware';
-    } else if (record.data.actor || record.data.attribution || record.data.campaign) {
+    } else if (
+      record.data.actor ||
+      record.data.attribution ||
+      record.data.campaign
+    ) {
       enrichmentType = 'attribution';
     }
 
@@ -643,15 +716,21 @@ export class EnhancedIOCService {
       type: enrichmentType,
       data: record.data,
       confidence: this.calculateEnrichmentConfidence(record, ioc),
-      timestamp: record.timestamp
+      timestamp: record.timestamp,
     };
   }
 
-  private calculateEnrichmentConfidence(record: IDataRecord, ioc: IIOC): number {
+  private calculateEnrichmentConfidence(
+    record: IDataRecord,
+    ioc: IIOC
+  ): number {
     let confidence = 0.5; // Base confidence
 
     // Higher confidence for exact matches
-    if (record.data.value === ioc.value || record.data.indicator === ioc.value) {
+    if (
+      record.data.value === ioc.value ||
+      record.data.indicator === ioc.value
+    ) {
       confidence += 0.3;
     }
 
@@ -665,7 +744,12 @@ export class EnhancedIOCService {
     }
 
     // Higher confidence for authoritative sources
-    const authoritativeSources = ['virustotal', 'mandiant', 'crowdstrike', 'microsoft'];
+    const authoritativeSources = [
+      'virustotal',
+      'mandiant',
+      'crowdstrike',
+      'microsoft',
+    ];
     if (authoritativeSources.includes(record.source.toLowerCase())) {
       confidence += 0.2;
     }
@@ -681,7 +765,7 @@ export class EnhancedIOCService {
       reputation: 0,
       malware: 0,
       attribution: 0,
-      context: 0
+      context: 0,
     };
 
     const factors: Array<{
@@ -710,48 +794,58 @@ export class EnhancedIOCService {
     factors.push({
       factor: 'base_severity',
       impact: baseScore,
-      description: `Base severity: ${ioc.severity}`
+      description: `Base severity: ${ioc.severity}`,
     });
 
     // Process enrichments
     for (const enrichment of enrichments) {
       const enrichmentScore = enrichment.confidence * 100;
-      
+
       switch (enrichment.type) {
         case 'reputation':
-          const repScore = enrichment.data.reputation || enrichment.data.score || 0;
-          categories.reputation = Math.max(categories.reputation, repScore * enrichment.confidence);
+          const repScore =
+            enrichment.data.reputation || enrichment.data.score || 0;
+          categories.reputation = Math.max(
+            categories.reputation,
+            repScore * enrichment.confidence
+          );
           factors.push({
             factor: 'reputation',
             impact: repScore * enrichment.confidence,
-            description: `Reputation data from ${enrichment.source}`
+            description: `Reputation data from ${enrichment.source}`,
           });
           break;
-          
+
         case 'malware':
           categories.malware = Math.max(categories.malware, enrichmentScore);
           factors.push({
             factor: 'malware_association',
             impact: enrichmentScore,
-            description: `Malware association from ${enrichment.source}`
+            description: `Malware association from ${enrichment.source}`,
           });
           break;
-          
+
         case 'attribution':
-          categories.attribution = Math.max(categories.attribution, enrichmentScore);
+          categories.attribution = Math.max(
+            categories.attribution,
+            enrichmentScore
+          );
           factors.push({
             factor: 'threat_attribution',
             impact: enrichmentScore,
-            description: `Threat actor attribution from ${enrichment.source}`
+            description: `Threat actor attribution from ${enrichment.source}`,
           });
           break;
-          
+
         case 'context':
-          categories.context = Math.max(categories.context, enrichmentScore * 0.5);
+          categories.context = Math.max(
+            categories.context,
+            enrichmentScore * 0.5
+          );
           factors.push({
             factor: 'contextual_data',
             impact: enrichmentScore * 0.5,
-            description: `Contextual information from ${enrichment.source}`
+            description: `Contextual information from ${enrichment.source}`,
           });
           break;
       }
@@ -760,50 +854,65 @@ export class EnhancedIOCService {
     // Calculate overall risk score
     const categoryScores = Object.values(categories);
     const maxCategoryScore = Math.max(...categoryScores);
-    const avgCategoryScore = categoryScores.reduce((sum, score) => sum + score, 0) / categoryScores.length;
-    
-    const overall = Math.round(Math.max(baseScore, (maxCategoryScore * 0.6 + avgCategoryScore * 0.4)));
+    const avgCategoryScore =
+      categoryScores.reduce((sum, score) => sum + score, 0) /
+      categoryScores.length;
+
+    const overall = Math.round(
+      Math.max(baseScore, maxCategoryScore * 0.6 + avgCategoryScore * 0.4)
+    );
 
     return {
       overall: Math.min(100, overall),
       categories,
-      factors: factors.sort((a, b) => b.impact - a.impact)
+      factors: factors.sort((a, b) => b.impact - a.impact),
     };
   }
 
   private calculateQueryConfidence(result: IFederatedResult): number {
     const sourceCount = Object.keys(result.sourceBreakdown || {}).length;
-    const baseConfidence = Math.min(0.9, 0.3 + (sourceCount * 0.15));
-    
+    const baseConfidence = Math.min(0.9, 0.3 + sourceCount * 0.15);
+
     // Factor in execution success
     const errorSources = Object.values(result.sourceBreakdown || {}).filter(
       source => source.errors && source.errors.length > 0
     ).length;
-    
+
     const errorPenalty = errorSources * 0.1;
-    
+
     return Math.max(0.1, baseConfidence - errorPenalty);
   }
 
-  private async getReputationData(ioc: IIOC, _context: IQueryContext): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
+  private async getReputationData(
+    ioc: IIOC,
+    _context: IQueryContext
+  ): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
     // Mock reputation enrichment - in production would call real APIs
     return {
       source: 'reputation-service',
       type: 'reputation',
       data: {
-        reputation: ioc.severity === 'critical' ? 100 : 
-                   ioc.severity === 'high' ? 75 :
-                   ioc.severity === 'medium' ? 50 : 25,
+        reputation:
+          ioc.severity === 'critical'
+            ? 100
+            : ioc.severity === 'high'
+              ? 75
+              : ioc.severity === 'medium'
+                ? 50
+                : 25,
         categories: ['malware', 'botnet'],
         firstSeen: ioc.firstSeen,
-        lastSeen: ioc.lastSeen
+        lastSeen: ioc.lastSeen,
       },
       confidence: 0.8,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
-  private async getGeolocationData(ioc: IIOC, _context: IQueryContext): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
+  private async getGeolocationData(
+    ioc: IIOC,
+    _context: IQueryContext
+  ): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
     if (ioc.type !== 'ip') return null;
 
     // Mock geolocation enrichment
@@ -818,14 +927,17 @@ export class EnhancedIOCService {
         latitude: 0,
         longitude: 0,
         asn: 'AS0000',
-        organization: 'Unknown'
+        organization: 'Unknown',
       },
       confidence: 0.9,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
-  private async getMalwareAnalysisData(ioc: IIOC, _context: IQueryContext): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
+  private async getMalwareAnalysisData(
+    ioc: IIOC,
+    _context: IQueryContext
+  ): Promise<IIOCEnrichmentResult['enrichments'][0] | null> {
     if (ioc.type !== 'hash') return null;
 
     // Mock malware analysis enrichment
@@ -838,10 +950,10 @@ export class EnhancedIOCService {
         firstSubmission: ioc.firstSeen,
         lastAnalysis: new Date(),
         signatures: [],
-        behaviors: []
+        behaviors: [],
       },
       confidence: 0.7,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -867,9 +979,10 @@ export class EnhancedIOCService {
     }> = [];
 
     for (const link of crossSourceLinks) {
-      const localIOC = iocs.find(ioc => 
-        ioc._id?.toString() === link.sourceEntity.id ||
-        ioc.value === link.sourceEntity.data.value
+      const localIOC = iocs.find(
+        ioc =>
+          ioc._id?.toString() === link.sourceEntity.id ||
+          ioc.value === link.sourceEntity.data.value
       );
 
       if (localIOC) {
@@ -877,7 +990,7 @@ export class EnhancedIOCService {
           localIOC,
           externalData: link.targetEntity,
           similarity: link.similarity,
-          linkType: link.linkType
+          linkType: link.linkType,
         });
       }
     }
@@ -893,10 +1006,11 @@ export class EnhancedIOCService {
     const campaigns: Array<any> = [];
 
     // Group findings by pattern type to identify campaigns
-    const campaignFindings = analytics.findings.filter(finding =>
-      finding.pattern.includes('campaign') || 
-      finding.pattern.includes('apt') ||
-      finding.pattern.includes('botnet')
+    const campaignFindings = analytics.findings.filter(
+      finding =>
+        finding.pattern.includes('campaign') ||
+        finding.pattern.includes('apt') ||
+        finding.pattern.includes('botnet')
     );
 
     for (const finding of campaignFindings) {
@@ -912,7 +1026,7 @@ export class EnhancedIOCService {
           confidence: finding.score / 100,
           timeline: this.buildCampaignTimeline(campaignIOCs),
           techniques: this.extractTechniques(finding),
-          infrastructure: this.extractInfrastructure(campaignIOCs)
+          infrastructure: this.extractInfrastructure(campaignIOCs),
         });
       }
     }
@@ -933,7 +1047,7 @@ export class EnhancedIOCService {
 
     // Group IOCs by date
     const dateGroups = new Map<string, IIOC[]>();
-    
+
     for (const ioc of iocs) {
       const dateKey = ioc.firstSeen.toISOString().split('T')[0];
       if (dateKey && !dateGroups.has(dateKey)) {
@@ -949,7 +1063,7 @@ export class EnhancedIOCService {
       timeline.push({
         date: new Date(dateKey),
         activity: `${dateIOCs.length} indicators observed`,
-        iocs: dateIOCs.map(ioc => ioc.value)
+        iocs: dateIOCs.map(ioc => ioc.value),
       });
     }
 
@@ -959,11 +1073,11 @@ export class EnhancedIOCService {
   private extractTechniques(finding: any): string[] {
     // Extract MITRE techniques from finding metadata
     const techniques = [];
-    
+
     if (finding.metadata?.techniques) {
       techniques.push(...finding.metadata.techniques);
     }
-    
+
     // Default techniques based on pattern
     switch (finding.pattern) {
       case 'apt-campaign':
@@ -995,7 +1109,7 @@ export class EnhancedIOCService {
 
     for (const ioc of iocs) {
       let role = 'unknown';
-      
+
       switch (ioc.type) {
         case 'ip':
           role = 'command_control';
@@ -1018,7 +1132,7 @@ export class EnhancedIOCService {
         type: ioc.type,
         value: ioc.value,
         role,
-        confidence: ioc.confidence / 100
+        confidence: ioc.confidence / 100,
       });
     }
 
@@ -1052,16 +1166,16 @@ export class EnhancedIOCService {
             {
               source: 'network_logs',
               query: `dest_ip:"${ioc.value}"`,
-              description: 'Search for outbound connections to the IP'
+              description: 'Search for outbound connections to the IP',
             },
             {
               source: 'proxy_logs',
               query: `server_ip:"${ioc.value}"`,
-              description: 'Search proxy logs for connections'
-            }
+              description: 'Search proxy logs for connections',
+            },
           ],
           indicators: [ioc.value],
-          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical'
+          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical',
         });
         break;
 
@@ -1073,16 +1187,16 @@ export class EnhancedIOCService {
             {
               source: 'dns_logs',
               query: `query:"${ioc.value}"`,
-              description: 'Search for DNS queries to the domain'
+              description: 'Search for DNS queries to the domain',
             },
             {
               source: 'web_logs',
               query: `host:"${ioc.value}"`,
-              description: 'Search web logs for requests to domain'
-            }
+              description: 'Search web logs for requests to domain',
+            },
           ],
           indicators: [ioc.value],
-          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical'
+          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical',
         });
         break;
 
@@ -1094,16 +1208,16 @@ export class EnhancedIOCService {
             {
               source: 'file_logs',
               query: `file_hash:"${ioc.value}"`,
-              description: 'Search for files with matching hash'
+              description: 'Search for files with matching hash',
             },
             {
               source: 'process_logs',
               query: `process_hash:"${ioc.value}"`,
-              description: 'Search for processes with matching hash'
-            }
+              description: 'Search for processes with matching hash',
+            },
           ],
           indicators: [ioc.value],
-          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical'
+          priority: ioc.severity as 'low' | 'medium' | 'high' | 'critical',
         });
         break;
     }

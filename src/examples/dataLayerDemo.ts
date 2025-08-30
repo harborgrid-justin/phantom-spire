@@ -2,7 +2,10 @@
  * Data Layer Integration Test - Demonstrates Palantir-like capabilities
  */
 
-import { DataLayerOrchestrator, IDataLayerConfig } from '../data-layer/DataLayerOrchestrator';
+import {
+  DataLayerOrchestrator,
+  IDataLayerConfig,
+} from '../data-layer/DataLayerOrchestrator';
 import { logger } from '../utils/logger';
 
 /**
@@ -16,17 +19,17 @@ export class DataLayerIntegrationExample {
     const config: IDataLayerConfig = {
       mongodb: {
         uri: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-        database: process.env.MONGODB_DB || 'phantom-spire'
+        database: process.env.MONGODB_DB || 'phantom-spire',
       },
       analytics: {
         enableAdvancedAnalytics: true,
         enableAnomalyDetection: true,
-        enablePredictiveAnalytics: true
+        enablePredictiveAnalytics: true,
       },
       federation: {
         enableCrossSourceQueries: true,
         enableRelationshipDiscovery: true,
-        queryTimeout: 30000
+        queryTimeout: 30000,
       },
       connectors: {
         'threat-feed-1': {
@@ -35,22 +38,22 @@ export class DataLayerIntegrationExample {
           connection: {
             url: 'https://api.openthreatintel.com',
             headers: {
-              'X-API-Source': 'phantom-spire'
-            }
+              'X-API-Source': 'phantom-spire',
+            },
           },
           timeout: 30000,
           authentication: {
             type: 'bearer',
             credentials: {
-              token: process.env.THREAT_INTEL_API_KEY || 'demo-key'
-            }
+              token: process.env.THREAT_INTEL_API_KEY || 'demo-key',
+            },
           },
           options: {
             enableRateLimit: true,
-            cacheDuration: 300000 // 5 minutes
-          }
-        }
-      }
+            cacheDuration: 300000, // 5 minutes
+          },
+        },
+      },
     };
 
     this.dataLayer = new DataLayerOrchestrator(config);
@@ -81,7 +84,6 @@ export class DataLayerIntegrationExample {
 
       // Show performance metrics
       this.demonstrateMetrics();
-
     } catch (error) {
       logger.error('❌ Data layer demonstration failed', error);
       throw error;
@@ -102,8 +104,8 @@ export class DataLayerIntegrationExample {
       permissions: ['read:iocs', 'read:analytics'],
       timeRange: {
         start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
-        end: new Date()
-      }
+        end: new Date(),
+      },
     };
 
     try {
@@ -113,25 +115,27 @@ export class DataLayerIntegrationExample {
         entity: 'iocs',
         filters: {
           severity: { $in: ['high', 'critical'] },
-          isActive: true
+          isActive: true,
         },
         fusion: 'union' as const,
         limit: 100,
-        sources: []
+        sources: [],
       };
 
       const results = await this.dataLayer.query(iocQuery, context);
-      
+
       logger.info('📈 Federated Query Results', {
         totalResults: results.metadata.total,
         sourcesQueried: Object.keys(results.sourceBreakdown || {}),
-        executionTime: results.metadata.executionTime
+        executionTime: results.metadata.executionTime,
       });
-
     } catch (error) {
-      logger.warn('⚠️  Federated query demonstration skipped (no data sources available)', {
-        error: (error as Error).message
-      });
+      logger.warn(
+        '⚠️  Federated query demonstration skipped (no data sources available)',
+        {
+          error: (error as Error).message,
+        }
+      );
     }
   }
 
@@ -143,7 +147,7 @@ export class DataLayerIntegrationExample {
 
     const context = {
       userId: 'demo-analyst',
-      permissions: ['read:iocs', 'read:analytics']
+      permissions: ['read:iocs', 'read:analytics'],
     };
 
     try {
@@ -153,10 +157,10 @@ export class DataLayerIntegrationExample {
         entity: 'iocs',
         filters: {
           timestamp: {
-            $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
-          }
+            $gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+          },
         },
-        sources: []
+        sources: [],
       };
 
       const analytics = await this.dataLayer.analyzeThreats(
@@ -165,7 +169,7 @@ export class DataLayerIntegrationExample {
         {
           patterns: ['apt-campaign', 'botnet-activity', 'data-exfiltration'],
           includeAnomalies: true,
-          includePredictions: true
+          includePredictions: true,
         }
       );
 
@@ -174,7 +178,7 @@ export class DataLayerIntegrationExample {
         findings: analytics.findings.length,
         recommendations: analytics.recommendations.length,
         executionTime: analytics.metadata.executionTime,
-        algorithmsUsed: analytics.metadata.algorithmsUsed
+        algorithmsUsed: analytics.metadata.algorithmsUsed,
       });
 
       // Log top findings
@@ -183,13 +187,12 @@ export class DataLayerIntegrationExample {
           risk: finding.risk,
           score: finding.score,
           evidence: finding.evidence.length,
-          description: finding.description
+          description: finding.description,
         });
       });
-
     } catch (error) {
       logger.warn('⚠️  Analytics demonstration skipped', {
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -202,7 +205,7 @@ export class DataLayerIntegrationExample {
 
     const context = {
       userId: 'demo-analyst',
-      permissions: ['read:iocs', 'read:analytics', 'read:relationships']
+      permissions: ['read:iocs', 'read:analytics', 'read:relationships'],
     };
 
     try {
@@ -215,19 +218,18 @@ export class DataLayerIntegrationExample {
         {
           maxDepth: 3,
           relationshipTypes: ['infrastructure', 'temporal', 'attribution'],
-          similarityThreshold: 0.75
+          similarityThreshold: 0.75,
         }
       );
 
       logger.info('🕸️  Relationship Discovery Results', {
         nodes: relationships.nodes.length,
         relationships: relationships.relationships.length,
-        crossSourceLinks: relationships.crossSourceLinks.length
+        crossSourceLinks: relationships.crossSourceLinks.length,
       });
-
     } catch (error) {
       logger.warn('⚠️  Relationship discovery demonstration skipped', {
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -247,12 +249,11 @@ export class DataLayerIntegrationExample {
           (status: any) => status.status === 'healthy'
         ).length,
         connectorsHealthy: Object.values(health.connectors).filter(
-          (status: any) => status.status === 'healthy'  
+          (status: any) => status.status === 'healthy'
         ).length,
         analyticsStatus: health.analytics.status,
-        federationStatus: health.federation.status
+        federationStatus: health.federation.status,
       });
-
     } catch (error) {
       logger.error('❌ Health monitoring failed', error);
     }
@@ -269,21 +270,21 @@ export class DataLayerIntegrationExample {
     logger.info('📈 System Metrics', {
       dataSources: {
         total: metrics.dataSources.total,
-        healthy: metrics.dataSources.healthy
+        healthy: metrics.dataSources.healthy,
       },
       queries: {
         totalExecuted: metrics.queries.totalExecuted,
         averageTime: Math.round(metrics.queries.averageExecutionTime),
-        errorRate: Math.round(metrics.queries.errorRate * 100)
+        errorRate: Math.round(metrics.queries.errorRate * 100),
       },
       analytics: {
         threatsAnalyzed: metrics.analytics.threatsAnalyzed,
-        patternsDetected: metrics.analytics.patternsDetected
+        patternsDetected: metrics.analytics.patternsDetected,
       },
       connectors: {
         total: metrics.connectors.total,
-        connected: metrics.connectors.connected
-      }
+        connected: metrics.connectors.connected,
+      },
     });
   }
 }
@@ -291,13 +292,14 @@ export class DataLayerIntegrationExample {
 // Example usage
 if (require.main === module) {
   const demo = new DataLayerIntegrationExample();
-  
-  demo.demonstrateCapabilities()
+
+  demo
+    .demonstrateCapabilities()
     .then(() => {
       logger.info('✅ Data layer demonstration completed successfully');
       process.exit(0);
     })
-    .catch((error) => {
+    .catch(error => {
       logger.error('❌ Data layer demonstration failed', error);
       process.exit(1);
     });

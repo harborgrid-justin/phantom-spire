@@ -228,7 +228,7 @@ export class IOCValidationService {
       if (url.pathname.includes('..') || url.pathname.includes('%2e%2e')) {
         result.warnings.push('URL contains directory traversal patterns');
       }
-    } catch (_error) {
+    } catch {
       result.errors.push('Invalid URL format');
     }
   }
