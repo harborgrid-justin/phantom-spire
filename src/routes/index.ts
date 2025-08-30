@@ -4,6 +4,7 @@ import iocRoutes from './iocs';
 import mitreRoutes from './mitre';
 import evidenceRoutes from './evidence/evidenceRoutes';
 import issueRoutes from './issue/issueRoutesSimplified';
+import { organizationRoutes } from './organization';
 import { createTaskRoutes } from './tasks/taskRoutes';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator';
 
@@ -17,6 +18,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/mitre', mitreRoutes);
   router.use('/evidence', evidenceRoutes);
   router.use('/issues', issueRoutes);
+  router.use('/organizations', organizationRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -36,11 +38,13 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         mitre: '/api/v1/mitre',
         evidence: '/api/v1/evidence',
         issues: '/api/v1/issues',
+        organizations: '/api/v1/organizations',
         tasks: orchestrator ? '/api/v1/tasks' : 'not available (orchestrator not initialized)',
         docs: '/api-docs',
         health: '/health',
       },
       features: {
+        organizationManagement: true,
         taskManagement: !!orchestrator,
         evidenceManagement: true,
         threatIntelligence: true,
