@@ -4,7 +4,7 @@
  */
 
 // Core model
-export { Issue, IIssue } from '../models/Issue';
+export { Issue, IIssue } from '../../models/Issue';
 
 // Service interfaces
 export * from './interfaces/IIssueManager';
