@@ -31,6 +31,16 @@ import {
   IThreatModel,
 } from './analytics/AdvancedAnalyticsEngine';
 import { RestApiConnector } from './connectors/RestApiConnector';
+import { EvidenceManagementService } from './evidence/services/EvidenceManagementService';
+import { EvidenceAnalyticsEngine } from './evidence/services/EvidenceAnalyticsEngine';
+import { 
+  IEvidenceManager, 
+  IEvidenceContext, 
+  ICreateEvidenceRequest,
+  IEvidenceQuery,
+  IEvidenceSearchResult 
+} from './evidence/interfaces/IEvidenceManager';
+import { IEvidence, EvidenceType, ClassificationLevel } from './evidence/interfaces/IEvidence';
 import {
   IDataSource,
   IDataRecord,
@@ -104,6 +114,8 @@ export interface IDataLayerMetrics {
 export class DataLayerOrchestrator {
   private federationEngine: DataFederationEngine;
   private analyticsEngine: AdvancedAnalyticsEngine;
+  private evidenceManager: EvidenceManagementService;
+  private evidenceAnalyticsEngine: EvidenceAnalyticsEngine;
   private dataSources: Map<string, IDataSource> = new Map();
   private connectors: Map<string, IDataConnector> = new Map();
   private pipelines: Map<string, IDataPipeline> = new Map();
@@ -124,6 +136,11 @@ export class DataLayerOrchestrator {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
     this.analyticsEngine = new AdvancedAnalyticsEngine();
+    
+    // Initialize Fortune 100-Grade Evidence Management
+    this.evidenceManager = new EvidenceManagementService();
+    this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(this.evidenceManager);
+    
     this.metrics = this.initializeMetrics();
     
     // Initialize message queue integration if provided
@@ -139,7 +156,7 @@ export class DataLayerOrchestrator {
       this.initializeIngestionEngine(messageQueueManager);
     }
 
-    logger.info('Data Layer Orchestrator initialized');
+    logger.info('Data Layer Orchestrator initialized with Fortune 100-Grade Evidence Management');
   }
 
   /**
@@ -783,5 +800,257 @@ export class DataLayerOrchestrator {
       stream: this.streamProcessor?.getMetrics(),
       deadLetterQueue: this.streamProcessor?.getDeadLetterQueue().length || 0,
     };
+  }
+
+  // ============================================================================
+  // Fortune 100-Grade Evidence Management API
+  // ============================================================================
+
+  /**
+   * Get Evidence Manager instance
+   */
+  public getEvidenceManager(): IEvidenceManager {
+    return this.evidenceManager;
+  }
+
+  /**
+   * Get Evidence Analytics Engine instance
+   */
+  public getEvidenceAnalyticsEngine(): EvidenceAnalyticsEngine {
+    return this.evidenceAnalyticsEngine;
+  }
+
+  /**
+   * Create new evidence with full chain of custody tracking
+   */
+  public async createEvidence(
+    request: ICreateEvidenceRequest, 
+    context: IEvidenceContext
+  ): Promise<IEvidence> {
+    try {
+      const evidence = await this.evidenceManager.createEvidence(request, context);
+      
+      // Update metrics
+      this.metrics.analytics.threatsAnalyzed++;
+      
+      logger.info('Evidence created via data layer orchestrator', {
+        evidenceId: evidence.id,
+        type: evidence.type,
+        classification: evidence.classification,
+        userId: context.userId
+      });
+      
+      return evidence;
+    } catch (error) {
+      logger.error('Failed to create evidence', {
+        sourceType: request.sourceType,
+        userId: context.userId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Search evidence with advanced filtering and access control
+   */
+  public async searchEvidence(
+    query: IEvidenceQuery, 
+    context: IEvidenceContext
+  ): Promise<IEvidenceSearchResult> {
+    try {
+      const result = await this.evidenceManager.searchEvidence(query, context);
+      
+      // Update metrics
+      this.metrics.queries.totalExecuted++;
+      
+      logger.info('Evidence search completed via data layer orchestrator', {
+        resultCount: result.totalCount,
+        hasMore: result.hasMore,
+        userId: context.userId
+      });
+      
+      return result;
+    } catch (error) {
+      this.metrics.queries.errorRate++;
+      logger.error('Failed to search evidence', {
+        userId: context.userId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Perform comprehensive evidence analysis with advanced analytics
+   */
+  public async analyzeEvidence(
+    evidenceIds: string[],
+    context: IEvidenceContext,
+    options: any = {}
+  ): Promise<any> {
+    try {
+      const result = await this.evidenceAnalyticsEngine.analyzeEvidence(
+        evidenceIds, 
+        context, 
+        options
+      );
+      
+      // Update metrics
+      this.metrics.analytics.patternsDetected += result.patterns.length;
+      this.metrics.analytics.anomaliesFound += result.findings.filter(f => f.type === 'anomaly').length;
+      
+      logger.info('Evidence analysis completed via data layer orchestrator', {
+        analysisId: result.analysisId,
+        evidenceAnalyzed: result.evidenceAnalyzed,
+        findingsCount: result.findings.length,
+        correlationsCount: result.correlations.length,
+        overallRisk: result.riskAssessment.overall_risk,
+        userId: context.userId
+      });
+      
+      return result;
+    } catch (error) {
+      logger.error('Failed to analyze evidence', {
+        evidenceIds,
+        userId: context.userId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Create evidence from IOC data (integration with existing IOC services)
+   */
+  public async createEvidenceFromIOC(
+    iocData: any,
+    context: IEvidenceContext
+  ): Promise<IEvidence> {
+    const request: ICreateEvidenceRequest = {
+      type: EvidenceType.IOC_EVIDENCE,
+      sourceType: iocData.sourceType || 'internal_detection' as any,
+      sourceId: iocData.id || iocData.value,
+      sourceSystem: iocData.source || 'phantom-spire',
+      data: {
+        value: iocData.value,
+        type: iocData.type,
+        confidence: iocData.confidence,
+        severity: iocData.severity,
+        tags: iocData.tags,
+        sources: iocData.sources,
+        firstSeen: iocData.firstSeen,
+        lastSeen: iocData.lastSeen
+      },
+      metadata: {
+        title: `IOC Evidence: ${iocData.value}`,
+        description: `Evidence for IOC ${iocData.type}: ${iocData.value}`,
+        severity: iocData.severity || 'medium',
+        confidence: iocData.confidence || 50,
+        format: 'json'
+      },
+      classification: this.mapSeverityToClassification(iocData.severity),
+      tags: iocData.tags || [],
+      handling: [{
+        type: 'retention',
+        instruction: 'Retain for threat intelligence purposes',
+        authority: 'system'
+      }]
+    };
+
+    return this.createEvidence(request, context);
+  }
+
+  /**
+   * Get evidence metrics and statistics
+   */
+  public async getEvidenceMetrics(timeRange?: { start: Date; end: Date }) {
+    try {
+      const metrics = await this.evidenceManager.getEvidenceMetrics(timeRange);
+      
+      logger.info('Evidence metrics retrieved', {
+        totalEvidence: metrics.totalEvidence,
+        averageConfidence: metrics.averageConfidence,
+        integrityViolations: metrics.custodyMetrics.integrityViolations
+      });
+      
+      return metrics;
+    } catch (error) {
+      logger.error('Failed to retrieve evidence metrics', {
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Generate evidence report
+   */
+  public async generateEvidenceReport(
+    query: any,
+    context: IEvidenceContext
+  ): Promise<any> {
+    try {
+      const report = await this.evidenceManager.generateEvidenceReport(query, context);
+      
+      logger.info('Evidence report generated', {
+        title: report.title,
+        evidenceCount: report.evidence.length,
+        generatedBy: context.userId
+      });
+      
+      return report;
+    } catch (error) {
+      logger.error('Failed to generate evidence report', {
+        userId: context.userId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Verify evidence integrity
+   */
+  public async verifyEvidenceIntegrity(
+    evidenceId: string,
+    context: IEvidenceContext
+  ) {
+    try {
+      const result = await this.evidenceManager.verifyIntegrity(evidenceId, context);
+      
+      logger.info('Evidence integrity verification completed', {
+        evidenceId,
+        isValid: result.isValid,
+        algorithm: result.algorithm,
+        userId: context.userId
+      });
+      
+      return result;
+    } catch (error) {
+      logger.error('Failed to verify evidence integrity', {
+        evidenceId,
+        userId: context.userId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Private helper method to map IOC severity to evidence classification
+   */
+  private mapSeverityToClassification(severity?: string): ClassificationLevel {
+    switch (severity?.toLowerCase()) {
+      case 'critical':
+        return ClassificationLevel.TLP_RED;
+      case 'high':
+        return ClassificationLevel.TLP_AMBER;
+      case 'medium':
+        return ClassificationLevel.TLP_GREEN;
+      case 'low':
+      default:
+        return ClassificationLevel.TLP_WHITE;
+    }
   }
 }
