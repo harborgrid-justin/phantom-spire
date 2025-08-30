@@ -187,7 +187,7 @@ export class PerformanceMonitor {
       id,
       operation,
       startTime,
-      metadata,
+      ...(metadata && { metadata }),
       end: (additionalMetadata?: Record<string, unknown>) => {
         this.endMeasurement(id, operation, startTime, {
           ...metadata,
@@ -215,7 +215,7 @@ export class PerformanceMonitor {
       startTime,
       endTime,
       duration,
-      metadata,
+      ...(metadata && { metadata }),
     };
 
     // Store measurement
@@ -255,9 +255,14 @@ export class PerformanceMonitor {
 
     // Calculate percentiles
     const sortedDurations = [...durations].sort((a, b) => a - b);
-    const p50 = sortedDurations[Math.floor(sortedDurations.length * 0.5)];
-    const p95 = sortedDurations[Math.floor(sortedDurations.length * 0.95)];
-    const p99 = sortedDurations[Math.floor(sortedDurations.length * 0.99)];
+    const p50 = sortedDurations[Math.floor(sortedDurations.length * 0.5)] || 0;
+    const p95 = sortedDurations[Math.floor(sortedDurations.length * 0.95)] || 0;
+    const p99 = sortedDurations[Math.floor(sortedDurations.length * 0.99)] || 0;
+    const lastMeasurement = measurements[measurements.length - 1];
+    
+    if (!lastMeasurement) {
+      return null;
+    }
 
     return {
       operation,
@@ -269,7 +274,7 @@ export class PerformanceMonitor {
       p50Duration: p50,
       p95Duration: p95,
       p99Duration: p99,
-      lastMeasurement: measurements[measurements.length - 1],
+      lastMeasurement,
     };
   }
 
