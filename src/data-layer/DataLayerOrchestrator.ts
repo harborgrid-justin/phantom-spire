@@ -11,6 +11,15 @@ import {
   AnalyticsPipelineMessageProducer 
 } from '../message-queue/producers/MessageProducers';
 import {
+  DataIngestionEngine,
+  IngestionPipelineManager,
+  StreamProcessor,
+  IngestionIntegration,
+  DEFAULT_INGESTION_CONFIG,
+  DEFAULT_PIPELINE_CONFIG,
+  DEFAULT_STREAM_CONFIG,
+} from './ingestion';
+import {
   DataFederationEngine,
   IFederatedQuery,
   IFederatedResult,
@@ -57,6 +66,16 @@ export interface IDataLayerConfig {
     enabled: boolean;
     asyncProcessing: boolean;
   };
+  // Fortune 100 Ingestion Configuration
+  ingestion?: {
+    enabled: boolean;
+    engineConfig?: any;
+    pipelineConfig?: any;
+    streamConfig?: any;
+    enableSTIX: boolean;
+    enableMISP: boolean;
+    enableRealTimeProcessing: boolean;
+  };
 }
 
 export interface IDataLayerMetrics {
@@ -96,6 +115,11 @@ export class DataLayerOrchestrator {
   private dataIngestionProducer?: DataIngestionMessageProducer;
   private analyticsPipelineProducer?: AnalyticsPipelineMessageProducer;
 
+  // Fortune 100 Ingestion Engine Components
+  private ingestionEngine?: DataIngestionEngine;
+  private pipelineManager?: IngestionPipelineManager;
+  private streamProcessor?: StreamProcessor;
+
   constructor(config: IDataLayerConfig, messageQueueManager?: MessageQueueManager) {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
@@ -108,6 +132,11 @@ export class DataLayerOrchestrator {
       this.dataIngestionProducer = new DataIngestionMessageProducer(messageQueueManager);
       this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(messageQueueManager);
       logger.info('Message queue integration enabled for data layer');
+    }
+
+    // Initialize Fortune 100 Ingestion Engine if configured
+    if (config.ingestion?.enabled && messageQueueManager) {
+      this.initializeIngestionEngine(messageQueueManager);
     }
 
     logger.info('Data Layer Orchestrator initialized');
@@ -133,10 +162,24 @@ export class DataLayerOrchestrator {
       // Initialize analytics models
       await this.initializeAnalytics();
 
+      // Start ingestion engine if configured
+      if (this.ingestionEngine) {
+        await this.ingestionEngine.start();
+        logger.info('Fortune 100 ingestion engine started');
+      }
+
+      // Start stream processor if configured
+      if (this.streamProcessor) {
+        await this.streamProcessor.start();
+        logger.info('Real-time stream processor started');
+      }
+
       logger.info('Modular data layer initialized successfully', {
         dataSources: this.dataSources.size,
         connectors: this.connectors.size,
         analyticsEnabled: this.config.analytics?.enableAdvancedAnalytics,
+        ingestionEnabled: this.config.ingestion?.enabled,
+        streamProcessingEnabled: this.config.ingestion?.enableRealTimeProcessing,
       });
     } catch (error) {
       logger.error('Failed to initialize data layer', error);
@@ -630,5 +673,115 @@ export class DataLayerOrchestrator {
     } else {
       return 'unhealthy';
     }
+  }
+
+  /**
+   * Initialize Fortune 100-grade ingestion engine
+   */
+  private initializeIngestionEngine(messageQueueManager: MessageQueueManager): void {
+    const ingestionConfig = {
+      ...DEFAULT_INGESTION_CONFIG,
+      ...this.config.ingestion?.engineConfig,
+    };
+
+    const pipelineConfig = {
+      ...DEFAULT_PIPELINE_CONFIG,
+      ...this.config.ingestion?.pipelineConfig,
+    };
+
+    const streamConfig = {
+      ...DEFAULT_STREAM_CONFIG,
+      ...this.config.ingestion?.streamConfig,
+    };
+
+    // Initialize ingestion engine
+    this.ingestionEngine = new DataIngestionEngine(ingestionConfig, messageQueueManager);
+    
+    // Initialize pipeline manager
+    this.pipelineManager = new IngestionPipelineManager(pipelineConfig);
+    
+    // Initialize stream processor if real-time processing is enabled
+    if (this.config.ingestion?.enableRealTimeProcessing) {
+      this.streamProcessor = new StreamProcessor(streamConfig);
+    }
+
+    // Set up integration between components
+    IngestionIntegration.integrateWithOrchestrator(this, this.ingestionEngine);
+
+    // Set up monitoring and alerting
+    IngestionIntegration.setupMonitoring(this.ingestionEngine, (alert) => {
+      logger.warn('Ingestion engine alert', alert);
+      // In production, this would trigger appropriate alerting mechanisms
+    });
+
+    logger.info('Fortune 100 ingestion engine components initialized', {
+      engineEnabled: true,
+      pipelineManagerEnabled: true,
+      streamProcessorEnabled: this.config.ingestion?.enableRealTimeProcessing,
+      stixEnabled: this.config.ingestion?.enableSTIX,
+      mispEnabled: this.config.ingestion?.enableMISP,
+    });
+  }
+
+  /**
+   * Get ingestion engine instance
+   */
+  public getIngestionEngine(): DataIngestionEngine | undefined {
+    return this.ingestionEngine;
+  }
+
+  /**
+   * Get pipeline manager instance
+   */
+  public getPipelineManager(): IngestionPipelineManager | undefined {
+    return this.pipelineManager;
+  }
+
+  /**
+   * Get stream processor instance
+   */
+  public getStreamProcessor(): StreamProcessor | undefined {
+    return this.streamProcessor;
+  }
+
+  /**
+   * Submit a data ingestion job
+   */
+  public async submitIngestionJob(
+    sourceId: string,
+    pipeline: IDataPipeline,
+    priority: number = 5
+  ): Promise<string | undefined> {
+    if (!this.ingestionEngine) {
+      logger.warn('Ingestion engine not initialized - cannot submit job');
+      return undefined;
+    }
+
+    try {
+      const jobId = await this.ingestionEngine.submitJob(sourceId, pipeline, priority);
+      logger.info('Ingestion job submitted via orchestrator', {
+        jobId,
+        sourceId,
+        priority,
+      });
+      return jobId;
+    } catch (error) {
+      logger.error('Failed to submit ingestion job', {
+        sourceId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Get ingestion metrics
+   */
+  public getIngestionMetrics() {
+    return {
+      engine: this.ingestionEngine?.getMetrics(),
+      stream: this.streamProcessor?.getMetrics(),
+      deadLetterQueue: this.streamProcessor?.getDeadLetterQueue().length || 0,
+    };
   }
 }
