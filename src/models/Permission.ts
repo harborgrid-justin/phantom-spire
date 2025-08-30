@@ -10,7 +10,14 @@ export interface IPermission extends Document {
   isActive: boolean;
   isSystemPermission: boolean; // Cannot be deleted or modified
   metadata: {
-    category: 'system' | 'user' | 'data' | 'threat-intel' | 'analytics' | 'workflow' | 'admin';
+    category:
+      | 'system'
+      | 'user'
+      | 'data'
+      | 'threat-intel'
+      | 'analytics'
+      | 'workflow'
+      | 'admin';
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     requiresJustification: boolean;
     auditRequired: boolean;
@@ -18,7 +25,17 @@ export interface IPermission extends Document {
   constraints?: {
     conditions?: Array<{
       field: string;
-      operator: 'eq' | 'ne' | 'gt' | 'lt' | 'gte' | 'lte' | 'in' | 'nin' | 'contains' | 'regex';
+      operator:
+        | 'eq'
+        | 'ne'
+        | 'gt'
+        | 'lt'
+        | 'gte'
+        | 'lte'
+        | 'in'
+        | 'nin'
+        | 'contains'
+        | 'regex';
       value: any;
     }>;
     timeWindow?: {
@@ -122,7 +139,15 @@ const permissionSchema = new Schema<IPermission>(
     metadata: {
       category: {
         type: String,
-        enum: ['system', 'user', 'data', 'threat-intel', 'analytics', 'workflow', 'admin'],
+        enum: [
+          'system',
+          'user',
+          'data',
+          'threat-intel',
+          'analytics',
+          'workflow',
+          'admin',
+        ],
         required: true,
       },
       riskLevel: {
@@ -140,18 +165,31 @@ const permissionSchema = new Schema<IPermission>(
       },
     },
     constraints: {
-      conditions: [{
-        field: {
-          type: String,
-          required: true,
+      conditions: [
+        {
+          field: {
+            type: String,
+            required: true,
+          },
+          operator: {
+            type: String,
+            enum: [
+              'eq',
+              'ne',
+              'gt',
+              'lt',
+              'gte',
+              'lte',
+              'in',
+              'nin',
+              'contains',
+              'regex',
+            ],
+            required: true,
+          },
+          value: Schema.Types.Mixed,
         },
-        operator: {
-          type: String,
-          enum: ['eq', 'ne', 'gt', 'lt', 'gte', 'lte', 'in', 'nin', 'contains', 'regex'],
-          required: true,
-        },
-        value: Schema.Types.Mixed,
-      }],
+      ],
       timeWindow: {
         start: {
           type: String,
@@ -193,19 +231,23 @@ permissionSchema.index({ isSystemPermission: 1 });
 permissionSchema.index({ isActive: 1 });
 
 // Virtual for full permission string
-permissionSchema.virtual('fullPermission').get(function() {
+permissionSchema.virtual('fullPermission').get(function () {
   return `${this.resource}:${this.action}`;
 });
 
 // Middleware to prevent deletion of system permissions
-permissionSchema.pre('deleteOne', { document: true, query: false }, function() {
-  if (this.isSystemPermission) {
-    throw new Error('System permissions cannot be deleted');
+permissionSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  function () {
+    if (this.isSystemPermission) {
+      throw new Error('System permissions cannot be deleted');
+    }
   }
-});
+);
 
 // Method to check if permission applies to a specific context
-permissionSchema.methods.appliesTo = function(context: {
+permissionSchema.methods.appliesTo = function (context: {
   resource: string;
   action: string;
   scope?: string;
@@ -218,22 +260,26 @@ permissionSchema.methods.appliesTo = function(context: {
   if (this.resource !== '*' && this.resource !== context.resource) {
     return false;
   }
-  
+
   // Check action match
   if (this.action !== '*' && this.action !== context.action) {
     return false;
   }
-  
+
   // Check scope match (simplified logic)
-  if (context.scope && this.scope !== 'global' && this.scope !== context.scope) {
+  if (
+    context.scope &&
+    this.scope !== 'global' &&
+    this.scope !== context.scope
+  ) {
     return false;
   }
-  
+
   return true;
 };
 
 // Method to evaluate permission constraints
-permissionSchema.methods.evaluateConstraints = function(context: {
+permissionSchema.methods.evaluateConstraints = function (context: {
   user?: any;
   resource?: any;
   timestamp?: Date;
@@ -243,47 +289,62 @@ permissionSchema.methods.evaluateConstraints = function(context: {
   if (!this.constraints) {
     return { allowed: true };
   }
-  
+
   const now = context.timestamp || new Date();
-  
+
   // Check time window constraints
   if (this.constraints.timeWindow?.start || this.constraints.timeWindow?.end) {
     const currentTime = now.toTimeString().substring(0, 5); // HH:MM
     const start = this.constraints.timeWindow.start;
     const end = this.constraints.timeWindow.end;
-    
+
     if (start && currentTime < start) {
-      return { allowed: false, reason: 'Permission not allowed at this time (before allowed window)' };
+      return {
+        allowed: false,
+        reason: 'Permission not allowed at this time (before allowed window)',
+      };
     }
-    
+
     if (end && currentTime > end) {
-      return { allowed: false, reason: 'Permission not allowed at this time (after allowed window)' };
+      return {
+        allowed: false,
+        reason: 'Permission not allowed at this time (after allowed window)',
+      };
     }
   }
-  
+
   // Check custom conditions
   if (this.constraints.conditions?.length) {
     for (const condition of this.constraints.conditions) {
       const fieldValue = this.getNestedValue(context, condition.field);
-      if (!this.evaluateCondition(fieldValue, condition.operator, condition.value)) {
-        return { 
-          allowed: false, 
-          reason: `Condition not met: ${condition.field} ${condition.operator} ${condition.value}` 
+      if (
+        !this.evaluateCondition(fieldValue, condition.operator, condition.value)
+      ) {
+        return {
+          allowed: false,
+          reason: `Condition not met: ${condition.field} ${condition.operator} ${condition.value}`,
         };
       }
     }
   }
-  
+
   return { allowed: true };
 };
 
 // Helper method to get nested object values
-permissionSchema.methods.getNestedValue = function(obj: any, path: string): any {
+permissionSchema.methods.getNestedValue = function (
+  obj: any,
+  path: string
+): any {
   return path.split('.').reduce((current, key) => current?.[key], obj);
 };
 
 // Helper method to evaluate conditions
-permissionSchema.methods.evaluateCondition = function(fieldValue: any, operator: string, conditionValue: any): boolean {
+permissionSchema.methods.evaluateCondition = function (
+  fieldValue: any,
+  operator: string,
+  conditionValue: any
+): boolean {
   switch (operator) {
     case 'eq':
       return fieldValue === conditionValue;
@@ -298,11 +359,17 @@ permissionSchema.methods.evaluateCondition = function(fieldValue: any, operator:
     case 'lte':
       return fieldValue <= conditionValue;
     case 'in':
-      return Array.isArray(conditionValue) && conditionValue.includes(fieldValue);
+      return (
+        Array.isArray(conditionValue) && conditionValue.includes(fieldValue)
+      );
     case 'nin':
-      return Array.isArray(conditionValue) && !conditionValue.includes(fieldValue);
+      return (
+        Array.isArray(conditionValue) && !conditionValue.includes(fieldValue)
+      );
     case 'contains':
-      return typeof fieldValue === 'string' && fieldValue.includes(conditionValue);
+      return (
+        typeof fieldValue === 'string' && fieldValue.includes(conditionValue)
+      );
     case 'regex':
       return new RegExp(conditionValue).test(String(fieldValue));
     default:
@@ -311,13 +378,13 @@ permissionSchema.methods.evaluateCondition = function(fieldValue: any, operator:
 };
 
 // Static method to find permissions by resource and action
-permissionSchema.statics.findByResourceAction = function(
-  resource: string, 
-  action: string, 
+permissionSchema.statics.findByResourceAction = function (
+  resource: string,
+  action: string,
   includeWildcards = true
 ) {
   const query: any = { isActive: true };
-  
+
   if (includeWildcards) {
     query.$or = [
       { resource, action },
@@ -329,32 +396,35 @@ permissionSchema.statics.findByResourceAction = function(
     query.resource = resource;
     query.action = action;
   }
-  
+
   return this.find(query);
 };
 
 // Static method to find permissions by category
-permissionSchema.statics.findByCategory = function(category: string) {
-  return this.find({ 
+permissionSchema.statics.findByCategory = function (category: string) {
+  return this.find({
     'metadata.category': category,
-    isActive: true 
+    isActive: true,
   }).sort({ name: 1 });
 };
 
 // Static method to find high-risk permissions
-permissionSchema.statics.findHighRisk = function() {
-  return this.find({ 
+permissionSchema.statics.findHighRisk = function () {
+  return this.find({
     'metadata.riskLevel': { $in: ['high', 'critical'] },
-    isActive: true 
+    isActive: true,
   }).sort({ 'metadata.riskLevel': -1, name: 1 });
 };
 
 // Static method to get system permissions
-permissionSchema.statics.getSystemPermissions = function() {
-  return this.find({ 
+permissionSchema.statics.getSystemPermissions = function () {
+  return this.find({
     isSystemPermission: true,
-    isActive: true 
+    isActive: true,
   }).sort({ resource: 1, action: 1 });
 };
 
-export const Permission = mongoose.model<IPermission>('Permission', permissionSchema);
+export const Permission = mongoose.model<IPermission>(
+  'Permission',
+  permissionSchema
+);

@@ -12,7 +12,12 @@ export interface IRole extends Document {
   isActive: boolean;
   isSystemRole: boolean; // Cannot be deleted or modified
   metadata: {
-    category: 'system' | 'functional' | 'operational' | 'administrative' | 'executive';
+    category:
+      | 'system'
+      | 'functional'
+      | 'operational'
+      | 'administrative'
+      | 'executive';
     scope: 'global' | 'company' | 'department' | 'team' | 'resource';
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
     requiresApproval: boolean;
@@ -63,18 +68,22 @@ const roleSchema = new Schema<IRole>(
       type: Schema.Types.ObjectId,
       ref: 'Role',
     },
-    childRoles: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Role',
-    }],
+    childRoles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Role',
+      },
+    ],
     company: {
       type: Schema.Types.ObjectId,
       ref: 'Company',
     },
-    permissions: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Permission',
-    }],
+    permissions: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Permission',
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -86,7 +95,13 @@ const roleSchema = new Schema<IRole>(
     metadata: {
       category: {
         type: String,
-        enum: ['system', 'functional', 'operational', 'administrative', 'executive'],
+        enum: [
+          'system',
+          'functional',
+          'operational',
+          'administrative',
+          'executive',
+        ],
         required: true,
       },
       scope: {
@@ -120,30 +135,36 @@ const roleSchema = new Schema<IRole>(
             match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, // HH:MM format
           },
         },
-        allowedDays: [{
-          type: Number,
-          min: 0,
-          max: 6,
-        }],
+        allowedDays: [
+          {
+            type: Number,
+            min: 0,
+            max: 6,
+          },
+        ],
         timezone: {
           type: String,
           default: 'UTC',
         },
       },
-      ipRestrictions: [{
-        type: String,
-        validate: {
-          validator: function(ip: string) {
-            // Basic CIDR validation
-            return /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(ip);
+      ipRestrictions: [
+        {
+          type: String,
+          validate: {
+            validator: function (ip: string) {
+              // Basic CIDR validation
+              return /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(ip);
+            },
+            message: 'Invalid IP address or CIDR notation',
           },
-          message: 'Invalid IP address or CIDR notation',
         },
-      }],
-      locationRestrictions: [{
-        type: String,
-        length: 2, // ISO country codes
-      }],
+      ],
+      locationRestrictions: [
+        {
+          type: String,
+          length: 2, // ISO country codes
+        },
+      ],
       requireMFA: {
         type: Boolean,
         default: false,
@@ -170,93 +191,105 @@ roleSchema.index({ 'metadata.scope': 1 });
 roleSchema.index({ isSystemRole: 1 });
 
 // Virtual for effective permissions (including inherited)
-roleSchema.virtual('effectivePermissions').get(function() {
+roleSchema.virtual('effectivePermissions').get(function () {
   // This will be calculated by service methods
   return this.permissions;
 });
 
 // Middleware to prevent deletion of system roles
-roleSchema.pre('deleteOne', { document: true, query: false }, function() {
+roleSchema.pre('deleteOne', { document: true, query: false }, function () {
   if (this.isSystemRole) {
     throw new Error('System roles cannot be deleted');
   }
 });
 
 // Middleware to prevent circular inheritance
-roleSchema.pre('save', async function(next) {
+roleSchema.pre('save', async function (next) {
   if (this.parentRole && this.parentRole.equals(this._id)) {
     throw new Error('Role cannot be its own parent');
   }
-  
+
   // Check for circular reference in hierarchy
   if (this.parentRole) {
     const depth = await this.getInheritanceDepth();
-    if (depth > 10) { // Max 10 levels deep
+    if (depth > 10) {
+      // Max 10 levels deep
       throw new Error('Role hierarchy too deep (max 10 levels)');
     }
   }
-  
+
   next();
 });
 
 // Middleware to update child roles when parent changes
-roleSchema.pre('save', async function(next) {
+roleSchema.pre('save', async function (next) {
   if (this.isModified('parentRole')) {
     // Remove from old parent's children
     if (this.parentRole) {
-      await mongoose.model('Role').updateOne(
-        { _id: this.parentRole },
-        { $addToSet: { childRoles: this._id } }
-      );
+      await mongoose
+        .model('Role')
+        .updateOne(
+          { _id: this.parentRole },
+          { $addToSet: { childRoles: this._id } }
+        );
     }
   }
   next();
 });
 
 // Method to get inheritance depth
-roleSchema.methods.getInheritanceDepth = async function(): Promise<number> {
+roleSchema.methods.getInheritanceDepth = async function (): Promise<number> {
   let depth = 0;
   let currentRole = this;
   const visitedIds = new Set();
-  
-  while (currentRole.parentRole && !visitedIds.has(currentRole._id.toString())) {
+
+  while (
+    currentRole.parentRole &&
+    !visitedIds.has(currentRole._id.toString())
+  ) {
     visitedIds.add(currentRole._id.toString());
     depth++;
     currentRole = await mongoose.model('Role').findById(currentRole.parentRole);
     if (!currentRole || depth > 10) break; // Prevent infinite loops
   }
-  
+
   return depth;
 };
 
 // Method to get all ancestor roles
-roleSchema.methods.getAncestors = async function(): Promise<IRole[]> {
+roleSchema.methods.getAncestors = async function (): Promise<IRole[]> {
   const ancestors: IRole[] = [];
   let currentRole = this;
   const visitedIds = new Set();
-  
-  while (currentRole.parentRole && !visitedIds.has(currentRole._id.toString())) {
+
+  while (
+    currentRole.parentRole &&
+    !visitedIds.has(currentRole._id.toString())
+  ) {
     visitedIds.add(currentRole._id.toString());
-    const parent = await mongoose.model('Role').findById(currentRole.parentRole);
+    const parent = await mongoose
+      .model('Role')
+      .findById(currentRole.parentRole);
     if (!parent) break;
     ancestors.unshift(parent);
     currentRole = parent;
     if (ancestors.length > 10) break; // Safety limit
   }
-  
+
   return ancestors;
 };
 
 // Method to get all descendant roles
-roleSchema.methods.getDescendants = async function(): Promise<IRole[]> {
+roleSchema.methods.getDescendants = async function (): Promise<IRole[]> {
   const descendants: IRole[] = [];
   const toProcess = [...this.childRoles];
   const processedIds = new Set();
-  
-  while (toProcess.length > 0 && descendants.length < 100) { // Safety limit
+
+  while (toProcess.length > 0 && descendants.length < 100) {
+    // Safety limit
     const roleId = toProcess.shift();
     if (!roleId || processedIds.has(roleId.toString())) continue;
-    
+
     processedIds.add(roleId.toString());
     const role = await mongoose.model('Role').findById(roleId);
     if (role) {
@@ -264,48 +297,52 @@ roleSchema.methods.getDescendants = async function(): Promise<IRole[]> {
       toProcess.push(...role.childRoles);
     }
   }
-  
+
   return descendants;
 };
 
 // Method to get all inherited permissions
-roleSchema.methods.getInheritedPermissions = async function(): Promise<mongoose.Types.ObjectId[]> {
+roleSchema.methods.getInheritedPermissions = async function (): Promise<
+  mongoose.Types.ObjectId[]
+> {
   const allPermissions = new Set<string>();
-  
+
   // Add own permissions
   this.permissions.forEach(p => allPermissions.add(p.toString()));
-  
+
   // Add ancestor permissions
   const ancestors = await this.getAncestors();
   for (const ancestor of ancestors) {
     ancestor.permissions.forEach(p => allPermissions.add(p.toString()));
   }
-  
+
   return Array.from(allPermissions).map(p => new mongoose.Types.ObjectId(p));
 };
 
 // Method to check if role has specific permission (including inherited)
-roleSchema.methods.hasPermission = async function(permissionId: mongoose.Types.ObjectId): Promise<boolean> {
+roleSchema.methods.hasPermission = async function (
+  permissionId: mongoose.Types.ObjectId
+): Promise<boolean> {
   const inheritedPermissions = await this.getInheritedPermissions();
   return inheritedPermissions.some(p => p.equals(permissionId));
 };
 
 // Method to check time-based access
-roleSchema.methods.isAccessAllowed = function(timestamp?: Date): boolean {
+roleSchema.methods.isAccessAllowed = function (timestamp?: Date): boolean {
   const now = timestamp || new Date();
   const constraints = this.constraints;
-  
+
   // Check time restrictions
   if (constraints.timeRestrictions?.allowedHours) {
     const currentTime = now.toTimeString().substring(0, 5); // HH:MM
     const start = constraints.timeRestrictions.allowedHours.start;
     const end = constraints.timeRestrictions.allowedHours.end;
-    
+
     if (start && end && (currentTime < start || currentTime > end)) {
       return false;
     }
   }
-  
+
   // Check day restrictions
   if (constraints.timeRestrictions?.allowedDays?.length) {
     const currentDay = now.getDay(); // 0-6
@@ -313,15 +350,15 @@ roleSchema.methods.isAccessAllowed = function(timestamp?: Date): boolean {
       return false;
     }
   }
-  
+
   return true;
 };
 
 // Method to check IP-based access
-roleSchema.methods.isIPAllowed = function(clientIP: string): boolean {
+roleSchema.methods.isIPAllowed = function (clientIP: string): boolean {
   const ipRestrictions = this.constraints.ipRestrictions;
   if (!ipRestrictions?.length) return true; // No restrictions
-  
+
   // Simple IP range check (would need more sophisticated logic for production)
   return ipRestrictions.some(allowedRange => {
     if (allowedRange.includes('/')) {
@@ -333,21 +370,25 @@ roleSchema.methods.isIPAllowed = function(clientIP: string): boolean {
 };
 
 // Static method to find roles by level range
-roleSchema.statics.findByLevelRange = function(minLevel: number, maxLevel: number, companyId?: mongoose.Types.ObjectId) {
+roleSchema.statics.findByLevelRange = function (
+  minLevel: number,
+  maxLevel: number,
+  companyId?: mongoose.Types.ObjectId
+) {
   const query: any = {
     level: { $gte: minLevel, $lte: maxLevel },
     isActive: true,
   };
-  
+
   if (companyId) {
     query.company = companyId;
   }
-  
+
   return this.find(query).sort({ level: -1 });
 };
 
 // Static method to get system roles
-roleSchema.statics.getSystemRoles = function() {
+roleSchema.statics.getSystemRoles = function () {
   return this.find({ isSystemRole: true, isActive: true }).sort({ level: -1 });
 };
 

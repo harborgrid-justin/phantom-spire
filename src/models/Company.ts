@@ -77,10 +77,12 @@ const companySchema = new Schema<ICompany>(
       type: Schema.Types.ObjectId,
       ref: 'Company',
     },
-    subsidiaries: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Company',
-    }],
+    subsidiaries: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Company',
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -121,19 +123,21 @@ const companySchema = new Schema<ICompany>(
         enum: ['basic', 'advanced', 'premium', 'enterprise'],
         default: 'basic',
       },
-      complianceRequirements: [{
-        type: String,
-        enum: [
-          'SOC2',
-          'ISO27001',
-          'GDPR',
-          'HIPAA',
-          'PCI-DSS',
-          'NIST',
-          'FedRAMP',
-          'FISMA',
-        ],
-      }],
+      complianceRequirements: [
+        {
+          type: String,
+          enum: [
+            'SOC2',
+            'ISO27001',
+            'GDPR',
+            'HIPAA',
+            'PCI-DSS',
+            'NIST',
+            'FedRAMP',
+            'FISMA',
+          ],
+        },
+      ],
       riskTolerance: {
         type: String,
         enum: ['low', 'medium', 'high'],
@@ -153,41 +157,45 @@ companySchema.index({ parentCompany: 1 });
 companySchema.index({ isActive: 1 });
 
 // Virtual for full hierarchy path
-companySchema.virtual('hierarchyPath').get(function() {
+companySchema.virtual('hierarchyPath').get(function () {
   // This will be populated by a service method
   return this.name;
 });
 
 // Middleware to update subsidiaries when parent changes
-companySchema.pre('save', async function(next) {
+companySchema.pre('save', async function (next) {
   if (this.isModified('parentCompany')) {
     // Remove from old parent's subsidiaries
     if (this.parentCompany) {
-      await mongoose.model('Company').updateOne(
-        { _id: this.parentCompany },
-        { $addToSet: { subsidiaries: this._id } }
-      );
+      await mongoose
+        .model('Company')
+        .updateOne(
+          { _id: this.parentCompany },
+          { $addToSet: { subsidiaries: this._id } }
+        );
     }
   }
   next();
 });
 
 // Method to check if company can have subsidiaries
-companySchema.methods.canHaveSubsidiaries = function(): boolean {
+companySchema.methods.canHaveSubsidiaries = function (): boolean {
   return this.settings.allowSubsidiaries;
 };
 
 // Method to get full hierarchy depth
-companySchema.methods.getHierarchyDepth = async function(): Promise<number> {
+companySchema.methods.getHierarchyDepth = async function (): Promise<number> {
   let depth = 0;
   let currentCompany = this;
-  
+
   while (currentCompany.parentCompany) {
     depth++;
-    currentCompany = await mongoose.model('Company').findById(currentCompany.parentCompany);
+    currentCompany = await mongoose
+      .model('Company')
+      .findById(currentCompany.parentCompany);
     if (!currentCompany || depth > 10) break; // Prevent infinite loops
   }
-  
+
   return depth;
 };
 

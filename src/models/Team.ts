@@ -15,9 +15,28 @@ export interface ITeam extends Document {
     allowGuestMembers: boolean;
   };
   metadata: {
-    teamType: 'operational' | 'project' | 'functional' | 'cross-functional' | 'temporary' | 'permanent';
-    specialization?: 'threat-hunting' | 'incident-response' | 'malware-analysis' | 'forensics' | 'intelligence' | 'operations' | 'research' | 'other';
-    clearanceLevel?: 'public' | 'internal' | 'confidential' | 'secret' | 'top-secret';
+    teamType:
+      | 'operational'
+      | 'project'
+      | 'functional'
+      | 'cross-functional'
+      | 'temporary'
+      | 'permanent';
+    specialization?:
+      | 'threat-hunting'
+      | 'incident-response'
+      | 'malware-analysis'
+      | 'forensics'
+      | 'intelligence'
+      | 'operations'
+      | 'research'
+      | 'other';
+    clearanceLevel?:
+      | 'public'
+      | 'internal'
+      | 'confidential'
+      | 'secret'
+      | 'top-secret';
     operatingHours?: {
       timezone: string;
       schedule: '24/7' | 'business-hours' | 'extended-hours' | 'on-call';
@@ -66,10 +85,12 @@ const teamSchema = new Schema<ITeam>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
-    members: [{
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    }],
+    members: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
@@ -93,7 +114,14 @@ const teamSchema = new Schema<ITeam>(
     metadata: {
       teamType: {
         type: String,
-        enum: ['operational', 'project', 'functional', 'cross-functional', 'temporary', 'permanent'],
+        enum: [
+          'operational',
+          'project',
+          'functional',
+          'cross-functional',
+          'temporary',
+          'permanent',
+        ],
         default: 'functional',
         required: true,
       },
@@ -102,7 +130,7 @@ const teamSchema = new Schema<ITeam>(
         enum: [
           'threat-hunting',
           'incident-response',
-          'malware-analysis', 
+          'malware-analysis',
           'forensics',
           'intelligence',
           'operations',
@@ -163,103 +191,117 @@ teamSchema.index({ 'metadata.specialization': 1 });
 teamSchema.index({ 'metadata.teamType': 1 });
 
 // Virtual for team capacity utilization
-teamSchema.virtual('capacityUtilization').get(function() {
+teamSchema.virtual('capacityUtilization').get(function () {
   const maxMembers = this.settings.maxMembers || 20;
   return Math.round((this.members.length / maxMembers) * 100);
 });
 
 // Virtual for full team path (Company > Department > Team)
-teamSchema.virtual('fullPath').get(function() {
+teamSchema.virtual('fullPath').get(function () {
   // This will be populated by a service method
   return this.name;
 });
 
 // Middleware to ensure team lead is also a member
-teamSchema.pre('save', async function(next) {
+teamSchema.pre('save', async function (next) {
   if (this.teamLead && !this.members.includes(this.teamLead)) {
     this.members.push(this.teamLead);
   }
-  
+
   // Check member limit
   const maxMembers = this.settings.maxMembers || 20;
   if (this.members.length > maxMembers) {
     throw new Error(`Team cannot have more than ${maxMembers} members`);
   }
-  
+
   next();
 });
 
 // Middleware to update performance metrics timestamp
-teamSchema.pre('save', function(next) {
-  if (this.isModified('performance.casesHandled') || 
-      this.isModified('performance.averageResponseTime') || 
-      this.isModified('performance.successRate')) {
+teamSchema.pre('save', function (next) {
+  if (
+    this.isModified('performance.casesHandled') ||
+    this.isModified('performance.averageResponseTime') ||
+    this.isModified('performance.successRate')
+  ) {
     this.performance.lastUpdated = new Date();
   }
   next();
 });
 
 // Method to add member to team
-teamSchema.methods.addMember = async function(userId: mongoose.Types.ObjectId): Promise<boolean> {
+teamSchema.methods.addMember = async function (
+  userId: mongoose.Types.ObjectId
+): Promise<boolean> {
   if (this.members.includes(userId)) return false; // Already a member
-  
+
   const maxMembers = this.settings.maxMembers || 20;
   if (this.members.length >= maxMembers) {
-    throw new Error(`Team has reached maximum capacity of ${maxMembers} members`);
+    throw new Error(
+      `Team has reached maximum capacity of ${maxMembers} members`
+    );
   }
-  
+
   this.members.push(userId);
   await this.save();
   return true;
 };
 
 // Method to remove member from team
-teamSchema.methods.removeMember = async function(userId: mongoose.Types.ObjectId): Promise<boolean> {
+teamSchema.methods.removeMember = async function (
+  userId: mongoose.Types.ObjectId
+): Promise<boolean> {
   const index = this.members.indexOf(userId);
   if (index === -1) return false; // Not a member
-  
+
   // Cannot remove team lead without reassigning
   if (this.teamLead && this.teamLead.equals(userId)) {
     throw new Error('Cannot remove team lead. Reassign leadership first.');
   }
-  
+
   this.members.splice(index, 1);
   await this.save();
   return true;
 };
 
 // Method to change team lead
-teamSchema.methods.changeTeamLead = async function(newLeadId?: mongoose.Types.ObjectId): Promise<void> {
+teamSchema.methods.changeTeamLead = async function (
+  newLeadId?: mongoose.Types.ObjectId
+): Promise<void> {
   if (newLeadId) {
     // Ensure new lead is a member
     if (!this.members.includes(newLeadId)) {
       await this.addMember(newLeadId);
     }
   }
-  
+
   this.teamLead = newLeadId;
   await this.save();
 };
 
 // Method to check if user can access this team
-teamSchema.methods.canUserAccess = async function(userId: mongoose.Types.ObjectId): Promise<boolean> {
+teamSchema.methods.canUserAccess = async function (
+  userId: mongoose.Types.ObjectId
+): Promise<boolean> {
   // Check if user is a member
   if (this.members.includes(userId)) return true;
-  
+
   // Check if user is the team lead
   if (this.teamLead && this.teamLead.equals(userId)) return true;
-  
+
   // Check department access (team members have access to parent department)
-  const department = await mongoose.model('Department').findById(this.department);
+  const department = await mongoose
+    .model('Department')
+    .findById(this.department);
   if (department) {
     return await department.canUserAccess(userId);
   }
-  
+
   return false;
 };
 
 // Method to update performance metrics
-teamSchema.methods.updatePerformance = async function(metrics: {
+teamSchema.methods.updatePerformance = async function (metrics: {
   casesHandled?: number;
   averageResponseTime?: number;
   successRate?: number;
@@ -271,24 +313,30 @@ teamSchema.methods.updatePerformance = async function(metrics: {
     this.performance.averageResponseTime = metrics.averageResponseTime;
   }
   if (metrics.successRate !== undefined) {
-    this.performance.successRate = Math.max(0, Math.min(100, metrics.successRate));
+    this.performance.successRate = Math.max(
+      0,
+      Math.min(100, metrics.successRate)
+    );
   }
-  
+
   this.performance.lastUpdated = new Date();
   await this.save();
 };
 
 // Static method to find teams by specialization
-teamSchema.statics.findBySpecialization = function(specialization: string, companyId?: mongoose.Types.ObjectId) {
-  const query: any = { 
+teamSchema.statics.findBySpecialization = function (
+  specialization: string,
+  companyId?: mongoose.Types.ObjectId
+) {
+  const query: any = {
     'metadata.specialization': specialization,
-    isActive: true 
+    isActive: true,
   };
-  
+
   if (companyId) {
     query.company = companyId;
   }
-  
+
   return this.find(query)
     .populate('department', 'name code')
     .populate('company', 'name code')
