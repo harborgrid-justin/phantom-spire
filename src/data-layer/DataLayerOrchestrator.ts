@@ -11,6 +11,20 @@ import {
   AnalyticsPipelineMessageProducer,
 } from '../message-queue/producers/MessageProducers';
 import {
+  TaskManagerEngine,
+  ITaskManager,
+  ITask,
+  TaskType,
+  TaskStatus,
+  TaskPriority,
+  ITaskQuery,
+  ITaskQueryResult,
+  TaskManagementSystemFactory,
+  CTI_TASK_TEMPLATES,
+  TaskManagementUtils,
+  DEFAULT_TASK_MANAGER_CONFIG,
+} from './tasks';
+import {
   DataIngestionEngine,
   IngestionPipelineManager,
   StreamProcessor,
@@ -120,11 +134,14 @@ export class DataLayerOrchestrator {
   private analyticsEngine: AdvancedAnalyticsEngine;
   private evidenceManager: EvidenceManagementService;
   private evidenceAnalyticsEngine: EvidenceAnalyticsEngine;
+  private taskManager: ITaskManager;
   private dataSources: Map<string, IDataSource> = new Map();
   private connectors: Map<string, IDataConnector> = new Map();
   private pipelines: Map<string, IDataPipeline> = new Map();
   private config: IDataLayerConfig;
   private metrics: IDataLayerMetrics;
+  private errorHandler: ErrorHandler;
+  private performanceMonitor: PerformanceMonitor;
 
   // Message Queue Integration
   private messageQueueManager?: MessageQueueManager;
@@ -143,11 +160,22 @@ export class DataLayerOrchestrator {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
     this.analyticsEngine = new AdvancedAnalyticsEngine();
+    this.errorHandler = new ErrorHandler();
+    this.performanceMonitor = new PerformanceMonitor();
 
     // Initialize Fortune 100-Grade Evidence Management
     this.evidenceManager = new EvidenceManagementService();
     this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(
       this.evidenceManager
+    );
+
+    // Initialize Fortune 100-Grade Task Management
+    this.taskManager = TaskManagementSystemFactory.createTaskManagerEngine(
+      {
+        ...DEFAULT_TASK_MANAGER_CONFIG,
+        ...config.taskManagement,
+      },
+      messageQueueManager
     );
 
     this.metrics = this.initializeMetrics();
@@ -191,6 +219,12 @@ export class DataLayerOrchestrator {
         await this.initializeConnectors();
       }
 
+      // Initialize task management system
+      if (this.taskManager) {
+        await this.taskManager.initialize();
+        logger.info('Fortune 100 task management system started');
+      }
+
       // Initialize analytics models
       await this.initializeAnalytics();
 
@@ -213,6 +247,7 @@ export class DataLayerOrchestrator {
         ingestionEnabled: this.config.ingestion?.enabled,
         streamProcessingEnabled:
           this.config.ingestion?.enableRealTimeProcessing,
+        taskManagementEnabled: !!this.taskManager,
       });
     } catch (error) {
       logger.error('Failed to initialize data layer', error);
@@ -501,6 +536,424 @@ export class DataLayerOrchestrator {
    */
   public getMetrics(): IDataLayerMetrics {
     return { ...this.metrics };
+  }
+
+  // ============================================================================
+  // FORTUNE 100-GRADE TASK MANAGEMENT INTEGRATION
+  // ============================================================================
+
+  /**
+   * Create and execute a CTI task using predefined templates
+   */
+  public async createAndExecuteCTITask(
+    templateName: keyof typeof CTI_TASK_TEMPLATES,
+    parameters: Record<string, any> = {},
+    context: IQueryContext,
+    overrides: any = {}
+  ): Promise<{ task: ITask; execution: any }> {
+    const measurement = this.performanceMonitor.startMeasurement('createAndExecuteCTITask');
+    
+    try {
+      // Create task from template
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        templateName,
+        {
+          ...overrides,
+          definition: {
+            ...overrides.definition,
+            parameters: {
+              ...parameters,
+              ...overrides.definition?.parameters,
+            },
+          },
+          createdBy: context.userId,
+          permissions: context.permissions || [],
+        }
+      );
+
+      // Create the task
+      const task = await this.taskManager.createTask(taskDefinition);
+
+      // Execute the task
+      const execution = await this.taskManager.executeTask(task.id, {
+        userId: context.userId,
+        permissions: context.permissions || [],
+        environment: 'production',
+        securityLevel: 'internal',
+        debug: false,
+        tracing: true,
+        profiling: true,
+      });
+
+      logger.info('CTI task created and executed', {
+        taskId: task.id,
+        template: templateName,
+        executionId: execution.id,
+        userId: context.userId,
+      });
+
+      measurement.end({ success: true });
+      return { task, execution };
+
+    } catch (error) {
+      measurement.end({ success: false });
+      throw this.errorHandler.handleError(error, 'createAndExecuteCTITask');
+    }
+  }
+
+  /**
+   * Execute data ingestion task with pipeline integration
+   */
+  public async executeDataIngestionTask(
+    sourceId: string,
+    pipeline: string,
+    parameters: Record<string, any>,
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'THREAT_INTELLIGENCE_INGESTION',
+        {
+          definition: {
+            parameters: {
+              sourceId,
+              pipeline,
+              ...parameters,
+            },
+          },
+          priority: TaskManagementUtils.calculateTaskPriority({
+            severity: parameters.severity,
+            urgency: parameters.urgency,
+            impact: parameters.impact,
+          }),
+        }
+      );
+
+      // Integrate with existing ingestion engine if available
+      if (this.ingestionEngine) {
+        taskDefinition.definition.parameters.ingestionEngineId = this.ingestionEngine.constructor.name;
+      }
+
+      return await this.createAndExecuteCTITask(
+        'THREAT_INTELLIGENCE_INGESTION',
+        parameters,
+        context,
+        taskDefinition
+      );
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeDataIngestionTask');
+    }
+  }
+
+  /**
+   * Execute evidence collection task with evidence management integration
+   */
+  public async executeEvidenceCollectionTask(
+    sources: string[],
+    incidentId: string,
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any; evidenceIds: string[] }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'INCIDENT_EVIDENCE_COLLECTION',
+        {
+          definition: {
+            parameters: {
+              sources,
+              incidentId,
+              evidenceManagerId: this.evidenceManager.constructor.name,
+            },
+          },
+          priority: 'critical' as TaskPriority,
+        }
+      );
+
+      const { task, execution } = await this.createAndExecuteCTITask(
+        'INCIDENT_EVIDENCE_COLLECTION',
+        { sources, incidentId },
+        context,
+        taskDefinition
+      );
+
+      // Create evidence entries for tracking
+      const evidenceIds: string[] = [];
+      for (const source of sources) {
+        const evidence = await this.evidenceManager.createEvidence({
+          type: 'IOC Evidence' as EvidenceType,
+          title: `Evidence from ${source}`,
+          description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
+          classification: 'internal' as ClassificationLevel,
+          source,
+          data: { taskId: task.id, executionId: execution.id },
+          metadata: { collectionTaskId: task.id, incidentId },
+        }, {
+          userId: context.userId,
+          permissions: context.permissions || [],
+        });
+
+        evidenceIds.push(evidence.id);
+      }
+
+      logger.info('Evidence collection task created with evidence tracking', {
+        taskId: task.id,
+        evidenceCount: evidenceIds.length,
+        incidentId,
+      });
+
+      return { task, execution, evidenceIds };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeEvidenceCollectionTask');
+    }
+  }
+
+  /**
+   * Execute threat analysis task with analytics integration
+   */
+  public async executeThreatAnalysisTask(
+    indicators: any[],
+    analysisType: string = 'comprehensive',
+    context: IQueryContext
+  ): Promise<{ task: ITask; execution: any; analysisResult?: IAnalyticsResult }> {
+    try {
+      const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
+        'DATA_CORRELATION_ANALYSIS',
+        {
+          definition: {
+            parameters: {
+              indicators,
+              analysisType,
+              analyticsEngineId: this.analyticsEngine.constructor.name,
+            },
+          },
+        }
+      );
+
+      const { task, execution } = await this.createAndExecuteCTITask(
+        'DATA_CORRELATION_ANALYSIS',
+        { indicators, analysisType },
+        context,
+        taskDefinition
+      );
+
+      // Optionally integrate with existing analytics engine
+      let analysisResult: IAnalyticsResult | undefined;
+      if (this.analyticsEngine && indicators.length > 0) {
+        try {
+          // Create a federated query for threat analysis
+          const query: IFederatedQuery = {
+            entity: 'threat_indicators',
+            filters: { indicators: indicators.map(i => i.value || i) },
+            type: 'search',
+          };
+
+          analysisResult = await this.analyticsEngine.analyzeThreats(
+            query,
+            context,
+            { includeAnomalies: true, includePredictions: true }
+          );
+        } catch (analyticsError) {
+          logger.warn('Analytics integration failed for task', {
+            taskId: task.id,
+            error: analyticsError,
+          });
+        }
+      }
+
+      return { task, execution, analysisResult };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'executeThreatAnalysisTask');
+    }
+  }
+
+  /**
+   * Create automated task workflow for incident response
+   */
+  public async createIncidentResponseWorkflow(
+    incidentId: string,
+    severity: string,
+    affectedSystems: string[],
+    context: IQueryContext
+  ): Promise<{ tasks: ITask[]; workflowId: string }> {
+    try {
+      const workflowId = `incident-response-${incidentId}-${Date.now()}`;
+      const tasks: ITask[] = [];
+
+      const priority = TaskManagementUtils.calculateTaskPriority({
+        severity,
+        urgency: 'urgent',
+        impact: affectedSystems.length > 5 ? 'high' : 'medium',
+      });
+
+      // 1. Evidence Collection Task
+      const evidenceTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('INCIDENT_EVIDENCE_COLLECTION', {
+          name: `Evidence Collection - ${incidentId}`,
+          priority,
+          definition: {
+            parameters: {
+              sources: affectedSystems,
+              incidentId,
+              preservationLevel: severity === 'critical' ? 'forensic' : 'standard',
+            },
+          },
+          metadata: { workflowId, incidentId, step: 1 },
+        })
+      );
+      tasks.push(evidenceTask);
+
+      // 2. Threat Analysis Task (depends on evidence collection)
+      const analysisTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('DATA_CORRELATION_ANALYSIS', {
+          name: `Threat Analysis - ${incidentId}`,
+          priority,
+          dependencies: [evidenceTask.id],
+          definition: {
+            parameters: {
+              datasets: [{ source: 'incident_evidence', incidentId }],
+              correlationTypes: ['temporal', 'attributional', 'behavioral'],
+              threshold: severity === 'critical' ? 0.6 : 0.75,
+            },
+          },
+          metadata: { workflowId, incidentId, step: 2 },
+        })
+      );
+      tasks.push(analysisTask);
+
+      // 3. Alert Task (immediate for critical incidents)
+      if (severity === 'critical') {
+        const alertTask = await this.taskManager.createTask(
+          TaskManagementUtils.createTaskFromTemplate('REAL_TIME_ALERT', {
+            name: `Critical Alert - ${incidentId}`,
+            priority: 'critical' as TaskPriority,
+            definition: {
+              parameters: {
+                alertType: 'critical_incident',
+                severity: 'critical',
+                incidentId,
+                affectedSystems,
+                channels: ['email', 'sms', 'webhook'],
+              },
+            },
+            metadata: { workflowId, incidentId, step: 3 },
+          })
+        );
+        tasks.push(alertTask);
+
+        // Execute alert task immediately
+        await this.taskManager.executeTask(alertTask.id, {
+          userId: context.userId,
+          permissions: context.permissions || [],
+          environment: 'production',
+          securityLevel: 'restricted',
+        });
+      }
+
+      // 4. Report Generation Task (depends on analysis)
+      const reportTask = await this.taskManager.createTask(
+        TaskManagementUtils.createTaskFromTemplate('WEEKLY_THREAT_REPORT', {
+          name: `Incident Report - ${incidentId}`,
+          priority,
+          dependencies: [analysisTask.id],
+          definition: {
+            parameters: {
+              template: 'incident-response-report',
+              format: 'pdf',
+              incidentId,
+              includeEvidence: true,
+              includeAnalysis: true,
+            },
+          },
+          metadata: { workflowId, incidentId, step: 4 },
+        })
+      );
+      tasks.push(reportTask);
+
+      // Execute the workflow (evidence collection first)
+      await this.taskManager.executeTask(evidenceTask.id, {
+        userId: context.userId,
+        permissions: context.permissions || [],
+        environment: 'production',
+        securityLevel: 'restricted',
+      });
+
+      logger.info('Incident response workflow created', {
+        workflowId,
+        incidentId,
+        taskCount: tasks.length,
+        severity,
+        affectedSystems: affectedSystems.length,
+      });
+
+      return { tasks, workflowId };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'createIncidentResponseWorkflow');
+    }
+  }
+
+  /**
+   * Query tasks with CTI-specific filters
+   */
+  public async queryCTITasks(
+    filters: Partial<ITaskQuery> = {},
+    context: IQueryContext
+  ): Promise<ITaskQueryResult> {
+    try {
+      // Apply security filtering based on user context
+      const secureFilters: ITaskQuery = {
+        ...filters,
+        // Only show tasks the user has permission to see
+        createdBy: context.permissions?.includes('admin') ? filters.createdBy : context.userId,
+      };
+
+      return await this.taskManager.queryTasks(secureFilters);
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'queryCTITasks');
+    }
+  }
+
+  /**
+   * Get task management system health and metrics
+   */
+  public async getTaskManagementHealth(): Promise<{
+    health: any;
+    metrics: any;
+    integration: {
+      evidenceManagement: boolean;
+      dataIngestion: boolean;
+      analytics: boolean;
+      messageQueue: boolean;
+    };
+  }> {
+    try {
+      const health = await this.taskManager.healthCheck();
+      const metrics = await this.taskManager.getSystemMetrics();
+
+      return {
+        health,
+        metrics,
+        integration: {
+          evidenceManagement: !!this.evidenceManager,
+          dataIngestion: !!this.ingestionEngine,
+          analytics: !!this.analyticsEngine,
+          messageQueue: !!this.messageQueueManager,
+        },
+      };
+
+    } catch (error) {
+      throw this.errorHandler.handleError(error, 'getTaskManagementHealth');
+    }
+  }
+
+  /**
+   * Get the task manager instance for direct access
+   */
+  public getTaskManager(): ITaskManager {
+    return this.taskManager;
   }
 
   /**
