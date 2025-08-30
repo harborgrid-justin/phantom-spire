@@ -10,14 +10,50 @@ import {
   IWorkflowInstance,
   IWorkflowInstanceFilter
 } from '../interfaces/IWorkflowEngine';
-import logger from '../../utils/logger';
+import { logger } from '../../utils/logger';
 
 // MongoDB Schemas
-interface IWorkflowDefinitionDocument extends IWorkflowDefinition, Document {}
-interface IWorkflowInstanceDocument extends IWorkflowInstance, Document {}
+interface IWorkflowDefinitionDocument extends Document {
+  workflowId: string; // Use workflowId instead of id to avoid conflict
+  name: string;
+  version: string;
+  description: string;
+  category: string;
+  tags: string[];
+  metadata: any;
+  triggers: any[];
+  steps: any[];
+  variables: Record<string, any>;
+  parameters: Record<string, any>;
+  sla: any;
+  security: any;
+  integrations: any;
+  monitoring: any;
+}
+
+interface IWorkflowInstanceDocument extends Document {
+  instanceId: string; // Use instanceId instead of id to avoid conflict
+  workflowId: string;
+  version: string;
+  status: string;
+  priority: string;
+  variables: Record<string, any>;
+  parameters: Record<string, any>;
+  startedAt: Date;
+  completedAt?: Date;
+  duration?: number;
+  currentSteps: string[];
+  completedSteps: string[];
+  failedSteps: string[];
+  initiatedBy: string;
+  parentInstanceId?: string;
+  error?: any;
+  history: any[];
+  metrics: any;
+}
 
 const workflowDefinitionSchema = new Schema<IWorkflowDefinitionDocument>({
-  id: { type: String, required: true, unique: true, index: true },
+  workflowId: { type: String, required: true, unique: true, index: true },
   name: { type: String, required: true },
   version: { type: String, required: true },
   description: { type: String, required: true },
@@ -191,7 +227,7 @@ const workflowDefinitionSchema = new Schema<IWorkflowDefinitionDocument>({
 });
 
 const workflowInstanceSchema = new Schema<IWorkflowInstanceDocument>({
-  id: { type: String, required: true, unique: true, index: true },
+  instanceId: { type: String, required: true, unique: true, index: true },
   workflowId: { type: String, required: true, index: true },
   version: { type: String, required: true },
   status: { 
@@ -262,7 +298,7 @@ const workflowInstanceSchema = new Schema<IWorkflowInstanceDocument>({
 // Indexes for performance
 workflowDefinitionSchema.index({ category: 1, tags: 1 });
 workflowDefinitionSchema.index({ 'metadata.author': 1, 'metadata.createdAt': -1 });
-workflowDefinitionSchema.index({ id: 1, version: 1 }, { unique: true });
+workflowDefinitionSchema.index({ workflowId: 1, version: 1 }, { unique: true });
 
 workflowInstanceSchema.index({ workflowId: 1, status: 1 });
 workflowInstanceSchema.index({ initiatedBy: 1, startedAt: -1 });
@@ -277,9 +313,16 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
   
   public async saveDefinition(definition: IWorkflowDefinition): Promise<void> {
     try {
+      // Convert IWorkflowDefinition to document format
+      const docData = {
+        ...definition,
+        workflowId: definition.id
+      };
+      delete (docData as any).id; // Remove the id field
+      
       await WorkflowDefinition.findOneAndUpdate(
-        { id: definition.id, version: definition.version },
-        definition,
+        { workflowId: definition.id, version: definition.version },
+        docData,
         { upsert: true, new: true }
       );
       
@@ -298,7 +341,7 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
 
   public async getDefinition(id: string, version?: string): Promise<IWorkflowDefinition> {
     try {
-      const query: any = { id };
+      const query: any = { workflowId: id };
       if (version) {
         query.version = version;
       }
@@ -309,7 +352,14 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
         throw new Error(`Workflow definition not found: ${id}${version ? ` (version: ${version})` : ''}`);
       }
 
-      return definition.toObject() as IWorkflowDefinition;
+      const result = definition.toObject();
+      // Convert back to IWorkflowDefinition format
+      result.id = result.workflowId;
+      delete result.workflowId;
+      delete result._id;
+      delete result.__v;
+      
+      return result as IWorkflowDefinition;
     } catch (error) {
       logger.error('Failed to get workflow definition', { 
         id, 

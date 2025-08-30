@@ -5,7 +5,7 @@
 
 export * from './interfaces/IWorkflowEngine';
 export * from './core/WorkflowEngine';
-export * from './repository/MongoWorkflowRepository';
+export * from './repository/InMemoryWorkflowRepository';
 export * from './templates/CTIWorkflowTemplates';
 export { WorkflowBPMOrchestrator, IWorkflowBPMConfig } from './WorkflowBPMOrchestrator';
 

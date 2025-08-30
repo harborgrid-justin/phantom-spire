@@ -4,14 +4,18 @@
  */
 
 import { WorkflowBPMOrchestrator } from '../workflow-bpm';
-import { MongoWorkflowRepository } from '../workflow-bpm/repository/MongoWorkflowRepository';
-import logger from '../utils/logger';
+import { logger } from '../utils/logger';
 
 // Mock services for demonstration
 class MockTaskManager {
   async createTask(params: any) {
     logger.info('Mock task created', { params });
     return { id: 'task-' + Date.now(), status: 'created' };
+  }
+  
+  on(event: string, _handler: Function) {
+    logger.info('Mock task manager event listener registered', { event });
+    // Store handler for potential future calls
   }
 }
 
@@ -20,19 +24,19 @@ class MockMessageQueue {
     logger.info('Mock message published', { queue, message });
   }
   
-  subscribe(pattern: string, handler: Function) {
+  subscribe(pattern: string, _handler: Function) {
     logger.info('Mock subscription created', { pattern });
   }
 }
 
 class MockEvidenceManager {
-  on(event: string, handler: Function) {
+  on(event: string, _handler: Function) {
     logger.info('Mock evidence manager event listener registered', { event });
   }
 }
 
 class MockIssueManager {
-  on(event: string, handler: Function) {
+  on(event: string, _handler: Function) {
     logger.info('Mock issue manager event listener registered', { event });
   }
 }

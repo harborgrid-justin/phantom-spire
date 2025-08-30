@@ -3,6 +3,8 @@
  * Enterprise-level workflow orchestration for Cyber Threat Intelligence Platform
  */
 
+import { EventEmitter } from 'events';
+
 export enum WorkflowStatus {
   PENDING = 'pending',
   RUNNING = 'running',
@@ -317,7 +319,7 @@ export interface IWorkflowMetrics {
 }
 
 // Workflow Engine Interfaces
-export interface IWorkflowEngine {
+export interface IWorkflowEngine extends EventEmitter {
   // Workflow definition management
   registerWorkflowDefinition(definition: IWorkflowDefinition): Promise<void>;
   unregisterWorkflowDefinition(workflowId: string): Promise<void>;

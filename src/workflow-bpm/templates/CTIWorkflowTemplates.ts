@@ -9,6 +9,7 @@ import {
   StepType,
   TriggerType 
 } from '../interfaces/IWorkflowEngine';
+import { EXTENDED_CTI_WORKFLOWS } from './ExtendedCTIWorkflows';
 
 export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
   
@@ -778,5 +779,13 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
 // Export individual templates
 export const APT_RESPONSE_WORKFLOW = CTI_WORKFLOW_TEMPLATES.APT_RESPONSE;
 export const MALWARE_ANALYSIS_WORKFLOW = CTI_WORKFLOW_TEMPLATES.MALWARE_ANALYSIS;
+
+// Merge with extended workflows
+Object.assign(CTI_WORKFLOW_TEMPLATES, EXTENDED_CTI_WORKFLOWS);
+
+// Export additional individual templates
+export const VULNERABILITY_MANAGEMENT_WORKFLOW = CTI_WORKFLOW_TEMPLATES.VULNERABILITY_MANAGEMENT;
+export const THREAT_HUNT_CAMPAIGN_WORKFLOW = CTI_WORKFLOW_TEMPLATES.THREAT_HUNT_CAMPAIGN;
+export const COMPLIANCE_AUDIT_WORKFLOW = CTI_WORKFLOW_TEMPLATES.COMPLIANCE_AUDIT;
 
 export default CTI_WORKFLOW_TEMPLATES;

@@ -18,12 +18,10 @@ import {
   IStepHandler,
   IStepContext,
   IStepResult,
-  StepType,
-  IWorkflowEvent,
-  IWorkflowError
+  StepType
 } from '../interfaces/IWorkflowEngine';
 import { IWorkflowRepository } from '../interfaces/IWorkflowEngine';
-import logger from '../../utils/logger';
+import { logger } from '../../utils/logger';
 
 export class WorkflowEngineCore extends EventEmitter implements IWorkflowEngine {
   private stepHandlers: Map<StepType, IStepHandler> = new Map();
@@ -497,7 +495,7 @@ export class WorkflowEngineCore extends EventEmitter implements IWorkflowEngine 
         message: (error as Error).message,
         stepId: instance.currentSteps[0] || 'unknown',
         timestamp: new Date(),
-        stack: (error as Error).stack
+        ...(error as Error).stack && { stack: (error as Error).stack }
       };
 
       await this.repository.updateInstance(instance.id, instance);
@@ -596,7 +594,7 @@ export class WorkflowEngineCore extends EventEmitter implements IWorkflowEngine 
         timestamp: new Date(),
         type: 'step_completed',
         stepId: step.id,
-        data: result.metadata
+        data: result.metadata || {}
       });
 
       await this.repository.updateInstance(instance.id, instance);
@@ -771,7 +769,7 @@ export class WorkflowEngineCore extends EventEmitter implements IWorkflowEngine 
 
   private createCheckpoints(): void {
     // Create checkpoints for active workflow instances
-    for (const instance of this.activeInstances.values()) {
+    for (const instance of Array.from(this.activeInstances.values())) {
       if (instance.status === WorkflowStatus.RUNNING) {
         this.repository.updateInstance(instance.id, instance);
       }

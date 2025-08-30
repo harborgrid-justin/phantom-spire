@@ -10,6 +10,8 @@ import { connectDatabase } from './config/database';
 import routes from './routes';
 import swaggerSpec from './config/swagger';
 import swaggerUi from 'swagger-ui-express';
+import { WorkflowBPMOrchestrator } from './workflow-bpm';
+import workflowRoutes from './routes/workflow/workflowRoutes';
 
 const app = express();
 
@@ -65,11 +67,42 @@ async function startServer(): Promise<void> {
     // Connect to database
     await connectDatabase();
     
+    // Initialize Workflow BPM Orchestrator
+    logger.info('🔧 Initializing Fortune 100-Grade Workflow BPM System...');
+    const workflowOrchestrator = new WorkflowBPMOrchestrator({
+      engine: {
+        maxConcurrentWorkflows: 50000,
+        memoryLimit: '8GB',
+        executionTimeout: 24 * 60 * 60 * 1000, // 24 hours
+        checkpointInterval: 5000
+      },
+      performance: {
+        enableOptimization: true,
+        enableMLOptimization: true,
+        enableDynamicScaling: true
+      }
+    });
+
+    // Wait for workflow orchestrator to be ready
+    await new Promise<void>((resolve) => {
+      workflowOrchestrator.once('orchestrator-ready', () => {
+        logger.info('✅ Workflow BPM Orchestrator initialized successfully');
+        resolve();
+      });
+    });
+
+    // Make workflow orchestrator available to routes
+    app.locals.workflowOrchestrator = workflowOrchestrator;
+
+    // Add workflow routes
+    app.use('/api/v1/workflow', workflowRoutes);
+    
     const PORT = config.PORT || 3000;
     app.listen(PORT, () => {
       logger.info(`🚀 Phantom Spire CTI Platform started on port ${PORT}`);
       logger.info(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
       logger.info(`🏥 Health Check: http://localhost:${PORT}/health`);
+      logger.info(`🔄 Workflow BPM API: http://localhost:${PORT}/api/v1/workflow`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
@@ -78,13 +111,33 @@ async function startServer(): Promise<void> {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   logger.info('SIGTERM received, shutting down gracefully');
+  
+  // Shutdown workflow orchestrator if it exists
+  if (app.locals.workflowOrchestrator) {
+    try {
+      await app.locals.workflowOrchestrator.shutdown();
+    } catch (error) {
+      logger.error('Error shutting down workflow orchestrator:', error);
+    }
+  }
+  
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   logger.info('SIGINT received, shutting down gracefully');
+  
+  // Shutdown workflow orchestrator if it exists
+  if (app.locals.workflowOrchestrator) {
+    try {
+      await app.locals.workflowOrchestrator.shutdown();
+    } catch (error) {
+      logger.error('Error shutting down workflow orchestrator:', error);
+    }
+  }
+  
   process.exit(0);
 });
 

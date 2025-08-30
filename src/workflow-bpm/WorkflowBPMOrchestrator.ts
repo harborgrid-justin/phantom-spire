@@ -5,16 +5,15 @@
 
 import { EventEmitter } from 'events';
 import { WorkflowEngineCore } from './core/WorkflowEngine';
-import { MongoWorkflowRepository } from './repository/MongoWorkflowRepository';
+import { InMemoryWorkflowRepository } from './repository/InMemoryWorkflowRepository';
 import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
 import { 
   IWorkflowEngine, 
   IWorkflowDefinition, 
   IWorkflowInstance,
-  WorkflowStatus,
-  WorkflowPriority
+  WorkflowStatus
 } from './interfaces/IWorkflowEngine';
-import logger from '../utils/logger';
+import { logger } from '../utils/logger';
 
 export interface IWorkflowBPMConfig {
   database?: {
@@ -40,8 +39,8 @@ export interface IWorkflowBPMConfig {
 }
 
 export class WorkflowBPMOrchestrator extends EventEmitter {
-  private workflowEngine: IWorkflowEngine;
-  private repository: MongoWorkflowRepository;
+  private workflowEngine!: IWorkflowEngine;
+  private repository!: InMemoryWorkflowRepository;
   private integrations: any = {};
   
   // Performance and monitoring
@@ -66,7 +65,7 @@ export class WorkflowBPMOrchestrator extends EventEmitter {
   private async initialize(): Promise<void> {
     try {
       // Initialize repository
-      this.repository = new MongoWorkflowRepository();
+      this.repository = new InMemoryWorkflowRepository();
       
       // Initialize workflow engine
       this.workflowEngine = new WorkflowEngineCore(
