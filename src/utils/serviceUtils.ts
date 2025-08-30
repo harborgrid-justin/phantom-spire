@@ -64,7 +64,8 @@ export class ErrorHandler {
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      const errorObj = error instanceof Error ? error : new Error(String(error));
+      const errorObj =
+        error instanceof Error ? error : new Error(String(error));
 
       if (!options.suppressError) {
         logger.error(`Operation failed: ${context.operationName}`, {
@@ -128,7 +129,7 @@ export class ErrorHandler {
         try {
           const result = await operation(item, itemIndex);
           successful.push(result);
-          
+
           if (options.logProgress && itemIndex % 10 === 0) {
             logger.debug(`Batch progress: ${context.operationName}`, {
               batchId,
@@ -139,9 +140,10 @@ export class ErrorHandler {
             });
           }
         } catch (error) {
-          const errorObj = error instanceof Error ? error : new Error(String(error));
+          const errorObj =
+            error instanceof Error ? error : new Error(String(error));
           failed.push({ item, index: itemIndex, error: errorObj });
-          
+
           if (!options.continueOnError) {
             throw errorObj;
           }
@@ -179,7 +181,10 @@ export class PerformanceMonitor {
   /**
    * Start performance measurement
    */
-  public static startMeasurement(operation: string, metadata?: Record<string, unknown>): IPerformanceMeasurement {
+  public static startMeasurement(
+    operation: string,
+    metadata?: Record<string, unknown>
+  ): IPerformanceMeasurement {
     const id = uuidv4();
     const startTime = Date.now();
 
@@ -222,7 +227,7 @@ export class PerformanceMonitor {
     if (!this.measurements.has(operation)) {
       this.measurements.set(operation, []);
     }
-    
+
     const operationMeasurements = this.measurements.get(operation)!;
     operationMeasurements.push(measurement);
 
@@ -241,7 +246,9 @@ export class PerformanceMonitor {
   /**
    * Get performance statistics for an operation
    */
-  public static getStatistics(operation: string): IPerformanceStatistics | null {
+  public static getStatistics(
+    operation: string
+  ): IPerformanceStatistics | null {
     const measurements = this.measurements.get(operation);
     if (!measurements || measurements.length === 0) {
       return null;
@@ -259,7 +266,7 @@ export class PerformanceMonitor {
     const p95 = sortedDurations[Math.floor(sortedDurations.length * 0.95)] || 0;
     const p99 = sortedDurations[Math.floor(sortedDurations.length * 0.99)] || 0;
     const lastMeasurement = measurements[measurements.length - 1];
-    
+
     if (!lastMeasurement) {
       return null;
     }
@@ -283,7 +290,7 @@ export class PerformanceMonitor {
    */
   public static getAllStatistics(): Record<string, IPerformanceStatistics> {
     const stats: Record<string, IPerformanceStatistics> = {};
-    
+
     for (const operation of this.measurements.keys()) {
       const operationStats = this.getStatistics(operation);
       if (operationStats) {
@@ -420,7 +427,7 @@ export class DataTransformer {
     // Process in batches to avoid memory issues
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
-      
+
       for (let j = 0; j < batch.length; j++) {
         const item = batch[j];
         const index = i + j;
@@ -441,7 +448,8 @@ export class DataTransformer {
 
           successful.push(transformed);
         } catch (error) {
-          const errorObj = error instanceof Error ? error : new Error(String(error));
+          const errorObj =
+            error instanceof Error ? error : new Error(String(error));
           failed.push({ item, index, error: errorObj });
 
           if (!continueOnError) {
@@ -457,9 +465,12 @@ export class DataTransformer {
   /**
    * Deep merge objects
    */
-  public static deepMerge<T extends Record<string, unknown>>(target: T, ...sources: Partial<T>[]): T {
+  public static deepMerge<T extends Record<string, unknown>>(
+    target: T,
+    ...sources: Partial<T>[]
+  ): T {
     if (!sources.length) return target;
-    
+
     const source = sources.shift();
     if (!source) return target;
 
@@ -514,19 +525,22 @@ export class RetryUtil {
     } = options;
 
     let lastError: Error;
-    
+
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
-        
+
         if (attempt === maxRetries || !retryCondition(lastError)) {
           throw lastError;
         }
 
-        const delay = Math.min(initialDelay * Math.pow(backoffMultiplier, attempt), maxDelay);
-        
+        const delay = Math.min(
+          initialDelay * Math.pow(backoffMultiplier, attempt),
+          maxDelay
+        );
+
         logger.warn(`Operation failed, retrying in ${delay}ms`, {
           attempt: attempt + 1,
           maxRetries,

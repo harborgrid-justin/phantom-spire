@@ -4,7 +4,7 @@
  */
 
 import { logger } from '../utils/logger';
-import { 
+import {
   MessageQueueServiceFactory,
   IOCMessageProducer,
   ThreatAnalysisMessageProducer,
@@ -47,7 +47,6 @@ export class MessageQueueDemo {
       await this.showSystemMetrics();
 
       logger.info('✅ Message Queue Demo completed successfully');
-
     } catch (error) {
       logger.error('❌ Message Queue Demo failed', error);
       throw error;
@@ -92,7 +91,8 @@ export class MessageQueueDemo {
   private async demonstrateIOCProcessing(): Promise<void> {
     logger.info('🔍 Demonstrating IOC Processing Pipeline...');
 
-    const messageQueueManager = this.messageQueueFactory.getMessageQueueManager();
+    const messageQueueManager =
+      this.messageQueueFactory.getMessageQueueManager();
     const iocProducer = new IOCMessageProducer(messageQueueManager);
 
     // Create sample IOCs for processing
@@ -110,7 +110,7 @@ export class MessageQueueDemo {
         metadata: { demo: true },
       },
       {
-        _id: 'demo-ioc-2', 
+        _id: 'demo-ioc-2',
         value: 'malicious-domain.com',
         type: 'domain',
         source: 'demo-feed',
@@ -120,7 +120,7 @@ export class MessageQueueDemo {
         firstSeen: new Date(),
         lastSeen: new Date(),
         metadata: { demo: true },
-      }
+      },
     ];
 
     // Publish IOC enrichment requests
@@ -157,8 +157,11 @@ export class MessageQueueDemo {
   private async demonstrateThreatAnalysis(): Promise<void> {
     logger.info('🧠 Demonstrating Threat Analysis Pipeline...');
 
-    const messageQueueManager = this.messageQueueFactory.getMessageQueueManager();
-    const threatAnalysisProducer = new ThreatAnalysisMessageProducer(messageQueueManager);
+    const messageQueueManager =
+      this.messageQueueFactory.getMessageQueueManager();
+    const threatAnalysisProducer = new ThreatAnalysisMessageProducer(
+      messageQueueManager
+    );
 
     // Create sample IOCs for analysis
     const analysisIOCs: IIOC[] = [
@@ -173,27 +176,28 @@ export class MessageQueueDemo {
         firstSeen: new Date(Date.now() - 86400000), // 24 hours ago
         lastSeen: new Date(),
         metadata: { campaign: 'Operation Stealth' },
-      }
+      },
     ];
 
     // Publish campaign analysis request
-    const campaignMessageId = await threatAnalysisProducer.publishThreatAnalysisRequest(
-      analysisIOCs,
-      'campaign',
-      {
-        includePredictions: true,
-        includeAnomalies: true,
-        timeWindow: {
-          start: new Date(Date.now() - 86400000 * 7), // 7 days ago
-          end: new Date(),
+    const campaignMessageId =
+      await threatAnalysisProducer.publishThreatAnalysisRequest(
+        analysisIOCs,
+        'campaign',
+        {
+          includePredictions: true,
+          includeAnomalies: true,
+          timeWindow: {
+            start: new Date(Date.now() - 86400000 * 7), // 7 days ago
+            end: new Date(),
+          },
         },
-      },
-      {
-        userId: 'threat-analyst',
-        permissions: ['read', 'analyze'],
-      },
-      MESSAGE_PRIORITIES.CRITICAL
-    );
+        {
+          userId: 'threat-analyst',
+          permissions: ['read', 'analyze'],
+        },
+        MESSAGE_PRIORITIES.CRITICAL
+      );
 
     logger.info('📤 Published threat analysis request', {
       messageId: campaignMessageId,
@@ -202,24 +206,25 @@ export class MessageQueueDemo {
       priority: 'CRITICAL',
     });
 
-    // Publish attribution analysis request  
-    const attributionMessageId = await threatAnalysisProducer.publishThreatAnalysisRequest(
-      analysisIOCs,
-      'attribution',
-      {
-        includePredictions: false,
-        includeAnomalies: true,
-        timeWindow: {
-          start: new Date(Date.now() - 86400000 * 30), // 30 days ago
-          end: new Date(),
+    // Publish attribution analysis request
+    const attributionMessageId =
+      await threatAnalysisProducer.publishThreatAnalysisRequest(
+        analysisIOCs,
+        'attribution',
+        {
+          includePredictions: false,
+          includeAnomalies: true,
+          timeWindow: {
+            start: new Date(Date.now() - 86400000 * 30), // 30 days ago
+            end: new Date(),
+          },
         },
-      },
-      {
-        userId: 'threat-analyst',
-        permissions: ['read', 'analyze'],
-      },
-      MESSAGE_PRIORITIES.HIGH
-    );
+        {
+          userId: 'threat-analyst',
+          permissions: ['read', 'analyze'],
+        },
+        MESSAGE_PRIORITIES.HIGH
+      );
 
     logger.info('📤 Published attribution analysis request', {
       messageId: attributionMessageId,
@@ -237,7 +242,8 @@ export class MessageQueueDemo {
   private async demonstrateRealTimeAlerts(): Promise<void> {
     logger.info('🚨 Demonstrating Real-Time Threat Alerts...');
 
-    const messageQueueManager = this.messageQueueFactory.getMessageQueueManager();
+    const messageQueueManager =
+      this.messageQueueFactory.getMessageQueueManager();
     const alertProducer = new AlertMessageProducer(messageQueueManager);
 
     // Create sample threat alert
@@ -252,11 +258,11 @@ export class MessageQueueDemo {
         severity: 'critical',
         firstSeen: new Date(),
         lastSeen: new Date(),
-        metadata: { 
+        metadata: {
           exploitType: 'buffer-overflow',
           targetSoftware: 'Adobe Reader',
         },
-      }
+      },
     ];
 
     // Publish critical threat alert
@@ -284,7 +290,7 @@ export class MessageQueueDemo {
           priority: 3,
           description: 'Update Adobe Reader to the latest version',
           automated: false,
-        }
+        },
       ],
       ['workstation-01', 'workstation-15'],
       ['zero-day', 'high-priority', 'immediate-action'],
@@ -316,9 +322,10 @@ export class MessageQueueDemo {
         {
           action: 'investigate-connections',
           priority: 2,
-          description: 'Investigate the source and nature of suspicious connections',
+          description:
+            'Investigate the source and nature of suspicious connections',
           automated: false,
-        }
+        },
       ],
       [],
       ['network-anomaly', 'investigation-required']
@@ -340,11 +347,12 @@ export class MessageQueueDemo {
   private async showSystemMetrics(): Promise<void> {
     logger.info('📊 Displaying System Metrics...');
 
-    const messageQueueManager = this.messageQueueFactory.getMessageQueueManager();
-    
+    const messageQueueManager =
+      this.messageQueueFactory.getMessageQueueManager();
+
     // Get manager-level metrics
     const managerMetrics = messageQueueManager.getManagerMetrics();
-    
+
     logger.info('📈 Message Queue Manager Metrics', {
       totalQueues: managerMetrics.totalQueues,
       totalSubscriptions: managerMetrics.totalSubscriptions,
@@ -357,7 +365,7 @@ export class MessageQueueDemo {
     // Get health status for all queues
     try {
       const healthStatus = await messageQueueManager.getHealthStatus();
-      
+
       for (const [queueName, health] of Object.entries(healthStatus)) {
         logger.info(`🏥 Queue Health: ${queueName}`, {
           status: health.status,
@@ -376,7 +384,7 @@ export class MessageQueueDemo {
     // Get queue-specific metrics
     try {
       const queueMetrics = await messageQueueManager.getMetrics();
-      
+
       for (const [queueName, metrics] of Object.entries(queueMetrics)) {
         logger.info(`📋 Queue Metrics: ${queueName}`, {
           messagesPublished: metrics.messagesPublished,
@@ -414,7 +422,7 @@ export class MessageQueueDemo {
  */
 export async function runMessageQueueDemo(): Promise<void> {
   const demo = new MessageQueueDemo();
-  
+
   try {
     await demo.runDemo();
   } finally {

@@ -47,7 +47,11 @@ export {
 // Configuration factory
 import { config } from '../config/config';
 import { IMessageQueueManagerConfig } from './core/MessageQueueManager';
-import { IQueueConfig, MessagePriority, QueueType } from './interfaces/IMessageQueue';
+import {
+  IQueueConfig,
+  MessagePriority,
+  QueueType,
+} from './interfaces/IMessageQueue';
 
 /**
  * Create default message queue manager configuration
@@ -125,7 +129,9 @@ export class MessageQueueServiceFactory {
   /**
    * Initialize the message queue system
    */
-  public async initialize(customConfig?: Partial<IMessageQueueManagerConfig>): Promise<MessageQueueManager> {
+  public async initialize(
+    customConfig?: Partial<IMessageQueueManagerConfig>
+  ): Promise<MessageQueueManager> {
     if (this.messageQueueManager) {
       return this.messageQueueManager;
     }
@@ -146,7 +152,9 @@ export class MessageQueueServiceFactory {
    */
   public getMessageQueueManager(): MessageQueueManager {
     if (!this.messageQueueManager) {
-      throw new Error('Message queue system not initialized. Call initialize() first.');
+      throw new Error(
+        'Message queue system not initialized. Call initialize() first.'
+      );
     }
     return this.messageQueueManager;
   }
@@ -179,29 +187,29 @@ export const MESSAGE_TYPES = {
   IOC_ENRICHMENT_RESULT: 'ioc.enrichment.result',
   IOC_VALIDATION_REQUEST: 'ioc.validation.request',
   IOC_VALIDATION_RESULT: 'ioc.validation.result',
-  
+
   // Threat Analysis Messages
   THREAT_ANALYSIS_REQUEST: 'threat.analysis.request',
   THREAT_ANALYSIS_RESULT: 'threat.analysis.result',
   CAMPAIGN_DISCOVERY: 'threat.campaign.discovery',
   ATTRIBUTION_ANALYSIS: 'threat.attribution.analysis',
-  
+
   // Data Integration Messages
   DATA_INGESTION_REQUEST: 'data.ingestion.request',
   DATA_INGESTION_RESULT: 'data.ingestion.result',
   DATA_VALIDATION_REQUEST: 'data.validation.request',
   DATA_VALIDATION_RESULT: 'data.validation.result',
-  
+
   // Alert Messages
   THREAT_ALERT_NOTIFICATION: 'alert.threat.notification',
   ALERT_ESCALATION: 'alert.escalation',
   ALERT_ACKNOWLEDGMENT: 'alert.acknowledgment',
-  
+
   // Analytics Pipeline Messages
   ANALYTICS_PIPELINE_REQUEST: 'analytics.pipeline.request',
   ANALYTICS_PIPELINE_RESULT: 'analytics.pipeline.result',
   ANALYTICS_STEP_COMPLETE: 'analytics.step.complete',
-  
+
   // System Messages
   SYSTEM_HEALTH_CHECK: 'system.health.check',
   SYSTEM_METRICS_UPDATE: 'system.metrics.update',

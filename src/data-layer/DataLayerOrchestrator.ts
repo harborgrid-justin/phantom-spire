@@ -6,9 +6,9 @@
 import { logger } from '../utils/logger';
 import { ErrorHandler, PerformanceMonitor } from '../utils/serviceUtils';
 import { MessageQueueManager } from '../message-queue/core/MessageQueueManager';
-import { 
-  DataIngestionMessageProducer, 
-  AnalyticsPipelineMessageProducer 
+import {
+  DataIngestionMessageProducer,
+  AnalyticsPipelineMessageProducer,
 } from '../message-queue/producers/MessageProducers';
 import {
   DataIngestionEngine,
@@ -33,14 +33,18 @@ import {
 import { RestApiConnector } from './connectors/RestApiConnector';
 import { EvidenceManagementService } from './evidence/services/EvidenceManagementService';
 import { EvidenceAnalyticsEngine } from './evidence/services/EvidenceAnalyticsEngine';
-import { 
-  IEvidenceManager, 
-  IEvidenceContext, 
+import {
+  IEvidenceManager,
+  IEvidenceContext,
   ICreateEvidenceRequest,
   IEvidenceQuery,
-  IEvidenceSearchResult 
+  IEvidenceSearchResult,
 } from './evidence/interfaces/IEvidenceManager';
-import { IEvidence, EvidenceType, ClassificationLevel } from './evidence/interfaces/IEvidence';
+import {
+  IEvidence,
+  EvidenceType,
+  ClassificationLevel,
+} from './evidence/interfaces/IEvidence';
 import {
   IDataSource,
   IDataRecord,
@@ -121,7 +125,7 @@ export class DataLayerOrchestrator {
   private pipelines: Map<string, IDataPipeline> = new Map();
   private config: IDataLayerConfig;
   private metrics: IDataLayerMetrics;
-  
+
   // Message Queue Integration
   private messageQueueManager?: MessageQueueManager;
   private dataIngestionProducer?: DataIngestionMessageProducer;
@@ -132,22 +136,31 @@ export class DataLayerOrchestrator {
   private pipelineManager?: IngestionPipelineManager;
   private streamProcessor?: StreamProcessor;
 
-  constructor(config: IDataLayerConfig, messageQueueManager?: MessageQueueManager) {
+  constructor(
+    config: IDataLayerConfig,
+    messageQueueManager?: MessageQueueManager
+  ) {
     this.config = config;
     this.federationEngine = new DataFederationEngine();
     this.analyticsEngine = new AdvancedAnalyticsEngine();
-    
+
     // Initialize Fortune 100-Grade Evidence Management
     this.evidenceManager = new EvidenceManagementService();
-    this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(this.evidenceManager);
-    
+    this.evidenceAnalyticsEngine = new EvidenceAnalyticsEngine(
+      this.evidenceManager
+    );
+
     this.metrics = this.initializeMetrics();
-    
+
     // Initialize message queue integration if provided
     if (messageQueueManager && config.messageQueue?.enabled) {
       this.messageQueueManager = messageQueueManager;
-      this.dataIngestionProducer = new DataIngestionMessageProducer(messageQueueManager);
-      this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(messageQueueManager);
+      this.dataIngestionProducer = new DataIngestionMessageProducer(
+        messageQueueManager
+      );
+      this.analyticsPipelineProducer = new AnalyticsPipelineMessageProducer(
+        messageQueueManager
+      );
       logger.info('Message queue integration enabled for data layer');
     }
 
@@ -156,7 +169,9 @@ export class DataLayerOrchestrator {
       this.initializeIngestionEngine(messageQueueManager);
     }
 
-    logger.info('Data Layer Orchestrator initialized with Fortune 100-Grade Evidence Management');
+    logger.info(
+      'Data Layer Orchestrator initialized with Fortune 100-Grade Evidence Management'
+    );
   }
 
   /**
@@ -196,7 +211,8 @@ export class DataLayerOrchestrator {
         connectors: this.connectors.size,
         analyticsEnabled: this.config.analytics?.enableAdvancedAnalytics,
         ingestionEnabled: this.config.ingestion?.enabled,
-        streamProcessingEnabled: this.config.ingestion?.enableRealTimeProcessing,
+        streamProcessingEnabled:
+          this.config.ingestion?.enableRealTimeProcessing,
       });
     } catch (error) {
       logger.error('Failed to initialize data layer', error);
@@ -211,11 +227,14 @@ export class DataLayerOrchestrator {
     query: IFederatedQuery,
     context: IQueryContext
   ): Promise<IFederatedResult> {
-    const measurement = PerformanceMonitor.startMeasurement('data_layer_query', {
-      queryType: query.type,
-      sources: query.sources,
-      userId: context.userId,
-    });
+    const measurement = PerformanceMonitor.startMeasurement(
+      'data_layer_query',
+      {
+        queryType: query.type,
+        sources: query.sources,
+        userId: context.userId,
+      }
+    );
 
     const operationResult = await ErrorHandler.executeWithHandling(
       () => this.federationEngine.federatedQuery(query, context),
@@ -236,8 +255,11 @@ export class DataLayerOrchestrator {
     );
 
     // Update metrics
-    this.updateQueryMetrics(operationResult.executionTime, operationResult.success);
-    
+    this.updateQueryMetrics(
+      operationResult.executionTime,
+      operationResult.success
+    );
+
     measurement.end({
       success: operationResult.success,
       resultCount: operationResult.result?.data.length || 0,
@@ -695,7 +717,9 @@ export class DataLayerOrchestrator {
   /**
    * Initialize Fortune 100-grade ingestion engine
    */
-  private initializeIngestionEngine(messageQueueManager: MessageQueueManager): void {
+  private initializeIngestionEngine(
+    messageQueueManager: MessageQueueManager
+  ): void {
     const ingestionConfig = {
       ...DEFAULT_INGESTION_CONFIG,
       ...this.config.ingestion?.engineConfig,
@@ -712,11 +736,14 @@ export class DataLayerOrchestrator {
     };
 
     // Initialize ingestion engine
-    this.ingestionEngine = new DataIngestionEngine(ingestionConfig, messageQueueManager);
-    
+    this.ingestionEngine = new DataIngestionEngine(
+      ingestionConfig,
+      messageQueueManager
+    );
+
     // Initialize pipeline manager
     this.pipelineManager = new IngestionPipelineManager(pipelineConfig);
-    
+
     // Initialize stream processor if real-time processing is enabled
     if (this.config.ingestion?.enableRealTimeProcessing) {
       this.streamProcessor = new StreamProcessor(streamConfig);
@@ -726,7 +753,7 @@ export class DataLayerOrchestrator {
     IngestionIntegration.integrateWithOrchestrator(this, this.ingestionEngine);
 
     // Set up monitoring and alerting
-    IngestionIntegration.setupMonitoring(this.ingestionEngine, (alert) => {
+    IngestionIntegration.setupMonitoring(this.ingestionEngine, alert => {
       logger.warn('Ingestion engine alert', alert);
       // In production, this would trigger appropriate alerting mechanisms
     });
@@ -775,7 +802,11 @@ export class DataLayerOrchestrator {
     }
 
     try {
-      const jobId = await this.ingestionEngine.submitJob(sourceId, pipeline, priority);
+      const jobId = await this.ingestionEngine.submitJob(
+        sourceId,
+        pipeline,
+        priority
+      );
       logger.info('Ingestion job submitted via orchestrator', {
         jobId,
         sourceId,
@@ -824,28 +855,31 @@ export class DataLayerOrchestrator {
    * Create new evidence with full chain of custody tracking
    */
   public async createEvidence(
-    request: ICreateEvidenceRequest, 
+    request: ICreateEvidenceRequest,
     context: IEvidenceContext
   ): Promise<IEvidence> {
     try {
-      const evidence = await this.evidenceManager.createEvidence(request, context);
-      
+      const evidence = await this.evidenceManager.createEvidence(
+        request,
+        context
+      );
+
       // Update metrics
       this.metrics.analytics.threatsAnalyzed++;
-      
+
       logger.info('Evidence created via data layer orchestrator', {
         evidenceId: evidence.id,
         type: evidence.type,
         classification: evidence.classification,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return evidence;
     } catch (error) {
       logger.error('Failed to create evidence', {
         sourceType: request.sourceType,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -855,27 +889,27 @@ export class DataLayerOrchestrator {
    * Search evidence with advanced filtering and access control
    */
   public async searchEvidence(
-    query: IEvidenceQuery, 
+    query: IEvidenceQuery,
     context: IEvidenceContext
   ): Promise<IEvidenceSearchResult> {
     try {
       const result = await this.evidenceManager.searchEvidence(query, context);
-      
+
       // Update metrics
       this.metrics.queries.totalExecuted++;
-      
+
       logger.info('Evidence search completed via data layer orchestrator', {
         resultCount: result.totalCount,
         hasMore: result.hasMore,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       this.metrics.queries.errorRate++;
       logger.error('Failed to search evidence', {
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -891,30 +925,32 @@ export class DataLayerOrchestrator {
   ): Promise<any> {
     try {
       const result = await this.evidenceAnalyticsEngine.analyzeEvidence(
-        evidenceIds, 
-        context, 
+        evidenceIds,
+        context,
         options
       );
-      
+
       // Update metrics
       this.metrics.analytics.patternsDetected += result.patterns.length;
-      this.metrics.analytics.anomaliesFound += result.findings.filter(f => f.type === 'anomaly').length;
-      
+      this.metrics.analytics.anomaliesFound += result.findings.filter(
+        f => f.type === 'anomaly'
+      ).length;
+
       logger.info('Evidence analysis completed via data layer orchestrator', {
         analysisId: result.analysisId,
         evidenceAnalyzed: result.evidenceAnalyzed,
         findingsCount: result.findings.length,
         correlationsCount: result.correlations.length,
         overallRisk: result.riskAssessment.overall_risk,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to analyze evidence', {
         evidenceIds,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -929,7 +965,7 @@ export class DataLayerOrchestrator {
   ): Promise<IEvidence> {
     const request: ICreateEvidenceRequest = {
       type: EvidenceType.IOC_EVIDENCE,
-      sourceType: iocData.sourceType || 'internal_detection' as any,
+      sourceType: iocData.sourceType || ('internal_detection' as any),
       sourceId: iocData.id || iocData.value,
       sourceSystem: iocData.source || 'phantom-spire',
       data: {
@@ -940,22 +976,24 @@ export class DataLayerOrchestrator {
         tags: iocData.tags,
         sources: iocData.sources,
         firstSeen: iocData.firstSeen,
-        lastSeen: iocData.lastSeen
+        lastSeen: iocData.lastSeen,
       },
       metadata: {
         title: `IOC Evidence: ${iocData.value}`,
         description: `Evidence for IOC ${iocData.type}: ${iocData.value}`,
         severity: iocData.severity || 'medium',
         confidence: iocData.confidence || 50,
-        format: 'json'
+        format: 'json',
       },
       classification: this.mapSeverityToClassification(iocData.severity),
       tags: iocData.tags || [],
-      handling: [{
-        type: 'retention',
-        instruction: 'Retain for threat intelligence purposes',
-        authority: 'system'
-      }]
+      handling: [
+        {
+          type: 'retention',
+          instruction: 'Retain for threat intelligence purposes',
+          authority: 'system',
+        },
+      ],
     };
 
     return this.createEvidence(request, context);
@@ -967,17 +1005,17 @@ export class DataLayerOrchestrator {
   public async getEvidenceMetrics(timeRange?: { start: Date; end: Date }) {
     try {
       const metrics = await this.evidenceManager.getEvidenceMetrics(timeRange);
-      
+
       logger.info('Evidence metrics retrieved', {
         totalEvidence: metrics.totalEvidence,
         averageConfidence: metrics.averageConfidence,
-        integrityViolations: metrics.custodyMetrics.integrityViolations
+        integrityViolations: metrics.custodyMetrics.integrityViolations,
       });
-      
+
       return metrics;
     } catch (error) {
       logger.error('Failed to retrieve evidence metrics', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -991,19 +1029,22 @@ export class DataLayerOrchestrator {
     context: IEvidenceContext
   ): Promise<any> {
     try {
-      const report = await this.evidenceManager.generateEvidenceReport(query, context);
-      
+      const report = await this.evidenceManager.generateEvidenceReport(
+        query,
+        context
+      );
+
       logger.info('Evidence report generated', {
         title: report.title,
         evidenceCount: report.evidence.length,
-        generatedBy: context.userId
+        generatedBy: context.userId,
       });
-      
+
       return report;
     } catch (error) {
       logger.error('Failed to generate evidence report', {
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -1017,21 +1058,24 @@ export class DataLayerOrchestrator {
     context: IEvidenceContext
   ) {
     try {
-      const result = await this.evidenceManager.verifyIntegrity(evidenceId, context);
-      
+      const result = await this.evidenceManager.verifyIntegrity(
+        evidenceId,
+        context
+      );
+
       logger.info('Evidence integrity verification completed', {
         evidenceId,
         isValid: result.isValid,
         algorithm: result.algorithm,
-        userId: context.userId
+        userId: context.userId,
       });
-      
+
       return result;
     } catch (error) {
       logger.error('Failed to verify evidence integrity', {
         evidenceId,
         userId: context.userId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
