@@ -286,8 +286,8 @@ export class IOCValidationRequestConsumer
       const handlerResult = this.createSuccessResult({
         processingTime,
         validationRulesApplied: validationRules.length,
-        validationsPassed: validationResult.validations.filter(v => v.passed).length,
-        validationsFailed: validationResult.validations.filter(v => !v.passed).length,
+        validationsPassed: validationResult.errors.length === 0 ? 1 : 0,
+        validationsFailed: validationResult.errors.length,
       });
 
       this.logProcessingComplete(message, handlerResult, processingTime);
@@ -323,7 +323,7 @@ export class IOCValidationRequestConsumer
     logger.debug('Storing validation result', {
       iocId,
       isValid: validationResult.isValid,
-      validationCount: validationResult.validations.length,
+      validationCount: validationResult.errors.length + validationResult.warnings.length,
     });
   }
 }
@@ -499,7 +499,7 @@ export class ThreatAnalysisRequestConsumer
 
     const findings = [];
     for (const ioc of infrastructureIOCs) {
-      const relatedIOCs = await IOCAnalysisService.findRelatedIOCs(ioc);
+      const relatedIOCs = await IOCAnalysisService.findCorrelatedIOCs(ioc);
       
       if (relatedIOCs.length > 0) {
         findings.push({
@@ -696,7 +696,6 @@ export class ThreatAlertNotificationConsumer
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createSuccessResult({
         processingTime,
-        alertSeverity: alert.severity,
         indicatorCount: alert.indicators.length,
         affectedSystemsCount: alert.affectedSystems?.length || 0,
       });

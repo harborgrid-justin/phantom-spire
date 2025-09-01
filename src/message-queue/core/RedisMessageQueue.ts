@@ -101,7 +101,6 @@ export class RedisMessageQueue implements IMessageQueue {
         url: this.redisConfig.url,
         socket: {
           connectTimeout: this.redisConfig.commandTimeout,
-          commandTimeout: this.redisConfig.commandTimeout,
         },
       });
 
@@ -109,7 +108,6 @@ export class RedisMessageQueue implements IMessageQueue {
         url: this.redisConfig.url,
         socket: {
           connectTimeout: this.redisConfig.commandTimeout,
-          commandTimeout: this.redisConfig.commandTimeout,
         },
       });
 
@@ -199,7 +197,7 @@ export class RedisMessageQueue implements IMessageQueue {
 
       // Handle deduplication
       if (this.config.enableDeduplication) {
-        const isDuplicate = await this.checkDuplication(message);
+        const isDuplicate = await this.checkDuplication(message as any);
         if (isDuplicate) {
           logger.debug(`Duplicate message detected, skipping: ${message.id}`);
           return {
@@ -217,7 +215,7 @@ export class RedisMessageQueue implements IMessageQueue {
       await this.notifySubscribers(message);
 
       // Update metrics
-      this.metrics.messagesPublished++;
+      (this.metrics as any).messagesPublished++;
       this.updateQueueSize();
 
       logger.debug(`Message published to queue ${this.name}`, {
@@ -261,7 +259,7 @@ export class RedisMessageQueue implements IMessageQueue {
         isActive: true,
         createdAt: new Date(),
         messageCount: 0,
-        handler,
+        handler: handler as any,
         options,
         isProcessing: false,
         pause: () => this.pauseSubscription(subscriptionId),
@@ -270,7 +268,7 @@ export class RedisMessageQueue implements IMessageQueue {
       };
 
       this.subscriptions.set(subscriptionId, subscription);
-      this.metrics.subscriptionCount++;
+      (this.metrics as any).subscriptionCount++;
 
       // Subscribe to Redis pub/sub for real-time notifications
       await this.subscriberClient.subscribe(
@@ -309,7 +307,7 @@ export class RedisMessageQueue implements IMessageQueue {
       }
 
       this.subscriptions.delete(subscriptionId);
-      this.metrics.subscriptionCount--;
+      (this.metrics as any).subscriptionCount--;
 
       logger.info(`Unsubscribed from queue ${this.name}`, {
         subscriptionId,
@@ -393,10 +391,10 @@ export class RedisMessageQueue implements IMessageQueue {
       const deadLetterSize = await this.getDeadLetterSize();
       const oldestMessage = await this.getOldestMessageAge();
 
-      this.metrics.messagesPending = queueSize;
-      this.metrics.messagesDeadLetter = deadLetterSize;
-      this.metrics.oldestMessageAge = oldestMessage;
-      this.metrics.queueSizeBytes = await this.getQueueSizeInBytes();
+      (this.metrics as any).messagesPending = queueSize;
+      (this.metrics as any).messagesDeadLetter = deadLetterSize;
+      (this.metrics as any).oldestMessageAge = oldestMessage;
+      (this.metrics as any).queueSizeBytes = await this.getQueueSizeInBytes();
 
       return { ...this.metrics };
     } catch (error) {
@@ -542,19 +540,19 @@ export class RedisMessageQueue implements IMessageQueue {
 
       // Process the message
       const startTime = Date.now();
-      const result = await subscription.handler.handle(message, context);
+      const result = await subscription.handler.handle(message as any, context);
       const processingTime = Date.now() - startTime;
 
       // Update metrics
       this.updateProcessingMetrics(processingTime, result.success);
-      subscription.messageCount++;
-      subscription.lastMessageAt = new Date();
+      (subscription as any).messageCount++;
+      (subscription as any).lastMessageAt = new Date();
 
       // Handle result
       if (result.success) {
         await context.acknowledge();
       } else if (result.retryable && message.metadata.retryCount < message.metadata.maxRetries) {
-        await this.scheduleRetry(message);
+        await this.scheduleRetry(message as any);
       } else {
         await context.deadLetter(result.error?.message || 'Processing failed');
       }
@@ -574,7 +572,7 @@ export class RedisMessageQueue implements IMessageQueue {
     const messageKey = this.getMessageKey(messageId);
     const serializedMessage = await this.redisClient.get(messageKey);
     
-    return serializedMessage ? JSON.parse(serializedMessage) : null;
+    return serializedMessage ? JSON.parse(serializedMessage as string) : null;
   }
 
   private async acknowledgeMessage(messageId: string): Promise<void> {
@@ -588,7 +586,7 @@ export class RedisMessageQueue implements IMessageQueue {
       this.redisClient.del(this.getMessageKey(messageId)),
     ]);
 
-    this.metrics.messagesConsumed++;
+    (this.metrics as any).messagesConsumed++;
     this.updateQueueSize();
   }
 
@@ -627,7 +625,7 @@ export class RedisMessageQueue implements IMessageQueue {
 
     // Remove from main queue
     await this.acknowledgeMessage(messageId);
-    this.metrics.messagesDeadLetter++;
+    (this.metrics as any).messagesDeadLetter++;
   }
 
   private messageMatchesFilter(notification: any, filter: any): boolean {

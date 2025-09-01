@@ -581,7 +581,9 @@ class LoadStageProcessor implements IStageProcessor {
   ): Promise<any> {
     // Load data using the configured connector
     if (stage.connector) {
-      const result = await stage.connector.load(inputData, stage.config);
+      const records = Array.isArray(inputData) ? inputData : [inputData];
+      const target = typeof stage.config.target === 'string' ? stage.config.target : 'default';
+      const result = await stage.connector.load(records, target);
       return { loadResult: result };
     }
 

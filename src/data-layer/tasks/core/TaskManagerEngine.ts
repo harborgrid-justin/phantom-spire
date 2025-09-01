@@ -251,7 +251,7 @@ export class TaskManagerEngine extends EventEmitter implements ITaskManager {
       
     } catch (error) {
       measurement.end({ success: false });
-      throw this.errorHandler.handleError(error, 'createTask');
+      throw ErrorHandler.handleError(error, 'createTask');
     }
   }
   
@@ -370,7 +370,7 @@ export class TaskManagerEngine extends EventEmitter implements ITaskManager {
       
     } catch (error) {
       measurement.end({ success: false });
-      throw this.errorHandler.handleError(error, 'executeTask');
+      throw ErrorHandler.handleError(error, 'executeTask');
     }
   }
   
@@ -544,13 +544,13 @@ export class TaskManagerEngine extends EventEmitter implements ITaskManager {
       };
       
       measurement.end({ success: true, resultCount: paginatedTasks.length });
-      result.executionTime = measurement.getDuration();
+      result.executionTime = Date.now() - measurement.startTime;
       
       return result;
       
     } catch (error) {
       measurement.end({ success: false });
-      throw this.errorHandler.handleError(error, 'queryTasks');
+      throw ErrorHandler.handleError(error, 'queryTasks');
     }
   }
   
