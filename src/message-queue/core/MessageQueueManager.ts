@@ -185,7 +185,7 @@ export class MessageQueueManager {
       });
 
       await queue.initialize();
-      this.queues[name] = queue;
+      (this.queues as any)[name] = queue;
       
       // Initialize circuit breaker for this queue
       this.circuitBreakers.set(name, {
@@ -238,7 +238,7 @@ export class MessageQueueManager {
 
       // Add tracing if enabled
       if (this.config.monitoring.enableTracing && !fullMessage.metadata.tracing) {
-        fullMessage.metadata = {
+        (fullMessage as any).metadata = {
           ...fullMessage.metadata,
           tracing: {
             traceId: uuidv4(),
@@ -249,7 +249,7 @@ export class MessageQueueManager {
 
       const result = await queue.publish(fullMessage);
       
-      this.metrics.totalMessagesPublished++;
+      (this.metrics as any).totalMessagesPublished++;
       this.resetCircuitBreaker(queueName);
       
       logger.debug(`Message published to queue ${queueName}`, {
@@ -261,7 +261,7 @@ export class MessageQueueManager {
       return result;
     } catch (error) {
       this.handleCircuitBreakerFailure(queueName);
-      this.metrics.totalErrors++;
+      (this.metrics as any).totalErrors++;
       logger.error(`Failed to publish message to queue ${queueName}`, error);
       throw error;
     }
@@ -284,10 +284,10 @@ export class MessageQueueManager {
     try {
       const subscription = await queue.subscribe(topic, handler, options);
       
-      this.subscriptions[subscription.id] = {
+      (this.subscriptions as any)[subscription.id] = {
         subscription,
         queue,
-        handler,
+        handler: handler as IMessageHandler<Record<string, unknown>>,
         options: options || {},
       };
       
@@ -315,7 +315,7 @@ export class MessageQueueManager {
 
     try {
       await subscriptionInfo.queue.unsubscribe(subscriptionId);
-      delete this.subscriptions[subscriptionId];
+      delete (this.subscriptions as any)[subscriptionId];
       
       logger.info(`Unsubscribed from subscription ${subscriptionId}`);
     } catch (error) {
@@ -435,9 +435,9 @@ export class MessageQueueManager {
    * Update metrics
    */
   private updateMetrics(): void {
-    this.metrics.totalQueues = Object.keys(this.queues).length;
-    this.metrics.totalSubscriptions = Object.keys(this.subscriptions).length;
-    this.metrics.uptime = Date.now() - this.startTime;
+    (this.metrics as any).totalQueues = Object.keys(this.queues).length;
+    (this.metrics as any).totalSubscriptions = Object.keys(this.subscriptions).length;
+    (this.metrics as any).uptime = Date.now() - this.startTime;
   }
 
   /**
@@ -470,8 +470,8 @@ export class MessageQueueManager {
     };
 
     if (updatedState.failureCount >= this.config.circuitBreaker.failureThreshold) {
-      updatedState.state = 'open';
-      updatedState.nextAttempt = new Date(
+      (updatedState as any).state = 'open';
+      (updatedState as any).nextAttempt = new Date(
         Date.now() + this.config.circuitBreaker.recoveryTimeout
       );
       

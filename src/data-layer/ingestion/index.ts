@@ -97,7 +97,7 @@ export const DEFAULT_INGESTION_CONFIG = {
           message: 'Value field is required',
         },
       ],
-      failureAction: 'reject',
+      failureAction: 'reject' as const,
     },
   ],
   
@@ -113,7 +113,7 @@ export const DEFAULT_INGESTION_CONFIG = {
   
   // Security
   enableEncryption: true,
-  auditLevel: 'comprehensive',
+  auditLevel: 'comprehensive' as const,
 };
 
 export const DEFAULT_PIPELINE_CONFIG = {
@@ -244,7 +244,7 @@ export class IngestionConfigBuilder {
     return {
       ...DEFAULT_INGESTION_CONFIG,
       enableEncryption: true,
-      auditLevel: 'comprehensive',
+      auditLevel: 'comprehensive' as const,
       enableDataValidation: true,
       validationRules: [
         {
@@ -263,7 +263,7 @@ export class IngestionConfigBuilder {
               message: 'Source attribution is required',
             },
           ],
-          failureAction: 'quarantine',
+          failureAction: 'quarantine' as const,
         },
       ],
     };

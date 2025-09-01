@@ -544,7 +544,7 @@ export class TaskManagerEngine extends EventEmitter implements ITaskManager {
       };
       
       measurement.end({ success: true, resultCount: paginatedTasks.length });
-      result.executionTime = measurement.endTime - measurement.startTime;
+      result.executionTime = Date.now() - measurement.startTime;
       
       return result;
       

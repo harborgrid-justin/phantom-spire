@@ -8,7 +8,7 @@ export * from './interfaces/ITaskManager';
 
 // Core implementation
 import { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine';
-import { TaskHandlerRegistry } from './registry/TaskHandlerRegistry';
+import { TaskHandlerRegistry } from './handlers/TaskHandlers';
 
 export { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine';
 

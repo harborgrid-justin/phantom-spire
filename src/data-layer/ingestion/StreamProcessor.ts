@@ -298,19 +298,21 @@ export class StreamProcessor extends EventEmitter {
       const transformStream = this.createTransformStream(dataPipeline);
       const sinkStream = await this.createSinkStream(sink);
 
-      // Create the processing pipeline
-      const processingPipeline = [
-        sourceStream,
-        this.createDeduplicationTransform(),
-        this.createBatchingTransform(),
-        transformStream,
-        this.createMetricsTransform(),
-        sinkStream,
-      ].filter(Boolean);
-
-      // Start the pipeline
-      const pipelineStreams = processingPipeline as any[];
-      await pipelineAsync(...pipelineStreams);
+      // Start the pipeline - use pipeline function directly
+      await new Promise<void>((resolve, reject) => {
+        pipeline(
+          sourceStream,
+          this.createDeduplicationTransform(),
+          this.createBatchingTransform(), 
+          transformStream,
+          this.createMetricsTransform(),
+          sinkStream,
+          (err) => {
+            if (err) reject(err);
+            else resolve();
+          }
+        );
+      });
 
       logger.info('Stream processing completed', { streamId });
       this.emit('streamCompleted', { streamId, sourceId, sinkId });
