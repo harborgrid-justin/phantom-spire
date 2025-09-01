@@ -25,7 +25,10 @@
     "db:seed": "node scripts/seed.js",
     "health:check": "curl http://localhost:3000/health || echo 'Service not available'",
     "logs:app": "docker-compose logs -f app",
-    "logs:databases": "docker-compose logs -f mongo postgres mysql redis"
+    "logs:databases": "docker-compose logs -f mongo postgres mysql redis",
+    "evaluate:installation": "node dist/scripts/evaluate-installation.js",
+    "evaluate:installation:json": "npm run evaluate:installation -- --format json",
+    "evaluate:installation:report": "npm run evaluate:installation -- --detailed --output installation-evaluation-report.md --format markdown"
   },
   "keywords": [
     "threat-intelligence",
