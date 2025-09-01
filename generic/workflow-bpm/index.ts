@@ -6,6 +6,7 @@
 export * from './interfaces/IWorkflowEngine';
 export * from './core/WorkflowEngine';
 export * from './repository/InMemoryWorkflowRepository';
+export * from './repository/MongoWorkflowRepository';
 export { WorkflowBPMOrchestrator, IWorkflowBPMConfig } from './WorkflowBPMOrchestrator';
 
 // Main export
@@ -32,3 +33,7 @@ export {
 export {
   InMemoryWorkflowRepository
 } from './repository/InMemoryWorkflowRepository';
+
+export {
+  MongoWorkflowRepository
+} from './repository/MongoWorkflowRepository';

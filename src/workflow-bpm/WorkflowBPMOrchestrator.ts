@@ -4,15 +4,15 @@
  */
 
 import { EventEmitter } from 'events';
-import { WorkflowEngineCore } from './core/WorkflowEngine';
-import { InMemoryWorkflowRepository } from './repository/InMemoryWorkflowRepository';
-import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
 import { 
+  WorkflowEngineCore, 
+  InMemoryWorkflowRepository,
   IWorkflowEngine, 
   IWorkflowDefinition, 
   IWorkflowInstance,
   WorkflowStatus
-} from './interfaces/IWorkflowEngine';
+} from '../../generic/workflow-bpm';
+import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
 import { logger } from '../utils/logger';
 
 export interface IWorkflowBPMConfig {
