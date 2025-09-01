@@ -68,7 +68,7 @@ CREATE TABLE evidence_management.evidence_items (
     type VARCHAR(100) NOT NULL,
     source_system VARCHAR(255),
     file_path TEXT,
-    file_hash SHA256,
+    file_hash VARCHAR(64),
     file_size BIGINT,
     content_type VARCHAR(100),
     retention_policy JSONB,

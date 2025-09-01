@@ -118,7 +118,7 @@ services:
     depends_on:
       - redis
     environment:
-      REDIS_HOSTS: local:redis:6379
+      REDIS_HOSTS: local:redis:6379:0:phantom_redis_pass
       HTTP_USER: admin
       HTTP_PASSWORD: phantom_admin
       PORT: 8081
