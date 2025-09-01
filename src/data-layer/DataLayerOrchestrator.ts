@@ -57,6 +57,7 @@ import {
 import {
   IEvidence,
   EvidenceType,
+  EvidenceSourceType,
   ClassificationLevel,
 } from './evidence/interfaces/IEvidence';
 import {
@@ -697,7 +698,12 @@ export class DataLayerOrchestrator {
           },
           {
             userId: context.userId,
+            userRole: 'system',
             permissions: context.permissions || [],
+            classification: 'internal' as ClassificationLevel,
+            sessionId: `system-${Date.now()}`,
+            ipAddress: 'system',
+            userAgent: 'phantom-spire-data-layer',
           }
         );
 

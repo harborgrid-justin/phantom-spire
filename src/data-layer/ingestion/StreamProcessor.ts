@@ -103,8 +103,8 @@ export class StreamProcessor extends EventEmitter {
   private deduplicationCache: Map<string, number> = new Map();
   private deadLetterQueue: IStreamRecord[] = [];
   private isRunning = false;
-  private metricsInterval?: NodeJS.Timer;
-  private cleanupInterval?: NodeJS.Timer;
+  private metricsInterval?: NodeJS.Timeout;
+  private cleanupInterval?: NodeJS.Timeout;
 
   constructor(config: IStreamConfig) {
     super();
@@ -309,7 +309,7 @@ export class StreamProcessor extends EventEmitter {
       ].filter(Boolean);
 
       // Start the pipeline
-      await pipelineAsync(...processingPipeline);
+      await pipelineAsync(processingPipeline[0], ...processingPipeline.slice(1));
 
       logger.info('Stream processing completed', { streamId });
       this.emit('streamCompleted', { streamId, sourceId, sinkId });
@@ -392,7 +392,7 @@ export class StreamProcessor extends EventEmitter {
   private async stopActiveStreams(): Promise<void> {
     const streamPromises = Array.from(this.activeStreams.values()).map(stream => {
       return new Promise<void>((resolve) => {
-        if (stream.destroy) {
+        if ('destroy' in stream && typeof stream.destroy === 'function') {
           stream.destroy();
         }
         resolve();
