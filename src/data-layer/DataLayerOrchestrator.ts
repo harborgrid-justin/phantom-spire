@@ -680,20 +680,20 @@ export class DataLayerOrchestrator {
         const evidence = await this.evidenceManager.createEvidence(
           {
             type: 'IOC Evidence' as EvidenceType,
-            title: `Evidence from ${source}`,
-            description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
-            classification: 'internal' as ClassificationLevel,
-            source,
+            sourceType: 'system' as EvidenceSourceType,
+            sourceId: source,
+            sourceSystem: 'phantom-spire-cti',
             data: { taskId: task.id, executionId: execution.id },
             metadata: { 
-              title: `Evidence from Task ${task.id}`,
-              description: `Automatically collected evidence from data ingestion task`,
+              title: `Evidence from ${source}`,
+              description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
               severity: 'medium' as const,
               confidence: 80,
               format: 'json',
               collectionTaskId: task.id, 
               incidentId 
             },
+            classification: 'internal' as ClassificationLevel,
           },
           {
             userId: context.userId,

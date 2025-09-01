@@ -3,7 +3,7 @@
  * Fortune 100-grade service layer for evidence operations
  */
 
-import { IEvidence, EvidenceType, EvidenceSourceType, ClassificationLevel } from './IEvidence';
+import { IEvidence, EvidenceType, EvidenceSourceType, ClassificationLevel, IRetentionPolicy } from './IEvidence';
 import { IQueryContext, IDataRecord } from '../../interfaces/IDataSource';
 
 export interface IEvidenceManager {
@@ -98,13 +98,7 @@ export interface IUpdateEvidenceRequest {
     expiresAt?: Date;
     authority: string;
   }>;
-  retentionPolicy?: {
-    retainUntil: Date;
-    purgeAfter: Date;
-    archiveAfter?: Date;
-    legalHold?: boolean;
-    compliance?: string[];
-  };
+  retentionPolicy?: IRetentionPolicy;
 }
 
 export interface IEvidenceQuery {

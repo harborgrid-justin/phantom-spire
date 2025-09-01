@@ -60,6 +60,7 @@ export interface IValidationResult {
 }
 
 export interface IExtractionRequest {
+  source?: string;
   query?: IQuery;
   filters?: Record<string, any>;
   timeRange?: {
