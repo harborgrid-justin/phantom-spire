@@ -14,6 +14,8 @@ import { WorkflowBPMOrchestrator } from './workflow-bpm';
 import workflowRoutes from './routes/workflow/workflowRoutes';
 import { initializeEnterpriseManagement, shutdownEnterpriseManagement } from './services';
 import { EnterprisePlatformIntegration } from './enterprise-integration';
+import { centralizedServiceCenter } from './centralized-service-center';
+import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter';
 
 const app = express();
 
@@ -150,6 +152,18 @@ async function startServer(): Promise<void> {
     
     logger.info('✅ Enterprise Service Bus and Service Mesh initialized successfully');
     
+    // Initialize Fortune 100 Centralized System Service Center
+    logger.info('🏛️ Initializing Fortune 100 Centralized System Service Center...');
+    await centralizedServiceCenter.start();
+    
+    // Make service center available to the application
+    app.locals.serviceCenter = centralizedServiceCenter;
+    
+    // Add unified API routes
+    app.use('/api/v1/platform', unifiedAPIRouter);
+    
+    logger.info('✅ Centralized System Service Center initialized - All modules linked successfully');
+    
     const PORT = config.PORT || 3000;
     app.listen(PORT, () => {
       logger.info(`🚀 Phantom Spire CTI Platform started on port ${PORT}`);
@@ -157,6 +171,8 @@ async function startServer(): Promise<void> {
       logger.info(`🏥 Health Check: http://localhost:${PORT}/health`);
       logger.info(`🔄 Workflow BPM API: http://localhost:${PORT}/api/v1/workflow`);
       logger.info(`🏢 Enterprise Integration: Service Bus and Service Mesh operational`);
+      logger.info(`🏛️ Centralized Service Center: http://localhost:${PORT}/api/v1/platform`);
+      logger.info(`📋 Unified API Documentation: http://localhost:${PORT}/api/v1/platform/docs`);
     });
   } catch (error) {
     logger.error('Failed to start server:', error);
@@ -193,6 +209,15 @@ process.on('SIGTERM', async () => {
     }
   }
   
+  // Shutdown centralized service center if it exists
+  if (app.locals.serviceCenter) {
+    try {
+      await app.locals.serviceCenter.stop();
+    } catch (error) {
+      logger.error('Error shutting down service center:', error);
+    }
+  }
+  
   process.exit(0);
 });
 
@@ -221,6 +246,15 @@ process.on('SIGINT', async () => {
       await app.locals.enterpriseIntegration.stop();
     } catch (error) {
       logger.error('Error shutting down enterprise integration:', error);
+    }
+  }
+  
+  // Shutdown centralized service center if it exists
+  if (app.locals.serviceCenter) {
+    try {
+      await app.locals.serviceCenter.stop();
+    } catch (error) {
+      logger.error('Error shutting down service center:', error);
     }
   }
   
