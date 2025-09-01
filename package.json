@@ -28,7 +28,9 @@
     "logs:databases": "docker-compose logs -f mongo postgres mysql redis",
     "evaluate:installation": "node dist/scripts/evaluate-installation.js",
     "evaluate:installation:json": "npm run evaluate:installation -- --format json",
-    "evaluate:installation:report": "npm run evaluate:installation -- --detailed --output installation-evaluation-report.md --format markdown"
+    "evaluate:installation:report": "npm run evaluate:installation -- --detailed --output installation-evaluation-report.md --format markdown",
+    "analyze:system": "node dist/scripts/analyze-system.js",
+    "analyze:system:report": "npm run analyze:system -- --report comprehensive-system-analysis.md"
   },
   "keywords": [
     "threat-intelligence",
