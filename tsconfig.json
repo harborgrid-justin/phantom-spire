@@ -27,6 +27,6 @@
     "jsx": "react",
     "types": ["node", "jest"]
   },
-  "include": ["src/**/*", ".development/references/**/*"],
+  "include": ["src/**/*", "scripts/**/*", ".development/references/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
