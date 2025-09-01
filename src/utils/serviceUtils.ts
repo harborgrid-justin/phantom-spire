@@ -3,7 +3,7 @@
  * Eliminates duplicative code across threat intelligence services
  */
 
-import { logger } from '../utils/logger';
+import { logger } from '../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -179,7 +179,7 @@ export class ErrorHandler {
     additionalData?: Record<string, unknown>
   ): Error {
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    
+
     logger.error(`Error in ${context}`, {
       error: errorObj.message,
       stack: errorObj.stack,

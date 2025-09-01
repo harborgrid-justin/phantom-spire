@@ -7,11 +7,11 @@
 export {
   CentralizedSystemServiceCenter,
   centralizedServiceCenter,
-} from './core/CentralizedSystemServiceCenter';
+} from './core/CentralizedSystemServiceCenter.js';
 
 // Interfaces
-export * from './interfaces/ICentralizedServiceCenter';
+export * from './interfaces/ICentralizedServiceCenter.js';
 
 // Re-export for convenience
-export { CentralizedSystemServiceCenter as ServiceCenter } from './core/CentralizedSystemServiceCenter';
-export { centralizedServiceCenter as serviceCenter } from './core/CentralizedSystemServiceCenter';
+export { CentralizedSystemServiceCenter as ServiceCenter } from './core/CentralizedSystemServiceCenter.js';
+export { centralizedServiceCenter as serviceCenter } from './core/CentralizedSystemServiceCenter.js';

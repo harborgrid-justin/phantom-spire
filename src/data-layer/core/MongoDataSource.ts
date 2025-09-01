@@ -3,7 +3,7 @@
  */
 
 import mongoose from 'mongoose';
-import { BaseDataSource } from './BaseDataSource';
+import { BaseDataSource } from './BaseDataSource.js';
 import {
   IDataRecord,
   IQuery,
@@ -11,7 +11,7 @@ import {
   IQueryResult,
   IHealthStatus,
   IRelationship
-} from '../interfaces/IDataSource';
+} from '../interfaces/IDataSource.js';
 // logger imported for future use
 
 export class MongoDataSource extends BaseDataSource {

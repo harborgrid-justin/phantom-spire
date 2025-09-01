@@ -4,17 +4,17 @@
  */
 
 // Core Components
-export { DataIngestionEngine } from './DataIngestionEngine';
-export { IngestionPipelineManager } from './IngestionPipelineManager';
-export { StreamProcessor } from './StreamProcessor';
+export { DataIngestionEngine } from './DataIngestionEngine.js';
+export { IngestionPipelineManager } from './IngestionPipelineManager.js';
+export { StreamProcessor } from './StreamProcessor.js';
 
 // Specialized Connectors
-import { STIXConnector } from './connectors/STIXConnector';
-import { MISPConnector } from './connectors/MISPConnector';
-import { DataIngestionEngine } from './DataIngestionEngine';
+import { STIXConnector } from './connectors/STIXConnector.js';
+import { MISPConnector } from './connectors/MISPConnector.js';
+import { DataIngestionEngine } from './DataIngestionEngine.js';
 
-export { STIXConnector } from './connectors/STIXConnector';
-export { MISPConnector } from './connectors/MISPConnector';
+export { STIXConnector } from './connectors/STIXConnector.js';
+export { MISPConnector } from './connectors/MISPConnector.js';
 
 // Type Definitions
 export type {
@@ -26,14 +26,14 @@ export type {
   IIngestionSource,
   ICronSchedule,
   IIngestionJob,
-} from './DataIngestionEngine';
+} from './DataIngestionEngine.js';
 
 export type {
   IPipelineConfig,
   IPipelineContext,
   IPipelineCheckpoint,
   IStageExecutionContext,
-} from './IngestionPipelineManager';
+} from './IngestionPipelineManager.js';
 
 export type {
   IStreamConfig,
@@ -42,7 +42,7 @@ export type {
   IStreamSink,
   IBatchContext,
   IStreamRecord,
-} from './StreamProcessor';
+} from './StreamProcessor.js';
 
 export type {
   ISTIXConnectorConfig,
@@ -52,7 +52,7 @@ export type {
   ISTIXIndicator,
   ISTIXMalware,
   ISTIXThreatActor,
-} from './connectors/STIXConnector';
+} from './connectors/STIXConnector.js';
 
 export type {
   IMISPConnectorConfig,
@@ -61,7 +61,7 @@ export type {
   IMISPObject,
   IMISPGalaxy,
   IMISPOrganization,
-} from './connectors/MISPConnector';
+} from './connectors/MISPConnector.js';
 
 /**
  * Default configurations for Fortune 100 deployment

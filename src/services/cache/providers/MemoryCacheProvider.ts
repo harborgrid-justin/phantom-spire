@@ -4,7 +4,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { ICacheProvider, ICacheMetrics } from '../interfaces/ICacheManager';
+import { ICacheProvider, ICacheMetrics } from '../interfaces/ICacheManager.js';
 
 interface MemoryCacheEntry<T = any> {
   value: T;

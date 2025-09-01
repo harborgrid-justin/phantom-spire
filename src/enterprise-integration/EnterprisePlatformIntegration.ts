@@ -7,20 +7,16 @@ import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
 // ESB imports
-import { EnterpriseServiceBus } from '../enterprise-service-bus/core/EnterpriseServiceBus';
+import { EnterpriseServiceBus } from '../enterprise-service-bus/core/EnterpriseServiceBus.js';
 import {
   IServiceDefinition,
   IServiceRequest,
-  IServiceResponse,
   IRequestContext as ESBRequestContext,
-} from '../enterprise-service-bus/interfaces/IEnterpriseServiceBus';
+} from '../enterprise-service-bus/interfaces/IEnterpriseServiceBus.js';
 
 // Service Mesh imports
-import { ServiceMesh } from '../service-mesh/core/ServiceMesh';
-import {
-  IServiceInstance,
-  IRequestContext as MeshRequestContext,
-} from '../service-mesh/interfaces/IServiceMesh';
+import { ServiceMesh } from '../service-mesh/core/ServiceMesh.js';
+import { IServiceInstance } from '../service-mesh/interfaces/IServiceMesh.js';
 
 /**
  * Enterprise Platform Integration Hub

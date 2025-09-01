@@ -7,14 +7,14 @@ import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
 // Import all existing platform services and managers
-import { EnterprisePlatformIntegration } from '../../enterprise-integration/EnterprisePlatformIntegration';
-import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator';
-import { WorkflowBPMOrchestrator } from '../../workflow-bpm/WorkflowBPMOrchestrator';
-import { MessageQueueManager } from '../../message-queue/core/MessageQueueManager';
-import { IssueManagementService } from '../../services/issue/IssueManagementService';
-import { cacheManager } from '../../services/cache/core/EnterpriseCacheManager';
-import { stateManager } from '../../services/state/core/EnterpriseStateManager';
-import { StateScope } from '../../services/state/interfaces/IStateManager';
+import { EnterprisePlatformIntegration } from '../../enterprise-integration/EnterprisePlatformIntegration.js';
+import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator.js';
+import { WorkflowBPMOrchestrator } from '../../workflow-bpm/WorkflowBPMOrchestrator.js';
+import { MessageQueueManager } from '../../message-queue/core/MessageQueueManager.js';
+import { IssueManagementService } from '../../services/issue/IssueManagementService.js';
+import { cacheManager } from '../../services/cache/core/EnterpriseCacheManager.js';
+import { stateManager } from '../../services/state/core/EnterpriseStateManager.js';
+import { StateScope } from '../../services/state/interfaces/IStateManager.js';
 
 // Import interfaces
 import {
@@ -28,7 +28,7 @@ import {
   IUnifiedRequestContext,
   IServiceHealth,
   IServiceMetrics
-} from '../interfaces/ICentralizedServiceCenter';
+} from '../interfaces/ICentralizedServiceCenter.js';
 
 /**
  * Default configuration for Fortune 100 deployment

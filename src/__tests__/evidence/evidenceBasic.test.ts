@@ -3,16 +3,16 @@
  * Simplified test suite focused on core functionality
  */
 
-import { EvidenceManagementService } from '../../data-layer/evidence/services/EvidenceManagementService';
+import { EvidenceManagementService } from '../../data-layer/evidence/services/EvidenceManagementService.js';
 import {
   EvidenceType,
   EvidenceSourceType,
   ClassificationLevel
-} from '../../data-layer/evidence/interfaces/IEvidence';
+} from '../../data-layer/evidence/interfaces/IEvidence.js';
 import {
   IEvidenceContext,
   ICreateEvidenceRequest
-} from '../../data-layer/evidence/interfaces/IEvidenceManager';
+} from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
 
 describe('Evidence Management Service - Basic Tests', () => {
   let evidenceService: EvidenceManagementService;

@@ -4,13 +4,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   IWorkflowDefinition,
   WorkflowStatus,
   WorkflowPriority,
   IWorkflowInstance
-} from '../interfaces/IWorkflowEngine';
+} from '../interfaces/IWorkflowEngine.js';
 
 export interface IWorkflowEngineConfig {
   maxConcurrentWorkflows: number;

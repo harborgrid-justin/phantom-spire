@@ -5,15 +5,15 @@
 
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
-import { IssueManagementService } from '../../services/issue/IssueManagementService';
+import { IssueManagementService } from '../../services/issue/IssueManagementService.js';
 import {
   ICreateIssueRequest,
   IUpdateIssueRequest,
   IIssueSearchQuery,
   IAddCommentRequest,
   IIssueContext,
-} from '../../services/issue/interfaces/IIssueManager';
-import { logger } from '../../utils/logger';
+} from '../../services/issue/interfaces/IIssueManager.js';
+import { logger } from '../../utils/logger.js';
 
 export class IssueController {
   private issueService: IssueManagementService;

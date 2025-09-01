@@ -1,5 +1,5 @@
-import { IOC, IIOC } from '../models/IOC';
-import { logger } from '../utils/logger';
+import { IOC, IIOC } from '../models/IOC.js';
+import { logger } from '../utils/logger.js';
 
 export interface RiskAssessment {
   overallRisk: number; // 0-100

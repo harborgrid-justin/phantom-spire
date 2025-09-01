@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { MitreTactic } from '../models/MitreTactic';
-import { MitreTechnique } from '../models/MitreTechnique';
-import { MitreGroup } from '../models/MitreGroup';
-import { MitreSoftware } from '../models/MitreSoftware';
-import { MitreMitigation } from '../models/MitreMitigation';
-import { MitreDataSource } from '../models/MitreDataSource';
-import { logger } from '../utils/logger';
+import { MitreTactic } from '../models/MitreTactic.js';
+import { MitreTechnique } from '../models/MitreTechnique.js';
+import { MitreGroup } from '../models/MitreGroup.js';
+import { MitreSoftware } from '../models/MitreSoftware.js';
+import { MitreMitigation } from '../models/MitreMitigation.js';
+import { MitreDataSource } from '../models/MitreDataSource.js';
+import { logger } from '../utils/logger.js';
 
 // MITRE ATT&CK STIX data source URL
 const MITRE_ATTACK_STIX_URL =

@@ -9,8 +9,8 @@ import {
   WorkflowPriority, 
   StepType,
   TriggerType 
-} from '../interfaces/IWorkflowEngine';
-import { EXTENDED_CTI_WORKFLOWS } from './ExtendedCTIWorkflows';
+} from '../interfaces/IWorkflowEngine.js';
+import { EXTENDED_CTI_WORKFLOWS } from './ExtendedCTIWorkflows.js';
 
 export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
   

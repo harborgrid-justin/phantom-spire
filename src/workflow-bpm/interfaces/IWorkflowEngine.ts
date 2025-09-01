@@ -5,7 +5,7 @@
 
 // Re-export all generic workflow interfaces
 // Temporarily disable broken imports - use any types for now
-// export * from '../../.development/references/generic/workflow-bpm/interfaces/IWorkflowEngine';
+// export * from '../../.development/references/generic/workflow-bpm/interfaces/IWorkflowEngine.js';
 
 export interface IWorkflowDefinition {
   id: string;

@@ -3,13 +3,13 @@
  * Tests for the enterprise-grade UI/UX evaluation platform
  */
 
-import { UIUXEvaluationService } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { UIUXEvaluationService } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService.js';
 import {
   EvaluationCategory,
   EvaluationSeverity,
   IPageEvaluation,
   IUIUXEvaluationConfig
-} from '../../services/ui-ux-evaluation/interfaces/IUIUXEvaluation';
+} from '../../services/ui-ux-evaluation/interfaces/IUIUXEvaluation.js';
 
 describe('UIUXEvaluationService', () => {
   let evaluationService: UIUXEvaluationService;

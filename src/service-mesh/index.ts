@@ -4,10 +4,10 @@
  */
 
 // Core Service Mesh Components
-export * from './core/ServiceMesh';
+export * from './core/ServiceMesh.js';
 
 // Service Mesh Interfaces
-export * from './interfaces/IServiceMesh';
+export * from './interfaces/IServiceMesh.js';
 
 // Re-export main classes for convenience
 export {
@@ -15,4 +15,4 @@ export {
   ServiceRegistry as Registry,
   LoadBalancer as LoadBalancer,
   CircuitBreaker as CircuitBreaker,
-} from './core/ServiceMesh';
+} from './core/ServiceMesh.js';

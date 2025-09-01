@@ -213,7 +213,10 @@ roleSchema.pre('deleteOne', { document: true, query: false }, function () {
 
 // Middleware to prevent circular inheritance
 roleSchema.pre('save', async function (next) {
-  if (this.parentRole && this.parentRole.equals(this._id as mongoose.Types.ObjectId)) {
+  if (
+    this.parentRole &&
+    this.parentRole.equals(this._id as mongoose.Types.ObjectId)
+  ) {
     throw new Error('Role cannot be its own parent');
   }
 

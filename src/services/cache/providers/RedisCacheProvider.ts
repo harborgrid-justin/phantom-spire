@@ -5,8 +5,8 @@
 
 import Redis from 'redis';
 import { EventEmitter } from 'events';
-import { ICacheProvider, ICacheMetrics } from '../interfaces/ICacheManager';
-import { logger } from '../../../utils/logger';
+import { ICacheProvider, ICacheMetrics } from '../interfaces/ICacheManager.js';
+import { logger } from '../../../utils/logger.js';
 
 export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
   private client: Redis.RedisClientType;

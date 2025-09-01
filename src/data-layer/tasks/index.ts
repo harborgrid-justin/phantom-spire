@@ -4,13 +4,13 @@
  */
 
 // Core interfaces
-export * from './interfaces/ITaskManager';
+export * from './interfaces/ITaskManager.js';
 
 // Core implementation
-import { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine';
-import { TaskHandlerRegistry } from './handlers/TaskHandlers';
+import { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine.js';
+import { TaskHandlerRegistry } from './handlers/TaskHandlers.js';
 
-export { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine';
+export { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine.js';
 
 // Built-in handlers
 export {
@@ -24,7 +24,7 @@ export {
   DataEnrichmentTaskHandler,
   CorrelationAnalysisTaskHandler,
   TaskHandlerRegistry,
-} from './handlers/TaskHandlers';
+} from './handlers/TaskHandlers.js';
 
 // Default configuration for common CTI task types
 export const DEFAULT_CTI_TASK_CONFIGURATIONS = {

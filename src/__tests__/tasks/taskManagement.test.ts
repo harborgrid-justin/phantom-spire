@@ -13,7 +13,7 @@ import {
   TaskManagementUtils,
   DEFAULT_TASK_MANAGER_CONFIG,
   TaskHandlerRegistry,
-} from '../../data-layer/tasks';
+} from '../../data-layer/tasks.js';
 
 describe('Fortune 100-Grade Task Management System', () => {
   let taskManager: ITaskManager;

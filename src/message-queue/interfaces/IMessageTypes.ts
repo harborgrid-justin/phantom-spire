@@ -3,10 +3,10 @@
  * Strongly typed messages for Fortune 100-grade threat intelligence operations
  */
 
-import { IMessage } from './IMessageQueue';
-import { IIOC } from '../../models/IOC';
-import { IDataRecord, IQueryContext } from '../../data-layer/interfaces/IDataSource';
-import { IAnalyticsResult } from '../../data-layer/analytics/AdvancedAnalyticsEngine';
+import { IMessage } from './IMessageQueue.js';
+import { IIOC } from '../../models/IOC.js';
+import { IDataRecord, IQueryContext } from '../../data-layer/interfaces/IDataSource.js';
+import { IAnalyticsResult } from '../../data-layer/analytics/AdvancedAnalyticsEngine.js';
 
 // IOC-related Messages
 export interface IIOCEnrichmentRequest {

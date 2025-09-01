@@ -4,14 +4,14 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { EnterpriseServiceBus } from '../../enterprise-service-bus/core/EnterpriseServiceBus';
+import { EnterpriseServiceBus } from '../../enterprise-service-bus/core/EnterpriseServiceBus.js';
 import { 
   IServiceDefinition, 
   IServiceRequest, 
   IRequestContext,
   IRoutingRule,
   IMessageTransformation
-} from '../../enterprise-service-bus/interfaces/IEnterpriseServiceBus';
+} from '../../enterprise-service-bus/interfaces/IEnterpriseServiceBus.js';
 
 describe('EnterpriseServiceBus', () => {
   let esb: EnterpriseServiceBus;

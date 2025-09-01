@@ -4,15 +4,15 @@
  */
 
 // Core interfaces
-export * from './interfaces/IMessageQueue';
-export * from './interfaces/IMessageTypes';
+export * from './interfaces/IMessageQueue.js';
+export * from './interfaces/IMessageTypes.js';
 
 // Core implementations
-export { MessageQueueManager } from './core/MessageQueueManager';
-export { RedisMessageQueue } from './core/RedisMessageQueue';
+export { MessageQueueManager } from './core/MessageQueueManager.js';
+export { RedisMessageQueue } from './core/RedisMessageQueue.js';
 
 // Import for internal use
-import { MessageQueueManager } from './core/MessageQueueManager';
+import { MessageQueueManager } from './core/MessageQueueManager.js';
 
 // Producers
 export {
@@ -22,7 +22,7 @@ export {
   DataIngestionMessageProducer,
   AlertMessageProducer,
   AnalyticsPipelineMessageProducer,
-} from './producers/MessageProducers';
+} from './producers/MessageProducers.js';
 
 // Consumers
 export {
@@ -32,7 +32,7 @@ export {
   ThreatAnalysisRequestConsumer,
   DataIngestionRequestConsumer,
   ThreatAlertNotificationConsumer,
-} from './consumers/MessageConsumers';
+} from './consumers/MessageConsumers.js';
 
 // Utilities
 export {
@@ -45,16 +45,16 @@ export {
   messageTracing,
   messageDeduplication,
   messageQueueMonitor,
-} from './utils/MessageQueueUtils';
+} from './utils/MessageQueueUtils.js';
 
 // Configuration factory
-import { config } from '../config/config';
-import { IMessageQueueManagerConfig } from './core/MessageQueueManager';
+import { config } from '../config/config.js';
+import { IMessageQueueManagerConfig } from './core/MessageQueueManager.js';
 import {
   IQueueConfig,
   MessagePriority,
   QueueType,
-} from './interfaces/IMessageQueue';
+} from './interfaces/IMessageQueue.js';
 
 /**
  * Create default message queue manager configuration

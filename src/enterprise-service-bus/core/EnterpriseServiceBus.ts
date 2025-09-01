@@ -16,7 +16,7 @@ import {
   IServiceBusMetrics,
   IServiceHealth,
   ITransformRule
-} from '../interfaces/IEnterpriseServiceBus';
+} from '../interfaces/IEnterpriseServiceBus.js';
 
 /**
  * Central Enterprise Service Bus implementation

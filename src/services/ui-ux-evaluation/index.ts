@@ -4,7 +4,7 @@
  */
 
 // Core services
-export { UIUXEvaluationService } from './core/UIUXEvaluationService';
+export { UIUXEvaluationService } from './core/UIUXEvaluationService.js';
 
 // Interfaces and types
 export {
@@ -18,21 +18,21 @@ export {
   type IEvaluationReport,
   type IEvaluationSession,
   type IEvaluationDashboard
-} from './interfaces/IUIUXEvaluation';
+} from './interfaces/IUIUXEvaluation.js';
 
 // React components (if React is available)
-export { EvaluationWidget } from './components/EvaluationComponents';
+export { EvaluationWidget } from './components/EvaluationComponents.js';
 
 // Hooks and utilities
 export {
   useUIUXEvaluation,
   createEvaluationStatusElement,
   addUIUXEvaluation
-} from './hooks/useUIUXEvaluation';
+} from './hooks/useUIUXEvaluation.js';
 
 // Import for internal use
-import { UIUXEvaluationService } from './core/UIUXEvaluationService';
-import { addUIUXEvaluation } from './hooks/useUIUXEvaluation';
+import { UIUXEvaluationService } from './core/UIUXEvaluationService.js';
+import { addUIUXEvaluation } from './hooks/useUIUXEvaluation.js';
 
 // Default configuration
 export const defaultEvaluationConfig = {

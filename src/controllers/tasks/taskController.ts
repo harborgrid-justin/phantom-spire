@@ -5,7 +5,7 @@
 
 import { Request, Response } from 'express';
 import { body, param, validationResult } from 'express-validator';
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   ITaskManager,
   TaskType,
@@ -13,7 +13,7 @@ import {
   TaskPriority,
   ITaskQuery,
   ITaskSchedule,
-} from '../../data-layer/tasks/interfaces/ITaskManager';
+} from '../../data-layer/tasks/interfaces/ITaskManager.js';
 
 export class TaskController {
   constructor(private taskManager: ITaskManager) {}

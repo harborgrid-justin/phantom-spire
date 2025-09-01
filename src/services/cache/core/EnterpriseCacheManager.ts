@@ -11,11 +11,11 @@ import {
   ICacheConfiguration,
   CacheLayer,
   CacheStrategy
-} from '../interfaces/ICacheManager';
-import { MemoryCacheProvider } from '../providers/MemoryCacheProvider';
-import { RedisCacheProvider } from '../providers/RedisCacheProvider';
-import { logger } from '../../../utils/logger';
-import { config } from '../../../config/config';
+} from '../interfaces/ICacheManager.js';
+import { MemoryCacheProvider } from '../providers/MemoryCacheProvider.js';
+import { RedisCacheProvider } from '../providers/RedisCacheProvider.js';
+import { logger } from '../../../utils/logger.js';
+import { config } from '../../../config/config.js';
 
 export class EnterpriseCacheManager extends EventEmitter implements ICacheManager {
   private memoryProvider: MemoryCacheProvider;

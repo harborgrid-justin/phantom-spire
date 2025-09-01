@@ -4,18 +4,14 @@
  */
 
 import { EventEmitter } from 'events';
-import {
-  WorkflowEngineCore,
-} from './core/WorkflowEngine';
-import {
-  MongoWorkflowRepository,
-} from './repository/MongoWorkflowRepository';
+import { WorkflowEngineCore } from './core/WorkflowEngine.js';
+import { MongoWorkflowRepository } from './repository/MongoWorkflowRepository.js';
 import {
   IWorkflowDefinition,
   IWorkflowInstance,
-} from './interfaces/IWorkflowEngine';
-import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
-import { logger } from '../utils/logger';
+} from './interfaces/IWorkflowEngine.js';
+import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates.js';
+import { logger } from '../utils/logger.js';
 
 export interface IWorkflowBPMConfig {
   database?: {

@@ -16,7 +16,7 @@ import {
   IIntegrityCheck,
   IEvidenceValidation,
   IRetentionPolicy
-} from '../interfaces/IEvidence';
+} from '../interfaces/IEvidence.js';
 import {
   IEvidenceManager,
   IEvidenceContext,
@@ -34,9 +34,9 @@ import {
   IEvidenceReport,
   IEvidenceMetrics,
   ITimeRange
-} from '../interfaces/IEvidenceManager';
-import { IDataSource } from '../../interfaces/IDataSource';
-import { logger } from '../../../utils/logger';
+} from '../interfaces/IEvidenceManager.js';
+import { IDataSource } from '../../interfaces/IDataSource.js';
+import { logger } from '../../../utils/logger.js';
 
 export class EvidenceManagementService implements IEvidenceManager {
   private evidenceStore: Map<string, IEvidence> = new Map();

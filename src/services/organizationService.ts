@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import { Company, ICompany } from '../models/Company';
-import { Department, IDepartment } from '../models/Department';
-import { Team, ITeam } from '../models/Team';
-import { User, IUser } from '../models/User';
-import { logger } from '../utils/logger';
+import { Company, ICompany } from '../models/Company.js';
+import { Department, IDepartment } from '../models/Department.js';
+import { Team, ITeam } from '../models/Team.js';
+import { User, IUser } from '../models/User.js';
+import { logger } from '../utils/logger.js';
 
 export interface ICreateCompanyRequest {
   name: string;

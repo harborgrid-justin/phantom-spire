@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../config/config';
-import { User } from '../models/User';
-import { rolePermissionService } from '../services/rolePermissionService';
-import { logger } from '../utils/logger';
+import { config } from '../config/config.js';
+import { User } from '../models/User.js';
+import { rolePermissionService } from '../services/rolePermissionService.js';
+import { logger } from '../utils/logger.js';
 
 export interface OrganizationAuthRequest extends Request {
   user?: {

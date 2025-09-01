@@ -4,12 +4,12 @@
  */
 
 // Core interfaces
-export * from './interfaces/IEvidence';
-export * from './interfaces/IEvidenceManager';
+export * from './interfaces/IEvidence.js';
+export * from './interfaces/IEvidenceManager.js';
 
 // Services
-export { EvidenceManagementService } from './services/EvidenceManagementService';
-export { EvidenceAnalyticsEngine } from './services/EvidenceAnalyticsEngine';
+export { EvidenceManagementService } from './services/EvidenceManagementService.js';
+export { EvidenceAnalyticsEngine } from './services/EvidenceAnalyticsEngine.js';
 
 // Re-export commonly used types
 export type {
@@ -20,7 +20,7 @@ export type {
   IChainOfCustodyEntry,
   CustodyAction,
   EvidenceRelationshipType
-} from './interfaces/IEvidence';
+} from './interfaces/IEvidence.js';
 
 export type {
   IEvidenceManager,
@@ -29,4 +29,4 @@ export type {
   IEvidenceQuery,
   IEvidenceSearchResult,
   IEvidenceMetrics
-} from './interfaces/IEvidenceManager';
+} from './interfaces/IEvidenceManager.js';

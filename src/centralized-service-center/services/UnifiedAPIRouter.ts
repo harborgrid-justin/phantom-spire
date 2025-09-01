@@ -4,8 +4,8 @@
  */
 
 import express from 'express';
-import { centralizedServiceCenter } from '../core/CentralizedSystemServiceCenter';
-import { IServiceOperationRequest, IUnifiedRequestContext } from '../interfaces/ICentralizedServiceCenter';
+import { centralizedServiceCenter } from '../core/CentralizedSystemServiceCenter.js';
+import { IServiceOperationRequest, IUnifiedRequestContext } from '../interfaces/ICentralizedServiceCenter.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();

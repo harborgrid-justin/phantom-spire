@@ -3,15 +3,15 @@
  * Enterprise-level data ingestion orchestrator for competitive cyber threat intelligence
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { EventEmitter } from 'events';
 import {
   IDataPipeline,
   IPipelineMetrics,
   IDataConnector,
-} from '../interfaces/IDataConnector';
-import { MessageQueueManager } from '../../message-queue/core/MessageQueueManager';
-import { DataIngestionMessageProducer } from '../../message-queue/producers/MessageProducers';
+} from '../interfaces/IDataConnector.js';
+import { MessageQueueManager } from '../../message-queue/core/MessageQueueManager.js';
+import { DataIngestionMessageProducer } from '../../message-queue/producers/MessageProducers.js';
 
 export interface IIngestionConfig {
   // Core Configuration

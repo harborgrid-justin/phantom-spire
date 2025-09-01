@@ -3,19 +3,16 @@
  * Provides unified interface for all data layer capabilities
  */
 
-import { logger } from '../utils/logger';
-import { ErrorHandler, PerformanceMonitor } from '../utils/serviceUtils';
-import { MessageQueueManager } from '../message-queue/core/MessageQueueManager';
+import { logger } from '../utils/logger.js';
+import { ErrorHandler, PerformanceMonitor } from '../utils/serviceUtils.js';
+import { MessageQueueManager } from '../message-queue/core/MessageQueueManager.js';
 import {
   DataIngestionMessageProducer,
   AnalyticsPipelineMessageProducer,
-} from '../message-queue/producers/MessageProducers';
+} from '../message-queue/producers/MessageProducers.js';
 import {
-  TaskManagerEngine,
   ITaskManager,
   ITask,
-  TaskType,
-  TaskStatus,
   TaskPriority,
   ITaskQuery,
   ITaskQueryResult,
@@ -23,7 +20,7 @@ import {
   CTI_TASK_TEMPLATES,
   TaskManagementUtils,
   DEFAULT_TASK_MANAGER_CONFIG,
-} from './tasks';
+} from './tasks/index.js';
 import {
   DataIngestionEngine,
   IngestionPipelineManager,
@@ -32,46 +29,46 @@ import {
   DEFAULT_INGESTION_CONFIG,
   DEFAULT_PIPELINE_CONFIG,
   DEFAULT_STREAM_CONFIG,
-} from './ingestion';
+} from './ingestion/index.js';
 import {
   DataFederationEngine,
   IFederatedQuery,
   IFederatedResult,
-} from './core/DataFederationEngine';
-import { MongoDataSource } from './core/MongoDataSource';
+} from './core/DataFederationEngine.js';
+import { MongoDataSource } from './core/MongoDataSource.js';
 import {
   AdvancedAnalyticsEngine,
   IAnalyticsResult,
   IThreatModel,
-} from './analytics/AdvancedAnalyticsEngine';
-import { RestApiConnector } from './connectors/RestApiConnector';
-import { EvidenceManagementService } from './evidence/services/EvidenceManagementService';
-import { EvidenceAnalyticsEngine } from './evidence/services/EvidenceAnalyticsEngine';
+} from './analytics/AdvancedAnalyticsEngine.js';
+import { RestApiConnector } from './connectors/RestApiConnector.js';
+import { EvidenceManagementService } from './evidence/services/EvidenceManagementService.js';
+import { EvidenceAnalyticsEngine } from './evidence/services/EvidenceAnalyticsEngine.js';
 import {
   IEvidenceManager,
   IEvidenceContext,
   ICreateEvidenceRequest,
   IEvidenceQuery,
   IEvidenceSearchResult,
-} from './evidence/interfaces/IEvidenceManager';
+} from './evidence/interfaces/IEvidenceManager.js';
 import {
   IEvidence,
   EvidenceType,
   EvidenceSourceType,
   ClassificationLevel,
-} from './evidence/interfaces/IEvidence';
+} from './evidence/interfaces/IEvidence.js';
 import {
   IDataSource,
   IDataRecord,
   IQueryContext,
   IRelationship,
-} from './interfaces/IDataSource';
+} from './interfaces/IDataSource.js';
 import {
   IDataConnector,
   IDataPipeline,
   IPipelineResult,
   IConnectorConfig,
-} from './interfaces/IDataConnector';
+} from './interfaces/IDataConnector.js';
 
 export interface IDataLayerConfig {
   mongodb?: {
@@ -685,14 +682,14 @@ export class DataLayerOrchestrator {
             sourceId: source,
             sourceSystem: 'phantom-spire-cti',
             data: { taskId: task.id, executionId: execution.id },
-            metadata: { 
+            metadata: {
               title: `Evidence from ${source}`,
               description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
               severity: 'medium' as const,
               confidence: 80,
               format: 'json',
-              collectionTaskId: task.id, 
-              incidentId 
+              collectionTaskId: task.id,
+              incidentId,
             },
             classification: 'internal' as ClassificationLevel,
           },
@@ -718,10 +715,7 @@ export class DataLayerOrchestrator {
 
       return { task, execution, evidenceIds };
     } catch (error) {
-      throw ErrorHandler.handleError(
-        error,
-        'executeEvidenceCollectionTask'
-      );
+      throw ErrorHandler.handleError(error, 'executeEvidenceCollectionTask');
     }
   }
 
@@ -763,20 +757,23 @@ export class DataLayerOrchestrator {
       if (this.analyticsEngine && indicators.length > 0) {
         try {
           // Convert indicators to IDataRecord format for threat analysis
-          const dataRecords: IDataRecord[] = indicators.map((indicator, index) => ({
-            id: `indicator-${index}`,
-            type: 'threat_indicator',
-            source: 'cti_task',
-            timestamp: new Date(),
-            data: {
-              value: typeof indicator === 'string' ? indicator : indicator.value,
-              indicator: indicator,
-            },
-            metadata: {
-              taskId: task.id,
-              analysisType: 'threat_analysis',
-            },
-          }));
+          const dataRecords: IDataRecord[] = indicators.map(
+            (indicator, index) => ({
+              id: `indicator-${index}`,
+              type: 'threat_indicator',
+              source: 'cti_task',
+              timestamp: new Date(),
+              data: {
+                value:
+                  typeof indicator === 'string' ? indicator : indicator.value,
+                indicator: indicator,
+              },
+              metadata: {
+                taskId: task.id,
+                analysisType: 'threat_analysis',
+              },
+            })
+          );
 
           analysisResult = await this.analyticsEngine.analyzeThreats(
             dataRecords,
@@ -925,10 +922,7 @@ export class DataLayerOrchestrator {
 
       return { tasks, workflowId };
     } catch (error) {
-      throw ErrorHandler.handleError(
-        error,
-        'createIncidentResponseWorkflow'
-      );
+      throw ErrorHandler.handleError(error, 'createIncidentResponseWorkflow');
     }
   }
 

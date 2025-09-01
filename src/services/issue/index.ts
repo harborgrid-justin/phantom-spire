@@ -4,13 +4,13 @@
  */
 
 // Core model
-export { Issue, IIssue } from '../../models/Issue';
+export { Issue, IIssue } from '../../models/Issue.js';
 
 // Service interfaces
-export * from './interfaces/IIssueManager';
+export * from './interfaces/IIssueManager.js';
 
 // Core service implementation
-export { IssueManagementService } from './IssueManagementService';
+export { IssueManagementService } from './IssueManagementService.js';
 
 // Default configuration for common issue types
 export const DEFAULT_ISSUE_CONFIGURATIONS = {

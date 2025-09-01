@@ -4,7 +4,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { IIssue, Issue } from '../../models/Issue';
+import { IIssue, Issue } from '../../models/Issue.js';
 import {
   IIssueManager,
   ICreateIssueRequest,
@@ -19,8 +19,8 @@ import {
   ITaskIntegration,
   IIssueAnalytics,
   IIssueNotification
-} from './interfaces/IIssueManager';
-import { logger } from '../../utils/logger';
+} from './interfaces/IIssueManager.js';
+import { logger } from '../../utils/logger.js';
 
 export class IssueManagementService implements IIssueManager {
   private logger = logger;

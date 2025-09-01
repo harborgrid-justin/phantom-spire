@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { SetupService } from '../services/SetupService';
-import { DatabaseHealthService } from '../services/DatabaseHealthService';
-import { SystemRequirementsService } from '../services/SystemRequirementsService';
-import { AdminUserService } from '../services/AdminUserService';
+import { SetupService } from '../services/SetupService.js';
+import { DatabaseHealthService } from '../services/DatabaseHealthService.js';
+import { SystemRequirementsService } from '../services/SystemRequirementsService.js';
+import { AdminUserService } from '../services/AdminUserService.js';
 
 const router = Router();
 const setupService = new SetupService();

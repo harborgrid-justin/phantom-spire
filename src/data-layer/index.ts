@@ -8,14 +8,14 @@ export {
   DataLayerOrchestrator,
   IDataLayerConfig,
   IDataLayerMetrics,
-} from './DataLayerOrchestrator';
+} from './DataLayerOrchestrator.js';
 export {
   DataFederationEngine,
   IFederatedQuery,
   IFederatedResult,
-} from './core/DataFederationEngine';
-export { BaseDataSource } from './core/BaseDataSource';
-export { MongoDataSource } from './core/MongoDataSource';
+} from './core/DataFederationEngine.js';
+export { BaseDataSource } from './core/BaseDataSource.js';
+export { MongoDataSource } from './core/MongoDataSource.js';
 
 // Analytics
 export {
@@ -25,14 +25,14 @@ export {
   IThreatModel,
   IAnomalyDetectionResult,
   ITimeSeriesPoint,
-} from './analytics/AdvancedAnalyticsEngine';
+} from './analytics/AdvancedAnalyticsEngine.js';
 
 // Connectors
-export { BaseDataConnector } from './connectors/BaseDataConnector';
+export { BaseDataConnector } from './connectors/BaseDataConnector.js';
 export {
   RestApiConnector,
   IRestApiConfig,
-} from './connectors/RestApiConnector';
+} from './connectors/RestApiConnector.js';
 
 // Interfaces
 export {
@@ -44,7 +44,7 @@ export {
   IRelationship,
   IProvenance,
   IHealthStatus,
-} from './interfaces/IDataSource';
+} from './interfaces/IDataSource.js';
 
 export {
   IDataConnector,
@@ -56,7 +56,7 @@ export {
   ILoadResult,
   IDataPipeline,
   IPipelineResult,
-} from './interfaces/IDataConnector';
+} from './interfaces/IDataConnector.js';
 
 export {
   IGraphAnalyzer,
@@ -64,7 +64,7 @@ export {
   IGraph,
   IEntityResolver,
   IPatternResult,
-} from './interfaces/IGraphAnalyzer';
+} from './interfaces/IGraphAnalyzer.js';
 
 // Services
 export {
@@ -72,4 +72,4 @@ export {
   IEnhancedIOCQuery,
   IEnhancedIOCResult,
   IIOCEnrichmentResult,
-} from '../services/enhancedIOCService';
+} from '../services/enhancedIOCService.js';

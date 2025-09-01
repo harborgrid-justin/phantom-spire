@@ -2,7 +2,7 @@
  * Abstract Base Data Source - Foundation for all data sources
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   IDataSource,
   IDataRecord,
@@ -10,7 +10,7 @@ import {
   IQueryContext,
   IQueryResult,
   IHealthStatus
-} from '../interfaces/IDataSource';
+} from '../interfaces/IDataSource.js';
 
 export abstract class BaseDataSource implements IDataSource {
   public abstract readonly name: string;

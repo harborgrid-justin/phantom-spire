@@ -3,13 +3,13 @@
  * Enterprise-grade message consumption and processing handlers
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { 
   IMessageHandler, 
   IMessage, 
   IMessageContext, 
   IHandlerResult 
-} from '../interfaces/IMessageQueue';
+} from '../interfaces/IMessageQueue.js';
 import {
   IIOCEnrichmentRequest,
   IIOCEnrichmentResult,
@@ -19,12 +19,12 @@ import {
   IDataIngestionResult,
   IThreatAlertNotification,
   IAnalyticsPipelineRequest
-} from '../interfaces/IMessageTypes';
-import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator';
-import { EnhancedIOCService } from '../../services/enhancedIOCService';
-import { IOCAnalysisService } from '../../services/iocAnalysisService';
-import { IOCValidationService } from '../../services/iocValidationService';
-import { IIOC } from '../../models/IOC';
+} from '../interfaces/IMessageTypes.js';
+import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator.js';
+import { EnhancedIOCService } from '../../services/enhancedIOCService.js';
+import { IOCAnalysisService } from '../../services/iocAnalysisService.js';
+import { IOCValidationService } from '../../services/iocValidationService.js';
+import { IIOC } from '../../models/IOC.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

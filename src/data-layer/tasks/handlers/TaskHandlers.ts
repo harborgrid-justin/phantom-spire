@@ -3,7 +3,7 @@
  * Provides enterprise-ready handlers for common CTI tasks
  */
 
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../utils/logger.js';
 import {
   ITask,
   ITaskHandler,
@@ -13,7 +13,7 @@ import {
   ITaskValidationResult,
   IResourceRequirements,
   TaskType,
-} from '../interfaces/ITaskManager';
+} from '../interfaces/ITaskManager.js';
 
 /**
  * Base Task Handler - Provides common functionality

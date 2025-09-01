@@ -1,14 +1,14 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
-import { asyncHandler } from '../middleware/errorHandler';
-import { MitreTactic } from '../models/MitreTactic';
-import { MitreTechnique } from '../models/MitreTechnique';
-import { MitreGroup } from '../models/MitreGroup';
-import { MitreSoftware } from '../models/MitreSoftware';
-import { MitreMitigation } from '../models/MitreMitigation';
-import { MitreDataSource } from '../models/MitreDataSource';
-import { MitreService } from '../services/mitreService';
-import { logger } from '../utils/logger';
+import { AuthRequest } from '../middleware/auth.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { MitreTactic } from '../models/MitreTactic.js';
+import { MitreTechnique } from '../models/MitreTechnique.js';
+import { MitreGroup } from '../models/MitreGroup.js';
+import { MitreSoftware } from '../models/MitreSoftware.js';
+import { MitreMitigation } from '../models/MitreMitigation.js';
+import { MitreDataSource } from '../models/MitreDataSource.js';
+import { MitreService } from '../services/mitreService.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * Sync MITRE ATT&CK data from official source

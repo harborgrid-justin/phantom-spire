@@ -3,15 +3,15 @@
  * Test suite for the Fortune 100-Grade Issue & Ticket Tracker
  */
 
-import { IssueManagementService } from '../../services/issue/IssueManagementService';
-import { Issue } from '../../models/Issue';
+import { IssueManagementService } from '../../services/issue/IssueManagementService.js';
+import { Issue } from '../../models/Issue.js';
 import {
   ICreateIssueRequest,
   IUpdateIssueRequest,
   IIssueContext,
   IIssueSearchQuery,
   IAddCommentRequest,
-} from '../../services/issue/interfaces/IIssueManager';
+} from '../../services/issue/interfaces/IIssueManager.js';
 
 // Mock the Issue model
 jest.mock('../../models/Issue');

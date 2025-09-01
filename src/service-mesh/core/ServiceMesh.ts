@@ -20,7 +20,7 @@ import {
   CircuitBreakerState,
   ITimeRange,
   IServiceMeshConfiguration
-} from '../interfaces/IServiceMesh';
+} from '../interfaces/IServiceMesh.js';
 
 /**
  * Enterprise Service Mesh Implementation

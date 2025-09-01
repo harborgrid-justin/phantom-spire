@@ -3,7 +3,7 @@
  * Handles STIX 2.0/2.1 JSON format for threat intelligence data ingestion
  */
 
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../utils/logger.js';
 import {
   IDataConnector,
   IConnectorConfig,
@@ -11,8 +11,8 @@ import {
   IExtractionRequest,
   IExtractionResult,
   ILoadResult,
-} from '../../interfaces/IDataConnector';
-import { IHealthStatus, IDataRecord } from '../../interfaces/IDataSource';
+} from '../../interfaces/IDataConnector.js';
+import { IHealthStatus, IDataRecord } from '../../interfaces/IDataSource.js';
 import axios, { AxiosInstance } from 'axios';
 
 export interface ISTIXConnectorConfig extends IConnectorConfig {

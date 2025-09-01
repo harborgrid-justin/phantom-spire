@@ -1,5 +1,5 @@
-import { IOCValidationService } from '../services/iocValidationService';
-import { CreateIOCRequest } from '../types/api';
+import { IOCValidationService } from '../services/iocValidationService.js';
+import { CreateIOCRequest } from '../types/api.js';
 
 describe('IOCValidationService', () => {
   describe('validateIOC', () => {
