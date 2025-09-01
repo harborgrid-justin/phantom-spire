@@ -1,0 +1,50 @@
+{
+  "name": "@generic/workflow-bpm",
+  "version": "1.0.0",
+  "description": "Generic Enterprise-grade Workflow and BPM System for Node.js projects",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "workflow",
+    "bpm",
+    "business-process",
+    "orchestration",
+    "enterprise",
+    "automation",
+    "typescript"
+  ],
+  "author": "Generic BPM Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "events": "^3.3.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {},
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/generic-workflow-bpm"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/generic-workflow-bpm/issues"
+  },
+  "homepage": "https://github.com/your-org/generic-workflow-bpm#readme"
+}
