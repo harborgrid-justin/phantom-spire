@@ -8,18 +8,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 // ESB imports
 import { EnterpriseServiceBus } from '../enterprise-service-bus/core/EnterpriseServiceBus';
-import { 
-  IServiceDefinition, 
-  IServiceRequest, 
-  IServiceResponse, 
-  IRequestContext as ESBRequestContext 
+import {
+  IServiceDefinition,
+  IServiceRequest,
+  IServiceResponse,
+  IRequestContext as ESBRequestContext,
 } from '../enterprise-service-bus/interfaces/IEnterpriseServiceBus';
 
 // Service Mesh imports
 import { ServiceMesh } from '../service-mesh/core/ServiceMesh';
-import { 
-  IServiceInstance, 
-  IRequestContext as MeshRequestContext 
+import {
+  IServiceInstance,
+  IRequestContext as MeshRequestContext,
 } from '../service-mesh/interfaces/IServiceMesh';
 
 /**
@@ -52,26 +52,28 @@ export class EnterprisePlatformIntegration extends EventEmitter {
 
     try {
       console.log('🚀 Starting Enterprise Platform Integration...');
-      
+
       // Start core components
       await this.servicebus.start();
       await this.serviceMesh.start();
-      
+
       // Register platform services
       await this.registerPlatformServices();
-      
+
       // Setup service instances in mesh
       await this.registerServiceInstances();
-      
+
       // Initialize integrations
       await this.initializeIntegrations();
-      
+
       this.started = true;
       this.emit('platform:started');
       console.log('✅ Enterprise Platform Integration started successfully');
-      
     } catch (error) {
-      console.error('❌ Failed to start Enterprise Platform Integration:', error);
+      console.error(
+        '❌ Failed to start Enterprise Platform Integration:',
+        error
+      );
       throw error;
     }
   }
@@ -85,17 +87,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
     }
 
     try {
-      await Promise.all([
-        this.servicebus.stop(),
-        this.serviceMesh.stop()
-      ]);
-      
+      await Promise.all([this.servicebus.stop(), this.serviceMesh.stop()]);
+
       this.started = false;
       this.emit('platform:stopped');
       console.log('✅ Enterprise Platform Integration stopped successfully');
-      
     } catch (error) {
-      console.error('❌ Failed to stop Enterprise Platform Integration:', error);
+      console.error(
+        '❌ Failed to stop Enterprise Platform Integration:',
+        error
+      );
       throw error;
     }
   }
@@ -136,22 +137,25 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         payload: request,
         context: this.convertToESBContext(context),
         timeout: context.timeout || 30000,
-        retries: context.retries || 3
+        retries: context.retries || 3,
       };
 
       // Select service instance through mesh
-      const instance = await this.serviceMesh.getLoadBalancer()
+      const instance = await this.serviceMesh
+        .getLoadBalancer()
         .selectInstance(serviceId, context.loadBalancingStrategy);
 
       if (!instance) {
-        throw new Error(`No healthy instances available for service ${serviceId}`);
+        throw new Error(
+          `No healthy instances available for service ${serviceId}`
+        );
       }
 
       // Get circuit breaker for the service
       const circuitBreaker = this.serviceMesh.getCircuitBreaker(serviceId);
 
       // Execute request through circuit breaker
-      const esbResponse = await circuitBreaker.execute(() => 
+      const esbResponse = await circuitBreaker.execute(() =>
         this.servicebus.processRequest(esbRequest)
       );
 
@@ -167,7 +171,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         throughput: 1,
         cpuUsage: Math.random() * 100,
         memoryUsage: Math.random() * 100,
-        customMetrics: {}
+        customMetrics: {},
       });
 
       return {
@@ -181,10 +185,9 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         processingTime: Date.now() - startTime,
         metadata: {
           circuitBreakerState: circuitBreaker.getState(),
-          loadBalancingStrategy: context.loadBalancingStrategy || 'round-robin'
-        }
+          loadBalancingStrategy: context.loadBalancingStrategy || 'round-robin',
+        },
       };
-
     } catch (error) {
       // Collect error metrics
       await this.serviceMesh.collectMetrics({
@@ -198,7 +201,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         throughput: 0,
         cpuUsage: 0,
         memoryUsage: 0,
-        customMetrics: {}
+        customMetrics: {},
       });
 
       return {
@@ -211,7 +214,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         payload: null,
         processingTime: Date.now() - startTime,
         error: error as Error,
-        metadata: {}
+        metadata: {},
       };
     }
   }
@@ -223,19 +226,21 @@ export class EnterprisePlatformIntegration extends EventEmitter {
     try {
       // Register in ESB
       await this.servicebus.registerService(service.definition);
-      
+
       // Register instances in Service Mesh
       for (const instance of service.instances) {
         await this.serviceMesh.getServiceRegistry().registerInstance(instance);
       }
-      
+
       this.platformServices.set(service.definition.id, service);
       this.emit('platform-service:registered', service);
-      
+
       console.log(`✅ Platform service registered: ${service.definition.name}`);
-      
     } catch (error) {
-      console.error(`❌ Failed to register platform service ${service.definition.name}:`, error);
+      console.error(
+        `❌ Failed to register platform service ${service.definition.name}:`,
+        error
+      );
       throw error;
     }
   }
@@ -246,7 +251,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
   async getHealthStatus(): Promise<IPlatformHealthStatus> {
     const [esbHealthy, meshHealthy] = await Promise.all([
       this.servicebus.isHealthy(),
-      this.serviceMesh.isHealthy()
+      this.serviceMesh.isHealthy(),
     ]);
 
     const services = await this.servicebus.listServices();
@@ -256,11 +261,11 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       overall: esbHealthy && meshHealthy ? 'healthy' : 'degraded',
       components: {
         serviceBus: esbHealthy ? 'healthy' : 'unhealthy',
-        serviceMesh: meshHealthy ? 'healthy' : 'unhealthy'
+        serviceMesh: meshHealthy ? 'healthy' : 'unhealthy',
       },
       services: services.length,
       instances: instances.length,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -277,15 +282,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       serviceMesh: {
         registeredServices: services.length,
         activeInstances: instances.length,
-        healthyInstances: instances.filter(i => i.health.status === 'healthy').length
+        healthyInstances: instances.filter(i => i.health.status === 'healthy')
+          .length,
       },
       platform: {
         totalRequests: esbMetrics.messagesProcessed,
         averageResponseTime: esbMetrics.averageLatency,
         errorRate: esbMetrics.errorRate,
-        uptime: this.started ? Date.now() - this.startTime : 0
+        uptime: this.started ? Date.now() - this.startTime : 0,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -296,16 +302,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
    */
   private setupIntegrationHandlers(): void {
     // ESB event handlers
-    this.servicebus.on('service:registered', (definition) => {
+    this.servicebus.on('service:registered', definition => {
       this.emit('integration:service:registered', definition);
     });
 
-    this.servicebus.on('request:processed', (event) => {
+    this.servicebus.on('request:processed', event => {
       this.emit('integration:request:processed', event);
     });
 
     // Service Mesh event handlers
-    this.serviceMesh.on('instance:registered', (instance) => {
+    this.serviceMesh.on('instance:registered', instance => {
       this.emit('integration:instance:registered', instance);
     });
 
@@ -325,8 +331,12 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       endpoints: [
         { name: 'create-task', path: '/api/v1/tasks', method: 'POST' },
         { name: 'get-task', path: '/api/v1/tasks/:id', method: 'GET' },
-        { name: 'execute-workflow', path: '/api/v1/workflows/execute', method: 'POST' }
-      ]
+        {
+          name: 'execute-workflow',
+          path: '/api/v1/workflows/execute',
+          method: 'POST',
+        },
+      ],
     });
 
     // Message Queue Service
@@ -337,8 +347,8 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       endpoints: [
         { name: 'publish', path: '/queue/publish', method: 'POST' },
         { name: 'subscribe', path: '/queue/subscribe', method: 'GET' },
-        { name: 'health', path: '/queue/health', method: 'GET' }
-      ]
+        { name: 'health', path: '/queue/health', method: 'GET' },
+      ],
     });
 
     // IOC Processing Service
@@ -349,8 +359,8 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       endpoints: [
         { name: 'enrich-ioc', path: '/api/v1/iocs/enrich', method: 'POST' },
         { name: 'validate-ioc', path: '/api/v1/iocs/validate', method: 'POST' },
-        { name: 'analyze-ioc', path: '/api/v1/iocs/analyze', method: 'POST' }
-      ]
+        { name: 'analyze-ioc', path: '/api/v1/iocs/analyze', method: 'POST' },
+      ],
     });
 
     // Evidence Management Service
@@ -359,10 +369,22 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Evidence Management Service',
       description: 'Digital forensics evidence collection and preservation',
       endpoints: [
-        { name: 'collect-evidence', path: '/api/v1/evidence/collect', method: 'POST' },
-        { name: 'preserve-evidence', path: '/api/v1/evidence/preserve', method: 'POST' },
-        { name: 'analyze-evidence', path: '/api/v1/evidence/analyze', method: 'POST' }
-      ]
+        {
+          name: 'collect-evidence',
+          path: '/api/v1/evidence/collect',
+          method: 'POST',
+        },
+        {
+          name: 'preserve-evidence',
+          path: '/api/v1/evidence/preserve',
+          method: 'POST',
+        },
+        {
+          name: 'analyze-evidence',
+          path: '/api/v1/evidence/analyze',
+          method: 'POST',
+        },
+      ],
     });
 
     // Issue Tracking Service
@@ -373,8 +395,12 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       endpoints: [
         { name: 'create-issue', path: '/api/v1/issues', method: 'POST' },
         { name: 'update-issue', path: '/api/v1/issues/:id', method: 'PUT' },
-        { name: 'escalate-issue', path: '/api/v1/issues/:id/escalate', method: 'POST' }
-      ]
+        {
+          name: 'escalate-issue',
+          path: '/api/v1/issues/:id/escalate',
+          method: 'POST',
+        },
+      ],
     });
   }
 
@@ -401,22 +427,22 @@ export class EnterprisePlatformIntegration extends EventEmitter {
           required: true,
           type: 'jwt',
           roles: ['user'],
-          permissions: [`${service.id}:${ep.name}`]
+          permissions: [`${service.id}:${ep.name}`],
         },
         rateLimiting: {
           enabled: true,
           requests: 100,
           windowMs: 60000,
-          skipSuccessfulRequests: false
-        }
+          skipSuccessfulRequests: false,
+        },
       })),
       capabilities: ['processing', 'storage', 'analysis'],
       dependencies: [],
       metadata: {
         category: 'platform',
         description: service.description,
-        builtIn: true
-      }
+        builtIn: true,
+      },
     };
 
     await this.servicebus.registerService(serviceDefinition);
@@ -438,7 +464,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
         metadata: {
           region: 'default',
           datacenter: 'primary',
-          weight: 100
+          weight: 100,
         },
         health: {
           status: 'healthy',
@@ -449,10 +475,10 @@ export class EnterprisePlatformIntegration extends EventEmitter {
           errorRate: 0,
           requestRate: 0,
           lastHealthCheck: new Date(),
-          issues: []
+          issues: [],
         },
         registeredAt: new Date(),
-        lastHeartbeat: new Date()
+        lastHeartbeat: new Date(),
       };
 
       await this.serviceMesh.getServiceRegistry().registerInstance(instance);
@@ -461,12 +487,12 @@ export class EnterprisePlatformIntegration extends EventEmitter {
 
   private async initializeIntegrations(): Promise<void> {
     console.log('🔧 Initializing component integrations...');
-    
+
     // Setup message queue integration
     if (this.messageQueueManager) {
       await this.setupMessageQueueIntegration();
     }
-    
+
     // Setup cross-component routing
     await this.setupCrossComponentRouting();
   }
@@ -481,7 +507,9 @@ export class EnterprisePlatformIntegration extends EventEmitter {
     console.log('🔀 Setting up cross-component routing...');
   }
 
-  private convertToESBContext(context: IEnterpriseRequestContext): ESBRequestContext {
+  private convertToESBContext(
+    context: IEnterpriseRequestContext
+  ): ESBRequestContext {
     return {
       userId: context.userId,
       organizationId: context.organizationId,
@@ -490,7 +518,7 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       spanId: context.spanId || uuidv4(),
       timestamp: new Date(),
       source: context.source || 'enterprise-integration',
-      priority: context.priority || 'normal'
+      priority: context.priority || 'normal',
     };
   }
 }
@@ -511,7 +539,12 @@ export interface IEnterpriseRequestContext {
   headers?: Record<string, string>;
   timeout?: number;
   retries?: number;
-  loadBalancingStrategy?: 'round-robin' | 'least-connections' | 'weighted' | 'random' | 'hash';
+  loadBalancingStrategy?:
+    | 'round-robin'
+    | 'least-connections'
+    | 'weighted'
+    | 'random'
+    | 'hash';
 }
 
 export interface IEnterpriseResponse {
@@ -575,12 +608,12 @@ export interface IIntegrationConfiguration {
 const DEFAULT_INTEGRATION_CONFIG: IIntegrationConfiguration = {
   messageQueue: {
     enabled: true,
-    integration: 'full'
+    integration: 'full',
   },
   crossComponentRouting: {
     enabled: true,
-    automaticDiscovery: true
-  }
+    automaticDiscovery: true,
+  },
 };
 
 export { EnterprisePlatformIntegration as EPI, DEFAULT_INTEGRATION_CONFIG };

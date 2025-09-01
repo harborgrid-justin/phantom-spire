@@ -548,8 +548,10 @@ export class DataLayerOrchestrator {
     context: IQueryContext,
     overrides: any = {}
   ): Promise<{ task: ITask; execution: any }> {
-    const measurement = this.performanceMonitor.startMeasurement('createAndExecuteCTITask');
-    
+    const measurement = this.performanceMonitor.startMeasurement(
+      'createAndExecuteCTITask'
+    );
+
     try {
       // Create task from template
       const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
@@ -591,7 +593,6 @@ export class DataLayerOrchestrator {
 
       measurement.end({ success: true });
       return { task, execution };
-
     } catch (error) {
       measurement.end({ success: false });
       throw this.errorHandler.handleError(error, 'createAndExecuteCTITask');
@@ -628,7 +629,8 @@ export class DataLayerOrchestrator {
 
       // Integrate with existing ingestion engine if available
       if (this.ingestionEngine) {
-        taskDefinition.definition.parameters.ingestionEngineId = this.ingestionEngine.constructor.name;
+        taskDefinition.definition.parameters.ingestionEngineId =
+          this.ingestionEngine.constructor.name;
       }
 
       return await this.createAndExecuteCTITask(
@@ -637,7 +639,6 @@ export class DataLayerOrchestrator {
         context,
         taskDefinition
       );
-
     } catch (error) {
       throw this.errorHandler.handleError(error, 'executeDataIngestionTask');
     }
@@ -676,18 +677,21 @@ export class DataLayerOrchestrator {
       // Create evidence entries for tracking
       const evidenceIds: string[] = [];
       for (const source of sources) {
-        const evidence = await this.evidenceManager.createEvidence({
-          type: 'IOC Evidence' as EvidenceType,
-          title: `Evidence from ${source}`,
-          description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
-          classification: 'internal' as ClassificationLevel,
-          source,
-          data: { taskId: task.id, executionId: execution.id },
-          metadata: { collectionTaskId: task.id, incidentId },
-        }, {
-          userId: context.userId,
-          permissions: context.permissions || [],
-        });
+        const evidence = await this.evidenceManager.createEvidence(
+          {
+            type: 'IOC Evidence' as EvidenceType,
+            title: `Evidence from ${source}`,
+            description: `Evidence collected from source: ${source} for incident: ${incidentId}`,
+            classification: 'internal' as ClassificationLevel,
+            source,
+            data: { taskId: task.id, executionId: execution.id },
+            metadata: { collectionTaskId: task.id, incidentId },
+          },
+          {
+            userId: context.userId,
+            permissions: context.permissions || [],
+          }
+        );
 
         evidenceIds.push(evidence.id);
       }
@@ -699,9 +703,11 @@ export class DataLayerOrchestrator {
       });
 
       return { task, execution, evidenceIds };
-
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'executeEvidenceCollectionTask');
+      throw this.errorHandler.handleError(
+        error,
+        'executeEvidenceCollectionTask'
+      );
     }
   }
 
@@ -712,7 +718,11 @@ export class DataLayerOrchestrator {
     indicators: any[],
     analysisType: string = 'comprehensive',
     context: IQueryContext
-  ): Promise<{ task: ITask; execution: any; analysisResult?: IAnalyticsResult }> {
+  ): Promise<{
+    task: ITask;
+    execution: any;
+    analysisResult?: IAnalyticsResult;
+  }> {
     try {
       const taskDefinition = TaskManagementUtils.createTaskFromTemplate(
         'DATA_CORRELATION_ANALYSIS',
@@ -759,7 +769,6 @@ export class DataLayerOrchestrator {
       }
 
       return { task, execution, analysisResult };
-
     } catch (error) {
       throw this.errorHandler.handleError(error, 'executeThreatAnalysisTask');
     }
@@ -786,36 +795,43 @@ export class DataLayerOrchestrator {
 
       // 1. Evidence Collection Task
       const evidenceTask = await this.taskManager.createTask(
-        TaskManagementUtils.createTaskFromTemplate('INCIDENT_EVIDENCE_COLLECTION', {
-          name: `Evidence Collection - ${incidentId}`,
-          priority,
-          definition: {
-            parameters: {
-              sources: affectedSystems,
-              incidentId,
-              preservationLevel: severity === 'critical' ? 'forensic' : 'standard',
+        TaskManagementUtils.createTaskFromTemplate(
+          'INCIDENT_EVIDENCE_COLLECTION',
+          {
+            name: `Evidence Collection - ${incidentId}`,
+            priority,
+            definition: {
+              parameters: {
+                sources: affectedSystems,
+                incidentId,
+                preservationLevel:
+                  severity === 'critical' ? 'forensic' : 'standard',
+              },
             },
-          },
-          metadata: { workflowId, incidentId, step: 1 },
-        })
+            metadata: { workflowId, incidentId, step: 1 },
+          }
+        )
       );
       tasks.push(evidenceTask);
 
       // 2. Threat Analysis Task (depends on evidence collection)
       const analysisTask = await this.taskManager.createTask(
-        TaskManagementUtils.createTaskFromTemplate('DATA_CORRELATION_ANALYSIS', {
-          name: `Threat Analysis - ${incidentId}`,
-          priority,
-          dependencies: [evidenceTask.id],
-          definition: {
-            parameters: {
-              datasets: [{ source: 'incident_evidence', incidentId }],
-              correlationTypes: ['temporal', 'attributional', 'behavioral'],
-              threshold: severity === 'critical' ? 0.6 : 0.75,
+        TaskManagementUtils.createTaskFromTemplate(
+          'DATA_CORRELATION_ANALYSIS',
+          {
+            name: `Threat Analysis - ${incidentId}`,
+            priority,
+            dependencies: [evidenceTask.id],
+            definition: {
+              parameters: {
+                datasets: [{ source: 'incident_evidence', incidentId }],
+                correlationTypes: ['temporal', 'attributional', 'behavioral'],
+                threshold: severity === 'critical' ? 0.6 : 0.75,
+              },
             },
-          },
-          metadata: { workflowId, incidentId, step: 2 },
-        })
+            metadata: { workflowId, incidentId, step: 2 },
+          }
+        )
       );
       tasks.push(analysisTask);
 
@@ -885,9 +901,11 @@ export class DataLayerOrchestrator {
       });
 
       return { tasks, workflowId };
-
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'createIncidentResponseWorkflow');
+      throw this.errorHandler.handleError(
+        error,
+        'createIncidentResponseWorkflow'
+      );
     }
   }
 
@@ -903,11 +921,12 @@ export class DataLayerOrchestrator {
       const secureFilters: ITaskQuery = {
         ...filters,
         // Only show tasks the user has permission to see
-        createdBy: context.permissions?.includes('admin') ? filters.createdBy : context.userId,
+        createdBy: context.permissions?.includes('admin')
+          ? filters.createdBy
+          : context.userId,
       };
 
       return await this.taskManager.queryTasks(secureFilters);
-
     } catch (error) {
       throw this.errorHandler.handleError(error, 'queryCTITasks');
     }
@@ -940,7 +959,6 @@ export class DataLayerOrchestrator {
           messageQueue: !!this.messageQueueManager,
         },
       };
-
     } catch (error) {
       throw this.errorHandler.handleError(error, 'getTaskManagementHealth');
     }

@@ -329,6 +329,9 @@ export interface ITaskQueryResult {
  * Core Task Manager Interface
  */
 export interface ITaskManager {
+  // Initialization
+  initialize(): Promise<void>;
+  
   // Task Lifecycle Management
   createTask(definition: Partial<ITask>): Promise<ITask>;
   getTask(taskId: string): Promise<ITask | null>;

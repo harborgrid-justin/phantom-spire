@@ -178,10 +178,11 @@ describe('IOCAnalysisService', () => {
     });
 
     it('should find correlated IOCs', async () => {
-      const mockFind = require('../models/IOC').IOC.find;
+      // Use already mocked IOC from the jest.mock setup
+      const { IOC } = await import('../models/IOC');
 
       // Mock chain methods properly
-      mockFind.mockReturnValue({
+      (IOC.find as jest.Mock).mockReturnValue({
         limit: jest.fn().mockResolvedValue([]),
       });
 
@@ -192,8 +193,9 @@ describe('IOCAnalysisService', () => {
     });
 
     it('should handle correlation errors gracefully', async () => {
-      const mockFind = require('../models/IOC').IOC.find;
-      mockFind.mockReturnValue({
+      // Use already mocked IOC from the jest.mock setup
+      const { IOC } = await import('../models/IOC');
+      (IOC.find as jest.Mock).mockReturnValue({
         limit: jest.fn().mockRejectedValue(new Error('Database error')),
       });
 
@@ -210,12 +212,11 @@ describe('IOCAnalysisService', () => {
     });
 
     it('should generate comprehensive analytics', async () => {
-      const mockCountDocuments = require('../models/IOC').IOC.countDocuments;
-      const mockAggregate = require('../models/IOC').IOC.aggregate;
+      const { IOC } = await import('../models/IOC');
 
       // Mock responses
-      mockCountDocuments.mockResolvedValue(100);
-      mockAggregate.mockResolvedValue([]);
+      (IOC.countDocuments as jest.Mock).mockResolvedValue(100);
+      (IOC.aggregate as jest.Mock).mockResolvedValue([]);
 
       const result = await IOCAnalysisService.generateAnalytics();
 
@@ -237,11 +238,10 @@ describe('IOCAnalysisService', () => {
     });
 
     it('should filter analytics by date range', async () => {
-      const mockCountDocuments = require('../models/IOC').IOC.countDocuments;
-      const mockAggregate = require('../models/IOC').IOC.aggregate;
+      const { IOC } = await import('../models/IOC');
 
-      mockCountDocuments.mockResolvedValue(50);
-      mockAggregate.mockResolvedValue([]);
+      (IOC.countDocuments as jest.Mock).mockResolvedValue(50);
+      (IOC.aggregate as jest.Mock).mockResolvedValue([]);
 
       const dateRange = {
         start: new Date('2024-01-01'),

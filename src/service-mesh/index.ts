@@ -10,9 +10,9 @@ export * from './core/ServiceMesh';
 export * from './interfaces/IServiceMesh';
 
 // Re-export main classes for convenience
-export { 
+export {
   ServiceMesh as Mesh,
   ServiceRegistry as Registry,
   LoadBalancer as LoadBalancer,
-  CircuitBreaker as CircuitBreaker
+  CircuitBreaker as CircuitBreaker,
 } from './core/ServiceMesh';

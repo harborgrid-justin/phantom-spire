@@ -17,7 +17,7 @@ interface Config {
   RATE_LIMIT_MAX_REQUESTS: number;
   BCRYPT_ROUNDS: number;
   API_VERSION: string;
-  
+
   // Enterprise Cache Management
   CACHE_ENABLED: boolean;
   CACHE_MEMORY_MAX_SIZE: number;
@@ -26,8 +26,8 @@ interface Config {
   CACHE_REDIS_PREFIX: string;
   CACHE_MONITORING_ENABLED: boolean;
   CACHE_MONITORING_INTERVAL: number;
-  
-  // Enterprise State Management  
+
+  // Enterprise State Management
   STATE_ENABLED: boolean;
   STATE_PERSISTENCE_ENABLED: boolean;
   STATE_PERSISTENCE_STRATEGY: string;
@@ -60,23 +60,37 @@ export const config: Config = {
   ),
   BCRYPT_ROUNDS: parseInt(process.env.BCRYPT_ROUNDS || '12', 10),
   API_VERSION: 'v1',
-  
+
   // Enterprise Cache Management
   CACHE_ENABLED: process.env.CACHE_ENABLED !== 'false',
-  CACHE_MEMORY_MAX_SIZE: parseInt(process.env.CACHE_MEMORY_MAX_SIZE || '10000', 10),
+  CACHE_MEMORY_MAX_SIZE: parseInt(
+    process.env.CACHE_MEMORY_MAX_SIZE || '10000',
+    10
+  ),
   CACHE_MEMORY_TTL: parseInt(process.env.CACHE_MEMORY_TTL || '300000', 10), // 5 minutes
   CACHE_REDIS_TTL: parseInt(process.env.CACHE_REDIS_TTL || '1800000', 10), // 30 minutes
-  CACHE_REDIS_PREFIX: process.env.CACHE_REDIS_PREFIX || 'phantomspire:enterprise:',
+  CACHE_REDIS_PREFIX:
+    process.env.CACHE_REDIS_PREFIX || 'phantomspire:enterprise:',
   CACHE_MONITORING_ENABLED: process.env.CACHE_MONITORING_ENABLED !== 'false',
-  CACHE_MONITORING_INTERVAL: parseInt(process.env.CACHE_MONITORING_INTERVAL || '30000', 10), // 30 seconds
-  
+  CACHE_MONITORING_INTERVAL: parseInt(
+    process.env.CACHE_MONITORING_INTERVAL || '30000',
+    10
+  ), // 30 seconds
+
   // Enterprise State Management
   STATE_ENABLED: process.env.STATE_ENABLED !== 'false',
   STATE_PERSISTENCE_ENABLED: process.env.STATE_PERSISTENCE_ENABLED !== 'false',
-  STATE_PERSISTENCE_STRATEGY: process.env.STATE_PERSISTENCE_STRATEGY || 'hybrid',
+  STATE_PERSISTENCE_STRATEGY:
+    process.env.STATE_PERSISTENCE_STRATEGY || 'hybrid',
   STATE_SYNC_INTERVAL: parseInt(process.env.STATE_SYNC_INTERVAL || '60000', 10), // 1 minute
   STATE_VERSIONING_ENABLED: process.env.STATE_VERSIONING_ENABLED !== 'false',
-  STATE_VERSIONING_MAX_VERSIONS: parseInt(process.env.STATE_VERSIONING_MAX_VERSIONS || '50', 10),
+  STATE_VERSIONING_MAX_VERSIONS: parseInt(
+    process.env.STATE_VERSIONING_MAX_VERSIONS || '50',
+    10
+  ),
   STATE_MONITORING_ENABLED: process.env.STATE_MONITORING_ENABLED !== 'false',
-  STATE_MONITORING_INTERVAL: parseInt(process.env.STATE_MONITORING_INTERVAL || '60000', 10), // 1 minute
+  STATE_MONITORING_INTERVAL: parseInt(
+    process.env.STATE_MONITORING_INTERVAL || '60000',
+    10
+  ), // 1 minute
 };

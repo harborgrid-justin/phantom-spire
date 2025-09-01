@@ -4,7 +4,10 @@
  */
 
 // Core service center
-export { CentralizedSystemServiceCenter, centralizedServiceCenter } from './core/CentralizedSystemServiceCenter';
+export {
+  CentralizedSystemServiceCenter,
+  centralizedServiceCenter,
+} from './core/CentralizedSystemServiceCenter';
 
 // Interfaces
 export * from './interfaces/ICentralizedServiceCenter';

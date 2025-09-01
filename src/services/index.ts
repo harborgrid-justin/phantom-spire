@@ -55,42 +55,44 @@ export const FORTUNE_100_CONFIG: IIntegratedConfiguration = {
       memory: {
         enabled: true,
         maxSize: 10000, // 10K entries
-        ttl: 300000 // 5 minutes
+        ttl: 300000, // 5 minutes
       },
       redis: {
         enabled: true,
         ttl: 1800000, // 30 minutes
-        keyPrefix: 'phantomspire:enterprise:'
-      }
+        keyPrefix: 'phantomspire:enterprise:',
+      },
     },
     monitoring: {
       enabled: true,
-      metricsInterval: 30000 // 30 seconds
-    }
+      metricsInterval: 30000, // 30 seconds
+    },
   },
   state: {
     enabled: true,
     persistence: {
       enabled: true,
       strategy: 'hybrid',
-      syncInterval: 60000 // 1 minute
+      syncInterval: 60000, // 1 minute
     },
     versioning: {
       enabled: true,
-      maxVersions: 50 // Keep 50 versions for audit trail
+      maxVersions: 50, // Keep 50 versions for audit trail
     },
     monitoring: {
       enabled: true,
       trackChanges: true,
-      metricsInterval: 60000 // 1 minute
-    }
-  }
+      metricsInterval: 60000, // 1 minute
+    },
+  },
 };
 
 /**
  * Initialize integrated cache and state management system
  */
-export async function initializeEnterpriseManagement(config?: Partial<IIntegratedConfiguration>): Promise<void> {
+export async function initializeEnterpriseManagement(
+  config?: Partial<IIntegratedConfiguration>
+): Promise<void> {
   const effectiveConfig = { ...FORTUNE_100_CONFIG, ...config };
 
   try {
@@ -102,7 +104,9 @@ export async function initializeEnterpriseManagement(config?: Partial<IIntegrate
       await stateManager.start();
     }
 
-    console.log('✅ Fortune 100-grade Cache and State Management initialized successfully');
+    console.log(
+      '✅ Fortune 100-grade Cache and State Management initialized successfully'
+    );
   } catch (error) {
     console.error('❌ Failed to initialize Enterprise Management:', error);
     throw error;
@@ -114,10 +118,7 @@ export async function initializeEnterpriseManagement(config?: Partial<IIntegrate
  */
 export async function shutdownEnterpriseManagement(): Promise<void> {
   try {
-    await Promise.all([
-      stateManager.stop(),
-      cacheManager.stop()
-    ]);
+    await Promise.all([stateManager.stop(), cacheManager.stop()]);
 
     console.log('✅ Enterprise Management shutdown completed');
   } catch (error) {

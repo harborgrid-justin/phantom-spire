@@ -12,7 +12,7 @@ class MockTaskManager {
     logger.info('Mock task created', { params });
     return { id: 'task-' + Date.now(), status: 'created' };
   }
-  
+
   on(event: string, _handler: Function) {
     logger.info('Mock task manager event listener registered', { event });
     // Store handler for potential future calls
@@ -23,7 +23,7 @@ class MockMessageQueue {
   async publish(queue: string, message: any) {
     logger.info('Mock message published', { queue, message });
   }
-  
+
   subscribe(pattern: string, _handler: Function) {
     logger.info('Mock subscription created', { pattern });
   }
@@ -51,7 +51,7 @@ export async function runWorkflowBPMDemo(): Promise<void> {
       taskManager: new MockTaskManager(),
       messageQueue: new MockMessageQueue(),
       evidenceManager: new MockEvidenceManager(),
-      issueManager: new MockIssueManager()
+      issueManager: new MockIssueManager(),
     };
 
     // Initialize Workflow BPM Orchestrator
@@ -61,14 +61,14 @@ export async function runWorkflowBPMDemo(): Promise<void> {
         maxConcurrentWorkflows: 10000,
         memoryLimit: '4GB',
         executionTimeout: 3600000, // 1 hour
-        checkpointInterval: 10000
+        checkpointInterval: 10000,
       },
       integrations: mockServices,
       performance: {
         enableOptimization: true,
         enableMLOptimization: true,
-        enableDynamicScaling: true
-      }
+        enableDynamicScaling: true,
+      },
     });
 
     // Wait for initialization
@@ -82,7 +82,7 @@ export async function runWorkflowBPMDemo(): Promise<void> {
     console.log('2. Listing Available Workflow Templates...');
     const definitions = await orchestrator.getWorkflowDefinitions();
     console.log(`📋 Found ${definitions.length} workflow templates:`);
-    
+
     definitions.forEach(def => {
       console.log(`   • ${def.name} (${def.id}) v${def.version}`);
       console.log(`     Category: ${def.category}`);
@@ -95,7 +95,7 @@ export async function runWorkflowBPMDemo(): Promise<void> {
     const aptIndicators = [
       { type: 'ip', value: '192.168.1.100', confidence: 85 },
       { type: 'domain', value: 'malicious-domain.com', confidence: 90 },
-      { type: 'hash', value: 'abc123def456', confidence: 95 }
+      { type: 'hash', value: 'abc123def456', confidence: 95 },
     ];
 
     const aptEvent = {
@@ -104,12 +104,12 @@ export async function runWorkflowBPMDemo(): Promise<void> {
       severity: 'critical',
       confidence: 90,
       source: 'threat-detection-system',
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     const aptInstance = await orchestrator.startAPTResponseWorkflow(
-      aptIndicators, 
-      aptEvent, 
+      aptIndicators,
+      aptEvent,
       'demo-user'
     );
 
@@ -129,7 +129,7 @@ export async function runWorkflowBPMDemo(): Promise<void> {
       sha1: 'def456ghi789jkl012',
       sha256: 'ghi789jkl012mno345',
       uploadedBy: 'analyst-001',
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
     };
 
     const malwareInstance = await orchestrator.startMalwareAnalysisWorkflow(
@@ -145,13 +145,13 @@ export async function runWorkflowBPMDemo(): Promise<void> {
 
     // Demo 4: Monitor workflow instances
     console.log('5. Monitoring Workflow Instances...');
-    
+
     // Wait a moment for workflows to progress
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const instances = await orchestrator.listWorkflowInstances();
     console.log(`📊 Active Workflow Instances (${instances.length}):`);
-    
+
     instances.forEach(instance => {
       console.log(`   • ${instance.id} (${instance.workflowId})`);
       console.log(`     Status: ${instance.status}`);
@@ -167,36 +167,48 @@ export async function runWorkflowBPMDemo(): Promise<void> {
     const engineMetrics = await orchestrator.getEngineMetrics();
 
     console.log('📈 Performance Metrics:');
-    console.log(`   Total Workflows Executed: ${performanceMetrics.totalWorkflowsExecuted}`);
+    console.log(
+      `   Total Workflows Executed: ${performanceMetrics.totalWorkflowsExecuted}`
+    );
     console.log(`   Active Workflows: ${performanceMetrics.activeWorkflows}`);
-    console.log(`   Average Execution Time: ${performanceMetrics.averageExecutionTime}ms`);
-    console.log(`   Success Rate: ${performanceMetrics.successRate.toFixed(2)}%`);
+    console.log(
+      `   Average Execution Time: ${performanceMetrics.averageExecutionTime}ms`
+    );
+    console.log(
+      `   Success Rate: ${performanceMetrics.successRate.toFixed(2)}%`
+    );
     console.log('');
 
     console.log('🔧 Engine Metrics:');
     console.log(`   Active Instances: ${engineMetrics.activeInstances}`);
     console.log(`   Total Executions: ${engineMetrics.totalExecutions}`);
     console.log(`   Success Rate: ${engineMetrics.successRate.toFixed(2)}%`);
-    console.log(`   Throughput: ${engineMetrics.performance.throughput.toFixed(2)} workflows/sec`);
+    console.log(
+      `   Throughput: ${engineMetrics.performance.throughput.toFixed(2)} workflows/sec`
+    );
     console.log(`   Average Latency: ${engineMetrics.performance.latency}ms`);
     console.log('');
 
     // Demo 6: Workflow control operations
     console.log('7. Demonstrating Workflow Control Operations...');
-    
+
     // Pause the APT workflow
     console.log('   Pausing APT Response Workflow...');
     await orchestrator.pauseWorkflow(aptInstance.id);
-    
+
     // Check status
-    const pausedInstance = await orchestrator.getWorkflowInstance(aptInstance.id);
+    const pausedInstance = await orchestrator.getWorkflowInstance(
+      aptInstance.id
+    );
     console.log(`   ⏸️  APT Workflow Status: ${pausedInstance.status}`);
 
     // Resume the workflow
     console.log('   Resuming APT Response Workflow...');
     await orchestrator.resumeWorkflow(aptInstance.id);
-    
-    const resumedInstance = await orchestrator.getWorkflowInstance(aptInstance.id);
+
+    const resumedInstance = await orchestrator.getWorkflowInstance(
+      aptInstance.id
+    );
     console.log(`   ▶️  APT Workflow Status: ${resumedInstance.status}`);
     console.log('');
 
@@ -209,93 +221,97 @@ export async function runWorkflowBPMDemo(): Promise<void> {
       description: 'A custom workflow for demonstration purposes',
       category: 'demo',
       tags: ['demo', 'custom', 'test'],
-      
+
       metadata: {
         author: 'demo-user',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
-      
-      triggers: [{
-        id: 'manual-trigger',
-        type: 'manual' as any,
-        name: 'Manual Trigger',
-        description: 'Manually triggered workflow',
-        enabled: true,
-        configuration: {}
-      }],
-      
-      steps: [{
-        id: 'demo-step',
-        name: 'Demo Step',
-        type: 'task' as any,
-        description: 'A simple demo step',
-        position: { x: 100, y: 100 },
-        configuration: { taskType: 'demo' },
-        inputs: {},
-        outputs: {},
-        nextSteps: [],
-        errorHandling: {
-          strategy: 'fail' as any
-        }
-      }],
-      
+
+      triggers: [
+        {
+          id: 'manual-trigger',
+          type: 'manual' as any,
+          name: 'Manual Trigger',
+          description: 'Manually triggered workflow',
+          enabled: true,
+          configuration: {},
+        },
+      ],
+
+      steps: [
+        {
+          id: 'demo-step',
+          name: 'Demo Step',
+          type: 'task' as any,
+          description: 'A simple demo step',
+          position: { x: 100, y: 100 },
+          configuration: { taskType: 'demo' },
+          inputs: {},
+          outputs: {},
+          nextSteps: [],
+          errorHandling: {
+            strategy: 'fail' as any,
+          },
+        },
+      ],
+
       variables: {},
       parameters: {},
-      
+
       sla: {
-        maxExecutionTime: '5m'
+        maxExecutionTime: '5m',
       },
-      
+
       security: {
         classification: 'internal' as any,
         requiredRoles: ['demo-user'],
         requiredPermissions: ['demo'],
         dataEncryption: false,
-        auditLevel: 'basic' as any
+        auditLevel: 'basic' as any,
       },
-      
+
       integrations: {
         taskManagement: {
           enabled: false,
           createTasks: false,
           updateTaskStatus: false,
-          taskPriority: 'medium' as any
+          taskPriority: 'medium' as any,
         },
         messageQueue: {
           enabled: false,
           publishEvents: false,
           subscribeToEvents: false,
-          deadLetterQueue: false
+          deadLetterQueue: false,
         },
         evidence: {
           enabled: false,
           collectEvidence: false,
           preserveChainOfCustody: false,
-          evidenceRetention: '1d'
+          evidenceRetention: '1d',
         },
         issues: {
           enabled: false,
           createIssues: false,
           linkToIssues: false,
-          escalationRules: []
-        }
+          escalationRules: [],
+        },
       },
-      
+
       monitoring: {
         enabled: true,
         collectMetrics: true,
         alerting: {
           enabled: false,
           channels: [],
-          conditions: []
+          conditions: [],
         },
         logging: {
           level: 'info' as any,
           includeStepDetails: false,
-          includeVariables: false
-        }
-      }
+          includeVariables: false,
+        },
+      },
     };
 
     await orchestrator.registerWorkflowDefinition(customWorkflow);
@@ -322,9 +338,13 @@ export async function runWorkflowBPMDemo(): Promise<void> {
 
     console.log(`📊 Total Workflow Instances: ${finalInstances.length}`);
     console.log(`🎯 Success Rate: ${finalMetrics.successRate.toFixed(2)}%`);
-    console.log(`⏱️  Average Execution Time: ${finalMetrics.averageExecutionTime}ms`);
-    
-    console.log('\n🎉 Fortune 100-Grade Workflow BPM Demo Completed Successfully!');
+    console.log(
+      `⏱️  Average Execution Time: ${finalMetrics.averageExecutionTime}ms`
+    );
+
+    console.log(
+      '\n🎉 Fortune 100-Grade Workflow BPM Demo Completed Successfully!'
+    );
     console.log('\nKey Achievements:');
     console.log('• ✅ Enterprise workflow engine initialized');
     console.log('• ✅ CTI-specific workflow templates loaded');
@@ -335,7 +355,9 @@ export async function runWorkflowBPMDemo(): Promise<void> {
     console.log('• ✅ Performance monitoring active');
     console.log('• ✅ Integration points configured\n');
 
-    console.log('The Fortune 100-Grade Workflow BPM system is now ready for production use!');
+    console.log(
+      'The Fortune 100-Grade Workflow BPM system is now ready for production use!'
+    );
     console.log('This system exceeds Oracle BPM capabilities with:');
     console.log('• Superior performance (50,000+ workflows/second)');
     console.log('• CTI-specific workflow templates');
@@ -344,13 +366,12 @@ export async function runWorkflowBPMDemo(): Promise<void> {
     console.log('• Enterprise-grade security and compliance');
     console.log('• Visual workflow designer (available via REST API)');
     console.log('• AI-powered optimization and recommendations\n');
-
   } catch (error) {
     logger.error('Workflow BPM Demo failed', {
       error: (error as Error).message,
-      stack: (error as Error).stack
+      stack: (error as Error).stack,
     });
-    
+
     console.error('❌ Demo failed:', (error as Error).message);
     throw error;
   }

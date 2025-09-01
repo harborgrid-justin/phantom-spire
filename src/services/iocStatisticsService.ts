@@ -108,9 +108,9 @@ export class IOCStatisticsService {
     // Check enterprise cache first
     if (useCache) {
       const cached = await cacheManager.get<IOCStatistics>(cacheKey, {
-        namespace: this.CACHE_NAMESPACE
+        namespace: this.CACHE_NAMESPACE,
       });
-      
+
       if (cached) {
         logger.info('Returning cached IOC statistics from enterprise cache');
         return cached;
@@ -179,7 +179,7 @@ export class IOCStatisticsService {
         await cacheManager.set(cacheKey, statistics, {
           namespace: this.CACHE_NAMESPACE,
           ttl: this.DEFAULT_CACHE_TTL,
-          tags: ['ioc-statistics']
+          tags: ['ioc-statistics'],
         });
       }
 
@@ -203,12 +203,12 @@ export class IOCStatisticsService {
     days: number = 30
   ): Promise<IOCTrendAnalysis> {
     const cacheKey = `trend-${period}-${days}`;
-    
+
     // Check enterprise cache first
     const cached = await cacheManager.get<IOCTrendAnalysis>(cacheKey, {
-      namespace: this.CACHE_NAMESPACE
+      namespace: this.CACHE_NAMESPACE,
     });
-    
+
     if (cached) {
       logger.info('Returning cached IOC trend analysis');
       return cached;
@@ -293,12 +293,12 @@ export class IOCStatisticsService {
    */
   static async generateQualityReport(): Promise<IOCQualityReport> {
     const cacheKey = 'quality-report';
-    
+
     // Check enterprise cache first
     const cached = await cacheManager.get<IOCQualityReport>(cacheKey, {
-      namespace: this.CACHE_NAMESPACE
+      namespace: this.CACHE_NAMESPACE,
     });
-    
+
     if (cached) {
       logger.info('Returning cached IOC quality report');
       return cached;
@@ -435,7 +435,7 @@ export class IOCStatisticsService {
       await cacheManager.set(cacheKey, report, {
         namespace: this.CACHE_NAMESPACE,
         ttl: this.DEFAULT_CACHE_TTL,
-        tags: ['ioc-quality', 'reports']
+        tags: ['ioc-quality', 'reports'],
       });
 
       logger.info('IOC quality report generated', {
@@ -456,13 +456,13 @@ export class IOCStatisticsService {
    */
   static async getDashboardStats(): Promise<any> {
     const cacheKey = 'dashboard-stats';
-    
-    // Check enterprise cache first  
+
+    // Check enterprise cache first
     const cached = await cacheManager.get(cacheKey, {
       namespace: this.CACHE_NAMESPACE,
-      ttl: 5 * 60 * 1000 // 5 minutes for dashboard stats
+      ttl: 5 * 60 * 1000, // 5 minutes for dashboard stats
     });
-    
+
     if (cached) {
       logger.debug('Returning cached dashboard stats');
       return cached;
@@ -933,7 +933,10 @@ export class IOCStatisticsService {
   /**
    * Invalidate specific cache entries by pattern
    */
-  static async invalidateCache(pattern?: string, tags?: string[]): Promise<number> {
+  static async invalidateCache(
+    pattern?: string,
+    tags?: string[]
+  ): Promise<number> {
     return await cacheManager.invalidate(pattern, tags);
   }
 }
