@@ -3,7 +3,7 @@
  * Fortune 100-Grade persistence layer for workflow definitions and instances with app-specific logger
  */
 
-import { MongoWorkflowRepository as GenericMongoWorkflowRepository } from '../../generic/workflow-bpm/repository/MongoWorkflowRepository';
+import { MongoWorkflowRepository as GenericMongoWorkflowRepository } from '../../.development/references/generic/workflow-bpm/repository/MongoWorkflowRepository';
 import { logger } from '../../utils/logger';
 
 // Export a configured instance with app-specific logger

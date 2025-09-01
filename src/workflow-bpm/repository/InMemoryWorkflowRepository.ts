@@ -4,4 +4,4 @@
  */
 
 // Re-export the generic implementation
-export { InMemoryWorkflowRepository } from '../../generic/workflow-bpm/repository/InMemoryWorkflowRepository';
+export { InMemoryWorkflowRepository } from '../../.development/references/generic/workflow-bpm/repository/InMemoryWorkflowRepository';

@@ -24,8 +24,8 @@
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
     "downlevelIteration": true,
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "generic/**/*"],
+  "include": ["src/**/*", ".development/references/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
