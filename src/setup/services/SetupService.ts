@@ -1,5 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { URL } from 'url';
+import net from 'net';
 import { DatabaseHealthService } from './DatabaseHealthService.js';
 import { SystemRequirementsService } from './SystemRequirementsService.js';
 import axios from 'axios';
@@ -197,8 +199,11 @@ export class SetupService {
       throw new Error('MISP URL and Auth Key are required');
     }
 
+    // SSRF mitigation: validate config.url
+    this.validateSafeUrl(config.url);
+
     try {
-      const response = await axios.get(`${config.url}/servers/getPyMISPVersion.json`, {
+      const response = await axios.get(`${config.url.replace(/\/+$/, '')}/servers/getPyMISPVersion.json`, {
         headers: {
           'Authorization': config.authKey,
           'Accept': 'application/json',
@@ -229,6 +234,59 @@ export class SetupService {
       throw new Error(message);
     }
   }
+  /**
+   * Validate input URL to mitigate SSRF risk.
+   * Throws an error if the URL is unsafe.
+   */
+  private validateSafeUrl(inputUrl: string): void {
+    let urlObj: URL;
+    try {
+      urlObj = new URL(inputUrl);
+    } catch (err) {
+      throw new Error('Invalid URL');
+    }
+    // Allow only http and https
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      throw new Error('URL must start with http:// or https://');
+    }
+    const hostname = urlObj.hostname;
+    // Block localhost/loopback
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '0.0.0.0' ||
+      hostname === '::1'
+    ) {
+      throw new Error('Host is not allowed');
+    }
+    // Block private network ranges
+    const blockedRanges = [
+      /^10\./,
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+      /^192\.168\./
+    ];
+    if (blockedRanges.some(re => re.test(hostname))) {
+      throw new Error('Host is not allowed');
+    }
+    // If hostname is an IP, block link-local/metdata
+    if (net.isIP(hostname)) {
+      if (
+        hostname.startsWith('169.254.') || // link local
+        hostname.startsWith('100.64.')   // CGNAT
+      ) {
+        throw new Error('Host is not allowed');
+      }
+    }
+    const lower = hostname.toLowerCase();
+    if (
+      lower.endsWith('metadata.google.internal') ||
+      lower.endsWith('169.254.169.254')
+    ) {
+      throw new Error('Host is not allowed');
+    }
+    // Optionally, add an allowlist or further checks here.
+  }
+
 
   private async testOTXIntegration(config: any, startTime: number): Promise<IntegrationTestResult> {
     if (!config.apiKey) {
