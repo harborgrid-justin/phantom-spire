@@ -8,6 +8,19 @@ yarn-error.log*
 dist/
 build/
 
+# TypeScript compiled output
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# But keep example and configuration files
+!jest.config.js
+!eslint.config.js
+!run-*.js
+!scripts/*.js
+!healthcheck.js
+
 # Environment variables
 .env
 .env.local

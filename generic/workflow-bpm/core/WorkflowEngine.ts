@@ -77,6 +77,7 @@ export class WorkflowEngineCore extends EventEmitter implements IWorkflowEngine 
     private config: IWorkflowEngineConfig = {}
   ) {
     super();
+    this.logger = this.config.logger || defaultLogger;
     this.config = {
       maxConcurrentWorkflows: 50000,
       memoryLimit: '8GB',
