@@ -1,19 +1,278 @@
-# Phantom Spire - Quick Start Deployment Guide
+# Phantom Spire CTI Platform - Quick Start Guide
 
-> **Get Phantom Spire running in production in under 10 minutes**
+Welcome to Phantom Spire! This guide will help you get your enterprise-grade Cyber Threat Intelligence platform up and running in minutes.
 
-## 🚀 One-Command Installation
+## 🚀 One-Command Installation (Recommended)
+
+The enhanced installation script provides complete setup with all databases and admin tools:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/harborgrid-justin/phantom-spire/main/install.sh | bash
+# Download and run enhanced installer (requires sudo)
+curl -fsSL https://raw.githubusercontent.com/harborgrid-justin/phantom-spire/main/scripts/enhanced-install.sh | sudo bash
 ```
 
-This single command will:
-- Install all system dependencies (Node.js, MongoDB, Redis)
-- Create system user and service
-- Deploy and configure Phantom Spire
-- Start all services
-- Configure firewall and security
+**What this does:**
+- ✅ Installs Docker and Docker Compose
+- ✅ Sets up all 4 databases (PostgreSQL, MySQL, MongoDB, Redis)
+- ✅ Creates system user and systemd service
+- ✅ Installs Node.js and builds the application
+- ✅ Configures firewall and security
+- ✅ Starts all services automatically
+- ✅ Provides database admin tools
+
+After installation completes, visit: **http://localhost:3000/setup**
+
+## 🛠️ Manual Setup (Development)
+
+If you prefer manual control or are setting up for development:
+
+### Step 1: Prerequisites
+
+```bash
+# Ubuntu/Debian
+sudo apt update
+sudo apt install -y curl git docker.io docker-compose nodejs npm
+
+# CentOS/RHEL/Fedora  
+sudo yum install -y curl git docker docker-compose nodejs npm
+sudo systemctl start docker && sudo systemctl enable docker
+```
+
+### Step 2: Get Phantom Spire
+
+```bash
+git clone https://github.com/harborgrid-justin/phantom-spire.git
+cd phantom-spire
+```
+
+### Step 3: Start Database Layer
+
+```bash
+# Start all databases with admin tools
+docker-compose up -d
+
+# Or start individual databases
+docker-compose up -d postgres mysql mongo redis
+```
+
+**Wait for databases to initialize** (30-60 seconds)
+
+### Step 4: Configure & Start Application
+
+```bash
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Build application
+npm run build
+
+# Start application
+npm start
+```
+
+### Step 5: Complete Setup
+
+Visit **http://localhost:3000/setup** to complete configuration through the interactive wizard.
+
+## 🎯 After Installation
+
+### Access Points
+
+| Service | URL | Purpose |
+|---------|-----|---------|
+| **Main Application** | http://localhost:3000 | Primary interface |
+| **Setup Wizard** | http://localhost:3000/setup | Initial configuration |
+| **API Documentation** | http://localhost:3000/api/docs | API reference |
+| **Health Check** | http://localhost:3000/health | System status |
+| **Database Admin** | http://localhost:8080 | Adminer (all databases) |
+| **MongoDB Admin** | http://localhost:8081 | Mongo Express |
+| **Redis Admin** | http://localhost:8082 | Redis Commander |
+
+### Default Database Connections
+
+| Database | Connection | Credentials |
+|----------|------------|-------------|
+| **PostgreSQL** | localhost:5432 | postgres/phantom_secure_pass |
+| **MySQL** | localhost:3306 | phantom_user/phantom_secure_pass |
+| **MongoDB** | localhost:27017 | admin/phantom_secure_pass |
+| **Redis** | localhost:6379 | password: phantom_redis_pass |
+
+## 🔧 Common Operations
+
+### Managing Services
+
+```bash
+# View running containers
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# Restart all services
+docker-compose restart
+
+# Stop all services
+docker-compose down
+
+# Reset all data (CAUTION: destroys all data)
+docker-compose down -v
+docker-compose up -d
+```
+
+### Application Management
+
+```bash
+# Start application
+npm start
+
+# Development mode (auto-restart)
+npm run dev
+
+# Build production version
+npm run build
+
+# Run tests
+npm test
+
+# Check health
+curl http://localhost:3000/health
+```
+
+### System Service (Linux)
+
+If installed with enhanced installer:
+
+```bash
+# Start/stop/restart
+sudo systemctl start phantom-spire
+sudo systemctl stop phantom-spire
+sudo systemctl restart phantom-spire
+
+# View logs
+sudo journalctl -u phantom-spire -f
+
+# Enable/disable auto-start
+sudo systemctl enable phantom-spire
+sudo systemctl disable phantom-spire
+```
+
+## 🔍 Troubleshooting
+
+### Database Connection Issues
+
+1. **Check containers are running:**
+   ```bash
+   docker-compose ps
+   ```
+
+2. **Check database logs:**
+   ```bash
+   docker-compose logs postgres
+   docker-compose logs mysql
+   docker-compose logs mongo
+   docker-compose logs redis
+   ```
+
+3. **Test individual connections:**
+   ```bash
+   # PostgreSQL
+   docker-compose exec postgres pg_isready -U postgres
+   
+   # MySQL
+   docker-compose exec mysql mysqladmin ping
+   
+   # MongoDB
+   docker-compose exec mongo mongosh --eval "db.adminCommand('ismaster')"
+   
+   # Redis
+   docker-compose exec redis redis-cli ping
+   ```
+
+### Application Issues
+
+1. **Check application logs:**
+   ```bash
+   # Docker logs
+   docker-compose logs app
+   
+   # System service logs (if using enhanced installer)
+   sudo journalctl -u phantom-spire -f
+   
+   # Direct logs
+   tail -f logs/application.log
+   ```
+
+2. **Verify environment configuration:**
+   ```bash
+   # Check .env file exists and has database URLs
+   cat .env | grep -E "(MONGODB|POSTGRESQL|MYSQL|REDIS)_URI"
+   ```
+
+3. **Test health endpoint:**
+   ```bash
+   curl -v http://localhost:3000/health
+   ```
+
+### Port Conflicts
+
+If default ports are in use, you can modify `docker-compose.yml`:
+
+```yaml
+services:
+  postgres:
+    ports:
+      - "5433:5432"  # Change to 5433 if 5432 is in use
+  mysql:
+    ports:
+      - "3307:3306"  # Change to 3307 if 3306 is in use
+  # ... etc
+```
+
+Don't forget to update your `.env` file accordingly.
+
+### Permission Issues
+
+```bash
+# Fix file permissions
+sudo chown -R $USER:$USER .
+sudo chmod -R 755 .
+
+# Fix Docker permissions
+sudo usermod -aG docker $USER
+# Log out and back in after this command
+```
+
+## 🎯 Next Steps
+
+After successful setup:
+
+1. **Complete the setup wizard** at http://localhost:3000/setup
+2. **Create your administrator account**
+3. **Configure external integrations** (MISP, OTX, VirusTotal)
+4. **Import threat intelligence feeds**
+5. **Set up automated workflows**
+6. **Configure user roles and permissions**
+
+## 📚 Additional Resources
+
+- **Full Documentation**: [README.md](README.md)
+- **Development Guide**: [.development/docs/DEVELOPMENT.md](.development/docs/DEVELOPMENT.md)
+- **API Documentation**: http://localhost:3000/api/docs (after setup)
+- **Security Guide**: [SECURITY.md](SECURITY.md)
+- **Production Setup**: [.development/docs/PRODUCTION.md](.development/docs/PRODUCTION.md)
+
+## 🆘 Getting Help
+
+- **GitHub Issues**: https://github.com/harborgrid-justin/phantom-spire/issues
+- **Discussions**: https://github.com/harborgrid-justin/phantom-spire/discussions
+- **Documentation**: Check the `/docs` directory in your installation
+
+---
+
+**Ready to secure your organization with enterprise-grade threat intelligence!** 🛡️
 
 ## 📦 Alternative Installation Methods
 
