@@ -115,6 +115,7 @@ export class ServiceRegistry extends EventEmitter {
               version: '1.0.0',
               url,
               port: parseInt(urlObj.port) || (urlObj.protocol === 'https:' ? 443 : 80),
+              healthy: true,
               metadata: {
                 discovered: true,
                 source: 'environment'

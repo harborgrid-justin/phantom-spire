@@ -23,7 +23,8 @@
     "exactOptionalPropertyTypes": false,
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "types": ["node"]
   },
   "include": ["src/**/*", "generic/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]

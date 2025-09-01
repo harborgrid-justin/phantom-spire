@@ -3,7 +3,7 @@
  * Demonstrates how to use the generic workflow system in any Node.js project
  */
 
-import { WorkflowBPMOrchestrator, IWorkflowDefinition, WorkflowStatus, StepType, TriggerType } from '../workflow-bpm';
+import { WorkflowBPMOrchestrator, IWorkflowDefinition, WorkflowStatus, WorkflowPriority, StepType, TriggerType } from '../workflow-bpm';
 
 // Simple demo workflow definition
 const approvalWorkflow: IWorkflowDefinition = {
@@ -97,7 +97,7 @@ const approvalWorkflow: IWorkflowDefinition = {
       nextSteps: ['final-decision'],
       humanTask: {
         candidateGroups: ['reviewers', 'managers'],
-        priority: 'medium',
+        priority: WorkflowPriority.MEDIUM,
         dueDate: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48 hours
         form: {
           fields: [
@@ -269,7 +269,7 @@ const approvalWorkflow: IWorkflowDefinition = {
       enabled: true,
       createTasks: true,
       updateTaskStatus: true,
-      taskPriority: 'medium'
+      taskPriority: WorkflowPriority.MEDIUM
     },
     messageQueue: {
       enabled: false,
