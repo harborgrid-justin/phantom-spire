@@ -9,6 +9,10 @@ export { IngestionPipelineManager } from './IngestionPipelineManager';
 export { StreamProcessor } from './StreamProcessor';
 
 // Specialized Connectors
+import { STIXConnector } from './connectors/STIXConnector';
+import { MISPConnector } from './connectors/MISPConnector';
+import { DataIngestionEngine } from './DataIngestionEngine';
+
 export { STIXConnector } from './connectors/STIXConnector';
 export { MISPConnector } from './connectors/MISPConnector';
 
@@ -80,16 +84,16 @@ export const DEFAULT_INGESTION_CONFIG = {
   validationRules: [
     {
       name: 'Required Fields Validation',
-      type: 'schema',
+      type: 'schema' as const,
       rules: [
         {
           field: 'type',
-          operator: 'required',
+          operator: 'required' as const,
           message: 'Type field is required',
         },
         {
           field: 'value',
-          operator: 'required',
+          operator: 'required' as const,
           message: 'Value field is required',
         },
       ],
@@ -245,17 +249,17 @@ export class IngestionConfigBuilder {
       validationRules: [
         {
           name: 'Security Validation',
-          type: 'business',
+          type: 'business' as const,
           rules: [
             {
               field: 'confidence',
-              operator: 'range',
+              operator: 'range' as const,
               value: [0, 100],
               message: 'Confidence must be between 0 and 100',
             },
             {
               field: 'source',
-              operator: 'required',
+              operator: 'required' as const,
               message: 'Source attribution is required',
             },
           ],
@@ -292,7 +296,7 @@ export class IngestionFactory {
     endpoint?: string,
     authToken?: string
   ): STIXConnector {
-    const config = { ...DEFAULT_STIX_CONFIG, name };
+    const config: any = { ...DEFAULT_STIX_CONFIG, name };
     
     if (endpoint) {
       config.endpoint = endpoint;
@@ -301,6 +305,7 @@ export class IngestionFactory {
     if (authToken) {
       config.authentication = {
         type: 'bearer',
+        credentials: { token: authToken },
         token: authToken,
       };
     }
@@ -316,7 +321,7 @@ export class IngestionFactory {
     endpoint?: string,
     authKey?: string
   ): MISPConnector {
-    const config = { ...DEFAULT_MISP_CONFIG, name };
+    const config: any = { ...DEFAULT_MISP_CONFIG, name };
     
     if (endpoint) {
       config.endpoint = endpoint;
@@ -325,6 +330,7 @@ export class IngestionFactory {
     if (authKey) {
       config.authentication = {
         type: 'authkey',
+        credentials: { authkey: authKey },
         authkey: authKey,
       };
     }

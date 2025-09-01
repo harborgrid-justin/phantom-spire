@@ -12,7 +12,7 @@ import {
   IExtractionResult,
   ILoadResult,
 } from '../../interfaces/IDataConnector';
-import { IHealthStatus } from '../../interfaces/IDataSource';
+import { IHealthStatus, IDataRecord } from '../../interfaces/IDataSource';
 import axios, { AxiosInstance } from 'axios';
 
 export interface IMISPConnectorConfig extends IConnectorConfig {
@@ -202,6 +202,8 @@ export interface IMISPEventTag {
 export class MISPConnector implements IDataConnector {
   public readonly name: string;
   public readonly type = 'misp';
+  public readonly version = '1.0.0';
+  public readonly supportedFormats = ['json', 'misp'];
   public readonly capabilities: string[] = [
     'extract',
     'validate',
@@ -231,6 +233,36 @@ export class MISPConnector implements IDataConnector {
       extractObjects: config.extractObjects,
       extractGalaxy: config.extractGalaxy,
     });
+  }
+
+  /**
+   * Initialize the connector with configuration
+   */
+  public async initialize(config: IConnectorConfig): Promise<void> {
+    this.config = { ...this.config, ...config } as IMISPConnectorConfig;
+    
+    if (this.config.endpoint) {
+      this.setupHttpClient();
+    }
+    
+    logger.info('MISPConnector initialized', {
+      name: this.name,
+      endpoint: this.config.endpoint,
+    });
+  }
+
+  /**
+   * Transform data using transformation rules
+   */
+  public async transform(data: any[], transformationRules: any[]): Promise<any[]> {
+    // Basic transformation for MISP data
+    return data.map(item => ({
+      id: item.uuid || item.id,
+      type: 'misp-event',
+      source: 'misp',
+      timestamp: new Date(item.timestamp || item.date),
+      data: item,
+    }));
   }
 
   /**
@@ -299,10 +331,9 @@ export class MISPConnector implements IDataConnector {
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
         message: error instanceof Error ? error.message : 'Unknown health check error',
-        details: {
-          connector: this.name,
-          type: this.type,
-          error: error instanceof Error ? error.message : 'Unknown error',
+        metrics: {
+          connectorType: this.type === 'misp' ? 1 : 0,
+          errorOccurred: 1,
         },
       };
     }
@@ -425,14 +456,15 @@ export class MISPConnector implements IDataConnector {
   /**
    * Load processed MISP data to destination
    */
-  public async load(data: any, config: Record<string, any>): Promise<ILoadResult> {
+  public async load(records: IDataRecord[], target: string): Promise<ILoadResult> {
     const startTime = Date.now();
-    const items = Array.isArray(data) ? data : [data];
+    const items = records.map(record => record.data);
     
     try {
       logger.info('Starting MISP data load', {
         connector: this.name,
         itemCount: items.length,
+        target: target,
       });
 
       let loaded = 0;
@@ -560,7 +592,7 @@ export class MISPConnector implements IDataConnector {
       throw new Error('HTTP client not configured');
     }
 
-    const searchParams = {
+    const searchParams: any = {
       limit: request.batchSize || this.config.batchSize,
       ...request.query,
     };
@@ -570,7 +602,7 @@ export class MISPConnector implements IDataConnector {
       searchParams.published = this.config.published;
     }
     if (this.config.eventTypes) {
-      searchParams.type = this.config.eventTypes;
+      searchParams.eventTypes = this.config.eventTypes;
     }
     if (this.config.threatLevelFilter) {
       searchParams.threat_level_id = this.config.threatLevelFilter;

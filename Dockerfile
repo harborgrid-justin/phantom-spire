@@ -7,14 +7,17 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci
 
 # Copy the rest of the application code
 COPY . .
 
 # Build the TypeScript code
 RUN npm run build
+
+# Remove dev dependencies to keep image lean
+RUN npm prune --production
 
 # Create a non-root user to run the application
 RUN addgroup -g 1001 -S nodejs

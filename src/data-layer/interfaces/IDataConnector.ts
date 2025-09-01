@@ -42,7 +42,7 @@ export interface IConnectionConfig {
 }
 
 export interface IAuthConfig {
-  type: 'none' | 'basic' | 'bearer' | 'apikey' | 'oauth2' | 'certificate';
+  type: 'none' | 'basic' | 'bearer' | 'apikey' | 'oauth2' | 'certificate' | 'authkey';
   credentials: Record<string, string>;
 }
 

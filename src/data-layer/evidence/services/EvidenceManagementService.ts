@@ -123,11 +123,12 @@ export class EvidenceManagementService implements IEvidenceManager {
       provenance,
       classification: request.classification,
       handling: request.handling || [],
-      retentionPolicy: request.retentionPolicy || {
-        retainUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
-        purgeAfter: new Date(Date.now() + 7 * 365 * 24 * 60 * 60 * 1000), // 7 years
-        legalHold: false as boolean,
-        compliance: ['enterprise'] as string[]
+      retentionPolicy: {
+        retainUntil: request.retentionPolicy?.retainUntil || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        purgeAfter: request.retentionPolicy?.purgeAfter || new Date(Date.now() + 7 * 365 * 24 * 60 * 60 * 1000),
+        archiveAfter: request.retentionPolicy?.archiveAfter,
+        legalHold: request.retentionPolicy?.legalHold ?? false,
+        compliance: request.retentionPolicy?.compliance ?? ['enterprise']
       },
       integrity,
       validation,
