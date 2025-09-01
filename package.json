@@ -14,6 +14,7 @@
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
     "demo:enterprise": "node scripts/run-enterprise-demo.js",
+    "demo:fortune100": "node run-fortune100-demo.js",
     "docker:build": "docker build -t phantom-spire .",
     "docker:run": "docker run -p 3000:3000 phantom-spire"
   },
