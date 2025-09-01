@@ -1,8 +1,8 @@
 import { Response } from 'express';
-import { organizationService } from '../services/organizationService';
-import { rolePermissionService } from '../services/rolePermissionService';
-import { asyncHandler } from '../middleware/errorHandler';
-import { AuthRequest } from '../middleware/auth';
+import { organizationService } from '../services/organizationService.js';
+import { rolePermissionService } from '../services/rolePermissionService.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { AuthRequest } from '../middleware/auth.js';
 
 /**
  * @swagger

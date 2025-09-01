@@ -1,6 +1,6 @@
-import { IOC } from '../models/IOC';
-import { logger } from '../utils/logger';
-import { cacheManager } from './cache/core/EnterpriseCacheManager';
+import { IOC } from '../models/IOC.js';
+import { logger } from '../utils/logger.js';
+import { cacheManager } from './cache/core/EnterpriseCacheManager.js';
 
 export interface IOCStatistics {
   overview: {

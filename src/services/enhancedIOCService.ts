@@ -3,18 +3,18 @@
  * Provides Palantir-like IOC intelligence capabilities
  */
 
-import { IIOC, IOC } from '../models/IOC';
-import { logger } from '../utils/logger';
-import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator';
+import { IIOC, IOC } from '../models/IOC.js';
+import { logger } from '../utils/logger.js';
+import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 import {
   IFederatedQuery,
   IFederatedResult,
-} from '../data-layer/core/DataFederationEngine';
+} from '../data-layer/core/DataFederationEngine.js';
 import {
   IQueryContext,
   IDataRecord,
-} from '../data-layer/interfaces/IDataSource';
-import { IAnalyticsResult } from '../data-layer/analytics/AdvancedAnalyticsEngine';
+} from '../data-layer/interfaces/IDataSource.js';
+import { IAnalyticsResult } from '../data-layer/analytics/AdvancedAnalyticsEngine.js';
 
 export interface IEnhancedIOCQuery {
   filters?: Record<string, any>;

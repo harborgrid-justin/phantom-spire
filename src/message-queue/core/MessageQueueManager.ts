@@ -3,7 +3,7 @@
  * Enterprise-level message queue management for cyber threat intelligence
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { 
   IMessageQueue, 
   IMessage, 
@@ -18,8 +18,8 @@ import {
   IQueueMetrics,
   ICircuitBreakerConfig,
   ICircuitBreakerState
-} from '../interfaces/IMessageQueue';
-import { RedisMessageQueue } from './RedisMessageQueue';
+} from '../interfaces/IMessageQueue.js';
+import { RedisMessageQueue } from './RedisMessageQueue.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface IMessageQueueManagerConfig {

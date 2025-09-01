@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { Permission } from './Permission';
+import { Permission } from './Permission.js';
 
 export interface IUser extends Document {
   email: string;

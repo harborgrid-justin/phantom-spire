@@ -3,14 +3,14 @@
  * Fortune 100-Grade Service Infrastructure Layer Tests
  */
 
-import { ServiceMesh, CircuitBreaker } from '../../service-mesh/core/ServiceMesh';
+import { ServiceMesh, CircuitBreaker } from '../../service-mesh/core/ServiceMesh.js';
 import { 
   IServiceInstance, 
   ITrafficPolicy,
   ISecurityPolicy,
   IObservabilityMetrics,
   IInstanceHealth
-} from '../../service-mesh/interfaces/IServiceMesh';
+} from '../../service-mesh/interfaces/IServiceMesh.js';
 
 describe('ServiceMesh', () => {
   let serviceMesh: ServiceMesh;

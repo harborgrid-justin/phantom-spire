@@ -174,7 +174,10 @@ departmentSchema.pre('save', async function (next) {
 
 // Middleware to prevent circular references
 departmentSchema.pre('save', async function (next) {
-  if (this.parentDepartment && this.parentDepartment.equals(this._id as mongoose.Types.ObjectId)) {
+  if (
+    this.parentDepartment &&
+    this.parentDepartment.equals(this._id as mongoose.Types.ObjectId)
+  ) {
     throw new Error('Department cannot be its own parent');
   }
 

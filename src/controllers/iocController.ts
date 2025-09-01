@@ -1,18 +1,18 @@
 import { Response } from 'express';
-import { IOC, IIOC } from '../models/IOC';
-import { AuthRequest } from '../middleware/auth';
-import { asyncHandler, createError } from '../middleware/errorHandler';
+import { IOC, IIOC } from '../models/IOC.js';
+import { AuthRequest } from '../middleware/auth.js';
+import { asyncHandler, createError } from '../middleware/errorHandler.js';
 import {
   CreateIOCRequest,
   UpdateIOCRequest,
   IOCQuery,
   ApiResponse,
-} from '../types/api';
-import { logger } from '../utils/logger';
-import { IOCValidationService } from '../services/iocValidationService';
-import { IOCAnalysisService } from '../services/iocAnalysisService';
-import { IOCEnrichmentService } from '../services/iocEnrichmentService';
-import { IOCStatisticsService } from '../services/iocStatisticsService';
+} from '../types/api.js';
+import { logger } from '../utils/logger.js';
+import { IOCValidationService } from '../services/iocValidationService.js';
+import { IOCAnalysisService } from '../services/iocAnalysisService.js';
+import { IOCEnrichmentService } from '../services/iocEnrichmentService.js';
+import { IOCStatisticsService } from '../services/iocStatisticsService.js';
 
 /**
  * @swagger

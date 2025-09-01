@@ -1,5 +1,5 @@
-import { CreateIOCRequest } from '../types/api';
-import { logger } from '../utils/logger';
+import { CreateIOCRequest } from '../types/api.js';
+import { logger } from '../utils/logger.js';
 
 export interface ValidationResult {
   isValid: boolean;

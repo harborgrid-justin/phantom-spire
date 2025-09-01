@@ -4,20 +4,20 @@
  */
 
 // Cache Management
-export * from './cache/interfaces/ICacheManager';
-export * from './cache/providers/MemoryCacheProvider';
-export * from './cache/providers/RedisCacheProvider';
-export * from './cache/core/EnterpriseCacheManager';
-export { cacheManager } from './cache/core/EnterpriseCacheManager';
+export * from './cache/interfaces/ICacheManager.js';
+export * from './cache/providers/MemoryCacheProvider.js';
+export * from './cache/providers/RedisCacheProvider.js';
+export * from './cache/core/EnterpriseCacheManager.js';
+export { cacheManager } from './cache/core/EnterpriseCacheManager.js';
 
 // State Management
-export * from './state/interfaces/IStateManager';
-export * from './state/core/EnterpriseStateManager';
-export { stateManager } from './state/core/EnterpriseStateManager';
+export * from './state/interfaces/IStateManager.js';
+export * from './state/core/EnterpriseStateManager.js';
+export { stateManager } from './state/core/EnterpriseStateManager.js';
 
 // Import the managers for use in functions
-import { cacheManager } from './cache/core/EnterpriseCacheManager';
-import { stateManager } from './state/core/EnterpriseStateManager';
+import { cacheManager } from './cache/core/EnterpriseCacheManager.js';
+import { stateManager } from './state/core/EnterpriseStateManager.js';
 
 // Configuration helpers
 export interface IIntegratedConfiguration {

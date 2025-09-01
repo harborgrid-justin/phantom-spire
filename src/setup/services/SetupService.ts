@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { DatabaseHealthService } from './DatabaseHealthService';
-import { SystemRequirementsService } from './SystemRequirementsService';
+import { DatabaseHealthService } from './DatabaseHealthService.js';
+import { SystemRequirementsService } from './SystemRequirementsService.js';
 import axios from 'axios';
 import mongoose from 'mongoose';
 

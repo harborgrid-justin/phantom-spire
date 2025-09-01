@@ -2,7 +2,7 @@
  * Graph Analysis and Relationship Interfaces
  */
 
-import { IDataRecord, IRelationship } from './IDataSource';
+import { IDataRecord, IRelationship } from './IDataSource.js';
 
 export interface IGraphAnalyzer {
   readonly name: string;

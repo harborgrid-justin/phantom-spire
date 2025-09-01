@@ -3,18 +3,18 @@
  * Comprehensive test suite for Fortune 100-grade evidence management
  */
 
-import { EvidenceManagementService } from '../../data-layer/evidence/services/EvidenceManagementService';
-import { EvidenceAnalyticsEngine } from '../../data-layer/evidence/services/EvidenceAnalyticsEngine';
+import { EvidenceManagementService } from '../../data-layer/evidence/services/EvidenceManagementService.js';
+import { EvidenceAnalyticsEngine } from '../../data-layer/evidence/services/EvidenceAnalyticsEngine.js';
 import {
   EvidenceType,
   EvidenceSourceType,
   ClassificationLevel,
   CustodyAction
-} from '../../data-layer/evidence/interfaces/IEvidence';
+} from '../../data-layer/evidence/interfaces/IEvidence.js';
 import {
   IEvidenceContext,
   ICreateEvidenceRequest
-} from '../../data-layer/evidence/interfaces/IEvidenceManager';
+} from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
 
 describe('Evidence Management Service', () => {
   let evidenceService: EvidenceManagementService;

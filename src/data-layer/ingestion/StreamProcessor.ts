@@ -3,7 +3,7 @@
  * Handles high-velocity threat intelligence data streams with backpressure and fault tolerance
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { EventEmitter } from 'events';
 import { Transform, Readable, Writable, pipeline } from 'stream';
 import { promisify } from 'util';
@@ -11,8 +11,8 @@ import {
   IDataPipeline,
   IPipelineResult,
   IDataConnector,
-} from '../interfaces/IDataConnector';
-import { IDataRecord } from '../interfaces/IDataSource';
+} from '../interfaces/IDataConnector.js';
+import { IDataRecord } from '../interfaces/IDataSource.js';
 
 const pipelineAsync = promisify(pipeline);
 

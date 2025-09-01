@@ -3,7 +3,7 @@
  * Provides Palantir-like data virtualization capabilities
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   IDataSource,
   IDataRecord,
@@ -11,7 +11,7 @@ import {
   IQueryContext,
   IQueryResult,
   IRelationship
-} from '../interfaces/IDataSource';
+} from '../interfaces/IDataSource.js';
 
 export interface IFederatedQuery extends IQuery {
   sources?: string[]; // Specific sources to query

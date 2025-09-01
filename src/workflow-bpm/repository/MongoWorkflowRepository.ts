@@ -3,8 +3,8 @@
  * Fortune 100-Grade persistence layer for workflow definitions and instances with app-specific logger
  */
 
-import { IWorkflowDefinition, IWorkflowInstance } from '../interfaces/IWorkflowEngine';
-import { logger } from '../../utils/logger';
+import { IWorkflowDefinition, IWorkflowInstance } from '../interfaces/IWorkflowEngine.js';
+import { logger } from '../../utils/logger.js';
 
 export class MongoWorkflowRepository {
   private logger: typeof logger;

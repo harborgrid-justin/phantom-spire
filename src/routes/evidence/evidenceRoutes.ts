@@ -5,18 +5,18 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { authMiddleware as authenticateToken, requireRole as authorizeRole } from '../../middleware/auth';
-import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator';
+import { authMiddleware as authenticateToken, requireRole as authorizeRole } from '../../middleware/auth.js';
+import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator.js';
 import { 
   EvidenceType, 
   EvidenceSourceType, 
   ClassificationLevel 
-} from '../../data-layer/evidence/interfaces/IEvidence';
+} from '../../data-layer/evidence/interfaces/IEvidence.js';
 import { 
   IEvidenceContext, 
   ICreateEvidenceRequest 
-} from '../../data-layer/evidence/interfaces/IEvidenceManager';
-import { logger } from '../../utils/logger';
+} from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
+import { logger } from '../../utils/logger.js';
 
 const router = Router();
 

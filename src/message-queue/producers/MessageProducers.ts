@@ -3,7 +3,7 @@
  * Enterprise-grade message production for IOC processing, threat analysis, and data ingestion
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { MessageQueueManager } from '../core/MessageQueueManager.js';
 import { 
   IMessage, 

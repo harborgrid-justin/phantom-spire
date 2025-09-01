@@ -3,8 +3,8 @@
  * Provides Palantir-like pattern recognition and predictive analytics
  */
 
-import { logger } from '../../utils/logger';
-import { IDataRecord, IRelationship } from '../interfaces/IDataSource';
+import { logger } from '../../utils/logger.js';
+import { IDataRecord, IRelationship } from '../interfaces/IDataSource.js';
 
 export interface IAnalyticsResult {
   type: string;

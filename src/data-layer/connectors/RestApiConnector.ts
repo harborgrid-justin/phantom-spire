@@ -6,16 +6,16 @@ import axios from 'axios';
 // Local types for Axios to avoid import issues
 type AxiosInstance = any;
 type AxiosRequestConfig = any;
-import { BaseDataConnector } from './BaseDataConnector';
+import { BaseDataConnector } from './BaseDataConnector.js';
 import {
   IConnectorConfig,
   IValidationResult,
   IExtractionRequest,
   IExtractionResult,
   ILoadResult
-} from '../interfaces/IDataConnector';
-import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource';
-import { logger } from '../../utils/logger';
+} from '../interfaces/IDataConnector.js';
+import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource.js';
+import { logger } from '../../utils/logger.js';
 
 export interface IRestApiConfig extends IConnectorConfig {
   connection: {

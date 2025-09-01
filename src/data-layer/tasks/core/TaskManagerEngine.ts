@@ -4,8 +4,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger } from '../../../utils/logger';
-import { ErrorHandler, PerformanceMonitor } from '../../../utils/serviceUtils';
+import { logger } from '../../../utils/logger.js';
+import { ErrorHandler, PerformanceMonitor } from '../../../utils/serviceUtils.js';
 import {
   ITask,
   ITaskManager,
@@ -24,8 +24,8 @@ import {
   TaskType,
   TaskPriority,
   ITaskHandler,
-} from '../interfaces/ITaskManager';
-import { MessageQueueManager } from '../../../message-queue/core/MessageQueueManager';
+} from '../interfaces/ITaskManager.js';
+import { MessageQueueManager } from '../../../message-queue/core/MessageQueueManager.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ITaskManagerConfig {

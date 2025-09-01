@@ -3,7 +3,7 @@
  * Fortune 100-Grade Issue & Ticket Tracker
  */
 
-import { IIssue } from '../../../models/Issue';
+import { IIssue } from '../../../models/Issue.js';
 
 export interface ICreateIssueRequest {
   title: string;

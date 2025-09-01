@@ -9,11 +9,11 @@ import {
   EvidenceSourceType, 
   EvidenceRelationshipType,
   IEvidenceRelationship 
-} from '../interfaces/IEvidence';
-import { IEvidenceManager, IEvidenceContext } from '../interfaces/IEvidenceManager';
-import { IDataRecord, IRelationship } from '../../interfaces/IDataSource';
-import { AdvancedAnalyticsEngine } from '../../analytics/AdvancedAnalyticsEngine';
-import { logger } from '../../../utils/logger';
+} from '../interfaces/IEvidence.js';
+import { IEvidenceManager, IEvidenceContext } from '../interfaces/IEvidenceManager.js';
+import { IDataRecord, IRelationship } from '../../interfaces/IDataSource.js';
+import { AdvancedAnalyticsEngine } from '../../analytics/AdvancedAnalyticsEngine.js';
+import { logger } from '../../../utils/logger.js';
 
 export interface IEvidenceAnalyticsResult {
   analysisId: string;

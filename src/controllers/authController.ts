@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, IUser } from '../models/User';
-import { config } from '../config/config';
-import { asyncHandler } from '../middleware/errorHandler';
-import { LoginRequest, RegisterRequest, ApiResponse } from '../types/api';
-import { logger } from '../utils/logger';
+import { User, IUser } from '../models/User.js';
+import { config } from '../config/config.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { LoginRequest, RegisterRequest, ApiResponse } from '../types/api.js';
+import { logger } from '../utils/logger.js';
 
 // JWT signing helper function
 const signJWT = (payload: object): string => {

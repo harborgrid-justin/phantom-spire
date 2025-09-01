@@ -1,5 +1,5 @@
-import { IOCAnalysisService } from '../services/iocAnalysisService';
-import { IIOC } from '../models/IOC';
+import { IOCAnalysisService } from '../services/iocAnalysisService.js';
+import { IIOC } from '../models/IOC.js';
 
 // Mock MongoDB ObjectId
 jest.mock('mongoose', () => ({

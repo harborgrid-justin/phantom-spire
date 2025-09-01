@@ -2,7 +2,7 @@
  * Base Data Connector - Abstract foundation for all data connectors
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   IDataConnector,
   IConnectorConfig,
@@ -11,8 +11,8 @@ import {
   IExtractionResult,
   ITransformationRule,
   ILoadResult
-} from '../interfaces/IDataConnector';
-import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource';
+} from '../interfaces/IDataConnector.js';
+import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource.js';
 
 export abstract class BaseDataConnector implements IDataConnector {
   public abstract readonly name: string;

@@ -1,5 +1,5 @@
-import { IIOC } from '../models/IOC';
-import { logger } from '../utils/logger';
+import { IIOC } from '../models/IOC.js';
+import { logger } from '../utils/logger.js';
 
 export interface EnrichmentResult {
   success: boolean;

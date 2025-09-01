@@ -3,8 +3,8 @@
  * Fortune 100-grade service layer for evidence operations
  */
 
-import { IEvidence, EvidenceType, EvidenceSourceType, ClassificationLevel, IRetentionPolicy } from './IEvidence';
-import { IQueryContext, IDataRecord } from '../../interfaces/IDataSource';
+import { IEvidence, EvidenceType, EvidenceSourceType, ClassificationLevel, IRetentionPolicy } from './IEvidence.js';
+import { IQueryContext, IDataRecord } from '../../interfaces/IDataSource.js';
 
 export interface IEvidenceManager {
   // Core evidence operations

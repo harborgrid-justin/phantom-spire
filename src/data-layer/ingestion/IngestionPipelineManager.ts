@@ -3,7 +3,7 @@
  * Orchestrates ETL operations for Fortune 100-grade data ingestion
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { EventEmitter } from 'events';
 import {
   IDataPipeline,
@@ -17,8 +17,8 @@ import {
   IExtractionResult,
   ITransformationRule,
   ILoadResult,
-} from '../interfaces/IDataConnector';
-import { IDataRecord } from '../interfaces/IDataSource';
+} from '../interfaces/IDataConnector.js';
+import { IDataRecord } from '../interfaces/IDataSource.js';
 
 export interface IPipelineConfig {
   maxConcurrentStages: number;
