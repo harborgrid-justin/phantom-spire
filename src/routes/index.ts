@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import authRoutes from './auth';
-import iocRoutes from './iocs';
-import mitreRoutes from './mitre';
-import evidenceRoutes from './evidence/evidenceRoutes';
-import issueRoutes from './issue/issueRoutesSimplified';
-import { organizationRoutes } from './organization';
-import { createTaskRoutes } from './tasks/taskRoutes';
-import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator';
+import authRoutes from './auth.js';
+import iocRoutes from './iocs.js';
+import mitreRoutes from './mitre.js';
+import evidenceRoutes from './evidence/evidenceRoutes.js';
+import issueRoutes from './issue/issueRoutesSimplified.js';
+import { organizationRoutes } from './organization.js';
+import { createTaskRoutes } from './tasks/taskRoutes.js';
+import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
 export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {

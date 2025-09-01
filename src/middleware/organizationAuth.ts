@@ -122,7 +122,7 @@ export const organizationAuthMiddleware = async (
 /**
  * Middleware to require specific permission
  */
-export const requirePermission = (permissionCode: string) => {
+const requirePermission = (permissionCode: string) => {
   return async (
     req: OrganizationAuthRequest,
     res: Response,
@@ -156,7 +156,7 @@ export const requirePermission = (permissionCode: string) => {
 /**
  * Middleware to require resource access with specific action
  */
-export const requireResourceAccess = (resource: string, action: string) => {
+const requireResourceAccess = (resource: string, action: string) => {
   return async (
     req: OrganizationAuthRequest,
     res: Response,
@@ -191,7 +191,7 @@ export const requireResourceAccess = (resource: string, action: string) => {
 /**
  * Middleware to require specific clearance level
  */
-export const requireClearanceLevel = (requiredLevel: string) => {
+const requireClearanceLevel = (requiredLevel: string) => {
   const clearanceLevels = [
     'public',
     'internal',
@@ -240,7 +240,7 @@ export const requireClearanceLevel = (requiredLevel: string) => {
 /**
  * Middleware to require company membership
  */
-export const requireCompanyMembership = (companyId?: string) => {
+const requireCompanyMembership = (companyId?: string) => {
   return (
     req: OrganizationAuthRequest,
     res: Response,
@@ -281,7 +281,7 @@ export const requireCompanyMembership = (companyId?: string) => {
 /**
  * Middleware to require department membership
  */
-export const requireDepartmentMembership = (departmentId?: string) => {
+const requireDepartmentMembership = (departmentId?: string) => {
   return (
     req: OrganizationAuthRequest,
     res: Response,
@@ -322,7 +322,7 @@ export const requireDepartmentMembership = (departmentId?: string) => {
 /**
  * Middleware to require team membership
  */
-export const requireTeamMembership = (teamId?: string) => {
+const requireTeamMembership = (teamId?: string) => {
   return (
     req: OrganizationAuthRequest,
     res: Response,
@@ -362,7 +362,7 @@ export const requireTeamMembership = (teamId?: string) => {
 /**
  * Middleware for role-level authorization
  */
-export const requireMinimumRoleLevel = (minimumLevel: number) => {
+const requireMinimumRoleLevel = (minimumLevel: number) => {
   return async (
     req: OrganizationAuthRequest,
     res: Response,

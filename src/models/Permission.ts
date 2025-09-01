@@ -50,6 +50,33 @@ export interface IPermission extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Instance methods
+  appliesTo(context: {
+    resource: string;
+    action: string;
+    scope?: string;
+    companyId?: mongoose.Types.ObjectId;
+    departmentId?: mongoose.Types.ObjectId;
+    teamId?: mongoose.Types.ObjectId;
+    userId?: mongoose.Types.ObjectId;
+  }): boolean;
+  evaluateConstraints(context: {
+    user?: any;
+    resource?: any;
+    timestamp?: Date;
+    clientIP?: string;
+    [key: string]: any;
+  }): { allowed: boolean; reason?: string };
+  getNestedValue(obj: any, path: string): any;
+  evaluateCondition(fieldValue: any, operator: string, conditionValue: any): boolean;
+}
+
+// Static methods interface
+export interface IPermissionModel extends mongoose.Model<IPermission> {
+  findByResourceAction(resource: string, action: string, includeWildcards?: boolean): mongoose.Query<IPermission[], IPermission>;
+  findByCategory(category: string): mongoose.Query<IPermission[], IPermission>;
+  findHighRisk(): mongoose.Query<IPermission[], IPermission>;
+  getSystemPermissions(): mongoose.Query<IPermission[], IPermission>;
 }
 
 const permissionSchema = new Schema<IPermission>(
@@ -424,7 +451,7 @@ permissionSchema.statics.getSystemPermissions = function () {
   }).sort({ resource: 1, action: 1 });
 };
 
-export const Permission = mongoose.model<IPermission>(
+export const Permission = mongoose.model<IPermission, IPermissionModel>(
   'Permission',
   permissionSchema
 );

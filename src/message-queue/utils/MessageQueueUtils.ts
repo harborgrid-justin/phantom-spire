@@ -4,13 +4,13 @@
  */
 
 import crypto from 'crypto';
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
 import { 
   IMessage, 
   IMessageMetadata, 
   IMessageEncryption, 
   IMessageTracing 
-} from '../interfaces/IMessageQueue';
+} from '../interfaces/IMessageQueue.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -42,7 +42,7 @@ export class MessageEncryptionUtil {
   public encryptMessage<T>(message: IMessage<T>): IMessage<{ encryptedPayload: string; iv: string; tag: string }> {
     try {
       const iv = crypto.randomBytes(this.ivLength);
-      const cipher = crypto.createCipherGCM(this.algorithm, this.encryptionKey, iv);
+      const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
       
       const payloadString = JSON.stringify(message.payload);
       let encrypted = cipher.update(payloadString, 'utf8', 'hex');
@@ -90,9 +90,9 @@ export class MessageEncryptionUtil {
 
       const { encryptedPayload, iv, tag } = encryptedMessage.payload;
       
-      const decipher = crypto.createDecipherGCM(
-        this.algorithm, 
-        this.encryptionKey, 
+      const decipher = crypto.createDecipheriv(
+        this.algorithm,
+        this.encryptionKey,
         Buffer.from(iv, 'hex')
       );
       

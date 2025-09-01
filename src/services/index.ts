@@ -15,6 +15,10 @@ export * from './state/interfaces/IStateManager';
 export * from './state/core/EnterpriseStateManager';
 export { stateManager } from './state/core/EnterpriseStateManager';
 
+// Import the managers for use in functions
+import { cacheManager } from './cache/core/EnterpriseCacheManager';
+import { stateManager } from './state/core/EnterpriseStateManager';
+
 // Configuration helpers
 export interface IIntegratedConfiguration {
   cache: {

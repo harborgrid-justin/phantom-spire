@@ -13,7 +13,21 @@ export interface IWorkflowDefinition {
   version: string;
   status: WorkflowStatus;
   priority: WorkflowPriority;
+  description?: string;
+  category?: string;
+  tags?: string[];
+  metadata?: {
+    author?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
+  triggers?: any[];
   steps: any[];
+  parameters?: Record<string, any>;
+  sla?: any;
+  security?: any;
+  integrations?: any;
+  monitoring?: any;
 }
 
 export enum WorkflowStatus {
@@ -25,17 +39,37 @@ export enum WorkflowStatus {
 export enum WorkflowPriority {
   LOW = 'low',
   MEDIUM = 'medium',
-  HIGH = 'high'
+  HIGH = 'high',
+  CRITICAL = 'critical'
 }
 
 export enum StepType {
   ACTION = 'action',
   DECISION = 'decision',
-  PARALLEL = 'parallel'
+  PARALLEL = 'parallel',
+  TASK = 'task',
+  SEQUENTIAL = 'sequential',
+  HUMAN = 'human',
+  MESSAGE = 'message'
 }
 
 export enum TriggerType {
   MANUAL = 'manual',
   AUTOMATIC = 'automatic',
-  SCHEDULED = 'scheduled'
+  SCHEDULED = 'scheduled',
+  EVENT = 'event'
+}
+
+export interface IWorkflowInstance {
+  id: string;
+  workflowId: string;
+  status: 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
+  parameters: Record<string, any>;
+  initiatedBy: string;
+  startedAt: Date;
+  completedAt?: Date;
+  duration?: number;
+  currentStep: number;
+  steps: any[];
+  error?: string;
 }

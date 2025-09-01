@@ -16,6 +16,7 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   ListItemIcon,
   Collapse,
@@ -49,14 +50,14 @@ import {
   Business
 } from '@mui/icons-material';
 
-import { UIUXEvaluationService } from '../core/UIUXEvaluationService';
+import { UIUXEvaluationService } from '../core/UIUXEvaluationService.js';
 import {
   IPageEvaluation,
   IEvaluationIssue,
   IEvaluationMetric,
   EvaluationCategory,
   EvaluationSeverity
-} from '../interfaces/IUIUXEvaluation';
+} from '../interfaces/IUIUXEvaluation.js';
 
 // Styled components
 const EvaluationPanel = styled(Card)(({ theme }) => ({
@@ -315,11 +316,11 @@ export const EvaluationWidget: React.FC<EvaluationWidgetProps> = ({
                 <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
                   Category Scores
                 </Typography>
-                {Object.entries(evaluation.categoryScores).map(([category, score]) => (
+                {Object.entries(evaluation.categoryScores).map(([category, score]: [EvaluationCategory, number]) => (
                   <Box key={category} sx={{ mb: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {getCategoryIcon(category as EvaluationCategory)}
+                        {getCategoryIcon(category)}
                         <Typography variant="caption" sx={{ ml: 1 }}>
                           {category.replace('_', ' ').toUpperCase()}
                         </Typography>
@@ -397,8 +398,7 @@ export const EvaluationWidget: React.FC<EvaluationWidgetProps> = ({
 
                 return (
                   <Box key={category} sx={{ mb: 2 }}>
-                    <ListItem
-                      button
+                    <ListItemButton
                       onClick={() => toggleCategory(category)}
                       sx={{ px: 0 }}
                     >
@@ -420,7 +420,7 @@ export const EvaluationWidget: React.FC<EvaluationWidgetProps> = ({
                         }
                       />
                       {expandedCategories.has(category) ? <ExpandLess /> : <ExpandMore />}
-                    </ListItem>
+                    </ListItemButton>
                     
                     <Collapse in={expandedCategories.has(category)}>
                       <List dense sx={{ pl: 4 }}>

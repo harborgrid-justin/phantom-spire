@@ -6,12 +6,14 @@
 import { EventEmitter } from 'events';
 import {
   WorkflowEngineCore,
-  InMemoryWorkflowRepository,
-  IWorkflowEngine,
+} from './core/WorkflowEngine';
+import {
+  MongoWorkflowRepository,
+} from './repository/MongoWorkflowRepository';
+import {
   IWorkflowDefinition,
   IWorkflowInstance,
-  WorkflowStatus,
-} from '../../.development/references/generic/workflow-bpm';
+} from './interfaces/IWorkflowEngine';
 import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
 import { logger } from '../utils/logger';
 
@@ -39,8 +41,8 @@ export interface IWorkflowBPMConfig {
 }
 
 export class WorkflowBPMOrchestrator extends EventEmitter {
-  private workflowEngine!: IWorkflowEngine;
-  private repository!: InMemoryWorkflowRepository;
+  private workflowEngine!: WorkflowEngineCore;
+  private repository!: MongoWorkflowRepository;
   private integrations: any = {};
 
   // Performance and monitoring
@@ -65,21 +67,16 @@ export class WorkflowBPMOrchestrator extends EventEmitter {
   private async initialize(): Promise<void> {
     try {
       // Initialize repository
-      this.repository = new InMemoryWorkflowRepository();
+      this.repository = new MongoWorkflowRepository(logger);
 
       // Initialize workflow engine
-      this.workflowEngine = new WorkflowEngineCore(this.repository, {
+      this.workflowEngine = new WorkflowEngineCore({
         maxConcurrentWorkflows:
           this.config.engine?.maxConcurrentWorkflows || 50000,
-        memoryLimit: this.config.engine?.memoryLimit || '8GB',
-        executionTimeout:
+        defaultTimeout:
           this.config.engine?.executionTimeout || 24 * 60 * 60 * 1000,
-        checkpointInterval: this.config.engine?.checkpointInterval || 5000,
-        optimization: {
-          enabled: this.config.performance?.enableOptimization ?? true,
-          mlOptimization: this.config.performance?.enableMLOptimization ?? true,
-          dynamicScaling: this.config.performance?.enableDynamicScaling ?? true,
-        },
+        enablePersistence: true,
+        enableMetrics: true,
       });
 
       // Set up integrations
@@ -710,7 +707,7 @@ export class WorkflowBPMOrchestrator extends EventEmitter {
 
     // Cancel all active workflows
     const activeInstances = await this.listWorkflowInstances({
-      status: [WorkflowStatus.RUNNING],
+      status: ['running'],
     });
     for (const instance of activeInstances) {
       try {

@@ -4,9 +4,9 @@
  */
 
 import { Router } from 'express';
-import { TaskController, createTaskValidation, updateTaskValidation, scheduleTaskValidation, taskIdValidation } from '../../controllers/tasks/taskController';
-import { authenticate } from '../../middleware/auth';
-import { ITaskManager } from '../../data-layer/tasks/interfaces/ITaskManager';
+import { TaskController, createTaskValidation, updateTaskValidation, scheduleTaskValidation, taskIdValidation } from '../../controllers/tasks/taskController.js';
+import { authenticate } from '../../middleware/auth.js';
+import { ITaskManager } from '../../data-layer/tasks/interfaces/ITaskManager.js';
 
 export function createTaskRoutes(taskManager: ITaskManager): Router {
   const router = Router();

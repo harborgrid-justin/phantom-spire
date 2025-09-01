@@ -37,6 +37,11 @@ export interface IDepartment extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Instance methods
+  getHierarchyDepth(): Promise<number>;
+  getAncestors(): Promise<IDepartment[]>;
+  getDescendants(): Promise<IDepartment[]>;
+  canUserAccess(userId: mongoose.Types.ObjectId): Promise<boolean>;
 }
 
 const departmentSchema = new Schema<IDepartment>(
@@ -169,7 +174,7 @@ departmentSchema.pre('save', async function (next) {
 
 // Middleware to prevent circular references
 departmentSchema.pre('save', async function (next) {
-  if (this.parentDepartment && this.parentDepartment.equals(this._id)) {
+  if (this.parentDepartment && this.parentDepartment.equals(this._id as mongoose.Types.ObjectId)) {
     throw new Error('Department cannot be its own parent');
   }
 

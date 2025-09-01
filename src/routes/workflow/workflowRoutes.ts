@@ -3,12 +3,13 @@
  * RESTful API endpoints for workflow management and execution
  */
 
-import { Router, Request, Response } from 'express';
-import { WorkflowBPMOrchestrator } from '../../workflow-bpm';
-import { validateRequest } from '../../middleware/validation';
-import { authenticate } from '../../middleware/auth';
-import { body, param, query } from 'express-validator';
-import logger from '../../utils/logger';
+import { Router, Response } from 'express';
+import { WorkflowBPMOrchestrator } from '../../workflow-bpm/index.js';
+import { validateRequest } from '../../middleware/validation.js';
+import { authenticate } from '../../middleware/auth.js';
+import { body, param } from 'express-validator';
+import { logger } from '../../utils/logger.js';
+import { AuthRequest } from '../../middleware/auth.js';
 
 const router = Router();
 
@@ -46,7 +47,7 @@ router.use(authenticate);
  *               items:
  *                 $ref: '#/components/schemas/WorkflowDefinition'
  */
-router.get('/definitions', async (req: Request, res: Response) => {
+router.get('/definitions', async (req: AuthRequest, res: Response) => {
   try {
     const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
     const definitions = await orchestrator.getWorkflowDefinitions();
@@ -115,7 +116,7 @@ router.post('/definitions',
     body('steps').isArray().withMessage('Steps must be an array'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const definition = req.body;
@@ -195,7 +196,7 @@ router.post('/definitions',
  *       200:
  *         description: List of workflow instances
  */
-router.get('/instances', async (req: Request, res: Response) => {
+router.get('/instances', async (req: AuthRequest, res: Response) => {
   try {
     const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
     
@@ -267,7 +268,7 @@ router.post('/instances',
     body('workflowId').notEmpty().withMessage('Workflow ID is required'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { workflowId, parameters = {} } = req.body;
@@ -334,7 +335,7 @@ router.get('/instances/:instanceId',
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
@@ -387,7 +388,7 @@ router.post('/instances/:instanceId/pause',
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
@@ -446,7 +447,7 @@ router.post('/instances/:instanceId/resume',
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
@@ -514,7 +515,7 @@ router.post('/instances/:instanceId/cancel',
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
@@ -587,7 +588,7 @@ router.post('/cti/apt-response',
     body('event').isObject().withMessage('Event must be an object'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { indicators, event } = req.body;
@@ -654,7 +655,7 @@ router.post('/cti/malware-analysis',
     body('sample').isObject().withMessage('Sample must be an object'),
     validateRequest
   ],
-  async (req: Request, res: Response) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
       const { sample } = req.body;
@@ -704,7 +705,7 @@ router.post('/cti/malware-analysis',
  *       200:
  *         description: Workflow engine metrics
  */
-router.get('/metrics', async (req: Request, res: Response) => {
+router.get('/metrics', async (req: AuthRequest, res: Response) => {
   try {
     const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
     

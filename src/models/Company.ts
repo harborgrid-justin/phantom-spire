@@ -25,6 +25,9 @@ export interface ICompany extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Instance methods
+  canHaveSubsidiaries(): boolean;
+  getHierarchyDepth(): Promise<number>;
 }
 
 const companySchema = new Schema<ICompany>(

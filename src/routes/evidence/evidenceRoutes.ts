@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { authenticateToken, authorizeRole } from '../../middleware/auth';
+import { authMiddleware as authenticateToken, requireRole as authorizeRole } from '../../middleware/auth';
 import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator';
 import { 
   EvidenceType, 
@@ -311,13 +311,13 @@ router.get('/',
       const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
       const context = createEvidenceContext(req);
       
-      const query = {
-        types: req.query.types ? (Array.isArray(req.query.types) ? req.query.types : [req.query.types]) : undefined,
-        sourceTypes: req.query.sourceTypes ? (Array.isArray(req.query.sourceTypes) ? req.query.sourceTypes : [req.query.sourceTypes]) : undefined,
-        classifications: req.query.classifications ? (Array.isArray(req.query.classifications) ? req.query.classifications : [req.query.classifications]) : undefined,
-        tags: req.query.tags ? (Array.isArray(req.query.tags) ? req.query.tags : [req.query.tags]) : undefined,
+      const query: any = {
+        types: req.query.types ? (Array.isArray(req.query.types) ? (req.query.types as string[]).map(t => t as EvidenceType) : [req.query.types as EvidenceType]) : undefined,
+        sourceTypes: req.query.sourceTypes ? (Array.isArray(req.query.sourceTypes) ? (req.query.sourceTypes as string[]).map(t => t as EvidenceSourceType) : [req.query.sourceTypes as EvidenceSourceType]) : undefined,
+        classifications: req.query.classifications ? (Array.isArray(req.query.classifications) ? (req.query.classifications as string[]).map(c => c as ClassificationLevel) : [req.query.classifications as ClassificationLevel]) : undefined,
+        tags: req.query.tags ? (Array.isArray(req.query.tags) ? req.query.tags as string[] : [req.query.tags as string]) : undefined,
         text: req.query.text as string,
-        severities: req.query.severities ? (Array.isArray(req.query.severities) ? req.query.severities : [req.query.severities]) : undefined,
+        severities: req.query.severities ? (Array.isArray(req.query.severities) ? req.query.severities as Array<'low' | 'medium' | 'high' | 'critical'> : [req.query.severities as 'low' | 'medium' | 'high' | 'critical']) : undefined,
         confidenceRange: (req.query.minConfidence || req.query.maxConfidence) ? {
           min: parseInt(req.query.minConfidence as string) || 0,
           max: parseInt(req.query.maxConfidence as string) || 100

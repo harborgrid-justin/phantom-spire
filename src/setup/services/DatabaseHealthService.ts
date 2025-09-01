@@ -203,9 +203,9 @@ export class DatabaseHealthService {
     const client = createClient({
       url: redisUrl,
       socket: {
-        connectTimeout: this.timeout,
-        commandTimeout: this.timeout
-      }
+        connectTimeout: this.timeout
+      },
+      commandsQueueMaxLength: this.timeout
     });
 
     try {
@@ -216,7 +216,8 @@ export class DatabaseHealthService {
       const info = await client.info('server');
       
       // Parse Redis version from info
-      const versionMatch = info.match(/redis_version:([^\r\n]+)/);
+      const infoStr = typeof info === 'string' ? info : JSON.stringify(info);
+      const versionMatch = infoStr.match(/redis_version:([^\r\n]+)/);
       const version = versionMatch ? versionMatch[1] : 'unknown';
       
       return {
@@ -228,7 +229,7 @@ export class DatabaseHealthService {
         details: {
           ping: pong,
           version,
-          mode: info.match(/redis_mode:([^\r\n]+)/)?.[1] || 'unknown'
+          mode: infoStr.match(/redis_mode:([^\r\n]+)/)?.[1] || 'unknown'
         }
       };
     } finally {

@@ -30,6 +30,10 @@ export {
   addUIUXEvaluation
 } from './hooks/useUIUXEvaluation';
 
+// Import for internal use
+import { UIUXEvaluationService } from './core/UIUXEvaluationService';
+import { addUIUXEvaluation } from './hooks/useUIUXEvaluation';
+
 // Default configuration
 export const defaultEvaluationConfig = {
   enabled: true,

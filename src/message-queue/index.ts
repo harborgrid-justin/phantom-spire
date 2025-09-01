@@ -11,6 +11,9 @@ export * from './interfaces/IMessageTypes';
 export { MessageQueueManager } from './core/MessageQueueManager';
 export { RedisMessageQueue } from './core/RedisMessageQueue';
 
+// Import for internal use
+import { MessageQueueManager } from './core/MessageQueueManager';
+
 // Producers
 export {
   BaseMessageProducer,

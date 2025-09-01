@@ -14,9 +14,9 @@ import {
   IStateScope,
   StateScope,
   StateAction
-} from '../interfaces/IStateManager';
-import { cacheManager } from '../../cache/core/EnterpriseCacheManager';
-import { logger } from '../../../utils/logger';
+} from '../interfaces/IStateManager.js';
+import { cacheManager } from '../../cache/core/EnterpriseCacheManager.js';
+import { logger } from '../../../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export class EnterpriseStateManager extends EventEmitter implements IStateManager {
@@ -86,7 +86,14 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
 
       this.isStarted = true;
       logger.info('Enterprise State Manager started successfully');
-      this.emit('started');
+      
+      const startEvent: Omit<IStateEvent, 'id' | 'timestamp'> = {
+        scope: StateScope.APPLICATION,
+        action: StateAction.CREATE,
+        key: 'system:started',
+        newValue: { timestamp: new Date() }
+      };
+      await this.emitStateEvent(startEvent);
     } catch (error) {
       logger.error('Failed to start Enterprise State Manager:', error);
       throw error;
@@ -104,7 +111,14 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
 
       this.isStarted = false;
       logger.info('Enterprise State Manager stopped successfully');
-      this.emit('stopped');
+      
+      const stopEvent: Omit<IStateEvent, 'id' | 'timestamp'> = {
+        scope: StateScope.APPLICATION,
+        action: StateAction.DELETE,
+        key: 'system:stopped',
+        previousValue: { timestamp: new Date() }
+      };
+      await this.emitStateEvent(stopEvent);
     } catch (error) {
       logger.error('Error stopping Enterprise State Manager:', error);
       throw error;
@@ -172,8 +186,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
         newValue: value,
         metadata: options?.metadata
       };
-
-      await this.emit('stateChanged', event);
+      await this.emitStateEvent(event);
 
       this.metrics.totalStates++;
     } catch (error) {
@@ -393,8 +406,26 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     return this.subscriptions.delete(subscriptionId);
   }
 
-  async emit(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void> {
+  async publishEvent(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void> {
     await this.emitStateEvent(event);
+  }
+
+  // Implementation of IStateManager.emit - using method overloading to handle both signatures
+  emit(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void>;
+  emit(eventName: string | symbol, ...args: any[]): boolean;
+  emit(eventOrName: Omit<IStateEvent, 'id' | 'timestamp'> | string | symbol, ...args: any[]): Promise<void> | boolean {
+    if (typeof eventOrName === 'object' && eventOrName !== null && 'scope' in eventOrName) {
+      // This is a state event
+      return this.publishEvent(eventOrName);
+    } else {
+      // This is an EventEmitter-style event
+      return super.emit(eventOrName as string | symbol, ...args);
+    }
+  }
+
+  // EventEmitter-compatible emit method
+  emitEventEmitter(eventName: string | symbol, ...args: any[]): boolean {
+    return super.emit(eventName, ...args);
   }
 
   async persist(scope?: StateScope): Promise<void> {
@@ -503,7 +534,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
 
   async configure(config: Partial<IStateConfiguration>): Promise<void> {
     this.configuration = { ...this.configuration, ...config };
-    this.emit('configUpdated', { config });
+    this.emitEventEmitter('configUpdated', { config });
   }
 
   async clear(scope?: StateScope): Promise<void> {
@@ -514,7 +545,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
         await cacheManager.clearNamespace('state');
       }
 
-      this.emit('cleared', { scope });
+      this.emitEventEmitter('cleared', { scope });
     } catch (error) {
       logger.error('State clear error:', error);
       throw error;
@@ -612,7 +643,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     this.metrics.totalEvents++;
     
     // Emit event
-    super.emit('stateChanged', fullEvent);
+    this.emitEventEmitter('stateChanged', fullEvent);
   }
 
   private matchesSubscription(event: IStateEvent, subscription: IStateSubscription): boolean {
@@ -635,7 +666,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
   private async collectMetrics(): Promise<void> {
     try {
       const metrics = await this.getMetrics();
-      this.emit('metrics', metrics);
+      this.emitEventEmitter('metrics', metrics);
     } catch (error) {
       logger.error('Error collecting state metrics:', error);
     }

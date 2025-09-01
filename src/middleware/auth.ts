@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { config } from '../config/config';
-import { logger } from '../utils/logger';
+import { config } from '../config/config.js';
+import { logger } from '../utils/logger.js';
 
 export interface AuthRequest extends Request {
   user?: {

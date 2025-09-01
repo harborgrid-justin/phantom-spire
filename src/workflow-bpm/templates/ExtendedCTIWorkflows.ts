@@ -5,6 +5,7 @@
 
 import { 
   IWorkflowDefinition, 
+  WorkflowStatus,
   WorkflowPriority, 
   StepType,
   TriggerType 
@@ -17,6 +18,8 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     id: 'vulnerability-management-workflow',
     name: 'Enterprise Vulnerability Management Workflow',
     version: '1.5',
+    status: WorkflowStatus.ACTIVE,
+    priority: WorkflowPriority.HIGH,
     description: 'Comprehensive vulnerability assessment and remediation workflow',
     category: 'vulnerability-management',
     tags: ['vulnerability', 'patch-management', 'risk-assessment', 'compliance'],
@@ -158,15 +161,6 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
       }
     ],
     
-    variables: {
-      vulnerability: {
-        type: 'object',
-        description: 'Vulnerability details',
-        required: true,
-        defaultValue: {}
-      }
-    },
-    
     parameters: {
       vulnerability: {
         type: 'object',
@@ -253,6 +247,8 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     id: 'threat-hunt-campaign-workflow',
     name: 'Threat Hunt Campaign Workflow',
     version: '2.2',
+    status: WorkflowStatus.ACTIVE,
+    priority: WorkflowPriority.HIGH,
     description: 'Systematic threat hunting campaign execution workflow',
     category: 'threat-hunting',
     tags: ['threat-hunting', 'investigation', 'proactive-defense', 'ttp-analysis'],
@@ -266,7 +262,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     triggers: [
       {
         id: 'scheduled-hunt',
-        type: TriggerType.SCHEDULE,
+        type: TriggerType.SCHEDULED,
         name: 'Scheduled Threat Hunt',
         description: 'Regular scheduled threat hunting activities',
         enabled: true,
@@ -563,21 +559,6 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
       }
     ],
     
-    variables: {
-      intelligence: {
-        type: 'object',
-        description: 'Threat intelligence driving the hunt',
-        required: false,
-        defaultValue: {}
-      },
-      hypothesis: {
-        type: 'string',
-        description: 'Hunt hypothesis',
-        required: true,
-        defaultValue: ''
-      }
-    },
-    
     parameters: {
       intelligence: {
         type: 'object',
@@ -673,6 +654,8 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     id: 'compliance-audit-workflow',
     name: 'Cybersecurity Compliance Audit Workflow',
     version: '1.3',
+    status: WorkflowStatus.ACTIVE,
+    priority: WorkflowPriority.MEDIUM,
     description: 'Automated compliance audit and reporting workflow',
     category: 'compliance',
     tags: ['compliance', 'audit', 'governance', 'reporting'],
@@ -686,7 +669,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     triggers: [
       {
         id: 'scheduled-audit',
-        type: TriggerType.SCHEDULE,
+        type: TriggerType.SCHEDULED,
         name: 'Scheduled Compliance Audit',
         description: 'Regular compliance audit execution',
         enabled: true,
@@ -845,15 +828,6 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         }
       }
     ],
-    
-    variables: {
-      auditType: {
-        type: 'string',
-        description: 'Type of compliance audit',
-        required: true,
-        defaultValue: 'general'
-      }
-    },
     
     parameters: {
       auditType: {

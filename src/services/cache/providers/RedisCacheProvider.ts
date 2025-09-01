@@ -79,7 +79,11 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
       this.emit('hit', { key });
       
       try {
-        return JSON.parse(value) as T;
+        if (typeof value === 'string') {
+          return JSON.parse(value) as T;
+        } else {
+          return value as unknown as T;
+        }
       } catch {
         // If JSON parse fails, return as string
         return value as unknown as T;
@@ -271,7 +275,11 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
         const key = keys[i];
         if (value !== null && key && value !== undefined) {
           try {
-            result.set(key, JSON.parse(value) as T);
+            if (typeof value === 'string') {
+              result.set(key, JSON.parse(value) as T);
+            } else {
+              result.set(key, value as unknown as T);
+            }
             this.metrics.hits++;
           } catch {
             result.set(key, value as unknown as T);

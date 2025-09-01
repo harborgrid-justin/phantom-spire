@@ -5,8 +5,8 @@
 
 import { Router } from 'express';
 import { body, param, query } from 'express-validator';
-import { IssueController } from '../../controllers/issue/IssueControllerSimplified';
-import { authMiddleware } from '../../middleware/auth';
+import { IssueController } from '../../controllers/issue/IssueControllerSimplified.js';
+import { authMiddleware } from '../../middleware/auth.js';
 
 const router = Router();
 const issueController = new IssueController();

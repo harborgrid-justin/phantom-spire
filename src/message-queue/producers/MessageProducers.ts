@@ -4,12 +4,12 @@
  */
 
 import { logger } from '../../utils/logger';
-import { MessageQueueManager } from '../core/MessageQueueManager';
+import { MessageQueueManager } from '../core/MessageQueueManager.js';
 import { 
   IMessage, 
   MessagePriority,
   IMessageMetadata 
-} from '../interfaces/IMessageQueue';
+} from '../interfaces/IMessageQueue.js';
 import {
   MessageTypes,
   QueueTopics,
@@ -23,9 +23,9 @@ import {
   DataIngestionRequestMessage,
   ThreatAlertNotificationMessage,
   AnalyticsPipelineRequestMessage
-} from '../interfaces/IMessageTypes';
-import { IIOC } from '../../models/IOC';
-import { IQueryContext, IDataRecord } from '../../data-layer/interfaces/IDataSource';
+} from '../interfaces/IMessageTypes.js';
+import { IIOC } from '../../models/IOC.js';
+import { IQueryContext, IDataRecord } from '../../data-layer/interfaces/IDataSource.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

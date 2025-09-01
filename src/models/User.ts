@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { Permission } from './Permission';
 
 export interface IUser extends Document {
   email: string;
@@ -51,11 +52,15 @@ export interface IUser extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Virtuals
+  fullName: string;
+  displayName: string;
   comparePassword(password: string): Promise<boolean>;
   hasRole(roleId: mongoose.Types.ObjectId): boolean;
   hasPermission(permissionCode: string): Promise<boolean>;
   canAccessResource(resource: string, action: string): Promise<boolean>;
   isManagerOf(userId: mongoose.Types.ObjectId): Promise<boolean>;
+  isAccountLocked(): boolean;
 }
 
 const userSchema = new Schema<IUser>(
@@ -314,7 +319,6 @@ userSchema.methods.hasPermission = async function (
 ): Promise<boolean> {
   // Get all user roles
   const Role = mongoose.model('Role');
-  const Permission = mongoose.model('Permission');
 
   const userRoles = await Role.find({ _id: { $in: this.roles } }).populate(
     'permissions'
@@ -337,8 +341,6 @@ userSchema.methods.canAccessResource = async function (
   resource: string,
   action: string
 ): Promise<boolean> {
-  const Permission = mongoose.model('Permission');
-
   // Find relevant permissions
   const permissions = await Permission.findByResourceAction(resource, action);
 

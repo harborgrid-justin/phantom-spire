@@ -14,7 +14,7 @@ import {
   IEvaluationSession,
   EvaluationCategory,
   EvaluationSeverity
-} from '../interfaces/IUIUXEvaluation';
+} from '../interfaces/IUIUXEvaluation.js';
 
 export class UIUXEvaluationService implements IUIUXEvaluationService {
   private config: IUIUXEvaluationConfig;

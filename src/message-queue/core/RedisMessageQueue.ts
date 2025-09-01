@@ -5,11 +5,11 @@
 
 import Redis from 'redis';
 import { logger } from '../../utils/logger';
-import { 
-  IMessageQueue, 
-  IMessage, 
-  IQueueConfig, 
-  QueueType, 
+import {
+  IMessageQueue,
+  IMessage,
+  IQueueConfig,
+  QueueType,
   MessagePriority,
   MessageStatus,
   IMessageHandler,
@@ -19,7 +19,7 @@ import {
   IQueueHealth,
   IQueueMetrics,
   IMessageContext,
-  IHandlerResult
+  IHandlerResult,
 } from '../interfaces/IMessageQueue';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -46,7 +46,7 @@ interface IStoredMessage<T = Record<string, unknown>> extends IMessage<T> {
 
 /**
  * Redis-based Message Queue Implementation
- * 
+ *
  * Features:
  * - Priority-based message ordering
  * - Dead letter queue handling
@@ -112,11 +112,11 @@ export class RedisMessageQueue implements IMessageQueue {
       });
 
       // Setup error handlers
-      this.redisClient.on('error', (error) => {
+      this.redisClient.on('error', error => {
         logger.error(`Redis client error for queue ${this.name}`, error);
       });
 
-      this.subscriberClient.on('error', (error) => {
+      this.subscriberClient.on('error', error => {
         logger.error(`Redis subscriber error for queue ${this.name}`, error);
       });
 
@@ -130,13 +130,16 @@ export class RedisMessageQueue implements IMessageQueue {
       this.startMessageProcessing();
 
       this.isInitialized = true;
-      
+
       logger.info(`Redis message queue initialized: ${this.name}`, {
         type: this.type,
         config: this.config,
       });
     } catch (error) {
-      logger.error(`Failed to initialize Redis message queue: ${this.name}`, error);
+      logger.error(
+        `Failed to initialize Redis message queue: ${this.name}`,
+        error
+      );
       throw error;
     }
   }
@@ -172,10 +175,13 @@ export class RedisMessageQueue implements IMessageQueue {
       }
 
       this.isInitialized = false;
-      
+
       logger.info(`Redis message queue shut down: ${this.name}`);
     } catch (error) {
-      logger.error(`Error shutting down Redis message queue: ${this.name}`, error);
+      logger.error(
+        `Error shutting down Redis message queue: ${this.name}`,
+        error
+      );
       throw error;
     }
   }
@@ -251,7 +257,7 @@ export class RedisMessageQueue implements IMessageQueue {
     }
 
     const subscriptionId = uuidv4();
-    
+
     try {
       const subscription: IRedisSubscription = {
         id: subscriptionId,
@@ -271,9 +277,8 @@ export class RedisMessageQueue implements IMessageQueue {
       (this.metrics as any).subscriptionCount++;
 
       // Subscribe to Redis pub/sub for real-time notifications
-      await this.subscriberClient.subscribe(
-        this.getTopicKey(topic),
-        (message) => this.handleMessage(subscriptionId, JSON.parse(message))
+      await this.subscriberClient.subscribe(this.getTopicKey(topic), message =>
+        this.handleMessage(subscriptionId, JSON.parse(message))
       );
 
       logger.info(`Created subscription for queue ${this.name}`, {
@@ -284,7 +289,10 @@ export class RedisMessageQueue implements IMessageQueue {
 
       return subscription;
     } catch (error) {
-      logger.error(`Failed to create subscription for queue ${this.name}`, error);
+      logger.error(
+        `Failed to create subscription for queue ${this.name}`,
+        error
+      );
       throw error;
     }
   }
@@ -324,7 +332,7 @@ export class RedisMessageQueue implements IMessageQueue {
    */
   public async getQueueHealth(): Promise<IQueueHealth> {
     const lastCheck = new Date();
-    
+
     try {
       if (!this.redisClient) {
         return {
@@ -352,15 +360,21 @@ export class RedisMessageQueue implements IMessageQueue {
       const issues: string[] = [];
 
       if (queueSize > this.config.maxQueueSize * 0.8) {
-        issues.push(`Queue size approaching limit: ${queueSize}/${this.config.maxQueueSize}`);
+        issues.push(
+          `Queue size approaching limit: ${queueSize}/${this.config.maxQueueSize}`
+        );
       }
 
       if (responseTime > 1000) {
         issues.push(`High response time: ${responseTime}ms`);
       }
 
-      const status = issues.length === 0 ? 'healthy' : 
-                    issues.length <= 2 ? 'degraded' : 'unhealthy';
+      const status =
+        issues.length === 0
+          ? 'healthy'
+          : issues.length <= 2
+            ? 'degraded'
+            : 'unhealthy';
 
       return {
         status,
@@ -475,7 +489,7 @@ export class RedisMessageQueue implements IMessageQueue {
 
     const deduplicationKey = this.getDeduplicationKey(message);
     const exists = await this.redisClient.exists(deduplicationKey);
-    
+
     if (!exists) {
       // Set deduplication marker
       await this.redisClient.setEx(
@@ -506,14 +520,20 @@ export class RedisMessageQueue implements IMessageQueue {
     );
   }
 
-  private async handleMessage(subscriptionId: string, notification: any): Promise<void> {
+  private async handleMessage(
+    subscriptionId: string,
+    notification: any
+  ): Promise<void> {
     const subscription = this.subscriptions.get(subscriptionId);
     if (!subscription || !subscription.isActive || subscription.isProcessing) {
       return;
     }
 
     // Apply message filters
-    if (subscription.options.filter && !this.messageMatchesFilter(notification, subscription.options.filter)) {
+    if (
+      subscription.options.filter &&
+      !this.messageMatchesFilter(notification, subscription.options.filter)
+    ) {
       return;
     }
 
@@ -534,8 +554,8 @@ export class RedisMessageQueue implements IMessageQueue {
         firstDelivery: message.firstDelivery || new Date(),
         lastDelivery: new Date(),
         acknowledge: () => this.acknowledgeMessage(message.id),
-        reject: (requeue) => this.rejectMessage(message.id, requeue),
-        deadLetter: (reason) => this.deadLetterMessage(message.id, reason),
+        reject: requeue => this.rejectMessage(message.id, requeue),
+        deadLetter: reason => this.deadLetterMessage(message.id, reason),
       };
 
       // Process the message
@@ -551,27 +571,35 @@ export class RedisMessageQueue implements IMessageQueue {
       // Handle result
       if (result.success) {
         await context.acknowledge();
-      } else if (result.retryable && message.metadata.retryCount < message.metadata.maxRetries) {
+      } else if (
+        result.retryable &&
+        message.metadata.retryCount < message.metadata.maxRetries
+      ) {
         await this.scheduleRetry(message as any);
       } else {
         await context.deadLetter(result.error?.message || 'Processing failed');
       }
     } catch (error) {
-      logger.error(`Error processing message in subscription ${subscriptionId}`, error);
+      logger.error(
+        `Error processing message in subscription ${subscriptionId}`,
+        error
+      );
       await this.rejectMessage(notification.messageId, true);
     } finally {
       subscription.isProcessing = false;
     }
   }
 
-  private async fetchMessage<T>(messageId: string): Promise<IStoredMessage<T> | null> {
+  private async fetchMessage<T>(
+    messageId: string
+  ): Promise<IStoredMessage<T> | null> {
     if (!this.redisClient) {
       return null;
     }
 
     const messageKey = this.getMessageKey(messageId);
     const serializedMessage = await this.redisClient.get(messageKey);
-    
+
     return serializedMessage ? JSON.parse(serializedMessage as string) : null;
   }
 
@@ -590,7 +618,10 @@ export class RedisMessageQueue implements IMessageQueue {
     this.updateQueueSize();
   }
 
-  private async rejectMessage(messageId: string, requeue: boolean = false): Promise<void> {
+  private async rejectMessage(
+    messageId: string,
+    requeue: boolean = false
+  ): Promise<void> {
     if (!requeue) {
       await this.acknowledgeMessage(messageId);
       return;
@@ -600,7 +631,10 @@ export class RedisMessageQueue implements IMessageQueue {
     // For now, just leave it in the queue
   }
 
-  private async deadLetterMessage(messageId: string, reason: string): Promise<void> {
+  private async deadLetterMessage(
+    messageId: string,
+    reason: string
+  ): Promise<void> {
     if (!this.redisClient) {
       return;
     }
@@ -633,12 +667,18 @@ export class RedisMessageQueue implements IMessageQueue {
     if (filter.topics && !filter.topics.includes(notification.topic)) {
       return false;
     }
-    
-    if (filter.messageTypes && !filter.messageTypes.includes(notification.type)) {
+
+    if (
+      filter.messageTypes &&
+      !filter.messageTypes.includes(notification.type)
+    ) {
       return false;
     }
-    
-    if (filter.priorities && !filter.priorities.includes(notification.priority)) {
+
+    if (
+      filter.priorities &&
+      !filter.priorities.includes(notification.priority)
+    ) {
       return false;
     }
 
@@ -655,30 +695,40 @@ export class RedisMessageQueue implements IMessageQueue {
   }
 
   private calculateRetryDelay(retryCount: number): number {
-    const { backoffStrategy, initialDelay, maxDelay, multiplier } = this.config.retry;
-    
+    const { backoffStrategy, initialDelay, maxDelay, multiplier } =
+      this.config.retry;
+
     switch (backoffStrategy) {
       case 'exponential':
-        return Math.min(initialDelay * Math.pow(multiplier, retryCount), maxDelay);
+        return Math.min(
+          initialDelay * Math.pow(multiplier, retryCount),
+          maxDelay
+        );
       case 'linear':
-        return Math.min(initialDelay + (retryCount * multiplier), maxDelay);
+        return Math.min(initialDelay + retryCount * multiplier, maxDelay);
       case 'fixed':
       default:
         return initialDelay;
     }
   }
 
-  private updateProcessingMetrics(processingTime: number, success: boolean): void {
+  private updateProcessingMetrics(
+    processingTime: number,
+    success: boolean
+  ): void {
     // Update average processing time
     const totalMessages = this.metrics.messagesConsumed + 1;
-    this.metrics.averageProcessingTime = (
-      (this.metrics.averageProcessingTime * (totalMessages - 1)) + processingTime
-    ) / totalMessages;
+    (this.metrics as any).averageProcessingTime =
+      (this.metrics.averageProcessingTime * (totalMessages - 1) +
+        processingTime) /
+      totalMessages;
 
     // Update error rate
     if (!success) {
-      const totalProcessed = this.metrics.messagesConsumed + this.metrics.messagesDeadLetter;
-      this.metrics.errorRate = (this.metrics.errorRate * totalProcessed + 1) / (totalProcessed + 1);
+      const totalProcessed =
+        this.metrics.messagesConsumed + this.metrics.messagesDeadLetter;
+      (this.metrics as any).errorRate =
+        (this.metrics.errorRate * totalProcessed + 1) / (totalProcessed + 1);
     }
   }
 
@@ -698,14 +748,14 @@ export class RedisMessageQueue implements IMessageQueue {
   private async pauseSubscription(subscriptionId: string): Promise<void> {
     const subscription = this.subscriptions.get(subscriptionId);
     if (subscription) {
-      subscription.isActive = false;
+      (subscription as any).isActive = false;
     }
   }
 
   private async resumeSubscription(subscriptionId: string): Promise<void> {
     const subscription = this.subscriptions.get(subscriptionId);
     if (subscription) {
-      subscription.isActive = true;
+      (subscription as any).isActive = true;
     }
   }
 
@@ -756,11 +806,13 @@ export class RedisMessageQueue implements IMessageQueue {
 
   private updateQueueSize(): void {
     // Update queue size metrics
-    this.getQueueSize().then(size => {
-      this.metrics.messagesPending = size;
-    }).catch(error => {
-      logger.error('Failed to update queue size metrics', error);
-    });
+    this.getQueueSize()
+      .then(size => {
+        (this.metrics as any).messagesPending = size;
+      })
+      .catch(error => {
+        logger.error('Failed to update queue size metrics', error);
+      });
   }
 
   // Key generation methods

@@ -50,6 +50,16 @@ export interface ITeam extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Instance methods
+  addMember(userId: mongoose.Types.ObjectId): Promise<boolean>;
+  removeMember(userId: mongoose.Types.ObjectId): Promise<boolean>;
+  changeTeamLead(newLeadId?: mongoose.Types.ObjectId): Promise<void>;
+  canUserAccess(userId: mongoose.Types.ObjectId): Promise<boolean>;
+  updatePerformance(metrics: {
+    casesHandled?: number;
+    averageResponseTime?: number;
+    successRate?: number;
+  }): Promise<void>;
 }
 
 const teamSchema = new Schema<ITeam>(

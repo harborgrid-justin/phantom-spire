@@ -36,6 +36,14 @@ export interface IRole extends Document {
   };
   createdAt: Date;
   updatedAt: Date;
+  // Instance methods
+  getInheritanceDepth(): Promise<number>;
+  getAncestors(): Promise<IRole[]>;
+  getDescendants(): Promise<IRole[]>;
+  getInheritedPermissions(): Promise<mongoose.Types.ObjectId[]>;
+  hasPermission(permissionId: mongoose.Types.ObjectId): Promise<boolean>;
+  isAccessAllowed(timestamp?: Date): boolean;
+  isIPAllowed(clientIP: string): boolean;
 }
 
 const roleSchema = new Schema<IRole>(
@@ -205,13 +213,14 @@ roleSchema.pre('deleteOne', { document: true, query: false }, function () {
 
 // Middleware to prevent circular inheritance
 roleSchema.pre('save', async function (next) {
-  if (this.parentRole && this.parentRole.equals(this._id)) {
+  if (this.parentRole && this.parentRole.equals(this._id as mongoose.Types.ObjectId)) {
     throw new Error('Role cannot be its own parent');
   }
 
   // Check for circular reference in hierarchy
   if (this.parentRole) {
-    const depth = await this.getInheritanceDepth();
+    const role = this as IRole;
+    const depth = await role.getInheritanceDepth();
     if (depth > 10) {
       // Max 10 levels deep
       throw new Error('Role hierarchy too deep (max 10 levels)');

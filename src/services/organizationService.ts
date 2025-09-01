@@ -68,11 +68,17 @@ export class OrganizationService {
           ? new mongoose.Types.ObjectId(request.parentCompany)
           : undefined,
         settings: {
-          ...Company.schema.paths.settings.defaultValue,
+          allowSubsidiaries: false,
+          securityPolicy: 'moderate' as const,
+          dataRetentionDays: 2555,
+          requireMFA: true,
+          allowExternalUsers: false,
           ...request.settings,
         },
         metadata: {
-          ...Company.schema.paths.metadata.defaultValue,
+          threatIntelligenceLevel: 'basic' as const,
+          complianceRequirements: [],
+          riskTolerance: 'medium' as const,
           ...request.metadata,
         },
       });
@@ -256,11 +262,14 @@ export class OrganizationService {
           ? new mongoose.Types.ObjectId(request.managerId)
           : undefined,
         settings: {
-          ...Department.schema.paths.settings.defaultValue,
+          maxTeams: 10,
+          allowNestedDepartments: true,
+          requireManagerApproval: false,
           ...request.settings,
         },
         metadata: {
-          ...Department.schema.paths.metadata.defaultValue,
+          function: request.metadata?.function || 'other',
+          clearanceLevel: 'internal' as const,
           ...request.metadata,
         },
       });
@@ -384,11 +393,18 @@ export class OrganizationService {
           ? new mongoose.Types.ObjectId(request.teamLeadId)
           : undefined,
         settings: {
-          ...Team.schema.paths.settings.defaultValue,
+          maxMembers: 20,
+          requireLeadApproval: true,
+          allowGuestMembers: false,
           ...request.settings,
         },
         metadata: {
-          ...Team.schema.paths.metadata.defaultValue,
+          teamType: request.metadata?.teamType || 'functional',
+          clearanceLevel: 'internal' as const,
+          operatingHours: {
+            timezone: 'UTC',
+            schedule: 'business-hours' as const,
+          },
           ...request.metadata,
         },
       });
@@ -527,10 +543,10 @@ export class OrganizationService {
 
       return {
         user,
-        company: user.company as ICompany,
-        department: user.department as IDepartment | undefined,
-        teams: user.teams as ITeam[],
-        directReports: user.directReports as IUser[],
+        company: user.company as unknown as ICompany,
+        department: user.department as unknown as IDepartment | undefined,
+        teams: user.teams as unknown as ITeam[],
+        directReports: user.directReports as unknown as IUser[],
       };
     } catch (error) {
       logger.error('Error getting user organization context:', error);

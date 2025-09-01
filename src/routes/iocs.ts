@@ -13,9 +13,9 @@ import {
   getDashboardStats,
   getTrendAnalysis,
   getQualityReport,
-} from '../controllers/iocController';
-import { authMiddleware, requireRole } from '../middleware/auth';
-import { validateRequest } from '../middleware/validation';
+} from '../controllers/iocController.js';
+import { authMiddleware, requireRole } from '../middleware/auth.js';
+import { validateRequest } from '../middleware/validation.js';
 
 const router = Router();
 

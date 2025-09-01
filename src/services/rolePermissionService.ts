@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import { Role, IRole } from '../models/Role';
-import { Permission, IPermission } from '../models/Permission';
-import { User, IUser } from '../models/User';
-import { logger } from '../utils/logger';
+import { Role, IRole } from '../models/Role.js';
+import { Permission, IPermission } from '../models/Permission.js';
+import { User, IUser } from '../models/User.js';
+import { logger } from '../utils/logger.js';
 
 export interface ICreateRoleRequest {
   name: string;

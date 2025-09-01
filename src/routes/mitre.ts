@@ -14,8 +14,8 @@ import {
   getMitigation,
   getDataSources,
   getDataSource,
-} from '../controllers/mitreController';
-import { authMiddleware } from '../middleware/auth';
+} from '../controllers/mitreController.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
 

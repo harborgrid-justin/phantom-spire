@@ -4,14 +4,14 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { UIUXEvaluationService } from '../core/UIUXEvaluationService';
+import { UIUXEvaluationService } from '../core/UIUXEvaluationService.js';
 import {
   IPageEvaluation,
   IEvaluationIssue,
   IEvaluationMetric,
   EvaluationCategory,
   EvaluationSeverity
-} from '../interfaces/IUIUXEvaluation';
+} from '../interfaces/IUIUXEvaluation.js';
 
 // Simple evaluation hook
 export const useUIUXEvaluation = (pageId: string, autoStart = true) => {

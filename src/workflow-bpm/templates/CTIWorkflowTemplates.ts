@@ -5,6 +5,7 @@
 
 import { 
   IWorkflowDefinition, 
+  WorkflowStatus,
   WorkflowPriority, 
   StepType,
   TriggerType 
@@ -18,6 +19,8 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
     id: 'apt-response-workflow',
     name: 'Advanced Persistent Threat Response Workflow',
     version: '2.0',
+    status: WorkflowStatus.ACTIVE,
+    priority: WorkflowPriority.CRITICAL,
     description: 'Comprehensive workflow for responding to APT indicators and campaigns',
     category: 'incident-response',
     tags: ['apt', 'incident-response', 'critical', 'automated'],
@@ -25,9 +28,7 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
     metadata: {
       author: 'CTI Team',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-15'),
-      approvedBy: 'Security Manager',
-      approvedAt: new Date('2024-01-16')
+      updatedAt: new Date('2024-01-15')
     },
     
     triggers: [
@@ -426,33 +427,6 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
       }
     ],
     
-    variables: {
-      indicators: {
-        type: 'array',
-        description: 'APT indicators detected',
-        required: true,
-        defaultValue: []
-      },
-      threatLevel: {
-        type: 'string',
-        description: 'Assessed threat level',
-        required: false,
-        defaultValue: 'medium'
-      },
-      riskScore: {
-        type: 'number',
-        description: 'Calculated risk score (1-10)',
-        required: false,
-        defaultValue: 5
-      },
-      affectedSystems: {
-        type: 'array',
-        description: 'List of affected systems',
-        required: false,
-        defaultValue: []
-      }
-    },
-    
     parameters: {
       indicators: {
         type: 'array',
@@ -549,6 +523,8 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
     id: 'malware-analysis-workflow',
     name: 'Automated Malware Analysis Workflow',
     version: '3.1',
+    status: WorkflowStatus.ACTIVE,
+    priority: WorkflowPriority.HIGH,
     description: 'Comprehensive automated malware analysis and intelligence generation',
     category: 'malware-analysis',
     tags: ['malware', 'analysis', 'sandbox', 'intelligence'],
@@ -696,15 +672,6 @@ export const CTI_WORKFLOW_TEMPLATES: Record<string, IWorkflowDefinition> = {
         }
       }
     ],
-    
-    variables: {
-      sample: {
-        type: 'object',
-        description: 'Malware sample metadata and data',
-        required: true,
-        defaultValue: {}
-      }
-    },
     
     parameters: {
       sample: {
