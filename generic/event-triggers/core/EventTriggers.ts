@@ -171,6 +171,7 @@ export class EventTriggers extends EventEmitter {
     this.createTrigger({
       name: 'Error Handler',
       eventPattern: /error|fail|exception/i,
+      enabled: true,
       priority: 10,
       action: (data) => {
         console.error('🚨 Auto error handler triggered:', data);
@@ -183,6 +184,8 @@ export class EventTriggers extends EventEmitter {
     this.createTrigger({
       name: 'Health Monitor',
       eventPattern: 'health-check',
+      enabled: true,
+      priority: 5,
       cooldownMs: 60000, // 1 minute cooldown
       action: async (data) => {
         console.info('💊 Health check triggered:', data);
@@ -196,6 +199,8 @@ export class EventTriggers extends EventEmitter {
     this.createTrigger({
       name: 'Performance Monitor',
       eventPattern: /performance|slow|timeout/i,
+      enabled: true,
+      priority: 8,
       condition: (data) => data.responseTime > 5000,
       action: (data) => {
         console.warn('🐌 Performance issue detected:', data);
@@ -213,6 +218,8 @@ export class EventTriggers extends EventEmitter {
         this.createTrigger({
           name: `Circuit Breaker Monitor (${moduleType})`,
           eventPattern: 'circuit-opened',
+          enabled: true,
+          priority: 9,
           action: (data) => {
             console.warn('🔴 Circuit breaker opened, triggering fallback procedures');
             this.fireEvent('system:circuit-breaker:opened', data);
@@ -225,6 +232,8 @@ export class EventTriggers extends EventEmitter {
         this.createTrigger({
           name: `Queue Monitor (${moduleType})`,
           eventPattern: 'queue-full',
+          enabled: true,
+          priority: 7,
           action: (data) => {
             console.warn('📦 Message queue full, scaling up processing');
             this.fireEvent('system:scale-up', { component: 'message-processing', reason: 'queue-full' });
@@ -237,6 +246,8 @@ export class EventTriggers extends EventEmitter {
         this.createTrigger({
           name: `Service Monitor (${moduleType})`,
           eventPattern: 'service-unhealthy',
+          enabled: true,
+          priority: 6,
           action: (data) => {
             console.warn('🏥 Service unhealthy, triggering recovery procedures');
             this.fireEvent('system:service:recovery', data);

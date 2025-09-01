@@ -368,9 +368,9 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
       const result = definition.toObject();
       // Convert back to IWorkflowDefinition format
       result.id = result.workflowId;
-      delete result.workflowId;
-      delete result._id;
-      delete result.__v;
+      delete (result as any).workflowId;
+      delete (result as any)._id;
+      delete (result as any).__v;
       
       return result as IWorkflowDefinition;
     } catch (error) {
@@ -391,9 +391,9 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
       return definitions.map(def => {
         const obj = def.toObject();
         obj.id = obj.workflowId;
-        delete obj.workflowId;
-        delete obj._id;
-        delete obj.__v;
+        delete (obj as any).workflowId;
+        delete (obj as any)._id;
+        delete (obj as any).__v;
         return obj as IWorkflowDefinition;
       });
     } catch (error) {
@@ -463,9 +463,9 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
 
       const result = instance.toObject();
       result.id = result.instanceId;
-      delete result.instanceId;
-      delete result._id;
-      delete result.__v;
+      delete (result as any).instanceId;
+      delete (result as any)._id;
+      delete (result as any).__v;
       
       return result as IWorkflowInstance;
     } catch (error) {
@@ -492,9 +492,9 @@ export class MongoWorkflowRepository implements IWorkflowRepository {
       return instances.map(instance => {
         const obj = instance.toObject();
         obj.id = obj.instanceId;
-        delete obj.instanceId;
-        delete obj._id;
-        delete obj.__v;
+        delete (obj as any).instanceId;
+        delete (obj as any)._id;
+        delete (obj as any).__v;
         return obj as IWorkflowInstance;
       });
     } catch (error) {

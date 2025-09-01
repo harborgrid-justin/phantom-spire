@@ -3,6 +3,8 @@
  * Revolutionary plug-and-play circuit breaker system with automatic configuration
  */
 
+import { EventEmitter } from 'events';
+
 export enum CircuitBreakerState {
   CLOSED = 'closed',
   OPEN = 'open',
@@ -50,7 +52,7 @@ export interface ICircuitBreakerEvents {
   'auto-discovery': (services: string[]) => void;
 }
 
-export interface ICircuitBreaker {
+export interface ICircuitBreaker extends EventEmitter {
   /** Execute operation with circuit breaker protection */
   execute<T>(operation: () => Promise<T>, fallback?: () => Promise<T>): Promise<T>;
   
@@ -91,7 +93,7 @@ export interface ICircuitBreakerFactory {
   getInstance(serviceName: string, config?: Partial<ICircuitBreakerConfig>): ICircuitBreaker;
 }
 
-export interface ICircuitBreakerRegistry {
+export interface ICircuitBreakerRegistry extends EventEmitter {
   /** Register a circuit breaker */
   register(serviceName: string, breaker: ICircuitBreaker): void;
   
