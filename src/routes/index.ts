@@ -39,7 +39,9 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         evidence: '/api/v1/evidence',
         issues: '/api/v1/issues',
         organizations: '/api/v1/organizations',
-        tasks: orchestrator ? '/api/v1/tasks' : 'not available (orchestrator not initialized)',
+        tasks: orchestrator
+          ? '/api/v1/tasks'
+          : 'not available (orchestrator not initialized)',
         docs: '/api-docs',
         health: '/health',
       },

@@ -7,7 +7,10 @@ export * from './interfaces/IWorkflowEngine';
 export * from './core/WorkflowEngine';
 export * from './repository/InMemoryWorkflowRepository';
 export * from './templates/CTIWorkflowTemplates';
-export { WorkflowBPMOrchestrator, IWorkflowBPMConfig } from './WorkflowBPMOrchestrator';
+export {
+  WorkflowBPMOrchestrator,
+  IWorkflowBPMConfig,
+} from './WorkflowBPMOrchestrator';
 
 // Main export
 export { WorkflowBPMOrchestrator as default } from './WorkflowBPMOrchestrator';
@@ -17,11 +20,11 @@ export {
   WorkflowStatus,
   WorkflowPriority,
   StepType,
-  TriggerType
+  TriggerType,
 } from './interfaces/IWorkflowEngine';
 
 export {
   CTI_WORKFLOW_TEMPLATES,
   APT_RESPONSE_WORKFLOW,
-  MALWARE_ANALYSIS_WORKFLOW
+  MALWARE_ANALYSIS_WORKFLOW,
 } from './templates/CTIWorkflowTemplates';

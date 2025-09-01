@@ -118,7 +118,7 @@ export class IngestionPipelineManager extends EventEmitter {
     try {
       // Validate pipeline before execution
       const validationResult = await pipeline.validate();
-      if (!validationResult.valid && this.config.validation.failFast) {
+      if (!validationResult.isValid && this.config.validation.failFast) {
         throw new Error(`Pipeline validation failed: ${validationResult.errors?.join(', ')}`);
       }
 
@@ -200,7 +200,7 @@ export class IngestionPipelineManager extends EventEmitter {
     );
 
     return {
-      status: execution.status,
+      status: execution.status === 'cancelled' ? 'paused' : execution.status,
       progress: execution.stageResults.length / execution.pipeline.stages.length,
       startTime: execution.startTime,
       recordsProcessed,
@@ -465,9 +465,9 @@ class IngestionPipeline implements IDataPipeline {
     }
 
     return {
-      valid: errors.length === 0,
-      errors: errors.length > 0 ? errors : undefined,
-      warnings: warnings.length > 0 ? warnings : undefined,
+      isValid: errors.length === 0,
+      errors: errors.length > 0 ? errors : [],
+      warnings: warnings.length > 0 ? warnings : [],
     };
   }
 

@@ -1,6 +1,6 @@
 /**
  * Fortune 100-Grade Organization Management Demonstration
- * 
+ *
  * This script demonstrates the advanced organizational management capabilities
  * that exceed Okta and Oracle IDM/IAM systems for cyber threat intelligence operations.
  */
@@ -89,7 +89,14 @@ class Fortune100Demo {
       },
       metadata: {
         threatIntelligenceLevel: 'enterprise',
-        complianceRequirements: ['SOC2', 'ISO27001', 'GDPR', 'NIST', 'FedRAMP', 'FISMA'],
+        complianceRequirements: [
+          'SOC2',
+          'ISO27001',
+          'GDPR',
+          'NIST',
+          'FedRAMP',
+          'FISMA',
+        ],
         riskTolerance: 'low',
       },
     });
@@ -231,7 +238,9 @@ class Fortune100Demo {
     teams.push(malwareAnalysisTeam);
 
     logger.info(`✅ Created Fortune 100 company structure:`);
-    logger.info(`   - Parent Company: ${parentCompany.name} (${parentCompany.code})`);
+    logger.info(
+      `   - Parent Company: ${parentCompany.name} (${parentCompany.code})`
+    );
     logger.info(`   - Subsidiary: ${subsidiary.name} (${subsidiary.code})`);
     logger.info(`   - Departments: ${departments.length}`);
     logger.info(`   - Teams: ${teams.length}`);
@@ -246,7 +255,11 @@ class Fortune100Demo {
   /**
    * Create users with advanced role assignments
    */
-  async createAdvancedUsers(company: any, departments: any[], teams: any[]): Promise<any[]> {
+  async createAdvancedUsers(
+    company: any,
+    departments: any[],
+    teams: any[]
+  ): Promise<any[]> {
     logger.info('👥 Creating Advanced User Hierarchy...');
 
     const users = [];
@@ -279,7 +292,9 @@ class Fortune100Demo {
     await ceo.save();
 
     // Assign System Admin role
-    const systemAdminRole = await mongoose.model('Role').findOne({ code: 'SYSTEM_ADMIN' });
+    const systemAdminRole = await mongoose
+      .model('Role')
+      .findOne({ code: 'SYSTEM_ADMIN' });
     if (systemAdminRole) {
       await rolePermissionService.assignRoleToUser({
         userId: ceo._id.toString(),
@@ -321,7 +336,9 @@ class Fortune100Demo {
     await ciso.save();
 
     // Assign Security Manager role
-    const secManagerRole = await mongoose.model('Role').findOne({ code: 'SECURITY_MANAGER' });
+    const secManagerRole = await mongoose
+      .model('Role')
+      .findOne({ code: 'SECURITY_MANAGER' });
     if (secManagerRole) {
       await rolePermissionService.assignRoleToUser({
         userId: ciso._id.toString(),
@@ -334,7 +351,10 @@ class Fortune100Demo {
     // Add CISO as department manager
     departments[0].manager = ciso._id;
     await departments[0].save();
-    await organizationService.addUserToDepartment(departments[0]._id.toString(), ciso._id.toString());
+    await organizationService.addUserToDepartment(
+      departments[0]._id.toString(),
+      ciso._id.toString()
+    );
 
     users.push(ciso);
 
@@ -369,7 +389,9 @@ class Fortune100Demo {
     await seniorAnalyst.save();
 
     // Assign Threat Intelligence Analyst role
-    const tiAnalystRole = await mongoose.model('Role').findOne({ code: 'TI_ANALYST' });
+    const tiAnalystRole = await mongoose
+      .model('Role')
+      .findOne({ code: 'TI_ANALYST' });
     if (tiAnalystRole) {
       await rolePermissionService.assignRoleToUser({
         userId: seniorAnalyst._id.toString(),
@@ -380,8 +402,14 @@ class Fortune100Demo {
     }
 
     // Add to team
-    await organizationService.addUserToTeam(teams[2]._id.toString(), seniorAnalyst._id.toString());
-    await organizationService.addUserToDepartment(departments[1]._id.toString(), seniorAnalyst._id.toString());
+    await organizationService.addUserToTeam(
+      teams[2]._id.toString(),
+      seniorAnalyst._id.toString()
+    );
+    await organizationService.addUserToDepartment(
+      departments[1]._id.toString(),
+      seniorAnalyst._id.toString()
+    );
 
     users.push(seniorAnalyst);
 
@@ -416,7 +444,9 @@ class Fortune100Demo {
     await socAnalyst.save();
 
     // Assign Security Analyst role
-    const secAnalystRole = await mongoose.model('Role').findOne({ code: 'SEC_ANALYST' });
+    const secAnalystRole = await mongoose
+      .model('Role')
+      .findOne({ code: 'SEC_ANALYST' });
     if (secAnalystRole) {
       await rolePermissionService.assignRoleToUser({
         userId: socAnalyst._id.toString(),
@@ -427,12 +457,20 @@ class Fortune100Demo {
     }
 
     // Add to team and department
-    await organizationService.addUserToTeam(teams[0]._id.toString(), socAnalyst._id.toString());
-    await organizationService.addUserToDepartment(departments[2]._id.toString(), socAnalyst._id.toString());
+    await organizationService.addUserToTeam(
+      teams[0]._id.toString(),
+      socAnalyst._id.toString()
+    );
+    await organizationService.addUserToDepartment(
+      departments[2]._id.toString(),
+      socAnalyst._id.toString()
+    );
 
     users.push(socAnalyst);
 
-    logger.info(`✅ Created ${users.length} users with advanced role assignments`);
+    logger.info(
+      `✅ Created ${users.length} users with advanced role assignments`
+    );
 
     return users;
   }
@@ -447,45 +485,64 @@ class Fortune100Demo {
 
     // Test CEO permissions (should have everything)
     logger.info('\n--- CEO Permissions ---');
-    const ceoPermissions = await rolePermissionService.getUserEffectivePermissions(ceo._id.toString());
+    const ceoPermissions =
+      await rolePermissionService.getUserEffectivePermissions(
+        ceo._id.toString()
+      );
     logger.info(`CEO has ${ceoPermissions.length} effective permissions`);
-    
-    const canCEOManageCompany = await rolePermissionService.userCanAccessResource(
-      ceo._id.toString(),
-      'company',
-      'manage'
-    );
+
+    const canCEOManageCompany =
+      await rolePermissionService.userCanAccessResource(
+        ceo._id.toString(),
+        'company',
+        'manage'
+      );
     logger.info(`CEO can manage companies: ${canCEOManageCompany}`);
 
     // Test CISO permissions
     logger.info('\n--- CISO Permissions ---');
-    const cisoPermissions = await rolePermissionService.getUserEffectivePermissions(ciso._id.toString());
+    const cisoPermissions =
+      await rolePermissionService.getUserEffectivePermissions(
+        ciso._id.toString()
+      );
     logger.info(`CISO has ${cisoPermissions.length} effective permissions`);
-    
-    const canCISOManageRoles = await rolePermissionService.userCanAccessResource(
-      ciso._id.toString(),
-      'role',
-      'manage'
-    );
+
+    const canCISOManageRoles =
+      await rolePermissionService.userCanAccessResource(
+        ciso._id.toString(),
+        'role',
+        'manage'
+      );
     logger.info(`CISO can manage roles: ${canCISOManageRoles}`);
 
     // Test Senior Analyst permissions
     logger.info('\n--- Senior Analyst Permissions ---');
-    const analystPermissions = await rolePermissionService.getUserEffectivePermissions(seniorAnalyst._id.toString());
-    logger.info(`Senior Analyst has ${analystPermissions.length} effective permissions`);
-    
-    const canAnalystCreateIOC = await rolePermissionService.userCanAccessResource(
-      seniorAnalyst._id.toString(),
-      'ioc',
-      'create'
+    const analystPermissions =
+      await rolePermissionService.getUserEffectivePermissions(
+        seniorAnalyst._id.toString()
+      );
+    logger.info(
+      `Senior Analyst has ${analystPermissions.length} effective permissions`
     );
+
+    const canAnalystCreateIOC =
+      await rolePermissionService.userCanAccessResource(
+        seniorAnalyst._id.toString(),
+        'ioc',
+        'create'
+      );
     logger.info(`Senior Analyst can create IOCs: ${canAnalystCreateIOC}`);
 
     // Test SOC Analyst permissions (should be limited)
     logger.info('\n--- SOC Analyst Permissions ---');
-    const socPermissions = await rolePermissionService.getUserEffectivePermissions(socAnalyst._id.toString());
-    logger.info(`SOC Analyst has ${socPermissions.length} effective permissions`);
-    
+    const socPermissions =
+      await rolePermissionService.getUserEffectivePermissions(
+        socAnalyst._id.toString()
+      );
+    logger.info(
+      `SOC Analyst has ${socPermissions.length} effective permissions`
+    );
+
     const canSOCDeleteUser = await rolePermissionService.userCanAccessResource(
       socAnalyst._id.toString(),
       'user',
@@ -501,7 +558,9 @@ class Fortune100Demo {
     logger.info('🏗️ Demonstrating Organizational Hierarchy...');
 
     // Get organization stats
-    const stats = await organizationService.getOrganizationStats(company._id.toString());
+    const stats = await organizationService.getOrganizationStats(
+      company._id.toString()
+    );
     logger.info('\n--- Organization Statistics ---');
     logger.info(`Company: ${stats.company.name} (${stats.company.code})`);
     logger.info(`Departments: ${stats.departmentCount}`);
@@ -511,28 +570,42 @@ class Fortune100Demo {
 
     // Get user organization context
     const [ceo, ciso, seniorAnalyst, socAnalyst] = users;
-    
+
     logger.info('\n--- User Organizational Context ---');
-    const cisoContext = await organizationService.getUserOrganizationContext(ciso._id.toString());
+    const cisoContext = await organizationService.getUserOrganizationContext(
+      ciso._id.toString()
+    );
     logger.info(`CISO Context:`);
     logger.info(`  - Company: ${(cisoContext.company as any).name}`);
-    logger.info(`  - Department: ${(cisoContext.department as any)?.name || 'None'}`);
-    logger.info(`  - Teams: ${(cisoContext.teams as any[]).map(t => t.name).join(', ')}`);
+    logger.info(
+      `  - Department: ${(cisoContext.department as any)?.name || 'None'}`
+    );
+    logger.info(
+      `  - Teams: ${(cisoContext.teams as any[]).map(t => t.name).join(', ')}`
+    );
     logger.info(`  - Direct Reports: ${cisoContext.directReports.length}`);
 
-    const analystContext = await organizationService.getUserOrganizationContext(seniorAnalyst._id.toString());
+    const analystContext = await organizationService.getUserOrganizationContext(
+      seniorAnalyst._id.toString()
+    );
     logger.info(`Senior Analyst Context:`);
     logger.info(`  - Company: ${(analystContext.company as any).name}`);
-    logger.info(`  - Department: ${(analystContext.department as any)?.name || 'None'}`);
-    logger.info(`  - Teams: ${(analystContext.teams as any[]).map(t => t.name).join(', ')}`);
+    logger.info(
+      `  - Department: ${(analystContext.department as any)?.name || 'None'}`
+    );
+    logger.info(
+      `  - Teams: ${(analystContext.teams as any[]).map(t => t.name).join(', ')}`
+    );
     logger.info(`  - Direct Reports: ${analystContext.directReports.length}`);
 
     // Demonstrate management relationships
     logger.info('\n--- Management Relationships ---');
     const isCISOManagerOfAnalyst = await ciso.isManagerOf(seniorAnalyst._id);
     logger.info(`CISO manages Senior Analyst: ${isCISOManagerOfAnalyst}`);
-    
-    const isAnalystManagerOfSOC = await seniorAnalyst.isManagerOf(socAnalyst._id);
+
+    const isAnalystManagerOfSOC = await seniorAnalyst.isManagerOf(
+      socAnalyst._id
+    );
     logger.info(`Senior Analyst manages SOC Analyst: ${isAnalystManagerOfSOC}`);
   }
 
@@ -542,15 +615,20 @@ class Fortune100Demo {
   async runDemo(): Promise<void> {
     try {
       await this.connect();
-      
-      logger.info('🚀 Starting Fortune 100-Grade Organization Management Demonstration');
-      logger.info('====================================================================');
+
+      logger.info(
+        '🚀 Starting Fortune 100-Grade Organization Management Demonstration'
+      );
+      logger.info(
+        '===================================================================='
+      );
 
       // Initialize system
       await this.initializeSystem();
 
       // Create organizational structure
-      const { company, departments, teams } = await this.createFortune100Company();
+      const { company, departments, teams } =
+        await this.createFortune100Company();
 
       // Create users with roles
       const users = await this.createAdvancedUsers(company, departments, teams);
@@ -561,18 +639,21 @@ class Fortune100Demo {
       // Demonstrate hierarchy
       await this.demonstrateHierarchy(company, users);
 
-      logger.info('\n====================================================================');
+      logger.info(
+        '\n===================================================================='
+      );
       logger.info('✅ Fortune 100-Grade Demonstration Complete!');
       logger.info('\nKey Features Demonstrated:');
       logger.info('• Hierarchical company and subsidiary management');
-      logger.info('• Multi-level department nesting with specialized functions');
+      logger.info(
+        '• Multi-level department nesting with specialized functions'
+      );
       logger.info('• Advanced team management with CTI specializations');
       logger.info('• Role-based access control with inheritance');
       logger.info('• Fine-grained permissions with context awareness');
       logger.info('• Management hierarchy with delegation capabilities');
       logger.info('• Security clearance levels and compliance requirements');
       logger.info('• Enterprise-grade audit and accountability');
-      
     } catch (error) {
       logger.error('Demo failed:', error);
       throw error;

@@ -169,6 +169,26 @@ export class ErrorHandler {
       totalProcessingTime,
     };
   }
+
+  /**
+   * Handle and format errors consistently
+   */
+  public static handleError(
+    error: unknown,
+    context: string,
+    additionalData?: Record<string, unknown>
+  ): Error {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    
+    logger.error(`Error in ${context}`, {
+      error: errorObj.message,
+      stack: errorObj.stack,
+      context,
+      ...additionalData,
+    });
+
+    return errorObj;
+  }
 }
 
 /**
@@ -179,7 +199,7 @@ export class PerformanceMonitor {
   private static readonly measurements = new Map<string, IMeasurement[]>();
 
   /**
-   * Start performance measurement
+   * Start performance measurement (static)
    */
   public static startMeasurement(
     operation: string,
@@ -200,6 +220,16 @@ export class PerformanceMonitor {
         });
       },
     };
+  }
+
+  /**
+   * Start performance measurement (instance)
+   */
+  public startMeasurement(
+    operation: string,
+    metadata?: Record<string, unknown>
+  ): IPerformanceMeasurement {
+    return PerformanceMonitor.startMeasurement(operation, metadata);
   }
 
   /**

@@ -26,7 +26,8 @@ export interface IMISPConnectorConfig extends IConnectorConfig {
   // Data source configuration
   endpoint?: string;
   authentication?: {
-    type: 'authkey' | 'basic';
+    type: 'basic' | 'authkey';
+    credentials: Record<string, string>;
     authkey?: string;
     username?: string;
     password?: string;
@@ -276,37 +277,28 @@ export class MISPConnector implements IDataConnector {
         const responseTime = Date.now() - startTime;
 
         return {
-          isHealthy: true,
+          status: 'healthy',
           lastCheck: new Date(),
           responseTime,
-          details: {
-            connector: this.name,
-            type: this.type,
-            endpoint: this.config.endpoint,
-            mispVersion: version,
-          },
+          message: 'MISP server is reachable',
         };
       }
 
       return {
-        isHealthy: true,
+        status: 'healthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        details: {
-          connector: this.name,
-          type: this.type,
-          mode: 'offline',
-        },
+        message: 'MISP authentication is valid',
       };
 
     } catch (error) {
       issues.push(error instanceof Error ? error.message : 'Unknown health check error');
       
       return {
-        isHealthy: false,
+        status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        issues,
+        message: error instanceof Error ? error.message : 'Unknown health check error',
         details: {
           connector: this.name,
           type: this.type,
@@ -364,8 +356,6 @@ export class MISPConnector implements IDataConnector {
           extracted: extractedData.length,
           hasMore: false, // Would be implemented for pagination
           executionTime,
-          eventCount: filteredEvents.length,
-          mispVersion: this.config.version,
         },
       };
 
@@ -393,7 +383,7 @@ export class MISPConnector implements IDataConnector {
     try {
       if (!data) {
         errors.push('No data provided for validation');
-        return { valid: false, errors };
+        return { isValid: false, errors, warnings: [] };
       }
 
       const events = this.normalizeToEvents(data);
@@ -415,9 +405,9 @@ export class MISPConnector implements IDataConnector {
       });
 
       return {
-        valid: errors.length === 0,
-        errors: errors.length > 0 ? errors : undefined,
-        warnings: warnings.length > 0 ? warnings : undefined,
+        isValid: errors.length === 0,
+        errors,
+        warnings,
       };
 
     } catch (error) {
@@ -425,8 +415,9 @@ export class MISPConnector implements IDataConnector {
       logger.error(errorMessage, error);
       
       return {
-        valid: false,
+        isValid: false,
         errors: [errorMessage],
+        warnings: [],
       };
     }
   }
