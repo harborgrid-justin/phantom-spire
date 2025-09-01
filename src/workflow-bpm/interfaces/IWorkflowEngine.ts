@@ -4,4 +4,4 @@
  */
 
 // Re-export all generic workflow interfaces
-export * from '../../generic/workflow-bpm/interfaces/IWorkflowEngine';
+export * from '../../.development/references/generic/workflow-bpm/interfaces/IWorkflowEngine';

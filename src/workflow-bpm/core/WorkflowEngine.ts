@@ -7,4 +7,4 @@
 export { 
   WorkflowEngineCore, 
   IWorkflowEngineConfig 
-} from '../../generic/workflow-bpm/core/WorkflowEngine';
+} from '../../.development/references/generic/workflow-bpm/core/WorkflowEngine';

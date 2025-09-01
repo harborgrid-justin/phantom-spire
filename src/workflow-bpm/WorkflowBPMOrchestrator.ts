@@ -11,7 +11,7 @@ import {
   IWorkflowDefinition,
   IWorkflowInstance,
   WorkflowStatus,
-} from '../../generic/workflow-bpm';
+} from '../../.development/references/generic/workflow-bpm';
 import { CTI_WORKFLOW_TEMPLATES } from './templates/CTIWorkflowTemplates';
 import { logger } from '../utils/logger';
 
