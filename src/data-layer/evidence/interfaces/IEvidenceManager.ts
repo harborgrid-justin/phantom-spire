@@ -62,6 +62,8 @@ export interface ICreateEvidenceRequest {
     confidence: number;
     format: string;
     customFields?: Record<string, any>;
+    collectionTaskId?: string;
+    incidentId?: string;
   };
   classification: ClassificationLevel;
   tags?: string[];

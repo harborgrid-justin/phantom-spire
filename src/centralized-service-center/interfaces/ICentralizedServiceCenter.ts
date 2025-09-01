@@ -176,6 +176,12 @@ export interface IPlatformStatus {
   lastUpdate: Date;
   // Enterprise-grade platform status
   platformGrade?: string;
+  enterpriseFeatures?: {
+    totalServices: number;
+    enterpriseGradeServices: number;
+    complianceStatus: string;
+    securityLevel: string;
+  };
 }
 
 /**
@@ -197,6 +203,9 @@ export interface IPlatformMetrics {
   // Enterprise-grade metrics
   platformGrade?: string;
   enterpriseGradeServices?: number;
+  complianceStatus?: string;
+  securityLevel?: string;
+  scalabilityTier?: string;
 }
 
 /**

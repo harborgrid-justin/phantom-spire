@@ -558,10 +558,10 @@ export class EvidenceAnalyticsEngine {
     
     // Use the advanced analytics engine to find patterns
     try {
-      const analyticsResult = await this.analyticsEngine.analyze(
+      const analyticsResult = await this.analyticsEngine.analyzeThreats(
         dataRecords,
         relationships,
-        { includePatterns: true, includeAnomalies: false }
+        { includeAnomalies: false }
       );
       
       // Convert analytics findings to evidence correlations

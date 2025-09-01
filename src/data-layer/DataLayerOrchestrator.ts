@@ -595,7 +595,7 @@ export class DataLayerOrchestrator {
       return { task, execution };
     } catch (error) {
       measurement.end({ success: false });
-      throw this.errorHandler.handleError(error, 'createAndExecuteCTITask');
+      throw ErrorHandler.handleError(error, 'createAndExecuteCTITask');
     }
   }
 
@@ -640,7 +640,7 @@ export class DataLayerOrchestrator {
         taskDefinition
       );
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'executeDataIngestionTask');
+      throw ErrorHandler.handleError(error, 'executeDataIngestionTask');
     }
   }
 
@@ -685,7 +685,15 @@ export class DataLayerOrchestrator {
             classification: 'internal' as ClassificationLevel,
             source,
             data: { taskId: task.id, executionId: execution.id },
-            metadata: { collectionTaskId: task.id, incidentId },
+            metadata: { 
+              title: `Evidence from Task ${task.id}`,
+              description: `Automatically collected evidence from data ingestion task`,
+              severity: 'medium' as const,
+              confidence: 80,
+              format: 'json',
+              collectionTaskId: task.id, 
+              incidentId 
+            },
           },
           {
             userId: context.userId,
@@ -704,7 +712,7 @@ export class DataLayerOrchestrator {
 
       return { task, execution, evidenceIds };
     } catch (error) {
-      throw this.errorHandler.handleError(
+      throw ErrorHandler.handleError(
         error,
         'executeEvidenceCollectionTask'
       );
@@ -748,17 +756,26 @@ export class DataLayerOrchestrator {
       let analysisResult: IAnalyticsResult | undefined;
       if (this.analyticsEngine && indicators.length > 0) {
         try {
-          // Create a federated query for threat analysis
-          const query: IFederatedQuery = {
-            entity: 'threat_indicators',
-            filters: { indicators: indicators.map(i => i.value || i) },
-            type: 'search',
-          };
+          // Convert indicators to IDataRecord format for threat analysis
+          const dataRecords: IDataRecord[] = indicators.map((indicator, index) => ({
+            id: `indicator-${index}`,
+            type: 'threat_indicator',
+            source: 'cti_task',
+            timestamp: new Date(),
+            data: {
+              value: typeof indicator === 'string' ? indicator : indicator.value,
+              indicator: indicator,
+            },
+            metadata: {
+              taskId: task.id,
+              analysisType: 'threat_analysis',
+            },
+          }));
 
           analysisResult = await this.analyticsEngine.analyzeThreats(
-            query,
-            context,
-            { includeAnomalies: true, includePredictions: true }
+            dataRecords,
+            [],
+            { includeAnomalies: true }
           );
         } catch (analyticsError) {
           logger.warn('Analytics integration failed for task', {
@@ -770,7 +787,7 @@ export class DataLayerOrchestrator {
 
       return { task, execution, analysisResult };
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'executeThreatAnalysisTask');
+      throw ErrorHandler.handleError(error, 'executeThreatAnalysisTask');
     }
   }
 
@@ -902,7 +919,7 @@ export class DataLayerOrchestrator {
 
       return { tasks, workflowId };
     } catch (error) {
-      throw this.errorHandler.handleError(
+      throw ErrorHandler.handleError(
         error,
         'createIncidentResponseWorkflow'
       );
@@ -928,7 +945,7 @@ export class DataLayerOrchestrator {
 
       return await this.taskManager.queryTasks(secureFilters);
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'queryCTITasks');
+      throw ErrorHandler.handleError(error, 'queryCTITasks');
     }
   }
 
@@ -960,7 +977,7 @@ export class DataLayerOrchestrator {
         },
       };
     } catch (error) {
-      throw this.errorHandler.handleError(error, 'getTaskManagementHealth');
+      throw ErrorHandler.handleError(error, 'getTaskManagementHealth');
     }
   }
 
