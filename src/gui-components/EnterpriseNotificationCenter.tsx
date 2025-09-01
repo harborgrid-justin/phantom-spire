@@ -48,6 +48,9 @@ import {
   VolumeUp
 } from '@mui/icons-material';
 
+// UI/UX Evaluation System Integration
+import { addUIUXEvaluation } from '../services/ui-ux-evaluation';
+
 // Advanced Notification System with Fortune 100 enterprise features
 const EnterpriseNotificationCenter: React.FC = () => {
   const theme = useTheme();
@@ -57,6 +60,21 @@ const EnterpriseNotificationCenter: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+
+  // Initialize UI/UX Evaluation System
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('enterprise-notification-center', {
+      continuous: true,
+      position: 'bottom-left', // Different position to avoid conflicts
+      minimized: false,
+      interval: 30000 // Evaluate every 30 seconds for notification system
+    });
+
+    // Cleanup on unmount
+    return () => {
+      evaluationController.remove();
+    };
+  }, []);
 
   // Styled components with enterprise-grade design
   const NotificationPanel = styled(Card)(({ theme }) => ({

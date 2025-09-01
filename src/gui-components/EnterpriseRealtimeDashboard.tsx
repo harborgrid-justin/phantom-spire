@@ -32,6 +32,9 @@ import {
   Fullscreen,
   FilterList
 } from '@mui/icons-material';
+
+// UI/UX Evaluation System Integration
+import { addUIUXEvaluation } from '../services/ui-ux-evaluation';
 import {
   LineChart,
   Line,
@@ -60,6 +63,21 @@ const EnterpriseRealtimeDashboard: React.FC = () => {
   const [realTimeData, setRealTimeData] = useState(generateMockData());
   const [isAutoRefresh, setIsAutoRefresh] = useState(true);
   const [selectedMetric, setSelectedMetric] = useState('threats');
+
+  // Initialize UI/UX Evaluation System
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('enterprise-realtime-dashboard', {
+      continuous: true,
+      position: 'bottom-right',
+      minimized: false,
+      interval: 60000 // Evaluate every minute for real-time dashboard
+    });
+
+    // Cleanup on unmount
+    return () => {
+      evaluationController.remove();
+    };
+  }, []);
 
   // Styled components following Material Design 3.0
   const DashboardCard = styled(Card)(({ theme, variant = 'default' }) => ({
