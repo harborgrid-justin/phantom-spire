@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import {
@@ -25,6 +25,9 @@ import {
   Fullscreen
 } from '@mui/icons-material';
 
+// UI/UX Evaluation System Integration
+import { addUIUXEvaluation } from '../services/ui-ux-evaluation';
+
 // Enterprise-grade workflow designer with Fortune 100 UI/UX standards
 const EnterpriseWorkflowDesigner: React.FC = () => {
   const theme = useTheme();
@@ -32,6 +35,21 @@ const EnterpriseWorkflowDesigner: React.FC = () => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [isExecuting, setIsExecuting] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Initialize UI/UX Evaluation System
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('enterprise-workflow-designer', {
+      continuous: true,
+      position: 'top-right', // Different position to avoid conflicts with dashboard
+      minimized: true, // Start minimized for workflow designer to avoid interfering with workflow canvas
+      interval: 45000 // Evaluate every 45 seconds
+    });
+
+    // Cleanup on unmount
+    return () => {
+      evaluationController.remove();
+    };
+  }, []);
 
   // Styled components following Material Design 3.0 principles
   const DesignerCanvas = styled(Paper)(({ theme }) => ({
