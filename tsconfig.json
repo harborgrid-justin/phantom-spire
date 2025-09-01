@@ -4,7 +4,7 @@
     "lib": ["ES2020", "DOM"],
     "module": "node16",
     "moduleResolution": "node16",
-    "rootDir": "./",
+    "rootDir": "./src",
     "outDir": "./dist",
     "strict": false,
     "esModuleInterop": true,
@@ -24,9 +24,8 @@
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
     "downlevelIteration": true,
-    "jsx": "react",
-    "types": ["node", "jest"]
+    "jsx": "react"
   },
-  "include": ["src/**/*", "scripts/**/*", ".development/references/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
