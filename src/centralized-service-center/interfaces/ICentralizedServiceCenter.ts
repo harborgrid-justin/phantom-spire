@@ -263,4 +263,14 @@ export interface ICentralizedServiceCenter extends EventEmitter {
    * Get unified API documentation
    */
   getApiDocumentation(): Promise<Record<string, any>>;
+
+  /**
+   * Get Fortune 100-grade compliance status across all services
+   */
+  getFortune100ComplianceStatus(): Promise<Record<string, any>>;
+
+  /**
+   * Get Fortune 100-grade platform capabilities summary
+   */
+  getFortune100Capabilities(): Promise<Record<string, any>>;
 }

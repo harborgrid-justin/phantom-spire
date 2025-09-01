@@ -3,7 +3,7 @@
  * Demonstrates Fortune 100-Grade Platform Orchestration
  */
 
-import { centralizedServiceCenter } from '../src/centralized-service-center';
+import { centralizedServiceCenter } from '../centralized-service-center';
 import { v4 as uuidv4 } from 'uuid';
 
 async function runCentralizedServiceCenterDemo(): Promise<void> {

@@ -171,10 +171,7 @@ export class DataLayerOrchestrator {
 
     // Initialize Fortune 100-Grade Task Management
     this.taskManager = TaskManagementSystemFactory.createTaskManagerEngine(
-      {
-        ...DEFAULT_TASK_MANAGER_CONFIG,
-        ...config.taskManagement,
-      },
+      DEFAULT_TASK_MANAGER_CONFIG,
       messageQueueManager
     );
 
