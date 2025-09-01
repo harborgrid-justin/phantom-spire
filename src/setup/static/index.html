@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Spire CTI Platform - Setup</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Material-UI CSS (via CDN for setup page) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .setup-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            max-width: 1000px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .setup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .setup-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+        }
+
+        .setup-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .setup-progress {
+            background: rgba(255, 255, 255, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .setup-progress-bar {
+            background: #4caf50;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .setup-content {
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .status-card.success {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-card.error {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-card.warning {
+            border-color: #ffc107;
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            min-width: 24px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .system-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .info-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #212529;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .setup-footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .setup-footer p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .database-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .database-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .database-card.connected {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .database-card.error {
+            border-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .database-card.checking {
+            border-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .database-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .database-card h3 {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        .database-card p {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge.checking {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .setup-header h1 {
+                font-size: 2rem;
+            }
+
+            .setup-content {
+                padding: 1rem;
+            }
+
+            .database-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .system-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1>🚀 Phantom Spire CTI Platform</h1>
+            <p>Enterprise-grade Cyber Threat Intelligence Platform</p>
+            <p><strong>Initial Setup & Configuration</strong></p>
+            <div class="setup-progress">
+                <div class="setup-progress-bar" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="setup-content" id="setupContent">
+            <!-- Loading state -->
+            <div id="loadingState" class="status-card">
+                <div class="loading-spinner"></div>
+                <div>
+                    <h3>Initializing Setup System...</h3>
+                    <p>Please wait while we prepare your Phantom Spire installation.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-footer">
+            <p>&copy; 2024 Phantom Spire CTI Platform. All rights reserved.</p>
+            <p>Need help? Check our <a href="/docs" target="_blank">documentation</a> or <a href="/api/docs" target="_blank">API guide</a>.</p>
+        </div>
+    </div>
+
+    <script>
+        class PhantomSpireSetup {
+            constructor() {
+                this.currentStep = 'initialization';
+                this.progress = 0;
+                this.setupData = {};
+                this.init();
+            }
+
+            async init() {
+                console.log('Initializing Phantom Spire Setup...');
+                
+                try {
+                    await this.checkSetupStatus();
+                    await this.performSystemCheck();
+                } catch (error) {
+                    this.showError('Setup initialization failed', error.message);
+                }
+            }
+
+            async checkSetupStatus() {
+                try {
+                    const response = await fetch('/api/setup/status');
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        throw new Error(data.message || 'Failed to check setup status');
+                    }
+
+                    if (!data.data.isSetupRequired) {
+                        this.showComplete();
+                        return;
+                    }
+
+                    this.updateProgress(10, 'Setup status verified');
+                } catch (error) {
+                    console.warn('Could not check setup status:', error.message);
+                    // Continue with setup anyway
+                }
+            }
+
+            async performSystemCheck() {
+                this.updateProgress(20, 'Checking system requirements...');
+                this.showContent('systemCheck');
+
+                try {
+                    const response = await fetch('/api/setup/system-check');
+                    const data = await response.json();
+
+                    if (data.success && data.status === 'ready') {
+                        this.updateProgress(40, 'System requirements verified');
+                        await this.performDatabaseCheck();
+                    } else {
+                        this.showSystemCheckResults(data.data, false);
+                    }
+                } catch (error) {
+                    this.showError('System check failed', error.message);
+                }
+            }
+
+            async performDatabaseCheck() {
+                this.updateProgress(50, 'Testing database connections...');
+                this.showContent('databaseCheck');
+
+                const databases = ['mongodb', 'postgresql', 'mysql', 'redis'];
+                const results = {};
+
+                for (const db of databases) {
+                    try {
+                        this.updateDatabaseStatus(db, 'checking');
+                        const response = await fetch(`/api/setup/database-check/${db}`);
+                        const data = await response.json();
+                        results[db] = data;
+                        
+                        this.updateDatabaseStatus(db, data.connected ? 'connected' : 'error', data);
+                        
+                        // Small delay for better UX
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    } catch (error) {
+                        results[db] = { connected: false, message: error.message };
+                        this.updateDatabaseStatus(db, 'error', { message: error.message });
+                    }
+                }
+
+                const allConnected = Object.values(results).every(r => r.connected);
+                
+                if (allConnected) {
+                    this.updateProgress(70, 'All databases connected successfully');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    this.showSetupComplete();
+                } else {
+                    this.showDatabaseErrors(results);
+                }
+            }
+
+            updateProgress(percent, message = '') {
+                this.progress = percent;
+                document.getElementById('progressBar').style.width = `${percent}%`;
+                
+                if (message) {
+                    console.log(`Setup Progress (${percent}%): ${message}`);
+                }
+            }
+
+            showContent(type) {
+                const content = document.getElementById('setupContent');
+                
+                switch (type) {
+                    case 'systemCheck':
+                        content.innerHTML = `
+                            <div class="status-card">
+                                <div class="loading-spinner"></div>
+                                <div>
+                                    <h3>🔍 System Requirements Check</h3>
+                                    <p>Verifying that your system meets the requirements for Phantom Spire...</p>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'databaseCheck':
+                        content.innerHTML = `
+                            <div class="status-card success">
+                                <div class="status-icon">✅</div>
+                                <div>
+                                    <h3>System Requirements Verified</h3>
+                                    <p>Your system meets all requirements. Now testing database connections...</p>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin: 2rem 0 1rem 0;">Database Connections</h3>
+                            <p>Phantom Spire uses a multi-database architecture optimized for different data types:</p>
+                            
+                            <div class="database-grid">
+                                <div class="database-card" id="db-mongodb">
+                                    <div class="database-icon">🍃</div>
+                                    <h3>MongoDB</h3>
+                                    <p>Document store for flexible threat data</p>
+                                    <div class="status-badge checking" id="status-mongodb">
+                                        <div class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 5px;"></div>
+                                        Checking...
+                                    </div>
+                                </div>
+                                
+                                <div class="database-card" id="db-postgresql">
+                                    <div class="database-icon">🐘</div>
+                                    <h3>PostgreSQL</h3>
+                                    <p>Structured threat intelligence & relationships</p>
+                                    <div class="status-badge checking" id="status-postgresql">
+                                        <div class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 5px;"></div>
+                                        Checking...
+                                    </div>
+                                </div>
+                                
+                                <div class="database-card" id="db-mysql">
+                                    <div class="database-icon">🐬</div>
+                                    <h3>MySQL</h3>
+                                    <p>Analytics, reporting & performance metrics</p>
+                                    <div class="status-badge checking" id="status-mysql">
+                                        <div class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 5px;"></div>
+                                        Checking...
+                                    </div>
+                                </div>
+                                
+                                <div class="database-card" id="db-redis">
+                                    <div class="database-icon">📦</div>
+                                    <h3>Redis</h3>
+                                    <p>Caching, sessions & real-time data</p>
+                                    <div class="status-badge checking" id="status-redis">
+                                        <div class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 5px;"></div>
+                                        Checking...
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+            }
+
+            updateDatabaseStatus(database, status, data = {}) {
+                const card = document.getElementById(`db-${database}`);
+                const statusBadge = document.getElementById(`status-${database}`);
+                
+                if (!card || !statusBadge) return;
+
+                card.className = `database-card ${status}`;
+                
+                switch (status) {
+                    case 'connected':
+                        statusBadge.className = 'status-badge connected';
+                        statusBadge.innerHTML = '✅ Connected';
+                        break;
+                    case 'error':
+                        statusBadge.className = 'status-badge error';
+                        statusBadge.innerHTML = '❌ Error';
+                        break;
+                    case 'checking':
+                        statusBadge.className = 'status-badge checking';
+                        statusBadge.innerHTML = '<div class="loading-spinner" style="width: 12px; height: 12px; border-width: 2px; margin-right: 5px;"></div>Checking...';
+                        break;
+                }
+            }
+
+            showSetupComplete() {
+                this.updateProgress(100, 'Setup verification complete');
+                
+                document.getElementById('setupContent').innerHTML = `
+                    <div class="status-card success">
+                        <div class="status-icon">🎉</div>
+                        <div style="flex: 1;">
+                            <h2>Database Layer Ready!</h2>
+                            <p>All databases are connected and ready. You can now proceed with the full setup process.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button class="btn btn-success" onclick="this.launchFullSetup()">
+                            🚀 Launch Complete Setup Wizard
+                        </button>
+                    </div>
+                    
+                    <div class="system-info">
+                        <div class="info-item">
+                            <h4>Next Steps</h4>
+                            <p>Complete Setup Wizard</p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Admin Tools</h4>
+                            <p><a href="http://localhost:8080" target="_blank">Database Admin</a></p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Monitoring</h4>
+                            <p><a href="/health" target="_blank">Health Check</a></p>
+                        </div>
+                        <div class="info-item">
+                            <h4>Documentation</h4>
+                            <p><a href="/docs" target="_blank">User Guide</a></p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showComplete() {
+                this.updateProgress(100, 'Setup already completed');
+                
+                document.getElementById('setupContent').innerHTML = `
+                    <div class="status-card success">
+                        <div class="status-icon">✅</div>
+                        <div style="flex: 1;">
+                            <h2>Phantom Spire is Ready!</h2>
+                            <p>Your Phantom Spire CTI Platform has already been configured and is ready to use.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <a href="/dashboard" class="btn btn-success">
+                            🎯 Open Dashboard
+                        </a>
+                        <a href="/health" class="btn btn-secondary" style="margin-left: 1rem;">
+                            📊 System Health
+                        </a>
+                    </div>
+                `;
+            }
+
+            showError(title, message) {
+                document.getElementById('setupContent').innerHTML = `
+                    <div class="status-card error">
+                        <div class="status-icon">❌</div>
+                        <div style="flex: 1;">
+                            <h3>${title}</h3>
+                            <p>An error occurred during setup. Please check the details below and try again.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="error-details">${message}</div>
+                    
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button class="btn btn-secondary" onclick="location.reload()">
+                            🔄 Retry Setup
+                        </button>
+                        <a href="/docs/troubleshooting" class="btn btn-secondary" style="margin-left: 1rem;">
+                            📖 Troubleshooting Guide
+                        </a>
+                    </div>
+                `;
+            }
+
+            showDatabaseErrors(results) {
+                const errorDbs = Object.entries(results).filter(([db, result]) => !result.connected);
+                
+                let errorHtml = `
+                    <div class="status-card error">
+                        <div class="status-icon">⚠️</div>
+                        <div style="flex: 1;">
+                            <h3>Database Connection Issues</h3>
+                            <p>${errorDbs.length} of ${Object.keys(results).length} databases failed to connect.</p>
+                        </div>
+                    </div>
+                    
+                    <h4>Troubleshooting Steps:</h4>
+                    <ol style="margin: 1rem 0; padding-left: 2rem;">
+                        <li>Make sure Docker containers are running: <code>docker-compose ps</code></li>
+                        <li>Check database logs: <code>docker-compose logs &lt;database-name&gt;</code></li>
+                        <li>Verify environment variables are correctly configured</li>
+                        <li>Ensure no firewall is blocking database connections</li>
+                    </ol>
+                `;
+
+                errorDbs.forEach(([db, result]) => {
+                    errorHtml += `
+                        <div class="error-details">
+                            <strong>${db.toUpperCase()} Error:</strong>
+                            ${result.message || 'Connection failed'}
+                        </div>
+                    `;
+                });
+
+                errorHtml += `
+                    <div style="text-align: center; margin: 2rem 0;">
+                        <button class="btn btn-secondary" onclick="location.reload()">
+                            🔄 Retry Database Connections
+                        </button>
+                        <a href="/docs/setup" class="btn btn-secondary" style="margin-left: 1rem;">
+                            📖 Setup Guide
+                        </a>
+                    </div>
+                `;
+
+                document.getElementById('setupContent').innerHTML = errorHtml;
+            }
+
+            launchFullSetup() {
+                // This would redirect to the full React setup wizard
+                window.location.href = '/setup/wizard';
+            }
+        }
+
+        // Initialize setup when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PhantomSpireSetup();
+        });
+    </script>
+</body>
+</html>
