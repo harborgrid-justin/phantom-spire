@@ -746,3 +746,203 @@ function generateMockIOCValue(type: string): string {
       return 'unknown-ioc-value';
   }
 }
+
+const IOCManagementConsole: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('ioc-management');
+
+  // Local state
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCriteria, setFilterCriteria] = useState<IOCFilter>({});
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [iocs, setIocs] = useState<ThreatIndicator[]>([]);
+
+  // UI/UX Evaluation
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('ioc-management-console', {
+      continuous: true,
+      position: 'bottom-right',
+      minimized: true,
+      interval: 200000
+    });
+
+    return () => evaluationController.remove();
+  }, []);
+
+  // Load initial data
+  useEffect(() => {
+    loadIOCs();
+  }, []);
+
+  const loadIOCs = async () => {
+    setIsLoading(true);
+    try {
+      // Generate mock data for demo
+      const mockIOCs = generateMockIOCs();
+      setIocs(mockIOCs);
+    } catch (error) {
+      addNotification('error', 'Failed to load IOCs');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Business logic operations
+  const handleValidateIOC = async (iocId: string) => {
+    try {
+      await businessLogic.execute('validate-ioc', { iocId });
+      setIocs(prev => 
+        prev.map(ioc => 
+          ioc.id === iocId ? { ...ioc, validated: true } : ioc
+        )
+      );
+      addNotification('success', 'IOC validation completed');
+    } catch (error) {
+      addNotification('error', 'IOC validation failed');
+    }
+  };
+
+  const handleBulkOperation = async (operation: string, iocIds: string[]) => {
+    try {
+      await businessLogic.execute('bulk-ioc-operation', { operation, iocIds }, 'medium');
+      addNotification('info', `Bulk ${operation} initiated for ${iocIds.length} IOCs`);
+      loadIOCs(); // Refresh data
+    } catch (error) {
+      addNotification('error', `Bulk ${operation} failed`);
+    }
+  };
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        IOC Management Console
+      </Typography>
+
+      {/* Action Bar */}
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => setShowAddDialog(true)}
+        >
+          Add IOC
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<Refresh />}
+          onClick={refresh}
+          disabled={!isFullyLoaded}
+        >
+          Refresh
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<Upload />}
+          onClick={() => businessLogic.execute('bulk-upload')}
+        >
+          Bulk Upload
+        </Button>
+      </Box>
+
+      {/* IOCs Table/Grid */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <DataGrid
+            rows={iocs}
+            columns={[
+              { field: 'value', headerName: 'IOC Value', width: 200 },
+              { field: 'type', headerName: 'Type', width: 120 },
+              { field: 'severity', headerName: 'Severity', width: 120 },
+              { field: 'confidence', headerName: 'Confidence', width: 120 },
+              { 
+                field: 'actions', 
+                headerName: 'Actions', 
+                width: 200,
+                renderCell: (params) => (
+                  <Button
+                    size="small"
+                    onClick={() => handleValidateIOC(params.row.id)}
+                  >
+                    Validate
+                  </Button>
+                )
+              }
+            ]}
+            checkboxSelection
+            disableRowSelectionOnClick
+            autoHeight
+          />
+        )}
+      </Paper>
+
+      {/* Add IOC Dialog */}
+      <Dialog open={showAddDialog} onClose={() => setShowAddDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Add New IOC</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2} sx={{ pt: 1 }}>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>IOC Type</InputLabel>
+                <Select>
+                  <MenuItem value="ip">IP Address</MenuItem>
+                  <MenuItem value="domain">Domain</MenuItem>
+                  <MenuItem value="hash">File Hash</MenuItem>
+                  <MenuItem value="url">URL</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="IOC Value"
+                placeholder="Enter the indicator value..."
+                multiline
+                rows={3}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowAddDialog(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained">
+            Add IOC
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
+    </Box>
+  );
+};
+
+export default IOCManagementConsole;
