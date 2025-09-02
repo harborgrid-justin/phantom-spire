@@ -3,7 +3,7 @@
  * Quick verification that the UI/UX evaluation system works
  */
 
-const { UIUXEvaluationService } = require('../../services/ui-ux-evaluation/core/UIUXEvaluationService');
+import { UIUXEvaluationService } from '../src/services/ui-ux-evaluation/core/UIUXEvaluationService.js';
 
 async function quickVerification() {
   console.log('🎯 UI/UX Evaluation System - Quick Verification\n');
@@ -55,8 +55,8 @@ async function quickVerification() {
 }
 
 // Run if called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   quickVerification();
 }
 
-module.exports = { quickVerification };
+export { quickVerification };
