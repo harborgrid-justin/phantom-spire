@@ -3,7 +3,7 @@
  * Knowledge base for threat intelligence data
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -17,7 +17,9 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { 
   Storage, 
@@ -29,8 +31,21 @@ import {
   TrendingUp
 } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 export const ThreatIntelRepository: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('repository');
+
   useEffect(() => {
     const evaluationController = addUIUXEvaluation('threat-intel-repository', {
       continuous: true,
@@ -42,17 +57,46 @@ export const ThreatIntelRepository: React.FC = () => {
     return () => evaluationController.remove();
   }, []);
 
-  const threatActors = [
+  // State for repository data
+  const [threatActors, setThreatActors] = useState([
     { name: 'APT29 (Cozy Bear)', indicators: 1234, lastActivity: '2 days ago', severity: 'critical' },
     { name: 'Lazarus Group', indicators: 987, lastActivity: '1 week ago', severity: 'high' },
     { name: 'FIN7', indicators: 756, lastActivity: '3 days ago', severity: 'high' }
-  ];
+  ]);
 
-  const campaigns = [
+  const [campaigns, setCampaigns] = useState([
     { name: 'Operation Ghost', indicators: 456, duration: '30 days', status: 'active' },
     { name: 'SolarWinds Supply Chain', indicators: 234, duration: '90 days', status: 'archived' },
     { name: 'Exchange Server Attacks', indicators: 678, duration: '45 days', status: 'monitoring' }
-  ];
+  ]);
+
+  // Business logic operations
+  const handleSearchRepository = async (query: string) => {
+    try {
+      await businessLogic.execute('search-repository', { query });
+      addNotification('info', `Searching repository for: ${query}`);
+    } catch (error) {
+      addNotification('error', 'Repository search failed');
+    }
+  };
+
+  const handleUpdateThreatActor = async (actorName: string) => {
+    try {
+      await businessLogic.execute('update-threat-actor', { actorName });
+      addNotification('success', 'Threat actor data updated');
+    } catch (error) {
+      addNotification('error', 'Failed to update threat actor');
+    }
+  };
+
+  const handleRefreshRepository = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'Repository data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh repository');
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -191,6 +235,24 @@ export const ThreatIntelRepository: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

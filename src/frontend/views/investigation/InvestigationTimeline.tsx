@@ -3,14 +3,16 @@
  * Visual timeline for threat investigations and analysis
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
   Paper,
   Card,
   CardContent,
-  Chip
+  Chip,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import {
   Timeline,
@@ -23,8 +25,21 @@ import {
 } from '@mui/lab';
 import { Timeline as TimelineIcon, Security, BugReport, Analytics } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 export const InvestigationTimeline: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('investigation');
+
   useEffect(() => {
     const evaluationController = addUIUXEvaluation('investigation-timeline', {
       continuous: true,
@@ -36,12 +51,32 @@ export const InvestigationTimeline: React.FC = () => {
     return () => evaluationController.remove();
   }, []);
 
-  const timelineEvents = [
+  // State and business logic operations
+  const [timelineEvents, setTimelineEvents] = useState([
     { time: '09:15', title: 'Initial Alert', description: 'Suspicious network activity detected', type: 'alert' },
     { time: '09:32', title: 'IOC Identified', description: 'Malicious IP address confirmed', type: 'ioc' },
     { time: '10:45', title: 'Incident Created', description: 'INC-2024-0123 created for investigation', type: 'incident' },
     { time: '11:20', title: 'Analysis Complete', description: 'Threat analysis completed, APT29 suspected', type: 'analysis' }
-  ];
+  ]);
+
+  const handleAddTimelineEvent = async (eventData: any) => {
+    try {
+      await businessLogic.execute('add-timeline-event', eventData);
+      setTimelineEvents(prev => [...prev, eventData]);
+      addNotification('success', 'Timeline event added');
+    } catch (error) {
+      addNotification('error', 'Failed to add timeline event');
+    }
+  };
+
+  const handleExportTimeline = async () => {
+    try {
+      await businessLogic.execute('export-timeline');
+      addNotification('info', 'Timeline export initiated');
+    } catch (error) {
+      addNotification('error', 'Failed to export timeline');
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -87,6 +122,24 @@ export const InvestigationTimeline: React.FC = () => {
           ))}
         </Timeline>
       </Paper>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
