@@ -18,12 +18,27 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Switch
+  Switch,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { RssFeed, CheckCircle, Error, Schedule } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 export const FeedManagement: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('feeds');
+
   const [feeds, setFeeds] = useState([
     { id: '1', name: 'VirusTotal', status: 'active', lastUpdate: '2 minutes ago', indicators: 12456 },
     { id: '2', name: 'AlienVault OTX', status: 'active', lastUpdate: '5 minutes ago', indicators: 8765 },
@@ -41,6 +56,51 @@ export const FeedManagement: React.FC = () => {
 
     return () => evaluationController.remove();
   }, []);
+
+  // Business logic operations
+  const handleRefreshFeed = async (feedId: string) => {
+    try {
+      await businessLogic.execute('refresh-feed', { feedId });
+      addNotification('info', 'Feed refresh initiated');
+      // Update local state
+      setFeeds(prev => prev.map(f => 
+        f.id === feedId ? { ...f, status: 'active', lastUpdate: 'Just now' } : f
+      ));
+    } catch (error) {
+      addNotification('error', 'Failed to refresh feed');
+    }
+  };
+
+  const handleToggleFeed = async (feedId: string, enabled: boolean) => {
+    try {
+      await businessLogic.execute('toggle-feed', { feedId, enabled });
+      addNotification('success', `Feed ${enabled ? 'enabled' : 'disabled'}`);
+      setFeeds(prev => prev.map(f => 
+        f.id === feedId ? { ...f, status: enabled ? 'active' : 'paused' } : f
+      ));
+    } catch (error) {
+      addNotification('error', 'Failed to toggle feed');
+    }
+  };
+
+  const handleBulkFeedOperation = async (operation: string) => {
+    try {
+      await businessLogic.execute('bulk-feed-operation', { operation }, 'medium');
+      addNotification('info', `Bulk ${operation} initiated for all feeds`);
+    } catch (error) {
+      addNotification('error', `Failed to ${operation} feeds`);
+    }
+  };
+
+  const handleRefreshAllFeeds = async () => {
+    try {
+      await refresh();
+      await handleBulkFeedOperation('refresh');
+      addNotification('success', 'All feeds refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh all feeds');
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -125,6 +185,24 @@ export const FeedManagement: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

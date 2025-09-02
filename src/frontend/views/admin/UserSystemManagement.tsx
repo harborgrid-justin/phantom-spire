@@ -21,25 +21,67 @@ import {
   TableHead,
   TableRow,
   Chip,
-  Avatar
+  Avatar,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { AdminPanelSettings, Group, Settings, Security } from '@mui/icons-material';
-// Note: UI/UX Evaluation service import - adjust path as needed
-// import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 export const UserSystemManagement: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('admin');
+
   const [activeTab, setActiveTab] = React.useState(0);
 
   useEffect(() => {
-    // const evaluationController = addUIUXEvaluation('user-system-management', {
-    //   continuous: true,
-    //   position: 'bottom-left',
-    //   minimized: true,
-    //   interval: 180000
-    // });
+    const evaluationController = addUIUXEvaluation('user-system-management', {
+      continuous: true,
+      position: 'bottom-left',
+      minimized: true,
+      interval: 180000
+    });
 
-    // return () => evaluationController.remove();
+    return () => evaluationController.remove();
   }, []);
+
+  // Business logic operations
+  const handleCreateUser = async (userData: any) => {
+    try {
+      await businessLogic.execute('create-user', userData, 'medium');
+      addNotification('success', 'User created successfully');
+    } catch (error) {
+      addNotification('error', 'Failed to create user');
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, role: string) => {
+    try {
+      await businessLogic.execute('update-user-role', { userId, role });
+      addNotification('success', 'User role updated');
+    } catch (error) {
+      addNotification('error', 'Failed to update user role');
+    }
+  };
+
+  const handleSystemConfiguration = async (config: any) => {
+    try {
+      await businessLogic.execute('update-system-config', config, 'high');
+      addNotification('info', 'System configuration updated');
+    } catch (error) {
+      addNotification('error', 'Failed to update system configuration');
+    }
+  };
 
   const users = [
     { id: 1, name: 'John Smith', email: 'john.smith@company.com', role: 'Admin', status: 'Active' },
@@ -145,6 +187,24 @@ export const UserSystemManagement: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

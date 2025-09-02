@@ -77,6 +77,7 @@ import {
   FormLabel,
   Checkbox,
   FormGroup,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -211,6 +212,8 @@ import {
   Funnel,
   LabelList
 } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 
 // Report template interfaces
@@ -371,6 +374,18 @@ const AdvancedReportingEngine: React.FC = () => {
   const theme = useTheme();
   const previewRef = useRef<HTMLDivElement>(null);
   
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('analytics-automation');
+  
   // Core data states
   const [reportTemplates, setReportTemplates] = useState<ReportTemplate[]>([]);
   const [reportGenerations, setReportGenerations] = useState<ReportGeneration[]>([]);
@@ -406,6 +421,55 @@ const AdvancedReportingEngine: React.FC = () => {
   const [formatFilter, setFormatFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [authorFilter, setAuthorFilter] = useState<string>('all');
+
+  // Initialize UI/UX Evaluation
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('advanced-reporting-engine', {
+      continuous: true,
+      position: 'bottom-left',
+      minimized: true,
+      interval: 160000
+    });
+
+    return () => evaluationController.remove();
+  }, []);
+
+  // Business logic operations
+  const handleGenerateReport = async (templateId: string, parameters: any) => {
+    try {
+      await businessLogic.execute('generate-report', { templateId, parameters }, 'medium');
+      addNotification('info', 'Report generation started');
+    } catch (error) {
+      addNotification('error', 'Failed to generate report');
+    }
+  };
+
+  const handleExportReport = async (reportId: string, format: string) => {
+    try {
+      await businessLogic.execute('export-report', { reportId, format }, 'medium');
+      addNotification('success', `Report exported in ${format} format`);
+    } catch (error) {
+      addNotification('error', 'Failed to export report');
+    }
+  };
+
+  const handleScheduleReport = async (templateId: string, schedule: any) => {
+    try {
+      await businessLogic.execute('schedule-report', { templateId, schedule }, 'medium');
+      addNotification('success', 'Report scheduled successfully');
+    } catch (error) {
+      addNotification('error', 'Failed to schedule report');
+    }
+  };
+
+  const handleRefreshReportingEngine = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'Reporting engine data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh reporting engine');
+    }
+  };
 
 
   // Generate mock report templates
@@ -1626,6 +1690,24 @@ const AdvancedReportingEngine: React.FC = () => {
           onClick={() => setSettingsOpen(true)}
         />
       </SpeedDial>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

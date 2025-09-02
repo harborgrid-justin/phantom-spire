@@ -41,7 +41,8 @@ import {
   Tab,
   Tabs,
   useTheme,
-  alpha
+  alpha,
+  Snackbar
 } from '@mui/material';
 import {
   Timeline,
@@ -82,6 +83,7 @@ import {
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { SecurityIncident, IncidentStatus, IncidentPriority, ThreatSeverity } from '../../types/common';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 interface IncidentMetrics {
   total: number;
@@ -117,6 +119,18 @@ interface IncidentPlaybook {
 export const IncidentResponseCenter: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('incident');
   
   const [incidents, setIncidents] = useState<SecurityIncident[]>([]);
   const [metrics, setMetrics] = useState<IncidentMetrics | null>(null);
@@ -170,6 +184,58 @@ export const IncidentResponseCenter: React.FC = () => {
       criticalCount: 5
     };
     setMetrics(mockMetrics);
+  };
+
+  // Business logic operations
+  const handleCreateIncident = async (incidentData: any) => {
+    try {
+      await businessLogic.execute('create-incident', incidentData, 'high');
+      addNotification('success', 'Incident created successfully');
+      await loadIncidents();
+      setShowCreateDialog(false);
+    } catch (error) {
+      addNotification('error', 'Failed to create incident');
+    }
+  };
+
+  const handleAssignIncident = async (incidentId: string, assigneeId: string) => {
+    try {
+      await businessLogic.execute('assign-incident', { incidentId, assigneeId });
+      addNotification('info', 'Incident assigned successfully');
+      await loadIncidents();
+    } catch (error) {
+      addNotification('error', 'Failed to assign incident');
+    }
+  };
+
+  const handleEscalateIncident = async (incidentId: string) => {
+    try {
+      await businessLogic.execute('escalate-incident', { incidentId }, 'critical');
+      addNotification('warning', 'Incident escalated to senior team');
+      await loadIncidents();
+    } catch (error) {
+      addNotification('error', 'Failed to escalate incident');
+    }
+  };
+
+  const handleRunPlaybook = async (incidentId: string, playbookId: string) => {
+    try {
+      await businessLogic.execute('run-incident-playbook', { incidentId, playbookId }, 'medium');
+      addNotification('info', 'Incident playbook execution started');
+    } catch (error) {
+      addNotification('error', 'Failed to run incident playbook');
+    }
+  };
+
+  const handleRefreshIncidents = async () => {
+    try {
+      await refresh();
+      await loadIncidents();
+      await loadMetrics();
+      addNotification('success', 'Incident data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh incidents');
+    }
   };
 
   const generateMockIncidents = (): SecurityIncident[] => {
@@ -878,6 +944,24 @@ export const IncidentResponseCenter: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
 
       <Routes>
         <Route path="/active" element={<div>Active Incidents Component</div>} />

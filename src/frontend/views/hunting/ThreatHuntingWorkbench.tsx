@@ -45,7 +45,8 @@ import {
   Tooltip,
   Badge,
   alpha,
-  useTheme
+  useTheme,
+  Snackbar
 } from '@mui/material';
 import {
   Search,
@@ -77,6 +78,7 @@ import {
 } from '@mui/icons-material';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 interface HuntingQuery {
   id: string;
@@ -122,6 +124,18 @@ interface HuntingSession {
 export const ThreatHuntingWorkbench: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('hunting');
   
   const [activeTab, setActiveTab] = useState(0);
   const [queries, setQueries] = useState<HuntingQuery[]>([]);
@@ -218,6 +232,64 @@ export const ThreatHuntingWorkbench: React.FC = () => {
       }
     ];
     setResults(mockResults);
+  };
+
+  // Business logic operations
+  const handleExecuteQuery = async (query: string, language: string) => {
+    try {
+      setIsExecuting(true);
+      await businessLogic.execute('execute-hunt-query', { query, language }, 'medium');
+      addNotification('info', 'Hunt query execution started');
+      // Simulate result loading
+      setTimeout(() => {
+        setIsExecuting(false);
+        addNotification('success', 'Hunt query completed successfully');
+      }, 3000);
+    } catch (error) {
+      setIsExecuting(false);
+      addNotification('error', 'Failed to execute hunt query');
+    }
+  };
+
+  const handleSaveQuery = async (queryData: any) => {
+    try {
+      await businessLogic.execute('save-hunt-query', queryData);
+      addNotification('success', 'Hunt query saved successfully');
+      await loadQueries();
+      setShowSaveDialog(false);
+    } catch (error) {
+      addNotification('error', 'Failed to save hunt query');
+    }
+  };
+
+  const handleCreateSession = async (sessionData: any) => {
+    try {
+      await businessLogic.execute('create-hunt-session', sessionData);
+      addNotification('success', 'Hunt session created successfully');
+      await loadSessions();
+      setShowSessionDialog(false);
+    } catch (error) {
+      addNotification('error', 'Failed to create hunt session');
+    }
+  };
+
+  const handleExportResults = async (resultId: string, format: string) => {
+    try {
+      await businessLogic.execute('export-hunt-results', { resultId, format });
+      addNotification('info', `Exporting results in ${format} format`);
+    } catch (error) {
+      addNotification('error', 'Failed to export hunt results');
+    }
+  };
+
+  const handleRefreshHuntingData = async () => {
+    try {
+      await refresh();
+      await Promise.all([loadQueries(), loadSessions(), loadRecentResults()]);
+      addNotification('success', 'Hunting data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh hunting data');
+    }
   };
 
   const generateMockQueries = (): HuntingQuery[] => {
@@ -836,6 +908,24 @@ export const ThreatHuntingWorkbench: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
 
       <Routes>
         <Route path="/workspace" element={<div>Hunting Workspace Component</div>} />

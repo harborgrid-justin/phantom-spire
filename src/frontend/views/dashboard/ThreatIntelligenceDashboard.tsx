@@ -25,7 +25,8 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
-  Badge
+  Badge,
+  Snackbar
 } from '@mui/material';
 import {
   Dashboard,
@@ -70,6 +71,7 @@ import {
   Radar
 } from 'recharts';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 import { ThreatSeverity, IOCType } from '../../types/common';
 
 interface DashboardMetrics {
@@ -132,6 +134,19 @@ interface CampaignActivity {
 
 export const ThreatIntelligenceDashboard: React.FC = () => {
   const theme = useTheme();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('dashboard');
+  
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [threatTrends, setThreatTrends] = useState<ThreatTrendData[]>([]);
   const [iocTypes, setIOCTypes] = useState<IOCTypeData[]>([]);
@@ -343,6 +358,49 @@ export const ThreatIntelligenceDashboard: React.FC = () => {
     setCampaigns(campaignData);
   };
 
+  // Business logic operations
+  const handleGenerateThreatReport = async () => {
+    try {
+      await businessLogic.execute('generate-threat-report', {
+        timeRange: '24h',
+        includeIOCs: true,
+        includeActors: true
+      });
+      addNotification('success', 'Threat report generation started');
+    } catch (error) {
+      addNotification('error', 'Failed to generate threat report');
+    }
+  };
+
+  const handleRefreshThreatFeeds = async () => {
+    try {
+      await businessLogic.execute('refresh-threat-feeds', {}, 'high');
+      addNotification('info', 'Threat feed refresh initiated');
+      await loadDashboardData();
+    } catch (error) {
+      addNotification('error', 'Failed to refresh threat feeds');
+    }
+  };
+
+  const handleEmergencyThreatResponse = async (threatId: string) => {
+    try {
+      await businessLogic.execute('emergency-threat-response', { threatId }, 'critical');
+      addNotification('warning', 'Emergency threat response protocol activated');
+    } catch (error) {
+      addNotification('error', 'Failed to activate emergency response');
+    }
+  };
+
+  const handleDashboardRefresh = async () => {
+    try {
+      await refresh();
+      await loadDashboardData();
+      addNotification('success', 'Dashboard refreshed successfully');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh dashboard');
+    }
+  };
+
   // Color configuration for severity levels
   const severityColors = {
     critical: theme.palette.error.main,
@@ -409,8 +467,8 @@ export const ThreatIntelligenceDashboard: React.FC = () => {
           <Button
             variant="outlined"
             startIcon={<Refresh />}
-            onClick={loadDashboardData}
-            disabled={loading}
+            onClick={handleDashboardRefresh}
+            disabled={loading || !isFullyLoaded}
           >
             Refresh
           </Button>
@@ -830,6 +888,24 @@ export const ThreatIntelligenceDashboard: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
