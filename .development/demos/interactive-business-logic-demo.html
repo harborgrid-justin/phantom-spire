@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Business Logic Demo - Phantom Spire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-desc {
+            color: #718096;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .demo-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-demo {
+            background: #bee3f8;
+            color: #2a4365;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .metric-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .interactive-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .demo-panel {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .demo-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .log-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .notification {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+
+        .notification.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .notification.warning {
+            background: #fefcbf;
+            color: #744210;
+            border-left: 4px solid #d69e2e;
+        }
+
+        .notification.info {
+            background: #bee3f8;
+            color: #2a4365;
+            border-left: 4px solid #3182ce;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #22543d;
+            background: #c6f6d5;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .real-time-dot {
+            width: 8px;
+            height: 8px;
+            background: #38a169;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .architecture-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .architecture-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .architecture-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-step {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .interactive-demo {
+                grid-template-columns: 1fr;
+            }
+            
+            .architecture-flow {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 Interactive Business Logic</h1>
+            <p>Complete Implementation with Advanced Patterns - Phantom Spire Platform</p>
+        </header>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-title">
+                    🧠 Business Logic Manager
+                </div>
+                <div class="feature-desc">
+                    Central request processing with validation, caching, and rule execution. Handles priority-based processing with comprehensive error handling.
+                </div>
+                <div class="real-time-indicator">
+                    <div class="real-time-dot"></div>
+                    Active & Processing
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    📡 Real-Time Data Service
+                </div>
+                <div class="feature-desc">
+                    Automatic data subscriptions with WebSocket-style updates. Provides real-time metrics for all service pages with intelligent caching.
+                </div>
+                <div class="real-time-indicator">
+                    <div class="real-time-dot"></div>
+                    Live Updates
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    ⚛️ React Integration
+                </div>
+                <div class="feature-desc">
+                    Seamless hooks providing business logic, real-time data, and notifications. Easy-to-use useServicePage hook for complete functionality.
+                </div>
+                <div class="real-time-indicator">
+                    <div class="real-time-dot"></div>
+                    Hooks Ready
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-title">
+                    📋 Business Rules Engine
+                </div>
+                <div class="feature-desc">
+                    Extensible rule system with validation and processing logic. Supports priority-based execution and complex business workflows.
+                </div>
+                <div class="real-time-indicator">
+                    <div class="real-time-dot"></div>
+                    Rules Active
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-header">
+                <div class="demo-title">📊 Live Service Metrics</div>
+                <div class="status-badge status-active">Real-Time Active</div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="totalRequests">2,847</div>
+                    <div class="metric-label">Total Requests</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="activeServices">5</div>
+                    <div class="metric-label">Active Services</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="businessRules">12</div>
+                    <div class="metric-label">Business Rules</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="cacheHitRate">87%</div>
+                    <div class="metric-label">Cache Hit Rate</div>
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-panel">
+                    <h3>🎛️ Interactive Controls</h3>
+                    <button class="demo-button" onclick="simulateAnalyticsRequest()">📊 Generate Analytics Report</button>
+                    <button class="demo-button" onclick="simulateIOCValidation()">🛡️ Validate IOC Batch</button>
+                    <button class="demo-button" onclick="simulateSystemHealth()">🏥 Run Health Check</button>
+                    <button class="demo-button" onclick="simulateRealTimeUpdate()">📡 Trigger Real-Time Update</button>
+                    
+                    <div id="notifications"></div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div class="demo-panel">
+                    <h3>📝 System Logs</h3>
+                    <div class="log-output" id="logOutput">
+                        [INFO] Business Logic Services initialized successfully
+                        [INFO] Real-time data service connected
+                        [INFO] 5 services registered with business rules
+                        [INFO] Cache manager initialized with 100MB capacity
+                        [INFO] System ready for interactive operations
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="demo-header">
+                <div class="demo-title">🔧 Enhanced Service Pages</div>
+                <div class="status-badge status-demo">Interactive Demo</div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-title">📊 Analytics Service</div>
+                    <div class="feature-desc">
+                        • Real-time data processing and visualization<br>
+                        • Interactive report generation with validation<br>
+                        • Export functionality with format validation<br>
+                        • Live metrics with trend analysis
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-title">🔴 Operations Center</div>
+                    <div class="feature-desc">
+                        • Live system monitoring with color-coded alerts<br>
+                        • Alert acknowledgment with business logic<br>
+                        • Emergency response protocols<br>
+                        • System maintenance with impact assessment
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-title">🛡️ IOC Management</div>
+                    <div class="feature-desc">
+                        • Real-time IOC validation and enrichment<br>
+                        • Bulk operations with progress tracking<br>
+                        • Confidence scoring and automated flagging<br>
+                        • Interactive filtering and search
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-title">🏥 Admin Health</div>
+                    <div class="feature-desc">
+                        • System health monitoring with recommendations<br>
+                        • Service management and restart capabilities<br>
+                        • User session management<br>
+                        • Performance metrics with thresholds
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="architecture-section">
+            <div class="architecture-title">🏗️ Business Logic Architecture</div>
+            <div class="architecture-flow">
+                <div class="flow-step">
+                    <h4>React Component</h4>
+                    <p>useServicePage hook</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <h4>Business Logic Manager</h4>
+                    <p>Request processing & validation</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <h4>Business Rules Engine</h4>
+                    <p>Rule execution & processing</p>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <h4>Real-Time Updates</h4>
+                    <p>Live data & notifications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class InteractiveBusinessLogicDemo {
+            constructor() {
+                this.requestCount = 2847;
+                this.notifications = [];
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 Interactive Business Logic Demo initialized');
+                this.startRealTimeUpdates();
+            }
+
+            startRealTimeUpdates() {
+                // Simulate real-time metric updates
+                setInterval(() => {
+                    this.updateMetrics();
+                }, 3000);
+
+                // Simulate cache hit rate fluctuation
+                setInterval(() => {
+                    const cacheHitRate = Math.floor(Math.random() * 15) + 80; // 80-95%
+                    document.getElementById('cacheHitRate').textContent = `${cacheHitRate}%`;
+                }, 5000);
+            }
+
+            updateMetrics() {
+                this.requestCount += Math.floor(Math.random() * 5) + 1;
+                document.getElementById('totalRequests').textContent = this.requestCount.toLocaleString();
+            }
+
+            addNotification(type, message) {
+                const notification = {
+                    id: Date.now(),
+                    type,
+                    message,
+                    timestamp: new Date()
+                };
+
+                this.notifications.unshift(notification);
+                this.renderNotifications();
+
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    this.removeNotification(notification.id);
+                }, 5000);
+            }
+
+            removeNotification(id) {
+                this.notifications = this.notifications.filter(n => n.id !== id);
+                this.renderNotifications();
+            }
+
+            renderNotifications() {
+                const container = document.getElementById('notifications');
+                container.innerHTML = this.notifications
+                    .slice(0, 3) // Show only last 3
+                    .map(n => `
+                        <div class="notification ${n.type}">
+                            ${n.message}
+                        </div>
+                    `).join('');
+            }
+
+            addLog(message, type = 'INFO') {
+                const logOutput = document.getElementById('logOutput');
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${type}] ${timestamp} - ${message}`;
+                
+                logOutput.innerHTML += '\n' + logEntry;
+                logOutput.scrollTop = logOutput.scrollHeight;
+            }
+
+            animateProgress(duration = 2000) {
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = '0%';
+                
+                const startTime = Date.now();
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    progressBar.style.width = `${progress * 100}%`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                animate();
+            }
+        }
+
+        // Demo functions
+        function simulateAnalyticsRequest() {
+            window.demo.animateProgress();
+            window.demo.addNotification('info', '📊 Analytics report generation started');
+            window.demo.addLog('Analytics request initiated - Processing trend analysis');
+            
+            setTimeout(() => {
+                window.demo.addNotification('success', '📊 Analytics report generated successfully');
+                window.demo.addLog('Analytics report completed - 2.3s processing time');
+            }, 2000);
+        }
+
+        function simulateIOCValidation() {
+            window.demo.animateProgress(3000);
+            window.demo.addNotification('info', '🛡️ IOC batch validation started');
+            window.demo.addLog('IOC validation request - Processing 127 indicators');
+            
+            setTimeout(() => {
+                window.demo.addNotification('success', '🛡️ IOC validation completed - 98% confidence');
+                window.demo.addLog('IOC validation completed - 121 validated, 6 flagged');
+            }, 3000);
+        }
+
+        function simulateSystemHealth() {
+            window.demo.animateProgress(1500);
+            window.demo.addNotification('info', '🏥 System health check initiated');
+            window.demo.addLog('Health check started - Scanning all services');
+            
+            setTimeout(() => {
+                window.demo.addNotification('success', '🏥 System health: All services operational');
+                window.demo.addLog('Health check completed - No issues detected');
+            }, 1500);
+        }
+
+        function simulateRealTimeUpdate() {
+            window.demo.addNotification('info', '📡 Real-time update triggered');
+            window.demo.addLog('Real-time data update - Broadcasting to subscribers');
+            
+            // Simulate metrics update
+            setTimeout(() => {
+                window.demo.updateMetrics();
+                window.demo.addNotification('success', '📡 Real-time data updated');
+                window.demo.addLog('Real-time update completed - Data synchronized');
+            }, 500);
+        }
+
+        // Initialize demo when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            window.demo = new InteractiveBusinessLogicDemo();
+            
+            console.log('🎯 Interactive Business Logic Demo loaded successfully!');
+            console.log('');
+            console.log('Features Demonstrated:');
+            console.log('  🧠 Business Logic Manager with request processing');
+            console.log('  📡 Real-Time Data Service with live updates');
+            console.log('  ⚛️ React Integration with comprehensive hooks');
+            console.log('  📋 Business Rules Engine with validation');
+            console.log('  🎛️ Interactive service page controls');
+            console.log('  📊 Live metrics and performance monitoring');
+        });
+    </script>
+</body>
+</html>
