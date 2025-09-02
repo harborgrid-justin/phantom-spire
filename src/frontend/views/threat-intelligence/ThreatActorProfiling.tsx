@@ -54,7 +54,8 @@ import {
   Stepper,
   Step,
   StepLabel,
-  StepContent
+  StepContent,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -102,6 +103,7 @@ import {
 } from '@mui/icons-material';
 
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 // Enhanced interfaces for threat actor data
 interface ThreatActor {
@@ -189,6 +191,19 @@ interface Campaign {
 
 const ThreatActorProfiling: React.FC = () => {
   const theme = useTheme();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('threat-intelligence');
+  
   const [actors, setActors] = useState<ThreatActor[]>([]);
   const [filteredActors, setFilteredActors] = useState<ThreatActor[]>([]);
   const [selectedActor, setSelectedActor] = useState<ThreatActor | null>(null);
@@ -231,6 +246,43 @@ const ThreatActorProfiling: React.FC = () => {
 
     return () => evaluationController.remove();
   }, []);
+
+  // Business logic operations
+  const handleUpdateActorProfile = async (actorId: string, profileData: any) => {
+    try {
+      await businessLogic.execute('update-actor-profile', { actorId, profileData }, 'medium');
+      addNotification('success', 'Threat actor profile updated');
+    } catch (error) {
+      addNotification('error', 'Failed to update actor profile');
+    }
+  };
+
+  const handleTrackNewActor = async (actorData: any) => {
+    try {
+      await businessLogic.execute('track-new-actor', actorData, 'medium');
+      addNotification('info', 'New threat actor added to tracking');
+    } catch (error) {
+      addNotification('error', 'Failed to add threat actor');
+    }
+  };
+
+  const handleAttributeIOCs = async (actorId: string, iocIds: string[]) => {
+    try {
+      await businessLogic.execute('attribute-iocs', { actorId, iocIds }, 'high');
+      addNotification('success', `Attributed ${iocIds.length} IOCs to threat actor`);
+    } catch (error) {
+      addNotification('error', 'Failed to attribute IOCs');
+    }
+  };
+
+  const handleRefreshActorData = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'Threat actor data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh actor data');
+    }
+  };
 
   // Mock data generation for threat actors
   const generateMockActors = useCallback((): ThreatActor[] => {
@@ -1229,6 +1281,24 @@ const ThreatActorProfiling: React.FC = () => {
           </DialogActions>
         </Dialog>
       )}
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

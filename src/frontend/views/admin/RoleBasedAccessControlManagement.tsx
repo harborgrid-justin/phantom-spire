@@ -84,7 +84,8 @@ import {
   ListSubheader,
   CardActions,
   CardHeader,
-  AvatarGroup
+  AvatarGroup,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -199,6 +200,7 @@ import {
 
 import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 // Enhanced Interfaces for RBAC and Permissions Management
 interface Role {
@@ -547,6 +549,19 @@ interface ApprovalStep {
 
 const RoleBasedAccessControlManagement: React.FC = () => {
   const theme = useTheme();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('admin');
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -610,6 +625,46 @@ const RoleBasedAccessControlManagement: React.FC = () => {
     loadPermissions();
     loadAnalytics();
   }, []);
+
+  // Business logic operations
+  const handleCreateRole = async (roleData: any) => {
+    try {
+      await businessLogic.execute('create-role', roleData, 'medium');
+      addNotification('success', 'Role created successfully');
+      await loadRoles();
+    } catch (error) {
+      addNotification('error', 'Failed to create role');
+    }
+  };
+
+  const handleAssignPermissions = async (roleId: string, permissions: string[]) => {
+    try {
+      await businessLogic.execute('assign-permissions', { roleId, permissions }, 'medium');
+      addNotification('success', 'Permissions assigned successfully');
+      await loadRoles();
+    } catch (error) {
+      addNotification('error', 'Failed to assign permissions');
+    }
+  };
+
+  const handleRevokeAccess = async (userId: string, resource: string) => {
+    try {
+      await businessLogic.execute('revoke-access', { userId, resource }, 'high');
+      addNotification('warning', 'Access revoked successfully');
+    } catch (error) {
+      addNotification('error', 'Failed to revoke access');
+    }
+  };
+
+  const handleRefreshRBAC = async () => {
+    try {
+      await refresh();
+      await Promise.all([loadRoles(), loadUsers(), loadGroups(), loadPermissions()]);
+      addNotification('success', 'RBAC data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh RBAC data');
+    }
+  };
 
   const loadRoles = async () => {
     setLoading(true);
@@ -1433,6 +1488,24 @@ const RoleBasedAccessControlManagement: React.FC = () => {
           onClick={() => setPermissionMatrixOpen(true)}
         />
       </SpeedDial>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Container>
   );
 };
