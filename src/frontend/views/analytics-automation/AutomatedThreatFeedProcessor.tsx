@@ -78,7 +78,8 @@ import {
   Checkbox,
   FormGroup,
   Autocomplete,
-  SpeedDialAction as MuiSpeedDialAction
+  SpeedDialAction as MuiSpeedDialAction,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -214,6 +215,8 @@ import {
   Funnel,
   LabelList
 } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 
 // Feed processing interfaces
@@ -398,6 +401,18 @@ const AutomatedThreatFeedProcessor: React.FC = () => {
   const theme = useTheme();
   const wsRef = useRef<WebSocket | null>(null);
   
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('analytics-automation');
+  
   // Core data states
   const [threatFeeds, setThreatFeeds] = useState<ThreatFeed[]>([]);
   const [feedProcessors, setFeedProcessors] = useState<FeedProcessor[]>([]);
@@ -435,6 +450,46 @@ const AutomatedThreatFeedProcessor: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [healthFilter, setHealthFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d' | '30d'>('24h');
+
+  // Initialize UI/UX Evaluation
+  useEffect(() => {
+    const evaluationController = addUIUXEvaluation('automated-threat-feed-processor', {
+      continuous: true,
+      position: 'bottom-left',
+      minimized: true,
+      interval: 150000
+    });
+
+    return () => evaluationController.remove();
+  }, []);
+
+  // Business logic operations
+  const handleStartProcessing = async (feedId: string) => {
+    try {
+      await businessLogic.execute('start-feed-processing', { feedId }, 'medium');
+      addNotification('success', 'Feed processing started');
+    } catch (error) {
+      addNotification('error', 'Failed to start feed processing');
+    }
+  };
+
+  const handleCreateProcessingPipeline = async (pipelineData: any) => {
+    try {
+      await businessLogic.execute('create-processing-pipeline', pipelineData, 'medium');
+      addNotification('success', 'Processing pipeline created');
+    } catch (error) {
+      addNotification('error', 'Failed to create processing pipeline');
+    }
+  };
+
+  const handleRefreshProcessor = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'Processor data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh processor');
+    }
+  };
 
 
   // Initialize WebSocket for real-time updates
@@ -1611,6 +1666,24 @@ const AutomatedThreatFeedProcessor: React.FC = () => {
           onClick={() => setSettingsOpen(true)}
         />
       </SpeedDial>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };

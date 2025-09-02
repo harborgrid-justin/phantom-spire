@@ -83,7 +83,8 @@ import {
   ListItemSecondaryAction,
   ListSubheader,
   CardActions,
-  CardHeader
+  CardHeader,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -182,6 +183,7 @@ import {
 
 import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 // Enhanced Interfaces for Multi-Source Threat Feed Integration
 interface ThreatFeed {
@@ -432,6 +434,19 @@ interface ScheduleConfig {
 
 const MultiSourceThreatFeedIntegration: React.FC = () => {
   const theme = useTheme();
+  
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('operations');
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -534,6 +549,46 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
       setVolumeData(volume);
     } catch (err) {
       console.error('Error loading analytics:', err);
+    }
+  };
+
+  // Business logic operations
+  const handleSyncFeed = async (feedId: string) => {
+    try {
+      await businessLogic.execute('sync-threat-feed', { feedId }, 'medium');
+      addNotification('info', 'Threat feed sync initiated');
+      await loadFeeds();
+    } catch (error) {
+      addNotification('error', 'Failed to sync threat feed');
+    }
+  };
+
+  const handleCreateFeedIntegration = async (integrationData: any) => {
+    try {
+      await businessLogic.execute('create-feed-integration', integrationData, 'medium');
+      addNotification('success', 'Feed integration created successfully');
+      await loadIntegrations();
+    } catch (error) {
+      addNotification('error', 'Failed to create feed integration');
+    }
+  };
+
+  const handleBulkFeedSync = async (feedIds: string[]) => {
+    try {
+      await businessLogic.execute('bulk-feed-sync', { feedIds }, 'high');
+      addNotification('info', `Bulk sync initiated for ${feedIds.length} feeds`);
+    } catch (error) {
+      addNotification('error', 'Bulk feed sync failed');
+    }
+  };
+
+  const handleRefreshAllFeeds = async () => {
+    try {
+      await refresh();
+      await Promise.all([loadFeeds(), loadIntegrations(), loadAnalytics()]);
+      addNotification('success', 'All feed data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh feed data');
     }
   };
 
@@ -1528,6 +1583,24 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
           onClick={() => loadFeeds()}
         />
       </SpeedDial>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Container>
   );
 };
