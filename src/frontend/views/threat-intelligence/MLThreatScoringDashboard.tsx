@@ -59,6 +59,7 @@ import {
   Step,
   StepLabel,
   StepContent,
+  Snackbar
 } from '@mui/material';
 
 import {
@@ -169,6 +170,7 @@ import {
 } from 'recharts';
 
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 // Enhanced interfaces for ML threat scoring
 interface ThreatScore {
@@ -297,6 +299,18 @@ interface MLPipeline {
 const MLThreatScoringDashboard: React.FC = () => {
   const theme = useTheme();
   
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('threat-intelligence');
+  
   // Core data states
   const [threatScores, setThreatScores] = useState<ThreatScore[]>([]);
   const [mlModels, setMLModels] = useState<MLModel[]>([]);
@@ -335,6 +349,43 @@ const MLThreatScoringDashboard: React.FC = () => {
 
     return () => evaluationController.remove();
   }, []);
+
+  // Business logic operations
+  const handleRetrainModel = async (modelId: string) => {
+    try {
+      await businessLogic.execute('retrain-ml-model', { modelId }, 'high');
+      addNotification('info', 'ML model retraining initiated');
+    } catch (error) {
+      addNotification('error', 'Failed to retrain ML model');
+    }
+  };
+
+  const handleUpdateThreatScore = async (entityId: string, scoreData: any) => {
+    try {
+      await businessLogic.execute('update-threat-score', { entityId, scoreData }, 'medium');
+      addNotification('success', 'Threat score updated successfully');
+    } catch (error) {
+      addNotification('error', 'Failed to update threat score');
+    }
+  };
+
+  const handleValidateMLPipeline = async (pipelineId: string) => {
+    try {
+      await businessLogic.execute('validate-ml-pipeline', { pipelineId }, 'medium');
+      addNotification('info', 'ML pipeline validation started');
+    } catch (error) {
+      addNotification('error', 'Failed to validate ML pipeline');
+    }
+  };
+
+  const handleRefreshMLDashboard = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'ML dashboard data refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh ML dashboard');
+    }
+  };
 
   // Generate mock ML models
   const generateMockModels = useCallback((): MLModel[] => {
@@ -1695,6 +1746,24 @@ const MLThreatScoringDashboard: React.FC = () => {
           onClick={() => setSettingsOpen(true)}
         />
       </SpeedDial>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
