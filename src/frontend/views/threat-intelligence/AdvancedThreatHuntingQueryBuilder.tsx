@@ -900,8 +900,8 @@ level: medium`;
                         <MenuItem value="==">=</MenuItem>
                         <MenuItem value="!=">!=</MenuItem>
                         <MenuItem value="contains">contains</MenuItem>
-                        <MenuItem value=">">></MenuItem>
-                        <MenuItem value="<"><</MenuItem>
+                        <MenuItem value=">">&gt;</MenuItem>
+                        <MenuItem value="<">&lt;</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
