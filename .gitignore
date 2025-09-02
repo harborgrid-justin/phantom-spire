@@ -8,6 +8,8 @@ yarn-error.log*
 dist/
 build/
 
+frontend/node_modules/
+
 # TypeScript compiled output
 *.js
 *.js.map
