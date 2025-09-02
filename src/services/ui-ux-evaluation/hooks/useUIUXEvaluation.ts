@@ -1,10 +1,11 @@
 /**
- * Simple UI/UX Evaluation Hook and Components
- * Lightweight evaluation system that can be easily integrated
+ * Enhanced UI/UX Evaluation Hook with Performance Monitoring
+ * Comprehensive evaluation system with real performance measurement and feature checking
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { UIUXEvaluationService } from '../core/UIUXEvaluationService.js';
+import PagePerformanceMonitor, { IPageLoadMetrics, IFeatureAvailabilityReport } from '../utils/PagePerformanceMonitor.js';
 import {
   IPageEvaluation,
   IEvaluationIssue,
@@ -13,27 +14,93 @@ import {
   EvaluationSeverity
 } from '../interfaces/IUIUXEvaluation.js';
 
-// Simple evaluation hook
+export interface IPerformanceMonitoringResult {
+  loadTime: number;
+  fcp: number;
+  tti: number;
+  score: 'excellent' | 'good' | 'fair' | 'poor';
+  trend: 'improving' | 'degrading' | 'stable';
+  featureAvailability: number;
+  missingFeatures: string[];
+  issues: string[];
+}
+
+// Enhanced evaluation hook with performance monitoring
 export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
   const [evaluation, setEvaluation] = useState<IPageEvaluation | null>(null);
+  const [performanceMetrics, setPerformanceMetrics] = useState<IPageLoadMetrics | null>(null);
+  const [featureReport, setFeatureReport] = useState<IFeatureAvailabilityReport | null>(null);
+  const [performanceMonitoring, setPerformanceMonitoring] = useState<IPerformanceMonitoringResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const serviceRef = useRef<UIUXEvaluationService>(new UIUXEvaluationService());
+  const performanceMonitorRef = useRef<PagePerformanceMonitor>(PagePerformanceMonitor.getInstance());
   const sessionRef = useRef<string | null>(null);
+  const monitoringInterval = useRef<NodeJS.Timeout | null>(null);
+
+  const runPerformanceEvaluation = useCallback(async () => {
+    try {
+      // Measure page performance
+      const metrics = await performanceMonitorRef.current.monitorPageLoad(pageId);
+      setPerformanceMetrics(metrics);
+
+      // Check feature availability 
+      const features = await performanceMonitorRef.current.checkFeatureAvailability(pageId);
+      setFeatureReport(features);
+
+      // Get comprehensive page report
+      const pageReport = performanceMonitorRef.current.getPageReport(pageId);
+      const performanceStats = performanceMonitorRef.current.getPerformanceStats(pageId);
+
+      const result: IPerformanceMonitoringResult = {
+        loadTime: metrics.loadTime,
+        fcp: metrics.firstContentfulPaint,
+        tti: metrics.timeToInteractive,
+        score: pageReport.overallHealth.status,
+        trend: performanceStats.trend,
+        featureAvailability: features.availabilityScore,
+        missingFeatures: features.missingFeatures,
+        issues: pageReport.overallHealth.issues
+      };
+
+      setPerformanceMonitoring(result);
+
+      console.log(`⚡ Performance evaluation completed for ${pageId}:`, {
+        loadTime: metrics.loadTime,
+        fcp: metrics.firstContentfulPaint,
+        featureScore: features.availabilityScore,
+        healthScore: pageReport.overallHealth.score
+      });
+
+      return result;
+    } catch (err) {
+      console.warn('Performance evaluation failed:', err);
+      return null;
+    }
+  }, [pageId]);
 
   const runEvaluation = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await serviceRef.current.evaluatePage(pageId);
-      setEvaluation(result);
-      console.log(`📊 UI/UX Evaluation completed for ${pageId}:`, {
-        score: result.overallScore,
-        issues: result.issues.length,
-        wcag: result.compliance.wcag,
-        enterprise: result.compliance.enterprise
+      // Run both UI/UX evaluation and performance monitoring
+      const [evaluation, performanceResult] = await Promise.all([
+        serviceRef.current.evaluatePage(pageId),
+        runPerformanceEvaluation()
+      ]);
+
+      setEvaluation(evaluation);
+
+      console.log(`📊 Complete UI/UX Evaluation completed for ${pageId}:`, {
+        uiuxScore: evaluation.overallScore,
+        performanceScore: performanceResult?.score || 'unknown',
+        issues: evaluation.issues.length,
+        wcag: evaluation.compliance.wcag,
+        enterprise: evaluation.compliance.enterprise,
+        featureAvailability: performanceResult?.featureAvailability || 0
       });
-      return result;
+
+      return { evaluation, performance: performanceResult };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
@@ -42,10 +109,15 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
     } finally {
       setLoading(false);
     }
-  }, [pageId]);
+  }, [pageId, runPerformanceEvaluation]);
 
-  const startContinuousEvaluation = useCallback(async (intervalMs = 30000) => {
+  const startContinuousMonitoring = useCallback(async (intervalMs = 30000) => {
     try {
+      // Stop existing monitoring
+      if (monitoringInterval.current) {
+        clearInterval(monitoringInterval.current);
+      }
+
       // Configure the service for continuous evaluation
       await serviceRef.current.configure({
         autoEvaluate: true,
@@ -63,17 +135,23 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
           issues: newEvaluation.issues.length
         });
       });
+
+      // Start continuous performance monitoring
+      monitoringInterval.current = setInterval(async () => {
+        await runPerformanceEvaluation();
+      }, intervalMs);
       
+      console.log(`🔄 Started continuous monitoring for ${pageId} (interval: ${intervalMs}ms)`);
       return sessionId;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setError(errorMessage);
-      console.error('Failed to start continuous evaluation:', errorMessage);
+      console.error('Failed to start continuous monitoring:', errorMessage);
       return null;
     }
-  }, [pageId]);
+  }, [pageId, runPerformanceEvaluation]);
 
-  const stopContinuousEvaluation = useCallback(async () => {
+  const stopContinuousMonitoring = useCallback(async () => {
     if (sessionRef.current) {
       try {
         await serviceRef.current.stopContinuousEvaluation(sessionRef.current);
@@ -83,7 +161,58 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
         console.error('Failed to stop continuous evaluation:', err);
       }
     }
+
+    if (monitoringInterval.current) {
+      clearInterval(monitoringInterval.current);
+      monitoringInterval.current = null;
+      console.log(`⏹️ Stopped performance monitoring for ${pageId}`);
+    }
   }, [pageId]);
+
+  const reportPerformanceIssue = useCallback(async (
+    title: string,
+    loadTime: number,
+    threshold: number = 3000
+  ) => {
+    const severity = loadTime > threshold * 2 ? EvaluationSeverity.CRITICAL :
+                    loadTime > threshold ? EvaluationSeverity.HIGH : EvaluationSeverity.MEDIUM;
+    
+    await serviceRef.current.reportIssue(pageId, {
+      category: EvaluationCategory.PERFORMANCE,
+      severity,
+      title,
+      description: `Page load time of ${loadTime}ms exceeds ${threshold}ms threshold`,
+      recommendation: 'Optimize page loading performance - reduce resource size, enable compression, use CDN',
+      metadata: { actualLoadTime: loadTime, threshold, type: 'performance-measurement' }
+    });
+    
+    await runEvaluation();
+    console.log(`🐛 Reported performance issue for ${pageId}:`, title);
+  }, [pageId, runEvaluation]);
+
+  const reportMissingFeature = useCallback(async (
+    featureName: string,
+    importance: 'critical' | 'high' | 'medium' | 'low' = 'medium'
+  ) => {
+    const severityMap = {
+      critical: EvaluationSeverity.CRITICAL,
+      high: EvaluationSeverity.HIGH,
+      medium: EvaluationSeverity.MEDIUM,
+      low: EvaluationSeverity.LOW
+    };
+
+    await serviceRef.current.reportIssue(pageId, {
+      category: EvaluationCategory.USABILITY,
+      severity: severityMap[importance],
+      title: `Missing Feature: ${featureName}`,
+      description: `Expected feature "${featureName}" is not available or not functioning properly`,
+      recommendation: `Implement or fix the "${featureName}" feature to improve user experience`,
+      metadata: { featureName, importance, type: 'feature-availability' }
+    });
+
+    await runEvaluation();
+    console.log(`🔧 Reported missing feature for ${pageId}:`, featureName);
+  }, [pageId, runEvaluation]);
 
   const reportCustomIssue = useCallback(async (
     title: string,
@@ -141,11 +270,21 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
   const generateReport = useCallback(async () => {
     try {
       const report = await serviceRef.current.generateReport([pageId]);
-      console.log(`📋 Generated evaluation report for ${pageId}:`, {
+      const performanceStats = performanceMonitorRef.current.getPerformanceStats(pageId);
+      const featureReport = performanceMonitorRef.current.getLatestFeatureReport(pageId);
+
+      console.log(`📋 Generated comprehensive evaluation report for ${pageId}:`, {
         overallScore: report.summary.overallScore,
-        totalIssues: report.summary.criticalIssues + report.summary.highIssues + report.summary.mediumIssues + report.summary.lowIssues
+        totalIssues: report.summary.criticalIssues + report.summary.highIssues + report.summary.mediumIssues + report.summary.lowIssues,
+        avgLoadTime: performanceStats.averageLoadTime,
+        featureAvailability: featureReport?.availabilityScore || 0
       });
-      return report;
+
+      return {
+        report,
+        performanceStats,
+        featureReport
+      };
     } catch (err) {
       console.error('Failed to generate report:', err);
       return null;
@@ -165,18 +304,29 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
       if (sessionRef.current) {
         serviceRef.current.stopContinuousEvaluation(sessionRef.current);
       }
+      if (monitoringInterval.current) {
+        clearInterval(monitoringInterval.current);
+      }
+      // Cleanup old performance data
+      performanceMonitorRef.current.cleanup();
     };
   }, []);
 
   return {
     evaluation,
+    performanceMetrics,
+    featureReport,
+    performanceMonitoring,
     loading,
     error,
     // Actions
     runEvaluation,
-    startContinuousEvaluation,
-    stopContinuousEvaluation,
+    runPerformanceEvaluation,
+    startContinuousMonitoring,
+    stopContinuousMonitoring,
     reportCustomIssue,
+    reportPerformanceIssue,
+    reportMissingFeature,
     collectCustomMetric,
     generateReport,
     // Computed values
@@ -186,11 +336,20 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
     highIssues: evaluation?.issues.filter(i => i.severity === EvaluationSeverity.HIGH).length || 0,
     wcagCompliance: evaluation?.compliance.wcag || 'Non-compliant',
     enterpriseCompliant: evaluation?.compliance.enterprise || false,
-    isHealthy: (evaluation?.overallScore || 0) >= 75 && (evaluation?.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length || 0) === 0
+    loadTime: performanceMetrics?.loadTime || 0,
+    fcp: performanceMetrics?.firstContentfulPaint || 0,
+    featureAvailability: featureReport?.availabilityScore || 0,
+    isHealthy: (evaluation?.overallScore || 0) >= 75 && 
+               (evaluation?.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length || 0) === 0 &&
+               (performanceMetrics?.loadTime || 0) <= 3000 &&
+               (featureReport?.availabilityScore || 0) >= 80,
+    performanceScore: performanceMonitoring?.score || 'unknown',
+    performanceTrend: performanceMonitoring?.trend || 'stable',
+    missingFeatures: featureReport?.missingFeatures || []
   };
 };
 
-// Simple evaluation status component that can be embedded anywhere
+// Enhanced evaluation status component with performance data
 export const createEvaluationStatusElement = (
   pageId: string,
   options: {
