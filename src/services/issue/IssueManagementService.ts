@@ -18,25 +18,41 @@ import {
   IIssueMetrics,
   ITaskIntegration,
   IIssueAnalytics,
-  IIssueNotification
+  IIssueNotification,
 } from './interfaces/IIssueManager.js';
 import { logger } from '../../utils/logger.js';
 
 export class IssueManagementService implements IIssueManager {
   private logger = logger;
-  
+
   // Workflow transitions configuration
   private workflowTransitions: IWorkflowTransition[] = [
     { fromStatus: 'open', toStatus: 'in_progress' },
     { fromStatus: 'open', toStatus: 'on_hold' },
-    { fromStatus: 'open', toStatus: 'resolved', requiredPermissions: ['resolve_issues'] },
-    { fromStatus: 'open', toStatus: 'rejected', requiredPermissions: ['reject_issues'] },
+    {
+      fromStatus: 'open',
+      toStatus: 'resolved',
+      requiredPermissions: ['resolve_issues'],
+    },
+    {
+      fromStatus: 'open',
+      toStatus: 'rejected',
+      requiredPermissions: ['reject_issues'],
+    },
     { fromStatus: 'in_progress', toStatus: 'on_hold' },
-    { fromStatus: 'in_progress', toStatus: 'resolved', requiredPermissions: ['resolve_issues'] },
+    {
+      fromStatus: 'in_progress',
+      toStatus: 'resolved',
+      requiredPermissions: ['resolve_issues'],
+    },
     { fromStatus: 'in_progress', toStatus: 'escalated' },
     { fromStatus: 'on_hold', toStatus: 'in_progress' },
     { fromStatus: 'on_hold', toStatus: 'open' },
-    { fromStatus: 'resolved', toStatus: 'closed', requiredPermissions: ['close_issues'] },
+    {
+      fromStatus: 'resolved',
+      toStatus: 'closed',
+      requiredPermissions: ['close_issues'],
+    },
     { fromStatus: 'resolved', toStatus: 'open' }, // reopen
     { fromStatus: 'escalated', toStatus: 'in_progress' },
   ];
@@ -48,13 +64,13 @@ export class IssueManagementService implements IIssueManager {
       name: 'Critical Priority Auto-Escalation',
       conditions: [
         { field: 'priority', operator: 'equals', value: 'critical' },
-        { field: 'age_hours', operator: 'greater_than', value: 2 }
+        { field: 'age_hours', operator: 'greater_than', value: 2 },
       ],
       actions: [
         { type: 'change_status', parameters: { status: 'escalated' } },
-        { type: 'notify', parameters: { roles: ['security_manager', 'ciso'] } }
+        { type: 'notify', parameters: { roles: ['security_manager', 'ciso'] } },
       ],
-      enabled: true
+      enabled: true,
     },
     {
       id: 'threat-level-critical-escalate',
@@ -62,59 +78,74 @@ export class IssueManagementService implements IIssueManager {
       conditions: [
         { field: 'threatLevel', operator: 'equals', value: 'critical' },
         { field: 'status', operator: 'equals', value: 'open' },
-        { field: 'age_hours', operator: 'greater_than', value: 1 }
+        { field: 'age_hours', operator: 'greater_than', value: 1 },
       ],
       actions: [
         { type: 'assign', parameters: { team: 'incident-response' } },
         { type: 'change_priority', parameters: { priority: 'critical' } },
-        { type: 'create_task', parameters: { taskType: 'evidence_collection' } }
+        {
+          type: 'create_task',
+          parameters: { taskType: 'evidence_collection' },
+        },
       ],
-      enabled: true
-    }
+      enabled: true,
+    },
   ];
 
   /**
    * Create a new issue
    */
-  async createIssue(request: ICreateIssueRequest, context: IIssueContext): Promise<IIssue> {
+  async createIssue(
+    request: ICreateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue> {
     try {
-      this.logger.info('Creating new issue', { title: request.title, type: request.issueType });
+      this.logger.info('Creating new issue', {
+        title: request.title,
+        type: request.issueType,
+      });
 
       const issue = new Issue({
         ...request,
         reporter: context.userId,
         workflowState: {
           currentStage: 'created',
-          stageHistory: [{
-            stage: 'created',
-            timestamp: new Date(),
-            actor: context.userId,
-            notes: 'Issue created'
-          }]
+          stageHistory: [
+            {
+              stage: 'created',
+              timestamp: new Date(),
+              actor: context.userId,
+              notes: 'Issue created',
+            },
+          ],
         },
-        auditTrail: [{
-          timestamp: new Date(),
-          userId: context.userId,
-          action: 'created',
-          notes: 'Issue created'
-        }]
+        auditTrail: [
+          {
+            timestamp: new Date(),
+            userId: context.userId,
+            action: 'created',
+            notes: 'Issue created',
+          },
+        ],
       });
 
       const savedIssue = await issue.save();
-      
+
       // Send notification
       await this.sendNotification({
         type: 'created',
         issueId: savedIssue._id?.toString() || savedIssue.id,
         recipientIds: this.getNotificationRecipients(savedIssue, 'created'),
         content: `Issue ${savedIssue.ticketId} has been created`,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       // Check for auto-assignment or escalation
       await this.processAutoActions(savedIssue);
 
-      this.logger.info('Issue created successfully', { ticketId: savedIssue.ticketId });
+      this.logger.info('Issue created successfully', {
+        ticketId: savedIssue.ticketId,
+      });
       return savedIssue;
     } catch (error) {
       this.logger.error('Error creating issue', { error, request });
@@ -125,10 +156,13 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Get issue by ID
    */
-  async getIssue(issueId: string, context: IIssueContext): Promise<IIssue | null> {
+  async getIssue(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<IIssue | null> {
     try {
       const issue = await Issue.findById(issueId);
-      
+
       if (!issue) {
         return null;
       }
@@ -148,7 +182,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Update an issue
    */
-  async updateIssue(issueId: string, updates: IUpdateIssueRequest, context: IIssueContext): Promise<IIssue> {
+  async updateIssue(
+    issueId: string,
+    updates: IUpdateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue> {
     try {
       const issue = await Issue.findById(issueId);
       if (!issue) {
@@ -161,14 +199,14 @@ export class IssueManagementService implements IIssueManager {
 
       // Track changes for audit trail
       const changes = this.trackChanges(issue, updates);
-      
+
       // Update the issue
       Object.assign(issue, updates);
       issue.auditTrail.push({
         timestamp: new Date(),
         userId: context.userId,
         action: 'updated',
-        notes: `Updated fields: ${Object.keys(updates).join(', ')}`
+        notes: `Updated fields: ${Object.keys(updates).join(', ')}`,
       });
 
       const updatedIssue = await issue.save();
@@ -178,7 +216,10 @@ export class IssueManagementService implements IIssueManager {
         await this.sendChangeNotifications(updatedIssue, changes, context);
       }
 
-      this.logger.info('Issue updated successfully', { ticketId: updatedIssue.ticketId, changes });
+      this.logger.info('Issue updated successfully', {
+        ticketId: updatedIssue.ticketId,
+        changes,
+      });
       return updatedIssue;
     } catch (error) {
       this.logger.error('Error updating issue', { error, issueId, updates });
@@ -205,7 +246,7 @@ export class IssueManagementService implements IIssueManager {
         timestamp: new Date(),
         userId: context.userId,
         action: 'deleted',
-        notes: 'Issue deleted'
+        notes: 'Issue deleted',
       });
 
       // Mark as deleted instead of actually deleting
@@ -213,10 +254,12 @@ export class IssueManagementService implements IIssueManager {
       issue.customFields.deleted = true;
       issue.customFields.deletedAt = new Date();
       issue.customFields.deletedBy = context.userId;
-      
+
       await issue.save();
 
-      this.logger.info('Issue deleted successfully', { ticketId: issue.ticketId });
+      this.logger.info('Issue deleted successfully', {
+        ticketId: issue.ticketId,
+      });
       return true;
     } catch (error) {
       this.logger.error('Error deleting issue', { error, issueId });
@@ -227,14 +270,25 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Search issues with advanced filtering
    */
-  async searchIssues(query: IIssueSearchQuery, context: IIssueContext): Promise<{
+  async searchIssues(
+    query: IIssueSearchQuery,
+    context: IIssueContext
+  ): Promise<{
     issues: IIssue[];
     totalCount: number;
     page: number;
     totalPages: number;
   }> {
     try {
-      const { query: searchQuery, filters, sortBy = 'updatedAt', sortOrder = 'desc', page = 1, limit = 50, includeResolved = false } = query;
+      const {
+        query: searchQuery,
+        filters,
+        sortBy = 'updatedAt',
+        sortOrder = 'desc',
+        page = 1,
+        limit = 50,
+        includeResolved = false,
+      } = query;
 
       // Build MongoDB query
       const mongoQuery: any = {};
@@ -251,7 +305,9 @@ export class IssueManagementService implements IIssueManager {
 
       // Security classification filtering
       if (!context.permissions.includes('view_all_issues')) {
-        mongoQuery.securityClassification = { $in: this.getAllowedClassifications(context) };
+        mongoQuery.securityClassification = {
+          $in: this.getAllowedClassifications(context),
+        };
       }
 
       // Exclude resolved issues unless explicitly requested
@@ -269,7 +325,7 @@ export class IssueManagementService implements IIssueManager {
 
       const [issues, totalCount] = await Promise.all([
         Issue.find(mongoQuery).sort(sort).skip(skip).limit(limit),
-        Issue.countDocuments(mongoQuery)
+        Issue.countDocuments(mongoQuery),
       ]);
 
       const totalPages = Math.ceil(totalCount / limit);
@@ -278,7 +334,7 @@ export class IssueManagementService implements IIssueManager {
         issues,
         totalCount,
         page,
-        totalPages
+        totalPages,
       };
     } catch (error) {
       this.logger.error('Error searching issues', { error, query });
@@ -289,7 +345,10 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Get issues by filter
    */
-  async getIssuesByFilter(filter: IIssueFilter, context: IIssueContext): Promise<IIssue[]> {
+  async getIssuesByFilter(
+    filter: IIssueFilter,
+    context: IIssueContext
+  ): Promise<IIssue[]> {
     const query: IIssueSearchQuery = { filters: filter };
     const result = await this.searchIssues(query, context);
     return result.issues;
@@ -298,7 +357,12 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Transition issue status with workflow validation
    */
-  async transitionIssueStatus(issueId: string, newStatus: string, context: IIssueContext, notes?: string): Promise<IIssue> {
+  async transitionIssueStatus(
+    issueId: string,
+    newStatus: string,
+    context: IIssueContext,
+    notes?: string
+  ): Promise<IIssue> {
     try {
       const issue = await Issue.findById(issueId);
       if (!issue) {
@@ -306,21 +370,25 @@ export class IssueManagementService implements IIssueManager {
       }
 
       // Validate transition
-      const validTransition = this.workflowTransitions.find(t => 
-        t.fromStatus === issue.status && t.toStatus === newStatus
+      const validTransition = this.workflowTransitions.find(
+        t => t.fromStatus === issue.status && t.toStatus === newStatus
       );
 
       if (!validTransition) {
-        throw new Error(`Invalid status transition from ${issue.status} to ${newStatus}`);
+        throw new Error(
+          `Invalid status transition from ${issue.status} to ${newStatus}`
+        );
       }
 
       // Check permissions
       if (validTransition.requiredPermissions) {
-        const hasPermission = validTransition.requiredPermissions.every(perm => 
+        const hasPermission = validTransition.requiredPermissions.every(perm =>
           context.permissions.includes(perm)
         );
         if (!hasPermission) {
-          throw new Error('Insufficient permissions for this status transition');
+          throw new Error(
+            'Insufficient permissions for this status transition'
+          );
         }
       }
 
@@ -332,7 +400,7 @@ export class IssueManagementService implements IIssueManager {
         stage: newStatus,
         timestamp: new Date(),
         actor: context.userId,
-        notes: notes || `Status changed from ${oldStatus} to ${newStatus}`
+        notes: notes || `Status changed from ${oldStatus} to ${newStatus}`,
       });
 
       // Add audit trail
@@ -343,7 +411,7 @@ export class IssueManagementService implements IIssueManager {
         field: 'status',
         oldValue: oldStatus,
         newValue: newStatus,
-        notes
+        notes,
       });
 
       const updatedIssue = await issue.save();
@@ -352,20 +420,27 @@ export class IssueManagementService implements IIssueManager {
       await this.sendNotification({
         type: 'status_changed',
         issueId: updatedIssue._id.toString(),
-        recipientIds: this.getNotificationRecipients(updatedIssue, 'status_changed'),
+        recipientIds: this.getNotificationRecipients(
+          updatedIssue,
+          'status_changed'
+        ),
         content: `Issue ${updatedIssue.ticketId} status changed from ${oldStatus} to ${newStatus}`,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
-      this.logger.info('Issue status transitioned', { 
-        ticketId: updatedIssue.ticketId, 
-        from: oldStatus, 
-        to: newStatus 
+      this.logger.info('Issue status transitioned', {
+        ticketId: updatedIssue.ticketId,
+        from: oldStatus,
+        to: newStatus,
       });
 
       return updatedIssue;
     } catch (error) {
-      this.logger.error('Error transitioning issue status', { error, issueId, newStatus });
+      this.logger.error('Error transitioning issue status', {
+        error,
+        issueId,
+        newStatus,
+      });
       throw error;
     }
   }
@@ -373,7 +448,10 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Get available status transitions for an issue
    */
-  async getAvailableTransitions(issueId: string, context: IIssueContext): Promise<IWorkflowTransition[]> {
+  async getAvailableTransitions(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<IWorkflowTransition[]> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -381,11 +459,13 @@ export class IssueManagementService implements IIssueManager {
 
     return this.workflowTransitions.filter(t => {
       if (t.fromStatus !== issue.status) return false;
-      
+
       if (t.requiredPermissions) {
-        return t.requiredPermissions.every(perm => context.permissions.includes(perm));
+        return t.requiredPermissions.every(perm =>
+          context.permissions.includes(perm)
+        );
       }
-      
+
       return true;
     });
   }
@@ -393,7 +473,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Assign issue to user
    */
-  async assignIssue(issueId: string, assigneeId: string, context: IIssueContext): Promise<IIssue> {
+  async assignIssue(
+    issueId: string,
+    assigneeId: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     try {
       const issue = await Issue.findById(issueId);
       if (!issue) {
@@ -408,7 +492,7 @@ export class IssueManagementService implements IIssueManager {
         action: 'assigned',
         field: 'assignee',
         oldValue: oldAssignee,
-        newValue: assigneeId
+        newValue: assigneeId,
       });
 
       const updatedIssue = await issue.save();
@@ -419,13 +503,20 @@ export class IssueManagementService implements IIssueManager {
         issueId: updatedIssue._id.toString(),
         recipientIds: [assigneeId],
         content: `You have been assigned to issue ${updatedIssue.ticketId}`,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
-      this.logger.info('Issue assigned', { ticketId: updatedIssue.ticketId, assignee: assigneeId });
+      this.logger.info('Issue assigned', {
+        ticketId: updatedIssue.ticketId,
+        assignee: assigneeId,
+      });
       return updatedIssue;
     } catch (error) {
-      this.logger.error('Error assigning issue', { error, issueId, assigneeId });
+      this.logger.error('Error assigning issue', {
+        error,
+        issueId,
+        assigneeId,
+      });
       throw error;
     }
   }
@@ -433,7 +524,10 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Unassign issue
    */
-  async unassignIssue(issueId: string, context: IIssueContext): Promise<IIssue> {
+  async unassignIssue(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -447,7 +541,7 @@ export class IssueManagementService implements IIssueManager {
       action: 'unassigned',
       field: 'assignee',
       oldValue: oldAssignee,
-      newValue: null
+      newValue: null,
     });
 
     return await issue.save();
@@ -456,7 +550,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Add watcher to issue
    */
-  async addWatcher(issueId: string, watcherId: string, context: IIssueContext): Promise<IIssue> {
+  async addWatcher(
+    issueId: string,
+    watcherId: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -473,7 +571,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Remove watcher from issue
    */
-  async removeWatcher(issueId: string, watcherId: string, context: IIssueContext): Promise<IIssue> {
+  async removeWatcher(
+    issueId: string,
+    watcherId: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -486,7 +588,10 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Add comment to issue
    */
-  async addComment(request: IAddCommentRequest, context: IIssueContext): Promise<IIssue> {
+  async addComment(
+    request: IAddCommentRequest,
+    context: IIssueContext
+  ): Promise<IIssue> {
     try {
       const issue = await Issue.findById(request.issueId);
       if (!issue) {
@@ -499,7 +604,7 @@ export class IssueManagementService implements IIssueManager {
         content: request.content,
         timestamp: new Date(),
         isInternal: request.isInternal || false,
-        attachments: request.attachments || []
+        attachments: request.attachments || [],
       };
 
       issue.comments.push(comment);
@@ -507,7 +612,7 @@ export class IssueManagementService implements IIssueManager {
         timestamp: new Date(),
         userId: context.userId,
         action: 'comment_added',
-        notes: `Comment added: ${request.content.substring(0, 100)}...`
+        notes: `Comment added: ${request.content.substring(0, 100)}...`,
       });
 
       const updatedIssue = await issue.save();
@@ -517,9 +622,12 @@ export class IssueManagementService implements IIssueManager {
         await this.sendNotification({
           type: 'comment_added',
           issueId: updatedIssue._id.toString(),
-          recipientIds: this.getNotificationRecipients(updatedIssue, 'comment_added'),
+          recipientIds: this.getNotificationRecipients(
+            updatedIssue,
+            'comment_added'
+          ),
           content: `New comment added to issue ${updatedIssue.ticketId}`,
-          timestamp: new Date()
+          timestamp: new Date(),
         });
       }
 
@@ -533,7 +641,12 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Update comment
    */
-  async updateComment(issueId: string, commentId: string, content: string, context: IIssueContext): Promise<IIssue> {
+  async updateComment(
+    issueId: string,
+    commentId: string,
+    content: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -544,7 +657,10 @@ export class IssueManagementService implements IIssueManager {
       throw new Error('Comment not found');
     }
 
-    if (comment.userId !== context.userId && !context.permissions.includes('edit_all_comments')) {
+    if (
+      comment.userId !== context.userId &&
+      !context.permissions.includes('edit_all_comments')
+    ) {
       throw new Error('Permission denied to edit this comment');
     }
 
@@ -555,7 +671,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Delete comment
    */
-  async deleteComment(issueId: string, commentId: string, context: IIssueContext): Promise<IIssue> {
+  async deleteComment(
+    issueId: string,
+    commentId: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -567,7 +687,10 @@ export class IssueManagementService implements IIssueManager {
     }
 
     const comment = issue.comments[commentIndex];
-    if (comment.userId !== context.userId && !context.permissions.includes('delete_all_comments')) {
+    if (
+      comment.userId !== context.userId &&
+      !context.permissions.includes('delete_all_comments')
+    ) {
       throw new Error('Permission denied to delete this comment');
     }
 
@@ -578,7 +701,12 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Log time spent on issue
    */
-  async logTime(issueId: string, hours: number, description: string, context: IIssueContext): Promise<IIssue> {
+  async logTime(
+    issueId: string,
+    hours: number,
+    description: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -588,7 +716,7 @@ export class IssueManagementService implements IIssueManager {
       userId: context.userId,
       hours,
       date: new Date(),
-      description
+      description,
     });
 
     // Update total actual hours
@@ -612,7 +740,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Escalate issue
    */
-  async escalateIssue(issueId: string, reason: string, context: IIssueContext): Promise<IIssue> {
+  async escalateIssue(
+    issueId: string,
+    reason: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -623,7 +755,7 @@ export class IssueManagementService implements IIssueManager {
       timestamp: new Date(),
       userId: context.userId,
       action: 'escalated',
-      notes: reason
+      notes: reason,
     });
 
     const updatedIssue = await issue.save();
@@ -634,7 +766,7 @@ export class IssueManagementService implements IIssueManager {
       issueId: updatedIssue._id.toString(),
       recipientIds: this.getEscalationRecipients(updatedIssue),
       content: `Issue ${updatedIssue.ticketId} has been escalated: ${reason}`,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return updatedIssue;
@@ -647,7 +779,7 @@ export class IssueManagementService implements IIssueManager {
     try {
       for (const rule of this.escalationRules.filter(r => r.enabled)) {
         const issues = await this.findIssuesMatchingRule(rule);
-        
+
         for (const issue of issues) {
           await this.executeEscalationActions(issue, rule);
         }
@@ -660,7 +792,12 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Link issue to task
    */
-  async linkToTask(issueId: string, taskId: string, relationship: string, context: IIssueContext): Promise<ITaskIntegration> {
+  async linkToTask(
+    issueId: string,
+    taskId: string,
+    relationship: string,
+    context: IIssueContext
+  ): Promise<ITaskIntegration> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -677,7 +814,7 @@ export class IssueManagementService implements IIssueManager {
       taskType: 'unknown', // This would be populated from the task system
       relationship: relationship as any,
       createdAt: new Date(),
-      createdBy: context.userId
+      createdBy: context.userId,
     };
 
     return integration;
@@ -686,7 +823,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Unlink issue from task
    */
-  async unlinkFromTask(issueId: string, taskId: string, context: IIssueContext): Promise<boolean> {
+  async unlinkFromTask(
+    issueId: string,
+    taskId: string,
+    context: IIssueContext
+  ): Promise<boolean> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       return false;
@@ -700,7 +841,10 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Get related tasks for issue
    */
-  async getRelatedTasks(issueId: string, context: IIssueContext): Promise<ITaskIntegration[]> {
+  async getRelatedTasks(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<ITaskIntegration[]> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -713,14 +857,17 @@ export class IssueManagementService implements IIssueManager {
       taskType: 'unknown',
       relationship: 'related_to' as any,
       createdAt: new Date(),
-      createdBy: 'system'
+      createdBy: 'system',
     }));
   }
 
   /**
    * Get issue metrics
    */
-  async getIssueMetrics(filter?: IIssueFilter, context?: IIssueContext): Promise<IIssueMetrics> {
+  async getIssueMetrics(
+    filter?: IIssueFilter,
+    context?: IIssueContext
+  ): Promise<IIssueMetrics> {
     const mongoQuery: any = {};
     if (filter) {
       this.applyFilters(mongoQuery, filter);
@@ -732,14 +879,17 @@ export class IssueManagementService implements IIssueManager {
       resolvedIssues,
       priorityDistribution,
       statusDistribution,
-      typeDistribution
+      typeDistribution,
     ] = await Promise.all([
       Issue.countDocuments(mongoQuery),
-      Issue.countDocuments({ ...mongoQuery, status: { $in: ['open', 'in_progress'] } }),
+      Issue.countDocuments({
+        ...mongoQuery,
+        status: { $in: ['open', 'in_progress'] },
+      }),
       Issue.countDocuments({ ...mongoQuery, status: 'resolved' }),
       this.getDistribution(mongoQuery, 'priority'),
       this.getDistribution(mongoQuery, 'status'),
-      this.getDistribution(mongoQuery, 'issueType')
+      this.getDistribution(mongoQuery, 'issueType'),
     ]);
 
     return {
@@ -751,31 +901,43 @@ export class IssueManagementService implements IIssueManager {
       issuesByStatus: statusDistribution,
       issuesByType: typeDistribution,
       slaBreaches: 0, // This would require SLA calculation
-      overdueIssues: await Issue.countDocuments({ ...mongoQuery, dueDate: { $lt: new Date() }, status: { $nin: ['resolved', 'closed'] } }),
-      assigneeWorkload: {}
+      overdueIssues: await Issue.countDocuments({
+        ...mongoQuery,
+        dueDate: { $lt: new Date() },
+        status: { $nin: ['resolved', 'closed'] },
+      }),
+      assigneeWorkload: {},
     };
   }
 
   /**
    * Get issue analytics
    */
-  async getIssueAnalytics(startDate: Date, endDate: Date, context?: IIssueContext): Promise<IIssueAnalytics> {
+  async getIssueAnalytics(
+    startDate: Date,
+    endDate: Date,
+    context?: IIssueContext
+  ): Promise<IIssueAnalytics> {
     // This would require complex aggregation queries
     return {
       resolutionTrends: [],
       priorityDistribution: {},
       averageTimeToResolution: {},
       topContributors: [],
-      teamPerformance: {}
+      teamPerformance: {},
     };
   }
 
   /**
    * Bulk update issues
    */
-  async bulkUpdateIssues(issueIds: string[], updates: IUpdateIssueRequest, context: IIssueContext): Promise<IIssue[]> {
+  async bulkUpdateIssues(
+    issueIds: string[],
+    updates: IUpdateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue[]> {
     const updatedIssues: IIssue[] = [];
-    
+
     for (const issueId of issueIds) {
       try {
         const updated = await this.updateIssue(issueId, updates, context);
@@ -791,9 +953,13 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Bulk assign issues
    */
-  async bulkAssignIssues(issueIds: string[], assigneeId: string, context: IIssueContext): Promise<IIssue[]> {
+  async bulkAssignIssues(
+    issueIds: string[],
+    assigneeId: string,
+    context: IIssueContext
+  ): Promise<IIssue[]> {
     const assignedIssues: IIssue[] = [];
-    
+
     for (const issueId of issueIds) {
       try {
         const assigned = await this.assignIssue(issueId, assigneeId, context);
@@ -809,10 +975,19 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Resolve issue
    */
-  async resolveIssue(issueId: string, resolution: {
-    type: 'fixed' | 'wont_fix' | 'duplicate' | 'invalid' | 'works_as_designed';
-    description: string;
-  }, context: IIssueContext): Promise<IIssue> {
+  async resolveIssue(
+    issueId: string,
+    resolution: {
+      type:
+        | 'fixed'
+        | 'wont_fix'
+        | 'duplicate'
+        | 'invalid'
+        | 'works_as_designed';
+      description: string;
+    },
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -822,14 +997,14 @@ export class IssueManagementService implements IIssueManager {
     issue.resolution = {
       ...resolution,
       resolvedBy: context.userId,
-      resolvedAt: new Date()
+      resolvedAt: new Date(),
     };
 
     issue.auditTrail.push({
       timestamp: new Date(),
       userId: context.userId,
       action: 'resolved',
-      notes: `Resolved as ${resolution.type}: ${resolution.description}`
+      notes: `Resolved as ${resolution.type}: ${resolution.description}`,
     });
 
     const updatedIssue = await issue.save();
@@ -840,7 +1015,7 @@ export class IssueManagementService implements IIssueManager {
       issueId: updatedIssue._id.toString(),
       recipientIds: this.getNotificationRecipients(updatedIssue, 'resolved'),
       content: `Issue ${updatedIssue.ticketId} has been resolved`,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return updatedIssue;
@@ -849,7 +1024,11 @@ export class IssueManagementService implements IIssueManager {
   /**
    * Reopen issue
    */
-  async reopenIssue(issueId: string, reason: string, context: IIssueContext): Promise<IIssue> {
+  async reopenIssue(
+    issueId: string,
+    reason: string,
+    context: IIssueContext
+  ): Promise<IIssue> {
     const issue = await Issue.findById(issueId);
     if (!issue) {
       throw new Error('Issue not found');
@@ -861,7 +1040,7 @@ export class IssueManagementService implements IIssueManager {
       timestamp: new Date(),
       userId: context.userId,
       action: 'reopened',
-      notes: reason
+      notes: reason,
     });
 
     return await issue.save();
@@ -875,20 +1054,31 @@ export class IssueManagementService implements IIssueManager {
   }
 
   private hasUpdatePermission(issue: IIssue, context: IIssueContext): boolean {
-    return context.permissions.includes('edit_issues') || issue.reporter === context.userId || issue.assignee === context.userId;
+    return (
+      context.permissions.includes('edit_issues') ||
+      issue.reporter === context.userId ||
+      issue.assignee === context.userId
+    );
   }
 
   private hasDeletePermission(issue: IIssue, context: IIssueContext): boolean {
-    return context.permissions.includes('delete_issues') || issue.reporter === context.userId;
+    return (
+      context.permissions.includes('delete_issues') ||
+      issue.reporter === context.userId
+    );
   }
 
   private getAllowedClassifications(context: IIssueContext): string[] {
     const role = context.userRole;
     switch (role) {
-      case 'admin': return ['public', 'internal', 'confidential', 'restricted'];
-      case 'security_manager': return ['public', 'internal', 'confidential'];
-      case 'analyst': return ['public', 'internal'];
-      default: return ['public'];
+      case 'admin':
+        return ['public', 'internal', 'confidential', 'restricted'];
+      case 'security_manager':
+        return ['public', 'internal', 'confidential'];
+      case 'analyst':
+        return ['public', 'internal'];
+      default:
+        return ['public'];
     }
   }
 
@@ -899,16 +1089,23 @@ export class IssueManagementService implements IIssueManager {
     if (filters.issueType) mongoQuery.issueType = { $in: filters.issueType };
     if (filters.assignee) mongoQuery.assignee = { $in: filters.assignee };
     if (filters.reporter) mongoQuery.reporter = { $in: filters.reporter };
-    if (filters.threatLevel) mongoQuery.threatLevel = { $in: filters.threatLevel };
+    if (filters.threatLevel)
+      mongoQuery.threatLevel = { $in: filters.threatLevel };
     if (filters.labels) mongoQuery.labels = { $in: filters.labels };
     if (filters.tags) mongoQuery.tags = { $in: filters.tags };
-    if (filters.securityClassification) mongoQuery.securityClassification = { $in: filters.securityClassification };
-    if (filters.teamAssignment) mongoQuery.teamAssignment = { $in: filters.teamAssignment };
-    
+    if (filters.securityClassification)
+      mongoQuery.securityClassification = {
+        $in: filters.securityClassification,
+      };
+    if (filters.teamAssignment)
+      mongoQuery.teamAssignment = { $in: filters.teamAssignment };
+
     if (filters.createdAfter || filters.createdBefore) {
       mongoQuery.createdAt = {};
-      if (filters.createdAfter) mongoQuery.createdAt.$gte = filters.createdAfter;
-      if (filters.createdBefore) mongoQuery.createdAt.$lte = filters.createdBefore;
+      if (filters.createdAfter)
+        mongoQuery.createdAt.$gte = filters.createdAfter;
+      if (filters.createdBefore)
+        mongoQuery.createdAt.$lte = filters.createdBefore;
     }
 
     if (filters.dueAfter || filters.dueBefore) {
@@ -918,9 +1115,12 @@ export class IssueManagementService implements IIssueManager {
     }
   }
 
-  private trackChanges(original: IIssue, updates: IUpdateIssueRequest): Array<{field: string, oldValue: any, newValue: any}> {
-    const changes: Array<{field: string, oldValue: any, newValue: any}> = [];
-    
+  private trackChanges(
+    original: IIssue,
+    updates: IUpdateIssueRequest
+  ): Array<{ field: string; oldValue: any; newValue: any }> {
+    const changes: Array<{ field: string; oldValue: any; newValue: any }> = [];
+
     for (const [key, newValue] of Object.entries(updates)) {
       const oldValue = (original as any)[key];
       if (oldValue !== newValue) {
@@ -931,14 +1131,19 @@ export class IssueManagementService implements IIssueManager {
     return changes;
   }
 
-  private async sendNotification(notification: IIssueNotification): Promise<void> {
+  private async sendNotification(
+    notification: IIssueNotification
+  ): Promise<void> {
     // This would integrate with the notification system
-    this.logger.info('Sending notification', { type: notification.type, issueId: notification.issueId });
+    this.logger.info('Sending notification', {
+      type: notification.type,
+      issueId: notification.issueId,
+    });
   }
 
   private getNotificationRecipients(issue: IIssue, type: string): string[] {
     const recipients: string[] = [];
-    
+
     // Always notify reporter and assignee
     recipients.push(issue.reporter);
     if (issue.assignee && !recipients.includes(issue.assignee)) {
@@ -960,16 +1165,22 @@ export class IssueManagementService implements IIssueManager {
     return [];
   }
 
-  private async sendChangeNotifications(issue: IIssue, changes: Array<{field: string, oldValue: any, newValue: any}>, context: IIssueContext): Promise<void> {
+  private async sendChangeNotifications(
+    issue: IIssue,
+    changes: Array<{ field: string; oldValue: any; newValue: any }>,
+    context: IIssueContext
+  ): Promise<void> {
     // Send notifications for significant changes
-    const significantChanges = changes.filter(c => ['status', 'priority', 'assignee'].includes(c.field));
+    const significantChanges = changes.filter(c =>
+      ['status', 'priority', 'assignee'].includes(c.field)
+    );
     if (significantChanges.length > 0) {
       await this.sendNotification({
         type: 'status_changed',
         issueId: issue._id.toString(),
         recipientIds: this.getNotificationRecipients(issue, 'status_changed'),
         content: `Issue ${issue.ticketId} updated: ${significantChanges.map(c => c.field).join(', ')}`,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   }
@@ -987,26 +1198,39 @@ export class IssueManagementService implements IIssueManager {
     return rule.conditions.every(condition => {
       switch (condition.field) {
         case 'priority':
-          return condition.operator === 'equals' ? issue.priority === condition.value : true;
+          return condition.operator === 'equals'
+            ? issue.priority === condition.value
+            : true;
         case 'threatLevel':
-          return condition.operator === 'equals' ? issue.threatLevel === condition.value : true;
+          return condition.operator === 'equals'
+            ? issue.threatLevel === condition.value
+            : true;
         case 'status':
-          return condition.operator === 'equals' ? issue.status === condition.value : true;
+          return condition.operator === 'equals'
+            ? issue.status === condition.value
+            : true;
         case 'age_hours':
-          const hoursSinceCreated = (Date.now() - issue.createdAt.getTime()) / (1000 * 60 * 60);
-          return condition.operator === 'greater_than' ? hoursSinceCreated > condition.value : true;
+          const hoursSinceCreated =
+            (Date.now() - issue.createdAt.getTime()) / (1000 * 60 * 60);
+          return condition.operator === 'greater_than'
+            ? hoursSinceCreated > condition.value
+            : true;
         default:
           return false;
       }
     });
   }
 
-  private async findIssuesMatchingRule(rule: IEscalationRule): Promise<IIssue[]> {
+  private async findIssuesMatchingRule(
+    rule: IEscalationRule
+  ): Promise<IIssue[]> {
     const mongoQuery: any = {};
-    
+
     rule.conditions.forEach(condition => {
       if (condition.field === 'age_hours') {
-        const thresholdDate = new Date(Date.now() - (condition.value * 60 * 60 * 1000));
+        const thresholdDate = new Date(
+          Date.now() - condition.value * 60 * 60 * 1000
+        );
         mongoQuery.createdAt = { $lt: thresholdDate };
       } else if (condition.field !== 'age_hours') {
         mongoQuery[condition.field] = condition.value;
@@ -1016,7 +1240,10 @@ export class IssueManagementService implements IIssueManager {
     return await Issue.find(mongoQuery);
   }
 
-  private async executeEscalationActions(issue: IIssue, rule: IEscalationRule): Promise<void> {
+  private async executeEscalationActions(
+    issue: IIssue,
+    rule: IEscalationRule
+  ): Promise<void> {
     for (const action of rule.actions) {
       switch (action.type) {
         case 'change_status':
@@ -1047,10 +1274,13 @@ export class IssueManagementService implements IIssueManager {
     }
   }
 
-  private async getDistribution(query: any, field: string): Promise<Record<string, number>> {
+  private async getDistribution(
+    query: any,
+    field: string
+  ): Promise<Record<string, number>> {
     const result = await Issue.aggregate([
       { $match: query },
-      { $group: { _id: `$${field}`, count: { $sum: 1 } } }
+      { $group: { _id: `$${field}`, count: { $sum: 1 } } },
     ]);
 
     const distribution: Record<string, number> = {};

@@ -55,19 +55,10 @@ import {
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  TreeView,
-  TreeItem,
   Collapse,
   Stepper,
   Step,
   StepLabel,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   Breadcrumbs,
   Link,
   Menu,
@@ -79,9 +70,20 @@ import {
   RadioGroup,
   Radio,
   FormLabel,
-  Checkbox,
-  CheckboxGroup
+  Checkbox
 } from '@mui/material';
+
+import { SimpleTreeView as TreeView, TreeItem } from '@mui/x-tree-view';
+
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent
+} from '@mui/lab';
 
 import {
   AccountTree,
@@ -160,7 +162,6 @@ import {
 } from '@mui/icons-material';
 
 import {
-  Sankey,
   ResponsiveContainer,
   Treemap,
   Cell,
@@ -176,7 +177,6 @@ import {
   LineChart,
   Line,
   ScatterChart,
-  Scatter,
   RadarChart,
   PolarGrid,
   PolarAngleAxis,
@@ -184,7 +184,7 @@ import {
   ComposedChart
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // MITRE ATT&CK interfaces
 interface MitreTactic {
@@ -806,8 +806,7 @@ const MITREAttackIntegration: React.FC = () => {
                             <LinearProgress
                               variant="determinate"
                               value={intensity}
-                              size="small"
-                              sx={{ mt: 0.5 }}
+                              sx={{ mt: 0.5, height: 4 }}
                             />
                           )}
                         </Box>
@@ -827,14 +826,12 @@ const MITREAttackIntegration: React.FC = () => {
   const renderTechniqueTree = () => (
     <Paper sx={{ p: 2, maxHeight: 600, overflow: 'auto' }}>
       <TreeView
-        defaultCollapseIcon={<ExpandMore />}
-        defaultExpandIcon={<ChevronRight />}
-        defaultExpanded={tactics.map(t => t.id)}
+        defaultExpandedItems={tactics.map(t => t.id)}
       >
         {tactics.map(tactic => (
           <TreeItem
             key={tactic.id}
-            nodeId={tactic.id}
+            itemId={tactic.id}
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 1 }}>
                 <Avatar
@@ -864,7 +861,7 @@ const MITREAttackIntegration: React.FC = () => {
               .map(technique => (
                 <TreeItem
                   key={technique.id}
-                  nodeId={technique.id}
+                  itemId={technique.id}
                   label={
                     <Box
                       sx={{
@@ -909,7 +906,7 @@ const MITREAttackIntegration: React.FC = () => {
                   {technique.subtechniques.map(subtech => (
                     <TreeItem
                       key={subtech}
-                      nodeId={subtech}
+                      itemId={subtech}
                       label={
                         <Typography variant="body2" color="textSecondary">
                           Subtechnique {subtech}

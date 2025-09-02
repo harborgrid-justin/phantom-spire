@@ -34,7 +34,9 @@ export class AdminUserService {
 
     // Validate required fields
     if (!username || !email || !password || !organization) {
-      throw new Error('All fields are required: username, email, password, organization');
+      throw new Error(
+        'All fields are required: username, email, password, organization'
+      );
     }
 
     // Validate email format
@@ -46,7 +48,9 @@ export class AdminUserService {
     // Validate username (alphanumeric and underscores only)
     const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
     if (!usernameRegex.test(username)) {
-      throw new Error('Username must be 3-20 characters long and contain only letters, numbers, and underscores');
+      throw new Error(
+        'Username must be 3-20 characters long and contain only letters, numbers, and underscores'
+      );
     }
 
     // Validate password strength
@@ -60,7 +64,9 @@ export class AdminUserService {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
-      throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character');
+      throw new Error(
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+      );
     }
 
     // Validate organization name
@@ -69,9 +75,13 @@ export class AdminUserService {
     }
   }
 
-  private async checkExistingUser(connection: mongoose.Connection, username: string, email: string): Promise<void> {
+  private async checkExistingUser(
+    connection: mongoose.Connection,
+    username: string,
+    email: string
+  ): Promise<void> {
     const db = connection.db;
-    
+
     // Check if username already exists
     const existingUsername = await db.collection('users').findOne({ username });
     if (existingUsername) {
@@ -85,11 +95,16 @@ export class AdminUserService {
     }
   }
 
-  private async createOrganization(connection: mongoose.Connection, organizationName: string): Promise<string> {
+  private async createOrganization(
+    connection: mongoose.Connection,
+    organizationName: string
+  ): Promise<string> {
     const db = connection.db;
-    
+
     // Check if organization already exists
-    const existingOrg = await db.collection('organizations').findOne({ name: organizationName });
+    const existingOrg = await db
+      .collection('organizations')
+      .findOne({ name: organizationName });
     if (existingOrg) {
       console.log(`Using existing organization: ${organizationName}`);
       return existingOrg._id.toString();
@@ -110,25 +125,31 @@ export class AdminUserService {
         integrations: {
           slack: { enabled: false },
           email: { enabled: true },
-          webhook: { enabled: true }
-        }
+          webhook: { enabled: true },
+        },
       },
       isDefault: true,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     const result = await db.collection('organizations').insertOne(organization);
-    console.log(`Created new organization: ${organizationName} with ID: ${organizationId}`);
-    
+    console.log(
+      `Created new organization: ${organizationName} with ID: ${organizationId}`
+    );
+
     return organizationId;
   }
 
-  private async createAdminRole(connection: mongoose.Connection): Promise<string> {
+  private async createAdminRole(
+    connection: mongoose.Connection
+  ): Promise<string> {
     const db = connection.db;
-    
+
     // Check if admin role already exists
-    const existingRole = await db.collection('roles').findOne({ name: 'Administrator' });
+    const existingRole = await db
+      .collection('roles')
+      .findOne({ name: 'Administrator' });
     if (existingRole) {
       console.log('Using existing Administrator role');
       return existingRole.id || existingRole._id.toString();
@@ -143,32 +164,54 @@ export class AdminUserService {
       description: 'Full system administrator with all permissions',
       permissions: [
         // Threat Intelligence permissions
-        'threats:read', 'threats:write', 'threats:delete', 'threats:admin',
+        'threats:read',
+        'threats:write',
+        'threats:delete',
+        'threats:admin',
         // Evidence Management permissions
-        'evidence:read', 'evidence:write', 'evidence:delete', 'evidence:admin',
+        'evidence:read',
+        'evidence:write',
+        'evidence:delete',
+        'evidence:admin',
         // Workflow Engine permissions
-        'workflows:read', 'workflows:write', 'workflows:delete', 'workflows:admin',
+        'workflows:read',
+        'workflows:write',
+        'workflows:delete',
+        'workflows:admin',
         // User Management permissions
-        'users:read', 'users:write', 'users:delete', 'users:admin',
+        'users:read',
+        'users:write',
+        'users:delete',
+        'users:admin',
         // Organization Management permissions
-        'organizations:read', 'organizations:write', 'organizations:admin',
+        'organizations:read',
+        'organizations:write',
+        'organizations:admin',
         // System Administration permissions
-        'system:read', 'system:write', 'system:admin', 'system:setup',
+        'system:read',
+        'system:write',
+        'system:admin',
+        'system:setup',
         // Analytics permissions
-        'analytics:read', 'analytics:write', 'analytics:admin',
+        'analytics:read',
+        'analytics:write',
+        'analytics:admin',
         // Integration permissions
-        'integrations:read', 'integrations:write', 'integrations:admin',
+        'integrations:read',
+        'integrations:write',
+        'integrations:admin',
         // Audit permissions
-        'audit:read', 'audit:admin'
+        'audit:read',
+        'audit:admin',
       ],
       isSystemRole: true,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     await db.collection('roles').insertOne(adminRole);
     console.log(`Created Administrator role with ID: ${roleId}`);
-    
+
     return roleId;
   }
 
@@ -177,27 +220,34 @@ export class AdminUserService {
     return await bcrypt.hash(password, saltRounds);
   }
 
-  public async createAdminUser(config: AdminUserConfig): Promise<AdminUserResult> {
-    console.log(`Creating admin user: ${config.username} for organization: ${config.organization}`);
-    
+  public async createAdminUser(
+    config: AdminUserConfig
+  ): Promise<AdminUserResult> {
+    console.log(
+      `Creating admin user: ${config.username} for organization: ${config.organization}`
+    );
+
     // Validate input
     await this.validateUserData(config);
-    
+
     const connection = await this.connectToMongoDB();
-    
+
     try {
       // Check for existing users
       await this.checkExistingUser(connection, config.username, config.email);
-      
+
       // Create organization
-      const organizationId = await this.createOrganization(connection, config.organization);
-      
+      const organizationId = await this.createOrganization(
+        connection,
+        config.organization
+      );
+
       // Create admin role
       const roleId = await this.createAdminRole(connection);
-      
+
       // Hash password
       const passwordHash = await this.hashPassword(config.password);
-      
+
       // Create admin user
       const userId = uuidv4();
       const adminUser = {
@@ -214,7 +264,7 @@ export class AdminUserService {
           firstName: 'System',
           lastName: 'Administrator',
           title: 'System Administrator',
-          department: 'IT Security'
+          department: 'IT Security',
         },
         permissions: [], // Will inherit from role
         settings: {
@@ -222,26 +272,28 @@ export class AdminUserService {
           notifications: {
             email: true,
             browser: true,
-            mobile: false
+            mobile: false,
           },
           dashboard: {
             layout: 'default',
-            refreshInterval: 30
-          }
+            refreshInterval: 30,
+          },
         },
         metadata: {
           createdBy: 'system_setup',
           createdDuring: 'initial_setup',
-          setupVersion: '1.0.0'
+          setupVersion: '1.0.0',
         },
         lastLogin: null,
         loginCount: 0,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date(),
       };
 
-      const result = await connection.db.collection('users').insertOne(adminUser);
-      
+      const result = await connection.db
+        .collection('users')
+        .insertOne(adminUser);
+
       // Create audit log entry
       await connection.db.collection('audit_logs').insertOne({
         _id: new mongoose.Types.ObjectId(),
@@ -255,12 +307,12 @@ export class AdminUserService {
           email: config.email,
           organizationId: organizationId,
           createdBy: 'system_setup',
-          roleAssigned: 'Administrator'
+          roleAssigned: 'Administrator',
         },
         ipAddress: '127.0.0.1',
-        userAgent: 'Phantom Spire Setup System'
+        userAgent: 'Phantom Spire Setup System',
       });
-      
+
       // Update system health record
       await connection.db.collection('system_health').insertOne({
         _id: new mongoose.Types.ObjectId(),
@@ -269,53 +321,60 @@ export class AdminUserService {
         status: 'healthy',
         metrics: {
           adminUserCreated: true,
-          setupComplete: false
+          setupComplete: false,
         },
-        message: 'Administrator user created successfully'
+        message: 'Administrator user created successfully',
       });
 
-      console.log(`Admin user created successfully: ${config.username} (ID: ${userId})`);
-      console.log(`Organization: ${config.organization} (ID: ${organizationId})`);
-      
+      console.log(
+        `Admin user created successfully: ${config.username} (ID: ${userId})`
+      );
+      console.log(
+        `Organization: ${config.organization} (ID: ${organizationId})`
+      );
+
       return {
         userId,
         organizationId,
         username: config.username,
         email: config.email,
         organization: config.organization,
-        created: true
+        created: true,
       };
     } finally {
       await connection.close();
     }
   }
 
-  public async validateAdminCredentials(username: string, password: string): Promise<boolean> {
+  public async validateAdminCredentials(
+    username: string,
+    password: string
+  ): Promise<boolean> {
     const connection = await this.connectToMongoDB();
-    
+
     try {
-      const user = await connection.db.collection('users').findOne({ 
+      const user = await connection.db.collection('users').findOne({
         username,
-        isActive: true 
+        isActive: true,
       });
-      
+
       if (!user || !user.passwordHash) {
         return false;
       }
-      
+
       const isValid = await bcrypt.compare(password, user.passwordHash);
-      
+
       if (isValid) {
         // Update last login
         await connection.db.collection('users').updateOne(
           { _id: user._id },
-          { 
+          {
             $set: { lastLogin: new Date(), updated_at: new Date() },
-            $inc: { loginCount: 1 }
+            $inc: { loginCount: 1 },
           }
         );
       }
-      
+
       return isValid;
     } finally {
       await connection.close();
@@ -324,35 +383,40 @@ export class AdminUserService {
 
   public async getAdminUserInfo(username: string): Promise<any> {
     const connection = await this.connectToMongoDB();
-    
+
     try {
-      const user = await connection.db.collection('users').findOne({ 
-        username,
-        isActive: true 
-      }, {
-        projection: { 
-          passwordHash: 0 // Exclude password hash
+      const user = await connection.db.collection('users').findOne(
+        {
+          username,
+          isActive: true,
+        },
+        {
+          projection: {
+            passwordHash: 0, // Exclude password hash
+          },
         }
-      });
-      
+      );
+
       if (user) {
         // Get organization info
-        const organization = await connection.db.collection('organizations').findOne({
-          id: user.organizationId
-        });
-        
+        const organization = await connection.db
+          .collection('organizations')
+          .findOne({
+            id: user.organizationId,
+          });
+
         // Get role info
         const role = await connection.db.collection('roles').findOne({
-          id: user.roleId
+          id: user.roleId,
         });
-        
+
         return {
           ...user,
           organization: organization ? organization.name : 'Unknown',
-          role: role ? role.name : 'Unknown'
+          role: role ? role.name : 'Unknown',
         };
       }
-      
+
       return null;
     } finally {
       await connection.close();

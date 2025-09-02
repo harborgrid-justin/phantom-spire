@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -192,11 +186,11 @@ import {
   Message,
   SpeakerNotes,
   Announcement,
-  CampaignIcon
+  Campaign
 } from '@mui/icons-material';
 
-import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, TreeMap } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced Interfaces for Incident Response
 interface IncidentWorkflow {

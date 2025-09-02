@@ -4,11 +4,11 @@
  */
 
 import { logger } from '../../utils/logger.js';
-import { 
-  IMessageQueue, 
-  IMessage, 
-  IQueueConfig, 
-  QueueType, 
+import {
+  IMessageQueue,
+  IMessage,
+  IQueueConfig,
+  QueueType,
   MessagePriority,
   IMessageHandler,
   ISubscription,
@@ -17,7 +17,7 @@ import {
   IQueueHealth,
   IQueueMetrics,
   ICircuitBreakerConfig,
-  ICircuitBreakerState
+  ICircuitBreakerState,
 } from '../interfaces/IMessageQueue.js';
 import { RedisMessageQueue } from './RedisMessageQueue.js';
 import { v4 as uuidv4 } from 'uuid';
@@ -68,7 +68,7 @@ export interface IMessageQueueManagerMetrics {
 
 /**
  * Central Message Queue Manager for Enterprise Threat Intelligence Platform
- * 
+ *
  * Features:
  * - Multi-queue management with different queue types
  * - Circuit breaker pattern for fault tolerance
@@ -81,7 +81,8 @@ export class MessageQueueManager {
   private readonly config: IMessageQueueManagerConfig;
   private readonly queues: IQueueRegistry = {};
   private readonly subscriptions: ISubscriptionRegistry = {};
-  private readonly circuitBreakers: Map<string, ICircuitBreakerState> = new Map();
+  private readonly circuitBreakers: Map<string, ICircuitBreakerState> =
+    new Map();
   private isInitialized = false;
   private startTime = Date.now();
   private metrics: IMessageQueueManagerMetrics;
@@ -105,15 +106,15 @@ export class MessageQueueManager {
 
     try {
       logger.info('Initializing Message Queue Manager');
-      
+
       // Initialize default queues
       await this.createDefaultQueues();
-      
+
       // Start monitoring
       this.startMonitoring();
-      
+
       this.isInitialized = true;
-      
+
       logger.info('Message Queue Manager initialized successfully', {
         queuesCount: Object.keys(this.queues).length,
         monitoring: this.config.monitoring,
@@ -134,7 +135,7 @@ export class MessageQueueManager {
 
     try {
       logger.info('Shutting down Message Queue Manager');
-      
+
       // Stop monitoring
       if (this.metricsInterval) {
         clearInterval(this.metricsInterval);
@@ -142,15 +143,15 @@ export class MessageQueueManager {
       if (this.healthCheckInterval) {
         clearInterval(this.healthCheckInterval);
       }
-      
+
       // Shutdown all queues
-      const shutdownPromises = Object.values(this.queues).map(queue => 
+      const shutdownPromises = Object.values(this.queues).map(queue =>
         queue.shutdown()
       );
       await Promise.all(shutdownPromises);
-      
+
       this.isInitialized = false;
-      
+
       logger.info('Message Queue Manager shut down successfully');
     } catch (error) {
       logger.error('Error during Message Queue Manager shutdown', error);
@@ -162,7 +163,7 @@ export class MessageQueueManager {
    * Create a new message queue
    */
   public async createQueue(
-    name: string, 
+    name: string,
     type: QueueType = QueueType.PRIORITY,
     config?: Partial<IQueueConfig>
   ): Promise<IMessageQueue> {
@@ -186,7 +187,7 @@ export class MessageQueueManager {
 
       await queue.initialize();
       (this.queues as any)[name] = queue;
-      
+
       // Initialize circuit breaker for this queue
       this.circuitBreakers.set(name, {
         state: 'closed',
@@ -237,7 +238,10 @@ export class MessageQueueManager {
       };
 
       // Add tracing if enabled
-      if (this.config.monitoring.enableTracing && !fullMessage.metadata.tracing) {
+      if (
+        this.config.monitoring.enableTracing &&
+        !fullMessage.metadata.tracing
+      ) {
         (fullMessage as any).metadata = {
           ...fullMessage.metadata,
           tracing: {
@@ -248,10 +252,10 @@ export class MessageQueueManager {
       }
 
       const result = await queue.publish(fullMessage);
-      
+
       (this.metrics as any).totalMessagesPublished++;
       this.resetCircuitBreaker(queueName);
-      
+
       logger.debug(`Message published to queue ${queueName}`, {
         messageId: result.messageId,
         type: message.type,
@@ -283,14 +287,14 @@ export class MessageQueueManager {
 
     try {
       const subscription = await queue.subscribe(topic, handler, options);
-      
+
       (this.subscriptions as any)[subscription.id] = {
         subscription,
         queue,
         handler: handler as IMessageHandler<Record<string, unknown>>,
         options: options || {},
       };
-      
+
       logger.info(`Created subscription for queue ${queueName}`, {
         subscriptionId: subscription.id,
         topic,
@@ -299,7 +303,10 @@ export class MessageQueueManager {
 
       return subscription;
     } catch (error) {
-      logger.error(`Failed to create subscription for queue ${queueName}`, error);
+      logger.error(
+        `Failed to create subscription for queue ${queueName}`,
+        error
+      );
       throw error;
     }
   }
@@ -316,10 +323,13 @@ export class MessageQueueManager {
     try {
       await subscriptionInfo.queue.unsubscribe(subscriptionId);
       delete (this.subscriptions as any)[subscriptionId];
-      
+
       logger.info(`Unsubscribed from subscription ${subscriptionId}`);
     } catch (error) {
-      logger.error(`Failed to unsubscribe from subscription ${subscriptionId}`, error);
+      logger.error(
+        `Failed to unsubscribe from subscription ${subscriptionId}`,
+        error
+      );
       throw error;
     }
   }
@@ -329,7 +339,7 @@ export class MessageQueueManager {
    */
   public async getHealthStatus(): Promise<Record<string, IQueueHealth>> {
     const healthStatus: Record<string, IQueueHealth> = {};
-    
+
     for (const [queueName, queue] of Object.entries(this.queues)) {
       try {
         healthStatus[queueName] = await queue.getQueueHealth();
@@ -344,7 +354,7 @@ export class MessageQueueManager {
         };
       }
     }
-    
+
     return healthStatus;
   }
 
@@ -353,7 +363,7 @@ export class MessageQueueManager {
    */
   public async getMetrics(): Promise<Record<string, IQueueMetrics>> {
     const queueMetrics: Record<string, IQueueMetrics> = {};
-    
+
     for (const [queueName, queue] of Object.entries(this.queues)) {
       try {
         queueMetrics[queueName] = await queue.getQueueMetrics();
@@ -361,7 +371,7 @@ export class MessageQueueManager {
         logger.error(`Failed to get metrics for queue ${queueName}`, error);
       }
     }
-    
+
     return queueMetrics;
   }
 
@@ -436,7 +446,9 @@ export class MessageQueueManager {
    */
   private updateMetrics(): void {
     (this.metrics as any).totalQueues = Object.keys(this.queues).length;
-    (this.metrics as any).totalSubscriptions = Object.keys(this.subscriptions).length;
+    (this.metrics as any).totalSubscriptions = Object.keys(
+      this.subscriptions
+    ).length;
     (this.metrics as any).uptime = Date.now() - this.startTime;
   }
 
@@ -469,12 +481,14 @@ export class MessageQueueManager {
       lastFailureTime: new Date(),
     };
 
-    if (updatedState.failureCount >= this.config.circuitBreaker.failureThreshold) {
+    if (
+      updatedState.failureCount >= this.config.circuitBreaker.failureThreshold
+    ) {
       (updatedState as any).state = 'open';
       (updatedState as any).nextAttempt = new Date(
         Date.now() + this.config.circuitBreaker.recoveryTimeout
       );
-      
+
       logger.warn(`Circuit breaker opened for queue ${queueName}`, {
         failureCount: updatedState.failureCount,
         nextAttempt: updatedState.nextAttempt,

@@ -5,11 +5,11 @@
 
 import crypto from 'crypto';
 import { logger } from '../../utils/logger.js';
-import { 
-  IMessage, 
-  IMessageMetadata, 
-  IMessageEncryption, 
-  IMessageTracing 
+import {
+  IMessage,
+  IMessageMetadata,
+  IMessageEncryption,
+  IMessageTracing,
 } from '../interfaces/IMessageQueue.js';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -39,15 +39,21 @@ export class MessageEncryptionUtil {
   /**
    * Encrypt message payload
    */
-  public encryptMessage<T>(message: IMessage<T>): IMessage<{ encryptedPayload: string; iv: string; tag: string }> {
+  public encryptMessage<T>(
+    message: IMessage<T>
+  ): IMessage<{ encryptedPayload: string; iv: string; tag: string }> {
     try {
       const iv = crypto.randomBytes(this.ivLength);
-      const cipher = crypto.createCipheriv(this.algorithm, this.encryptionKey, iv);
-      
+      const cipher = crypto.createCipheriv(
+        this.algorithm,
+        this.encryptionKey,
+        iv
+      );
+
       const payloadString = JSON.stringify(message.payload);
       let encrypted = cipher.update(payloadString, 'utf8', 'hex');
       encrypted += cipher.final('hex');
-      
+
       const tag = cipher.getAuthTag();
 
       const encryptionMetadata: IMessageEncryption = {
@@ -81,7 +87,11 @@ export class MessageEncryptionUtil {
    * Decrypt message payload
    */
   public decryptMessage<T>(
-    encryptedMessage: IMessage<{ encryptedPayload: string; iv: string; tag: string }>
+    encryptedMessage: IMessage<{
+      encryptedPayload: string;
+      iv: string;
+      tag: string;
+    }>
   ): IMessage<T> {
     try {
       if (!encryptedMessage.metadata.encryption?.encrypted) {
@@ -89,18 +99,18 @@ export class MessageEncryptionUtil {
       }
 
       const { encryptedPayload, iv, tag } = encryptedMessage.payload;
-      
+
       const decipher = crypto.createDecipheriv(
         this.algorithm,
         this.encryptionKey,
         Buffer.from(iv, 'hex')
       );
-      
+
       decipher.setAuthTag(Buffer.from(tag, 'hex'));
-      
+
       let decrypted = decipher.update(encryptedPayload, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
-      
+
       const originalPayload = JSON.parse(decrypted) as T;
 
       return {
@@ -220,7 +230,7 @@ export class MessageTracingUtil {
    */
   public cleanupOldTraces(maxAgeMs: number = 300000): void {
     const cutoff = Date.now() - maxAgeMs;
-    
+
     for (const [spanId, trace] of this.traces.entries()) {
       if (trace.startTime < cutoff) {
         this.traces.delete(spanId);
@@ -259,7 +269,7 @@ export class MessageDeduplicationUtil {
 
   constructor(deduplicationWindowMs: number = 60000) {
     this.deduplicationWindow = deduplicationWindowMs;
-    
+
     // Clean up old entries periodically
     setInterval(() => this.cleanup(), deduplicationWindowMs);
   }
@@ -270,9 +280,9 @@ export class MessageDeduplicationUtil {
   public isDuplicate<T>(message: IMessage<T>): boolean {
     const hash = this.getMessageHash(message);
     const now = Date.now();
-    
+
     const lastSeen = this.seenMessages.get(hash);
-    if (lastSeen && (now - lastSeen) < this.deduplicationWindow) {
+    if (lastSeen && now - lastSeen < this.deduplicationWindow) {
       logger.debug('Duplicate message detected', {
         messageId: message.id,
         hash,
@@ -295,7 +305,7 @@ export class MessageDeduplicationUtil {
       topic: message.topic,
       payload: message.payload,
     };
-    
+
     const hash = crypto.createHash('sha256');
     hash.update(JSON.stringify(hashInput));
     return hash.digest('hex');
@@ -306,7 +316,7 @@ export class MessageDeduplicationUtil {
    */
   private cleanup(): void {
     const cutoff = Date.now() - this.deduplicationWindow;
-    
+
     for (const [hash, timestamp] of this.seenMessages.entries()) {
       if (timestamp < cutoff) {
         this.seenMessages.delete(hash);
@@ -324,7 +334,7 @@ export class MessageDeduplicationUtil {
   } {
     const now = Date.now();
     const timestamps = Array.from(this.seenMessages.values());
-    
+
     return {
       totalMessages: this.seenMessages.size,
       oldestMessage: timestamps.length > 0 ? Math.min(...timestamps) : now,
@@ -353,7 +363,7 @@ export class MessageQueueMonitor {
   ): void {
     const key = `${queueName}:${messageType}`;
     let queueMetrics = this.metrics.get(key);
-    
+
     if (!queueMetrics) {
       queueMetrics = {
         queueName,
@@ -372,10 +382,16 @@ export class MessageQueueMonitor {
     // Update metrics
     queueMetrics.totalMessages++;
     queueMetrics.totalProcessingTime += processingTime;
-    queueMetrics.averageProcessingTime = 
+    queueMetrics.averageProcessingTime =
       queueMetrics.totalProcessingTime / queueMetrics.totalMessages;
-    queueMetrics.minProcessingTime = Math.min(queueMetrics.minProcessingTime, processingTime);
-    queueMetrics.maxProcessingTime = Math.max(queueMetrics.maxProcessingTime, processingTime);
+    queueMetrics.minProcessingTime = Math.min(
+      queueMetrics.minProcessingTime,
+      processingTime
+    );
+    queueMetrics.maxProcessingTime = Math.max(
+      queueMetrics.maxProcessingTime,
+      processingTime
+    );
     queueMetrics.lastProcessed = Date.now();
 
     if (success) {
@@ -394,8 +410,9 @@ export class MessageQueueMonitor {
    * Get metrics for a specific queue
    */
   public getQueueMetrics(queueName: string): IQueueMetrics[] {
-    return Array.from(this.metrics.values())
-      .filter(metrics => metrics.queueName === queueName);
+    return Array.from(this.metrics.values()).filter(
+      metrics => metrics.queueName === queueName
+    );
   }
 
   /**
@@ -410,7 +427,9 @@ export class MessageQueueMonitor {
    */
   public getActiveAlerts(): IAlert[] {
     const now = Date.now();
-    return this.alerts.filter(alert => !alert.resolved && alert.timestamp > now - 3600000); // 1 hour
+    return this.alerts.filter(
+      alert => !alert.resolved && alert.timestamp > now - 3600000
+    ); // 1 hour
   }
 
   /**
@@ -448,7 +467,8 @@ export class MessageQueueMonitor {
     }
 
     // High processing time alert
-    if (metrics.averageProcessingTime > 30000) { // 30 seconds
+    if (metrics.averageProcessingTime > 30000) {
+      // 30 seconds
       this.addAlert({
         id: uuidv4(),
         type: 'high_processing_time',
@@ -469,16 +489,17 @@ export class MessageQueueMonitor {
    */
   private addAlert(alert: IAlert): void {
     // Check if similar alert already exists
-    const existingAlert = this.alerts.find(a => 
-      !a.resolved && 
-      a.type === alert.type && 
-      a.queueName === alert.queueName && 
-      a.messageType === alert.messageType
+    const existingAlert = this.alerts.find(
+      a =>
+        !a.resolved &&
+        a.type === alert.type &&
+        a.queueName === alert.queueName &&
+        a.messageType === alert.messageType
     );
 
     if (!existingAlert) {
       this.alerts.push(alert);
-      
+
       // Limit number of alerts
       if (this.alerts.length > this.maxAlerts) {
         this.alerts.splice(0, this.alerts.length - this.maxAlerts);
@@ -539,7 +560,7 @@ export class CircuitBreaker {
       if (!this.nextAttempt || Date.now() < this.nextAttempt) {
         throw new Error('Circuit breaker is OPEN');
       }
-      
+
       // Try to move to half-open state
       this.state = CircuitBreakerState.HALF_OPEN;
       logger.info('Circuit breaker moved to HALF_OPEN state');
@@ -547,12 +568,15 @@ export class CircuitBreaker {
 
     try {
       const result = await operation();
-      
+
       // Success - reset circuit breaker
-      if (this.state === CircuitBreakerState.HALF_OPEN || this.failureCount > 0) {
+      if (
+        this.state === CircuitBreakerState.HALF_OPEN ||
+        this.failureCount > 0
+      ) {
         this.reset();
       }
-      
+
       return result;
     } catch (error) {
       this.recordFailure();
@@ -584,7 +608,7 @@ export class CircuitBreaker {
     if (this.failureCount >= this.config.failureThreshold) {
       this.state = CircuitBreakerState.OPEN;
       this.nextAttempt = Date.now() + this.config.recoveryTimeout;
-      
+
       logger.warn('Circuit breaker moved to OPEN state', {
         failureCount: this.failureCount,
         nextAttempt: this.nextAttempt,
@@ -597,7 +621,7 @@ export class CircuitBreaker {
     this.lastFailureTime = undefined;
     this.nextAttempt = undefined;
     this.state = CircuitBreakerState.CLOSED;
-    
+
     logger.info('Circuit breaker reset to CLOSED state');
   }
 }

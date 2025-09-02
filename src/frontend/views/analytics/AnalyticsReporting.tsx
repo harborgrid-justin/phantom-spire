@@ -15,7 +15,7 @@ import {
   Chip
 } from '@mui/material';
 import { Analytics, TrendingUp, Assessment } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const AnalyticsReporting: React.FC = () => {
   useEffect(() => {

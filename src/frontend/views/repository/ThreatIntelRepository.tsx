@@ -28,7 +28,7 @@ import {
   BookmarkBorder,
   TrendingUp
 } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const ThreatIntelRepository: React.FC = () => {
   useEffect(() => {

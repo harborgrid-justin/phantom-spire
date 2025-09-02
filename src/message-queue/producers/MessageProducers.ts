@@ -5,10 +5,10 @@
 
 import { logger } from '../../utils/logger.js';
 import { MessageQueueManager } from '../core/MessageQueueManager.js';
-import { 
-  IMessage, 
+import {
+  IMessage,
   MessagePriority,
-  IMessageMetadata 
+  IMessageMetadata,
 } from '../interfaces/IMessageQueue.js';
 import {
   MessageTypes,
@@ -22,10 +22,13 @@ import {
   ThreatAnalysisRequestMessage,
   DataIngestionRequestMessage,
   ThreatAlertNotificationMessage,
-  AnalyticsPipelineRequestMessage
+  AnalyticsPipelineRequestMessage,
 } from '../interfaces/IMessageTypes.js';
 import { IIOC } from '../../models/IOC.js';
-import { IQueryContext, IDataRecord } from '../../data-layer/interfaces/IDataSource.js';
+import {
+  IQueryContext,
+  IDataRecord,
+} from '../../data-layer/interfaces/IDataSource.js';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -130,12 +133,12 @@ export class IOCMessageProducer extends BaseMessageProducer {
         {
           'ioc-type': ioc.type,
           'ioc-value': ioc.value,
-          'urgency': priority.toString(),
+          urgency: priority.toString(),
         }
       );
 
       const result = await this.queueManager.publish('ioc-processing', message);
-      
+
       logger.info('Published IOC enrichment request', {
         messageId: result.messageId,
         iocId: payload.iocId,
@@ -184,7 +187,7 @@ export class IOCMessageProducer extends BaseMessageProducer {
       );
 
       const result = await this.queueManager.publish('ioc-processing', message);
-      
+
       logger.info('Published IOC validation request', {
         messageId: result.messageId,
         iocId: payload.iocId,
@@ -250,8 +253,11 @@ export class ThreatAnalysisMessageProducer extends BaseMessageProducer {
         }
       );
 
-      const result = await this.queueManager.publish('threat-analysis', message);
-      
+      const result = await this.queueManager.publish(
+        'threat-analysis',
+        message
+      );
+
       logger.info('Published threat analysis request', {
         messageId: result.messageId,
         analysisId: payload.analysisId,
@@ -300,8 +306,11 @@ export class ThreatAnalysisMessageProducer extends BaseMessageProducer {
         }
       );
 
-      const result = await this.queueManager.publish('threat-analysis', message);
-      
+      const result = await this.queueManager.publish(
+        'threat-analysis',
+        message
+      );
+
       logger.info('Published campaign discovery request', {
         messageId: result.messageId,
         discoveryId: payload.discoveryId,
@@ -366,14 +375,14 @@ export class DataIngestionMessageProducer extends BaseMessageProducer {
           'source-id': sourceId,
           'source-name': sourceName,
           'data-type': dataType,
-          'format': format,
+          format: format,
           'record-count': data.length.toString(),
           'batch-id': batchId,
         }
       );
 
       const result = await this.queueManager.publish('data-ingestion', message);
-      
+
       logger.info('Published data ingestion request', {
         messageId: result.messageId,
         sourceId,
@@ -412,11 +421,11 @@ export class DataIngestionMessageProducer extends BaseMessageProducer {
 
     try {
       const bulkId = uuidv4();
-      
+
       for (let i = 0; i < dataChunks.length; i++) {
         const chunk = dataChunks[i];
         const batchId = `${bulkId}-chunk-${i}`;
-        
+
         const messageId = await this.publishDataIngestionRequest(
           sourceId,
           sourceName,
@@ -427,7 +436,7 @@ export class DataIngestionMessageProducer extends BaseMessageProducer {
           [],
           priority
         );
-        
+
         messageIds.push(messageId);
       }
 
@@ -478,7 +487,7 @@ export class AlertMessageProducer extends BaseMessageProducer {
   ): Promise<string> {
     try {
       const priority = this.severityToPriority(severity);
-      
+
       const payload: IThreatAlertNotification = {
         alertId: uuidv4(),
         severity,
@@ -510,8 +519,11 @@ export class AlertMessageProducer extends BaseMessageProducer {
         }
       );
 
-      const result = await this.queueManager.publish('real-time-alerts', message);
-      
+      const result = await this.queueManager.publish(
+        'real-time-alerts',
+        message
+      );
+
       logger.info('Published threat alert notification', {
         messageId: result.messageId,
         alertId: payload.alertId,
@@ -564,8 +576,11 @@ export class AlertMessageProducer extends BaseMessageProducer {
         }
       );
 
-      const result = await this.queueManager.publish('real-time-alerts', message);
-      
+      const result = await this.queueManager.publish(
+        'real-time-alerts',
+        message
+      );
+
       logger.info('Published alert escalation', {
         messageId: result.messageId,
         escalationId: payload.escalationId,
@@ -653,8 +668,11 @@ export class AnalyticsPipelineMessageProducer extends BaseMessageProducer {
         }
       );
 
-      const result = await this.queueManager.publish('analytics-pipeline', message);
-      
+      const result = await this.queueManager.publish(
+        'analytics-pipeline',
+        message
+      );
+
       logger.info('Published analytics pipeline request', {
         messageId: result.messageId,
         pipelineId: payload.pipelineId,

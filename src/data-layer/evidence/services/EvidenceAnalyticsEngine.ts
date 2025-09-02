@@ -3,14 +3,17 @@
  * Advanced analytics capabilities for evidence management and correlation
  */
 
-import { 
-  IEvidence, 
-  EvidenceType, 
-  EvidenceSourceType, 
+import {
+  IEvidence,
+  EvidenceType,
+  EvidenceSourceType,
   EvidenceRelationshipType,
-  IEvidenceRelationship 
+  IEvidenceRelationship,
 } from '../interfaces/IEvidence.js';
-import { IEvidenceManager, IEvidenceContext } from '../interfaces/IEvidenceManager.js';
+import {
+  IEvidenceManager,
+  IEvidenceContext,
+} from '../interfaces/IEvidenceManager.js';
 import { IDataRecord, IRelationship } from '../../interfaces/IDataSource.js';
 import { AdvancedAnalyticsEngine } from '../../analytics/AdvancedAnalyticsEngine.js';
 import { logger } from '../../../utils/logger.js';
@@ -29,7 +32,12 @@ export interface IEvidenceAnalyticsResult {
 
 export interface IEvidenceFinding {
   id: string;
-  type: 'anomaly' | 'pattern' | 'correlation' | 'quality_issue' | 'integrity_violation';
+  type:
+    | 'anomaly'
+    | 'pattern'
+    | 'correlation'
+    | 'quality_issue'
+    | 'integrity_violation';
   severity: 'low' | 'medium' | 'high' | 'critical';
   confidence: number; // 0-100
   title: string;
@@ -43,7 +51,12 @@ export interface IEvidenceCorrelation {
   id: string;
   primary_evidence: string;
   related_evidence: string[];
-  correlation_type: 'temporal' | 'spatial' | 'behavioral' | 'attribution' | 'technical';
+  correlation_type:
+    | 'temporal'
+    | 'spatial'
+    | 'behavioral'
+    | 'attribution'
+    | 'technical';
   strength: number; // 0-100
   confidence: number; // 0-100
   description: string;
@@ -58,7 +71,11 @@ export interface IEvidenceCorrelation {
 export interface IEvidencePattern {
   id: string;
   name: string;
-  type: 'threat_campaign' | 'attack_chain' | 'source_pattern' | 'quality_pattern';
+  type:
+    | 'threat_campaign'
+    | 'attack_chain'
+    | 'source_pattern'
+    | 'quality_pattern';
   evidence_count: number;
   confidence: number; // 0-100
   description: string;
@@ -89,7 +106,12 @@ export interface IEvidenceRiskAssessment {
 
 export interface IEvidenceRecommendation {
   id: string;
-  type: 'investigation' | 'validation' | 'enrichment' | 'escalation' | 'retention';
+  type:
+    | 'investigation'
+    | 'validation'
+    | 'enrichment'
+    | 'escalation'
+    | 'retention';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   title: string;
   description: string;
@@ -134,23 +156,23 @@ export class EvidenceAnalyticsEngine {
    * Perform comprehensive evidence analysis
    */
   async analyzeEvidence(
-    evidenceIds: string[], 
+    evidenceIds: string[],
     context: IEvidenceContext,
     options: IEvidenceAnalyticsOptions = {}
   ): Promise<IEvidenceAnalyticsResult> {
     const analysisId = this.generateAnalysisId();
     const timestamp = new Date();
-    
+
     this.auditLogger.info('Starting evidence analysis', {
       analysisId,
       evidenceCount: evidenceIds.length,
       userId: context.userId,
-      options
+      options,
     });
 
     // Retrieve evidence objects
     const evidence = await this.retrieveEvidence(evidenceIds, context);
-    
+
     const result: IEvidenceAnalyticsResult = {
       analysisId,
       timestamp,
@@ -164,15 +186,15 @@ export class EvidenceAnalyticsEngine {
         risk_factors: [],
         data_integrity_risk: 0,
         source_reliability_risk: 0,
-        classification_risk: 0
+        classification_risk: 0,
       },
       recommendations: [],
       quality: {
         completeness: 100,
         coverage: 100,
         depth: 100,
-        timeliness: 100
-      }
+        timeliness: 100,
+      },
     };
 
     try {
@@ -181,33 +203,48 @@ export class EvidenceAnalyticsEngine {
       const relationships = this.extractRelationships(evidence);
 
       // Analyze data integrity issues
-      result.findings.push(...await this.analyzeDataIntegrity(evidence));
+      result.findings.push(...(await this.analyzeDataIntegrity(evidence)));
 
       // Analyze custody chain issues
-      result.findings.push(...await this.analyzeCustodyChains(evidence, context));
+      result.findings.push(
+        ...(await this.analyzeCustodyChains(evidence, context))
+      );
 
       // Analyze source quality and reliability
-      result.findings.push(...await this.analyzeSourceQuality(evidence));
+      result.findings.push(...(await this.analyzeSourceQuality(evidence)));
 
       // Find correlations if requested
       if (options.include_correlations !== false) {
-        result.correlations = await this.findEvidenceCorrelations(evidence, dataRecords, relationships);
+        result.correlations = await this.findEvidenceCorrelations(
+          evidence,
+          dataRecords,
+          relationships
+        );
       }
 
       // Detect patterns if requested
       if (options.include_patterns !== false) {
-        result.patterns = await this.detectEvidencePatterns(evidence, dataRecords);
+        result.patterns = await this.detectEvidencePatterns(
+          evidence,
+          dataRecords
+        );
       }
 
       // Perform risk assessment if requested
       if (options.include_risk_assessment !== false) {
-        result.riskAssessment = await this.assessEvidenceRisk(evidence, result.findings);
+        result.riskAssessment = await this.assessEvidenceRisk(
+          evidence,
+          result.findings
+        );
       }
 
       // Generate recommendations if requested
       if (options.include_recommendations !== false) {
         result.recommendations = await this.generateRecommendations(
-          evidence, result.findings, result.correlations, result.patterns
+          evidence,
+          result.findings,
+          result.correlations,
+          result.patterns
         );
       }
 
@@ -220,13 +257,12 @@ export class EvidenceAnalyticsEngine {
         findingsCount: result.findings.length,
         correlationsCount: result.correlations.length,
         patternsCount: result.patterns.length,
-        overallRisk: result.riskAssessment.overall_risk
+        overallRisk: result.riskAssessment.overall_risk,
       });
-
     } catch (error) {
       this.auditLogger.error('Evidence analysis failed', {
         analysisId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -238,10 +274,13 @@ export class EvidenceAnalyticsEngine {
    * Analyze single evidence item for anomalies
    */
   async analyzeSingleEvidence(
-    evidenceId: string, 
+    evidenceId: string,
     context: IEvidenceContext
   ): Promise<IEvidenceFinding[]> {
-    const evidence = await this.evidenceManager.getEvidence(evidenceId, context);
+    const evidence = await this.evidenceManager.getEvidence(
+      evidenceId,
+      context
+    );
     if (!evidence) {
       throw new Error(`Evidence ${evidenceId} not found or access denied`);
     }
@@ -249,7 +288,10 @@ export class EvidenceAnalyticsEngine {
     const findings: IEvidenceFinding[] = [];
 
     // Check data integrity
-    const integrityResult = await this.evidenceManager.verifyIntegrity(evidenceId, context);
+    const integrityResult = await this.evidenceManager.verifyIntegrity(
+      evidenceId,
+      context
+    );
     if (!integrityResult.isValid) {
       findings.push({
         id: this.generateFindingId(),
@@ -262,14 +304,17 @@ export class EvidenceAnalyticsEngine {
         supporting_data: {
           expected_hash: integrityResult.expectedHash,
           actual_hash: integrityResult.currentHash,
-          algorithm: integrityResult.algorithm
+          algorithm: integrityResult.algorithm,
         },
-        created_at: new Date()
+        created_at: new Date(),
       });
     }
 
     // Check custody chain
-    const custodyResult = await this.evidenceManager.verifyCustodyChain(evidenceId, context);
+    const custodyResult = await this.evidenceManager.verifyCustodyChain(
+      evidenceId,
+      context
+    );
     if (!custodyResult.isValid) {
       findings.push({
         id: this.generateFindingId(),
@@ -281,9 +326,9 @@ export class EvidenceAnalyticsEngine {
         evidence: [evidenceId],
         supporting_data: {
           chain_length: custodyResult.chainLength,
-          issues: custodyResult.issues
+          issues: custodyResult.issues,
         },
-        created_at: new Date()
+        created_at: new Date(),
       });
     }
 
@@ -307,9 +352,10 @@ export class EvidenceAnalyticsEngine {
 
     // Group evidence by time windows
     const timeGroups = new Map<number, IEvidence[]>();
-    
+
     for (const e of evidence) {
-      const timeSlot = Math.floor(e.createdAt.getTime() / timeWindow) * timeWindow;
+      const timeSlot =
+        Math.floor(e.createdAt.getTime() / timeWindow) * timeWindow;
       if (!timeGroups.has(timeSlot)) {
         timeGroups.set(timeSlot, []);
       }
@@ -323,11 +369,12 @@ export class EvidenceAnalyticsEngine {
       for (let i = 0; i < groupEvidence.length; i++) {
         for (let j = i + 1; j < groupEvidence.length; j++) {
           const correlation = this.calculateTemporalCorrelation(
-            groupEvidence[i], 
+            groupEvidence[i],
             groupEvidence[j]
           );
-          
-          if (correlation.strength > 50) { // Only include strong correlations
+
+          if (correlation.strength > 50) {
+            // Only include strong correlations
             correlations.push(correlation);
           }
         }
@@ -340,18 +387,18 @@ export class EvidenceAnalyticsEngine {
   // Private helper methods
 
   private async retrieveEvidence(
-    evidenceIds: string[], 
+    evidenceIds: string[],
     context: IEvidenceContext
   ): Promise<IEvidence[]> {
     const evidence: IEvidence[] = [];
-    
+
     for (const id of evidenceIds) {
       const e = await this.evidenceManager.getEvidence(id, context);
       if (e) {
         evidence.push(e);
       }
     }
-    
+
     return evidence;
   }
 
@@ -365,12 +412,12 @@ export class EvidenceAnalyticsEngine {
         ...e.data,
         metadata: e.metadata,
         classification: e.classification,
-        sourceType: e.sourceType
+        sourceType: e.sourceType,
       },
       metadata: {
         confidence: e.metadata.confidence,
         severity: e.metadata.severity,
-        quality: e.metadata.quality
+        quality: e.metadata.quality,
       },
       relationships: e.relationships.map(rel => ({
         id: rel.id,
@@ -379,14 +426,14 @@ export class EvidenceAnalyticsEngine {
         targetId: rel.targetEvidenceId,
         weight: rel.confidence / 100,
         confidence: rel.confidence / 100,
-        createdAt: rel.createdAt
-      }))
+        createdAt: rel.createdAt,
+      })),
     }));
   }
 
   private extractRelationships(evidence: IEvidence[]): IRelationship[] {
     const relationships: IRelationship[] = [];
-    
+
     for (const e of evidence) {
       for (const rel of e.relationships) {
         relationships.push({
@@ -396,23 +443,27 @@ export class EvidenceAnalyticsEngine {
           targetId: rel.targetEvidenceId,
           weight: rel.confidence / 100,
           confidence: rel.confidence / 100,
-          createdAt: rel.createdAt
+          createdAt: rel.createdAt,
         });
       }
     }
-    
+
     return relationships;
   }
 
-  private async analyzeDataIntegrity(evidence: IEvidence[]): Promise<IEvidenceFinding[]> {
+  private async analyzeDataIntegrity(
+    evidence: IEvidence[]
+  ): Promise<IEvidenceFinding[]> {
     const findings: IEvidenceFinding[] = [];
-    
+
     for (const e of evidence) {
       // Check if integrity validation is recent
-      const timeSinceValidation = Date.now() - e.integrity.lastVerified.getTime();
+      const timeSinceValidation =
+        Date.now() - e.integrity.lastVerified.getTime();
       const daysSince = timeSinceValidation / (24 * 60 * 60 * 1000);
-      
-      if (daysSince > 30) { // Flag if not validated in 30 days
+
+      if (daysSince > 30) {
+        // Flag if not validated in 30 days
         findings.push({
           id: this.generateFindingId(),
           type: 'quality_issue',
@@ -423,12 +474,12 @@ export class EvidenceAnalyticsEngine {
           evidence: [e.id],
           supporting_data: {
             last_validated: e.integrity.lastVerified,
-            days_since_validation: Math.round(daysSince)
+            days_since_validation: Math.round(daysSince),
           },
-          created_at: new Date()
+          created_at: new Date(),
         });
       }
-      
+
       if (!e.integrity.isValid) {
         findings.push({
           id: this.generateFindingId(),
@@ -440,30 +491,32 @@ export class EvidenceAnalyticsEngine {
           evidence: [e.id],
           supporting_data: {
             hash_algorithm: e.integrity.algorithm,
-            hash_value: e.integrity.hash
+            hash_value: e.integrity.hash,
           },
-          created_at: new Date()
+          created_at: new Date(),
         });
       }
     }
-    
+
     return findings;
   }
 
   private async analyzeCustodyChains(
-    evidence: IEvidence[], 
+    evidence: IEvidence[],
     context: IEvidenceContext
   ): Promise<IEvidenceFinding[]> {
     const findings: IEvidenceFinding[] = [];
-    
+
     for (const e of evidence) {
       // Check for gaps in custody chain
       const chainEntries = e.chainOfCustody;
-      
+
       for (let i = 1; i < chainEntries.length; i++) {
-        const timeDiff = chainEntries[i].timestamp.getTime() - chainEntries[i-1].timestamp.getTime();
+        const timeDiff =
+          chainEntries[i].timestamp.getTime() -
+          chainEntries[i - 1].timestamp.getTime();
         const hoursDiff = timeDiff / (60 * 60 * 1000);
-        
+
         // Flag gaps longer than 24 hours
         if (hoursDiff > 24) {
           findings.push({
@@ -476,14 +529,14 @@ export class EvidenceAnalyticsEngine {
             evidence: [e.id],
             supporting_data: {
               gap_hours: Math.round(hoursDiff),
-              previous_entry: chainEntries[i-1],
-              current_entry: chainEntries[i]
+              previous_entry: chainEntries[i - 1],
+              current_entry: chainEntries[i],
             },
-            created_at: new Date()
+            created_at: new Date(),
           });
         }
       }
-      
+
       // Check for minimum custody entries
       if (chainEntries.length < 2) {
         findings.push({
@@ -495,38 +548,47 @@ export class EvidenceAnalyticsEngine {
           description: 'Evidence has very short custody chain',
           evidence: [e.id],
           supporting_data: {
-            chain_length: chainEntries.length
+            chain_length: chainEntries.length,
           },
-          created_at: new Date()
+          created_at: new Date(),
         });
       }
     }
-    
+
     return findings;
   }
 
-  private async analyzeSourceQuality(evidence: IEvidence[]): Promise<IEvidenceFinding[]> {
+  private async analyzeSourceQuality(
+    evidence: IEvidence[]
+  ): Promise<IEvidenceFinding[]> {
     const findings: IEvidenceFinding[] = [];
-    
+
     // Analyze source reliability patterns
-    const sourceReliability = new Map<string, { total: number, count: number, evidence: string[] }>();
-    
+    const sourceReliability = new Map<
+      string,
+      { total: number; count: number; evidence: string[] }
+    >();
+
     for (const e of evidence) {
       const reliability = e.metadata.quality.reliability;
       if (!sourceReliability.has(e.sourceSystem)) {
-        sourceReliability.set(e.sourceSystem, { total: 0, count: 0, evidence: [] });
+        sourceReliability.set(e.sourceSystem, {
+          total: 0,
+          count: 0,
+          evidence: [],
+        });
       }
-      
+
       const stats = sourceReliability.get(e.sourceSystem)!;
       stats.total += reliability;
       stats.count++;
       stats.evidence.push(e.id);
     }
-    
+
     // Flag sources with consistently low reliability
     for (const [sourceSystem, stats] of sourceReliability) {
       const avgReliability = stats.total / stats.count;
-      
+
       if (avgReliability < 0.5 && stats.count > 2) {
         findings.push({
           id: this.generateFindingId(),
@@ -539,13 +601,13 @@ export class EvidenceAnalyticsEngine {
           supporting_data: {
             source_system: sourceSystem,
             average_reliability: avgReliability,
-            evidence_count: stats.count
+            evidence_count: stats.count,
           },
-          created_at: new Date()
+          created_at: new Date(),
         });
       }
     }
-    
+
     return findings;
   }
 
@@ -555,7 +617,7 @@ export class EvidenceAnalyticsEngine {
     relationships: IRelationship[]
   ): Promise<IEvidenceCorrelation[]> {
     const correlations: IEvidenceCorrelation[] = [];
-    
+
     // Use the advanced analytics engine to find patterns
     try {
       const analyticsResult = await this.analyticsEngine.analyzeThreats(
@@ -563,10 +625,13 @@ export class EvidenceAnalyticsEngine {
         relationships,
         { includeAnomalies: false }
       );
-      
+
       // Convert analytics findings to evidence correlations
       for (const finding of analyticsResult.findings) {
-        if (finding.pattern === 'network-analysis' || finding.pattern === 'correlation') {
+        if (
+          finding.pattern === 'network-analysis' ||
+          finding.pattern === 'correlation'
+        ) {
           correlations.push({
             id: this.generateCorrelationId(),
             primary_evidence: finding.evidence[0]?.id || '',
@@ -575,14 +640,14 @@ export class EvidenceAnalyticsEngine {
             strength: finding.score,
             confidence: finding.score,
             description: finding.description,
-            evidence_links: []
+            evidence_links: [],
           });
         }
       }
     } catch (error) {
       this.auditLogger.warn('Analytics engine correlation failed', error);
     }
-    
+
     return correlations;
   }
 
@@ -591,41 +656,45 @@ export class EvidenceAnalyticsEngine {
     dataRecords: IDataRecord[]
   ): Promise<IEvidencePattern[]> {
     const patterns: IEvidencePattern[] = [];
-    
+
     // Detect temporal patterns
     patterns.push(...this.detectTemporalPatterns(evidence));
-    
+
     // Detect source patterns
     patterns.push(...this.detectSourcePatterns(evidence));
-    
+
     // Detect classification patterns
     patterns.push(...this.detectClassificationPatterns(evidence));
-    
+
     return patterns;
   }
 
   private detectTemporalPatterns(evidence: IEvidence[]): IEvidencePattern[] {
     const patterns: IEvidencePattern[] = [];
-    
+
     // Group evidence by hour of day
     const hourlyDistribution = new Array(24).fill(0);
     for (const e of evidence) {
       const hour = e.createdAt.getHours();
       hourlyDistribution[hour]++;
     }
-    
+
     // Find peak hours (more than 2 standard deviations above mean)
     const mean = hourlyDistribution.reduce((sum, count) => sum + count, 0) / 24;
-    const variance = hourlyDistribution.reduce((sum, count) => sum + Math.pow(count - mean, 2), 0) / 24;
+    const variance =
+      hourlyDistribution.reduce(
+        (sum, count) => sum + Math.pow(count - mean, 2),
+        0
+      ) / 24;
     const stdDev = Math.sqrt(variance);
-    
+
     const peakHours = [];
     for (let hour = 0; hour < 24; hour++) {
       if (hourlyDistribution[hour] > mean + 2 * stdDev) {
         peakHours.push(hour);
       }
     }
-    
+
     if (peakHours.length > 0) {
       patterns.push({
         id: this.generatePatternId(),
@@ -634,26 +703,31 @@ export class EvidenceAnalyticsEngine {
         evidence_count: evidence.length,
         confidence: 75,
         description: `Evidence collection peaks during hours: ${peakHours.join(', ')}`,
-        pattern_elements: [{
-          element_type: 'hour_of_day',
-          values: peakHours.map(h => h.toString()),
-          frequency: Math.max(...peakHours.map(h => hourlyDistribution[h]))
-        }]
+        pattern_elements: [
+          {
+            element_type: 'hour_of_day',
+            values: peakHours.map(h => h.toString()),
+            frequency: Math.max(...peakHours.map(h => hourlyDistribution[h])),
+          },
+        ],
       });
     }
-    
+
     return patterns;
   }
 
   private detectSourcePatterns(evidence: IEvidence[]): IEvidencePattern[] {
     const patterns: IEvidencePattern[] = [];
-    
+
     // Analyze source type distribution
     const sourceTypeCount = new Map<EvidenceSourceType, number>();
     for (const e of evidence) {
-      sourceTypeCount.set(e.sourceType, (sourceTypeCount.get(e.sourceType) || 0) + 1);
+      sourceTypeCount.set(
+        e.sourceType,
+        (sourceTypeCount.get(e.sourceType) || 0) + 1
+      );
     }
-    
+
     // Find dominant source types (more than 50% of evidence)
     const totalEvidence = evidence.length;
     for (const [sourceType, count] of sourceTypeCount) {
@@ -665,58 +739,74 @@ export class EvidenceAnalyticsEngine {
           evidence_count: count,
           confidence: 80,
           description: `Evidence heavily skewed towards ${sourceType} sources`,
-          pattern_elements: [{
-            element_type: 'source_type',
-            values: [sourceType],
-            frequency: count
-          }]
+          pattern_elements: [
+            {
+              element_type: 'source_type',
+              values: [sourceType],
+              frequency: count,
+            },
+          ],
         });
       }
     }
-    
+
     return patterns;
   }
 
-  private detectClassificationPatterns(evidence: IEvidence[]): IEvidencePattern[] {
+  private detectClassificationPatterns(
+    evidence: IEvidence[]
+  ): IEvidencePattern[] {
     const patterns: IEvidencePattern[] = [];
-    
+
     // Look for classification escalation patterns
     const classificationTimeline = evidence
       .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
       .map(e => ({ time: e.createdAt, classification: e.classification }));
-    
+
     // Simple escalation detection (more sophisticated analysis could be added)
     let escalationCount = 0;
     for (let i = 1; i < classificationTimeline.length; i++) {
-      const prev = classificationTimeline[i-1];
+      const prev = classificationTimeline[i - 1];
       const curr = classificationTimeline[i];
-      
-      if (this.isClassificationEscalation(prev.classification, curr.classification)) {
+
+      if (
+        this.isClassificationEscalation(
+          prev.classification,
+          curr.classification
+        )
+      ) {
         escalationCount++;
       }
     }
-    
-    if (escalationCount > evidence.length * 0.3) { // More than 30% escalations
+
+    if (escalationCount > evidence.length * 0.3) {
+      // More than 30% escalations
       patterns.push({
         id: this.generatePatternId(),
         name: 'Classification Escalation Pattern',
         type: 'threat_campaign',
         evidence_count: evidence.length,
         confidence: 70,
-        description: 'Evidence shows pattern of classification escalation over time',
-        pattern_elements: [{
-          element_type: 'classification_trend',
-          values: ['escalating'],
-          frequency: escalationCount
-        }],
+        description:
+          'Evidence shows pattern of classification escalation over time',
+        pattern_elements: [
+          {
+            element_type: 'classification_trend',
+            values: ['escalating'],
+            frequency: escalationCount,
+          },
+        ],
         timeline: {
           start: evidence[0].createdAt,
           end: evidence[evidence.length - 1].createdAt,
-          duration_hours: (evidence[evidence.length - 1].createdAt.getTime() - evidence[0].createdAt.getTime()) / (60 * 60 * 1000)
-        }
+          duration_hours:
+            (evidence[evidence.length - 1].createdAt.getTime() -
+              evidence[0].createdAt.getTime()) /
+            (60 * 60 * 1000),
+        },
       });
     }
-    
+
     return patterns;
   }
 
@@ -728,43 +818,55 @@ export class EvidenceAnalyticsEngine {
     const integrityRisk = this.calculateIntegrityRisk(evidence, findings);
     const reliabilityRisk = this.calculateReliabilityRisk(evidence);
     const classificationRisk = this.calculateClassificationRisk(evidence);
-    
+
     // Calculate overall risk score
-    const overallScore = Math.max(integrityRisk, reliabilityRisk, classificationRisk);
-    
+    const overallScore = Math.max(
+      integrityRisk,
+      reliabilityRisk,
+      classificationRisk
+    );
+
     const riskFactors = [];
-    
+
     if (integrityRisk > 50) {
       riskFactors.push({
         factor: 'Data Integrity',
         impact: integrityRisk,
-        description: 'High risk due to integrity violations or stale validations'
+        description:
+          'High risk due to integrity violations or stale validations',
       });
     }
-    
+
     if (reliabilityRisk > 50) {
       riskFactors.push({
         factor: 'Source Reliability',
         impact: reliabilityRisk,
-        description: 'High risk due to unreliable evidence sources'
+        description: 'High risk due to unreliable evidence sources',
       });
     }
-    
+
     if (classificationRisk > 50) {
       riskFactors.push({
         factor: 'Classification Handling',
         impact: classificationRisk,
-        description: 'High risk due to sensitive classification levels'
+        description: 'High risk due to sensitive classification levels',
       });
     }
-    
+
     return {
-      overall_risk: overallScore > 75 ? 'critical' : overallScore > 50 ? 'high' : overallScore > 25 ? 'medium' : 'low',
+      overall_risk:
+        overallScore > 75
+          ? 'critical'
+          : overallScore > 50
+            ? 'high'
+            : overallScore > 25
+              ? 'medium'
+              : 'low',
       risk_score: overallScore,
       risk_factors: riskFactors,
       data_integrity_risk: integrityRisk,
       source_reliability_risk: reliabilityRisk,
-      classification_risk: classificationRisk
+      classification_risk: classificationRisk,
     };
   }
 
@@ -775,27 +877,30 @@ export class EvidenceAnalyticsEngine {
     patterns: IEvidencePattern[]
   ): Promise<IEvidenceRecommendation[]> {
     const recommendations: IEvidenceRecommendation[] = [];
-    
+
     // Recommendations based on findings
-    const integrityViolations = findings.filter(f => f.type === 'integrity_violation');
+    const integrityViolations = findings.filter(
+      f => f.type === 'integrity_violation'
+    );
     if (integrityViolations.length > 0) {
       recommendations.push({
         id: this.generateRecommendationId(),
         type: 'validation',
         priority: 'high',
         title: 'Validate Evidence Integrity',
-        description: 'Multiple evidence items have integrity issues requiring immediate validation',
+        description:
+          'Multiple evidence items have integrity issues requiring immediate validation',
         evidence: integrityViolations.flatMap(f => f.evidence),
         suggested_actions: [
           'Recalculate data hashes',
           'Verify source data',
           'Review custody chain',
-          'Contact original collectors'
+          'Contact original collectors',
         ],
-        estimated_effort: 'medium'
+        estimated_effort: 'medium',
       });
     }
-    
+
     // Recommendations based on patterns
     const campaignPatterns = patterns.filter(p => p.type === 'threat_campaign');
     if (campaignPatterns.length > 0) {
@@ -810,12 +915,12 @@ export class EvidenceAnalyticsEngine {
           'Correlate with external intelligence',
           'Expand collection timeframe',
           'Identify additional indicators',
-          'Brief threat intelligence team'
+          'Brief threat intelligence team',
         ],
-        estimated_effort: 'high'
+        estimated_effort: 'high',
       });
     }
-    
+
     // Recommendations based on correlations
     if (correlations.length > 5) {
       recommendations.push({
@@ -823,54 +928,69 @@ export class EvidenceAnalyticsEngine {
         type: 'enrichment',
         priority: 'low',
         title: 'Enrich Highly Correlated Evidence',
-        description: 'Multiple correlations found - consider enrichment opportunities',
-        evidence: correlations.flatMap(c => [c.primary_evidence, ...c.related_evidence]),
+        description:
+          'Multiple correlations found - consider enrichment opportunities',
+        evidence: correlations.flatMap(c => [
+          c.primary_evidence,
+          ...c.related_evidence,
+        ]),
         suggested_actions: [
           'Cross-reference with additional sources',
           'Validate correlation confidence',
           'Document relationships',
-          'Update evidence metadata'
+          'Update evidence metadata',
         ],
-        estimated_effort: 'low'
+        estimated_effort: 'low',
       });
     }
-    
+
     return recommendations;
   }
 
   // Helper methods for risk calculations and utilities
 
-  private calculateIntegrityRisk(evidence: IEvidence[], findings: IEvidenceFinding[]): number {
-    const integrityViolations = findings.filter(f => f.type === 'integrity_violation').length;
+  private calculateIntegrityRisk(
+    evidence: IEvidence[],
+    findings: IEvidenceFinding[]
+  ): number {
+    const integrityViolations = findings.filter(
+      f => f.type === 'integrity_violation'
+    ).length;
     const totalEvidence = evidence.length;
-    
+
     if (totalEvidence === 0) return 0;
-    
+
     const violationRatio = integrityViolations / totalEvidence;
     return Math.min(violationRatio * 100, 100);
   }
 
   private calculateReliabilityRisk(evidence: IEvidence[]): number {
-    const avgReliability = evidence.reduce((sum, e) => sum + e.metadata.quality.reliability, 0) / evidence.length;
+    const avgReliability =
+      evidence.reduce((sum, e) => sum + e.metadata.quality.reliability, 0) /
+      evidence.length;
     return (1 - avgReliability) * 100;
   }
 
   private calculateClassificationRisk(evidence: IEvidence[]): number {
-    const highClassification = evidence.filter(e => 
-      [e.classification].includes('secret' as any) || 
-      [e.classification].includes('top_secret' as any)
+    const highClassification = evidence.filter(
+      e =>
+        [e.classification].includes('secret' as any) ||
+        [e.classification].includes('top_secret' as any)
     ).length;
-    
+
     return (highClassification / evidence.length) * 60; // Max 60% risk from classification
   }
 
-  private calculateTemporalCorrelation(e1: IEvidence, e2: IEvidence): IEvidenceCorrelation {
+  private calculateTemporalCorrelation(
+    e1: IEvidence,
+    e2: IEvidence
+  ): IEvidenceCorrelation {
     const timeDiff = Math.abs(e1.createdAt.getTime() - e2.createdAt.getTime());
     const hoursDiff = timeDiff / (60 * 60 * 1000);
-    
+
     // Stronger correlation for closer timestamps
     const strength = Math.max(0, 100 - (hoursDiff / 24) * 10); // Decreases by 10 per day
-    
+
     return {
       id: this.generateCorrelationId(),
       primary_evidence: e1.id,
@@ -879,18 +999,20 @@ export class EvidenceAnalyticsEngine {
       strength: Math.round(strength),
       confidence: Math.round(strength * 0.8), // Slightly lower confidence than strength
       description: `Evidence items created within ${Math.round(hoursDiff)} hours of each other`,
-      evidence_links: [{
-        source: e1.id,
-        target: e2.id,
-        relationship: EvidenceRelationshipType.CORRELATES_WITH,
-        weight: strength / 100
-      }]
+      evidence_links: [
+        {
+          source: e1.id,
+          target: e2.id,
+          relationship: EvidenceRelationshipType.CORRELATES_WITH,
+          weight: strength / 100,
+        },
+      ],
     };
   }
 
   private assessDataQuality(evidence: IEvidence): IEvidenceFinding[] {
     const findings: IEvidenceFinding[] = [];
-    
+
     // Check confidence levels
     if (evidence.metadata.confidence < 50) {
       findings.push({
@@ -902,12 +1024,12 @@ export class EvidenceAnalyticsEngine {
         description: 'Evidence has low confidence rating',
         evidence: [evidence.id],
         supporting_data: {
-          confidence: evidence.metadata.confidence
+          confidence: evidence.metadata.confidence,
         },
-        created_at: new Date()
+        created_at: new Date(),
       });
     }
-    
+
     // Check data completeness
     if (evidence.metadata.quality.completeness < 0.7) {
       findings.push({
@@ -919,39 +1041,46 @@ export class EvidenceAnalyticsEngine {
         description: 'Evidence data appears to be incomplete',
         evidence: [evidence.id],
         supporting_data: {
-          completeness: evidence.metadata.quality.completeness
+          completeness: evidence.metadata.quality.completeness,
         },
-        created_at: new Date()
+        created_at: new Date(),
       });
     }
-    
+
     return findings;
   }
 
   private isClassificationEscalation(prev: any, curr: any): boolean {
     const hierarchy = [
-      'unclassified', 'tlp_white', 'tlp_green', 'tlp_amber', 'tlp_red',
-      'confidential', 'secret', 'top_secret'
+      'unclassified',
+      'tlp_white',
+      'tlp_green',
+      'tlp_amber',
+      'tlp_red',
+      'confidential',
+      'secret',
+      'top_secret',
     ];
-    
+
     const prevLevel = hierarchy.indexOf(prev);
     const currLevel = hierarchy.indexOf(curr);
-    
+
     return currLevel > prevLevel;
   }
 
   private calculateAnalysisQuality(
-    evidence: IEvidence[], 
+    evidence: IEvidence[],
     options: IEvidenceAnalyticsOptions
   ): IAnalysisQuality {
     const depth = options.analysis_depth || 'standard';
-    const depthScore = depth === 'comprehensive' ? 100 : depth === 'standard' ? 75 : 50;
-    
+    const depthScore =
+      depth === 'comprehensive' ? 100 : depth === 'standard' ? 75 : 50;
+
     return {
       completeness: 100, // All requested evidence was analyzed
       coverage: Math.min((evidence.length / 10) * 100, 100), // Better coverage with more evidence
       depth: depthScore,
-      timeliness: 100 // Analysis completed immediately
+      timeliness: 100, // Analysis completed immediately
     };
   }
 

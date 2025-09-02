@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Spire CTI Platform - Frontend</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Material-UI CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    
+    <!-- React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@6/dist/umd/react-router-dom.development.js"></script>
+    
+    <!-- Material-UI from CDN -->
+    <script crossorigin src="https://unpkg.com/@mui/material@5/umd/material-ui.development.js"></script>
+    <script crossorigin src="https://unpkg.com/@mui/icons-material@5/umd/material-ui-icons.development.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        #root {
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .view-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .view-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .view-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .view-description {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .nav-container {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-link.active {
+            background: #28a745;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #d4edda;
+            color: #155724;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <h2>Loading Phantom Spire CTI Platform...</h2>
+            <p>Initializing React Frontend Components</p>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, createElement: h } = React;
+        const { BrowserRouter: Router, Routes, Route, Link, useLocation, Navigate } = ReactRouterDOM;
+        const { ThemeProvider, createTheme, CssBaseline, Box, Typography, Card, CardContent, Grid, AppBar, Toolbar, Drawer, List, ListItem, ListItemText, ListItemIcon, Container } = MaterialUI;
+
+        // Create Material-UI theme
+        const theme = createTheme({
+            palette: {
+                mode: 'light',
+                primary: {
+                    main: '#1976d2',
+                },
+                secondary: {
+                    main: '#dc004e',
+                },
+                background: {
+                    default: '#f5f5f5',
+                    paper: '#ffffff'
+                }
+            },
+            typography: {
+                fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+            }
+        });
+
+        // Navigation Component
+        const Navigation = () => {
+            const location = useLocation();
+            
+            const navItems = [
+                { path: '/dashboard', label: 'Dashboard', icon: '📊' },
+                { path: '/ioc', label: 'IOC Management', icon: '🛡️' },
+                { path: '/incidents', label: 'Incident Response', icon: '🚨' },
+                { path: '/hunting', label: 'Threat Hunting', icon: '🔍' },
+                { path: '/analytics', label: 'Analytics', icon: '📈' },
+                { path: '/feeds', label: 'Feed Management', icon: '📡' },
+                { path: '/investigation', label: 'Investigation', icon: '🔬' },
+                { path: '/admin', label: 'Administration', icon: '⚙️' },
+                { path: '/operations', label: 'Operations Center', icon: '🎯' },
+                { path: '/repository', label: 'Threat Intel Repository', icon: '📚' },
+                { path: '/integrations', label: 'Integrations', icon: '🔗' },
+            ];
+
+            return (
+                <div className="nav-container">
+                    <div className="nav-links">
+                        {navItems.map(item => (
+                            <Link 
+                                key={item.path}
+                                to={item.path} 
+                                className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
+                            >
+                                {item.icon} {item.label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Generic View Component
+        const GenericView = ({ title, description, features, icon }) => {
+            return (
+                <div className="view-container">
+                    <div className="view-header">
+                        <h1 className="view-title">{icon} {title}</h1>
+                        <p className="view-description">{description}</p>
+                        <span className="status-indicator">✅ Operational</span>
+                    </div>
+                    
+                    <div className="feature-grid">
+                        {features.map((feature, index) => (
+                            <div key={index} className="feature-card">
+                                <div className="feature-icon">{feature.icon}</div>
+                                <h3 className="feature-title">{feature.title}</h3>
+                                <p className="feature-description">{feature.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Dashboard View
+        const DashboardView = () => {
+            const features = [
+                {
+                    icon: '📊',
+                    title: 'Real-time Threat Intelligence',
+                    description: 'Monitor and analyze threat intelligence data from multiple sources in real-time.'
+                },
+                {
+                    icon: '🛡️',
+                    title: 'IOC Analysis',
+                    description: 'Advanced Indicator of Compromise analysis with machine learning capabilities.'
+                },
+                {
+                    icon: '🚨',
+                    title: 'Incident Response',
+                    description: 'Streamlined incident response workflows with automated playbooks.'
+                },
+                {
+                    icon: '🔍',
+                    title: 'Threat Hunting',
+                    description: 'Proactive threat hunting with advanced query capabilities and visualization.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Threat Intelligence Dashboard"
+                    description="Enterprise-grade cyber threat intelligence platform providing comprehensive visibility into your security posture."
+                    features={features}
+                    icon="📊"
+                />
+            );
+        };
+
+        // IOC Management View
+        const IOCView = () => {
+            const features = [
+                {
+                    icon: '🔍',
+                    title: 'IOC Detection',
+                    description: 'Automated detection and classification of indicators of compromise.'
+                },
+                {
+                    icon: '📊',
+                    title: 'IOC Analytics',
+                    description: 'Advanced analytics and correlation of IOC data across multiple sources.'
+                },
+                {
+                    icon: '🛡️',
+                    title: 'IOC Validation',
+                    description: 'Comprehensive validation and scoring of IOC reliability and relevance.'
+                },
+                {
+                    icon: '📈',
+                    title: 'IOC Enrichment',
+                    description: 'Enrich IOC data with contextual information from threat intelligence feeds.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="IOC Management Console"
+                    description="Comprehensive Indicator of Compromise management with advanced analysis and correlation capabilities."
+                    features={features}
+                    icon="🛡️"
+                />
+            );
+        };
+
+        // Incident Response View
+        const IncidentView = () => {
+            const features = [
+                {
+                    icon: '🚨',
+                    title: 'Incident Detection',
+                    description: 'Automated incident detection with customizable alerting rules.'
+                },
+                {
+                    icon: '📋',
+                    title: 'Response Playbooks',
+                    description: 'Pre-defined and customizable incident response playbooks.'
+                },
+                {
+                    icon: '👥',
+                    title: 'Team Collaboration',
+                    description: 'Real-time collaboration tools for incident response teams.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Incident Analytics',
+                    description: 'Comprehensive analytics and reporting on incident response metrics.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Incident Response Center"
+                    description="Centralized incident response management with automated workflows and team collaboration."
+                    features={features}
+                    icon="🚨"
+                />
+            );
+        };
+
+        // Threat Hunting View
+        const HuntingView = () => {
+            const features = [
+                {
+                    icon: '🔍',
+                    title: 'Advanced Queries',
+                    description: 'Powerful query builder for complex threat hunting scenarios.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Data Visualization',
+                    description: 'Interactive visualizations for threat hunting analysis.'
+                },
+                {
+                    icon: '🤖',
+                    title: 'ML-Powered Hunting',
+                    description: 'Machine learning algorithms to identify suspicious patterns.'
+                },
+                {
+                    icon: '📈',
+                    title: 'Hunt Analytics',
+                    description: 'Comprehensive analytics on hunting activities and results.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Threat Hunting Workbench"
+                    description="Advanced threat hunting platform with machine learning capabilities and interactive visualizations."
+                    features={features}
+                    icon="🔍"
+                />
+            );
+        };
+
+        // Analytics View
+        const AnalyticsView = () => {
+            const features = [
+                {
+                    icon: '📊',
+                    title: 'Threat Analytics',
+                    description: 'Comprehensive threat intelligence analytics and reporting.'
+                },
+                {
+                    icon: '📈',
+                    title: 'Trend Analysis',
+                    description: 'Advanced trend analysis and predictive modeling.'
+                },
+                {
+                    icon: '🎯',
+                    title: 'Risk Assessment',
+                    description: 'Automated risk assessment and scoring capabilities.'
+                },
+                {
+                    icon: '📋',
+                    title: 'Custom Reports',
+                    description: 'Customizable reporting with automated distribution.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Analytics & Reporting"
+                    description="Advanced analytics platform with predictive modeling and comprehensive reporting capabilities."
+                    features={features}
+                    icon="📈"
+                />
+            );
+        };
+
+        // Feed Management View
+        const FeedsView = () => {
+            const features = [
+                {
+                    icon: '📡',
+                    title: 'Feed Integration',
+                    description: 'Integration with multiple threat intelligence feed sources.'
+                },
+                {
+                    icon: '⚙️',
+                    title: 'Feed Configuration',
+                    description: 'Flexible configuration and management of threat feeds.'
+                },
+                {
+                    icon: '🔄',
+                    title: 'Real-time Processing',
+                    description: 'Real-time processing and normalization of feed data.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Feed Analytics',
+                    description: 'Analytics and quality metrics for threat intelligence feeds.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Feed Management"
+                    description="Comprehensive threat intelligence feed management with real-time processing and analytics."
+                    features={features}
+                    icon="📡"
+                />
+            );
+        };
+
+        // Investigation View
+        const InvestigationView = () => {
+            const features = [
+                {
+                    icon: '🔬',
+                    title: 'Investigation Timeline',
+                    description: 'Interactive timeline for security investigations.'
+                },
+                {
+                    icon: '🔗',
+                    title: 'Evidence Correlation',
+                    description: 'Advanced correlation of digital evidence and artifacts.'
+                },
+                {
+                    icon: '📋',
+                    title: 'Case Management',
+                    description: 'Comprehensive case management and documentation.'
+                },
+                {
+                    icon: '👥',
+                    title: 'Collaboration Tools',
+                    description: 'Team collaboration tools for investigation workflows.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Investigation Timeline"
+                    description="Advanced investigation platform with timeline visualization and evidence correlation."
+                    features={features}
+                    icon="🔬"
+                />
+            );
+        };
+
+        // Admin View
+        const AdminView = () => {
+            const features = [
+                {
+                    icon: '👥',
+                    title: 'User Management',
+                    description: 'Comprehensive user and role management system.'
+                },
+                {
+                    icon: '🔐',
+                    title: 'Access Control',
+                    description: 'Role-based access control with fine-grained permissions.'
+                },
+                {
+                    icon: '⚙️',
+                    title: 'System Configuration',
+                    description: 'System-wide configuration and settings management.'
+                },
+                {
+                    icon: '📊',
+                    title: 'System Monitoring',
+                    description: 'Real-time system health monitoring and alerting.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="System Administration"
+                    description="Comprehensive system administration with user management and access control."
+                    features={features}
+                    icon="⚙️"
+                />
+            );
+        };
+
+        // Operations View
+        const OperationsView = () => {
+            const features = [
+                {
+                    icon: '🎯',
+                    title: 'Operations Dashboard',
+                    description: 'Real-time operations center with comprehensive monitoring.'
+                },
+                {
+                    icon: '🚨',
+                    title: 'Alert Management',
+                    description: 'Centralized alert management and escalation workflows.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Performance Metrics',
+                    description: 'Key performance indicators and operational metrics.'
+                },
+                {
+                    icon: '🔄',
+                    title: 'Workflow Automation',
+                    description: 'Automated operational workflows and processes.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Real-Time Operations Center"
+                    description="Centralized operations center with real-time monitoring and automated workflows."
+                    features={features}
+                    icon="🎯"
+                />
+            );
+        };
+
+        // Repository View
+        const RepositoryView = () => {
+            const features = [
+                {
+                    icon: '📚',
+                    title: 'Threat Intelligence Repository',
+                    description: 'Centralized repository for threat intelligence data.'
+                },
+                {
+                    icon: '🔍',
+                    title: 'Advanced Search',
+                    description: 'Powerful search capabilities across all threat data.'
+                },
+                {
+                    icon: '📊',
+                    title: 'Data Classification',
+                    description: 'Automated classification and tagging of threat data.'
+                },
+                {
+                    icon: '🔗',
+                    title: 'Data Correlation',
+                    description: 'Advanced correlation and relationship mapping.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Threat Intelligence Repository"
+                    description="Centralized threat intelligence repository with advanced search and correlation capabilities."
+                    features={features}
+                    icon="📚"
+                />
+            );
+        };
+
+        // Integrations View
+        const IntegrationsView = () => {
+            const features = [
+                {
+                    icon: '🔗',
+                    title: 'Platform Integrations',
+                    description: 'Integration with leading security platforms and tools.'
+                },
+                {
+                    icon: '📡',
+                    title: 'API Management',
+                    description: 'Comprehensive API management and documentation.'
+                },
+                {
+                    icon: '🔄',
+                    title: 'Data Synchronization',
+                    description: 'Real-time data synchronization across platforms.'
+                },
+                {
+                    icon: '⚙️',
+                    title: 'Custom Connectors',
+                    description: 'Build custom connectors for proprietary systems.'
+                }
+            ];
+
+            return (
+                <GenericView
+                    title="Integration Platform"
+                    description="Comprehensive integration platform with support for leading security tools and custom connectors."
+                    features={features}
+                    icon="🔗"
+                />
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                // Simulate app initialization
+                setTimeout(() => {
+                    setLoading(false);
+                }, 2000);
+            }, []);
+
+            if (loading) {
+                return (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <h2>Loading Phantom Spire CTI Platform...</h2>
+                        <p>Initializing React Frontend Components</p>
+                    </div>
+                );
+            }
+
+            return (
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <Router>
+                        <Navigation />
+                        <Routes>
+                            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                            <Route path="/dashboard" element={<DashboardView />} />
+                            <Route path="/ioc" element={<IOCView />} />
+                            <Route path="/incidents" element={<IncidentView />} />
+                            <Route path="/hunting" element={<HuntingView />} />
+                            <Route path="/analytics" element={<AnalyticsView />} />
+                            <Route path="/feeds" element={<FeedsView />} />
+                            <Route path="/investigation" element={<InvestigationView />} />
+                            <Route path="/admin" element={<AdminView />} />
+                            <Route path="/operations" element={<OperationsView />} />
+                            <Route path="/repository" element={<RepositoryView />} />
+                            <Route path="/integrations" element={<IntegrationsView />} />
+                        </Routes>
+                    </Router>
+                </ThemeProvider>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

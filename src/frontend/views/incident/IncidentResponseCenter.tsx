@@ -27,13 +27,6 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Timeline,
-  TimelineItem,
-  TimelineContent,
-  TimelineConnector,
-  TimelineSeparator,
-  TimelineDot,
-  TimelineOppositeContent,
   LinearProgress,
   Alert,
   Tooltip,
@@ -51,12 +44,20 @@ import {
   alpha
 } from '@mui/material';
 import {
+  Timeline,
+  TimelineItem,
+  TimelineContent,
+  TimelineConnector,
+  TimelineSeparator,
+  TimelineDot,
+  TimelineOppositeContent
+} from '@mui/lab';
+import {
   BugReport,
   Add,
   Assignment,
   Person,
   Schedule,
-  Priority,
   Warning,
   CheckCircle,
   Error,
@@ -80,7 +81,7 @@ import {
 } from '@mui/icons-material';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { SecurityIncident, IncidentStatus, IncidentPriority, ThreatSeverity } from '../../types/common';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 interface IncidentMetrics {
   total: number;

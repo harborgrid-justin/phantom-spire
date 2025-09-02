@@ -32,15 +32,15 @@ export interface IWorkflowDefinition {
 
 export enum WorkflowStatus {
   DRAFT = 'draft',
-  ACTIVE = 'active', 
-  INACTIVE = 'inactive'
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 
 export enum WorkflowPriority {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum StepType {
@@ -50,14 +50,14 @@ export enum StepType {
   TASK = 'task',
   SEQUENTIAL = 'sequential',
   HUMAN = 'human',
-  MESSAGE = 'message'
+  MESSAGE = 'message',
 }
 
 export enum TriggerType {
   MANUAL = 'manual',
   AUTOMATIC = 'automatic',
   SCHEDULED = 'scheduled',
-  EVENT = 'event'
+  EVENT = 'event',
 }
 
 export interface IWorkflowInstance {

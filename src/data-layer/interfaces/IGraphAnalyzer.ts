@@ -7,13 +7,30 @@ import { IDataRecord, IRelationship } from './IDataSource.js';
 export interface IGraphAnalyzer {
   readonly name: string;
   readonly algorithms: string[];
-  
-  findConnectedComponents(nodes: IGraphNode[], relationships: IRelationship[]): Promise<IConnectedComponent[]>;
-  calculateCentrality(graph: IGraph, type: 'betweenness' | 'closeness' | 'degree' | 'eigenvector'): Promise<ICentralityResult>;
-  detectCommunities(graph: IGraph, algorithm?: string): Promise<ICommunityResult>;
-  findShortestPath(graph: IGraph, startId: string, endId: string): Promise<IPathResult>;
+
+  findConnectedComponents(
+    nodes: IGraphNode[],
+    relationships: IRelationship[]
+  ): Promise<IConnectedComponent[]>;
+  calculateCentrality(
+    graph: IGraph,
+    type: 'betweenness' | 'closeness' | 'degree' | 'eigenvector'
+  ): Promise<ICentralityResult>;
+  detectCommunities(
+    graph: IGraph,
+    algorithm?: string
+  ): Promise<ICommunityResult>;
+  findShortestPath(
+    graph: IGraph,
+    startId: string,
+    endId: string
+  ): Promise<IPathResult>;
   analyzePatterns(graph: IGraph, patterns: IPattern[]): Promise<IPatternResult>;
-  calculateSimilarity(node1: IGraphNode, node2: IGraphNode, method: 'jaccard' | 'cosine' | 'euclidean'): Promise<number>;
+  calculateSimilarity(
+    node1: IGraphNode,
+    node2: IGraphNode,
+    method: 'jaccard' | 'cosine' | 'euclidean'
+  ): Promise<number>;
 }
 
 export interface IGraphNode {
@@ -106,7 +123,7 @@ export interface IPatternResult {
 export interface IEntityResolver {
   readonly name: string;
   readonly strategies: string[];
-  
+
   resolve(entities: IDataRecord[]): Promise<IResolutionResult>;
   deduplicate(entities: IDataRecord[]): Promise<IDeduplicationResult>;
   link(entity1: IDataRecord, entity2: IDataRecord): Promise<ILinkResult>;

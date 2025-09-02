@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -93,7 +87,6 @@ import {
 } from '@mui/material';
 
 import {
-  Rss,
   CloudDownload,
   Sync,
   SyncProblem,
@@ -187,8 +180,8 @@ import {
   AttachMoney
 } from '@mui/icons-material';
 
-import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, TreeMap, ComposedChart, Pie } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced Interfaces for Multi-Source Threat Feed Integration
 interface ThreatFeed {
@@ -1014,7 +1007,7 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
             <CardHeader
               avatar={
                 <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-                  <Rss />
+                  <DataUsage />
                 </Avatar>
               }
               title={
@@ -1133,7 +1126,7 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Avatar sx={{ bgcolor: theme.palette.primary.main, width: 32, height: 32 }}>
-                      <Rss fontSize="small" />
+                      <DataUsage fontSize="small" />
                     </Avatar>
                     <Box>
                       <Typography variant="subtitle2" fontWeight="bold">
@@ -1235,7 +1228,7 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Rss sx={{ mr: 1, color: theme.palette.primary.main }} />
+              <DataUsage sx={{ mr: 1, color: theme.palette.primary.main }} />
               <Typography variant="h6">Total Feeds</Typography>
             </Box>
             <Typography variant="h4" fontWeight="bold">

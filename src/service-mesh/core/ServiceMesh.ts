@@ -19,7 +19,7 @@ import {
   LoadBalancingStrategy,
   CircuitBreakerState,
   ITimeRange,
-  IServiceMeshConfiguration
+  IServiceMeshConfiguration,
 } from '../interfaces/IServiceMesh.js';
 
 /**
@@ -35,10 +35,15 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
   private started: boolean = false;
   private healthCheckInterval?: NodeJS.Timeout;
 
-  constructor(private config: IServiceMeshConfiguration = DEFAULT_SERVICE_MESH_CONFIG) {
+  constructor(
+    private config: IServiceMeshConfiguration = DEFAULT_SERVICE_MESH_CONFIG
+  ) {
     super();
     this.serviceRegistry = new ServiceRegistry(this.config.registry);
-    this.loadBalancer = new LoadBalancer(this.serviceRegistry, this.config.loadBalancer);
+    this.loadBalancer = new LoadBalancer(
+      this.serviceRegistry,
+      this.config.loadBalancer
+    );
     this.setupEventHandlers();
   }
 
@@ -61,7 +66,10 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
    */
   getCircuitBreaker(serviceId: string): ICircuitBreaker {
     if (!this.circuitBreakers.has(serviceId)) {
-      const circuitBreaker = new CircuitBreaker(serviceId, this.config.circuitBreaker);
+      const circuitBreaker = new CircuitBreaker(
+        serviceId,
+        this.config.circuitBreaker
+      );
       this.circuitBreakers.set(serviceId, circuitBreaker);
     }
     return this.circuitBreakers.get(serviceId)!;
@@ -74,7 +82,9 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     this.validateTrafficPolicy(policy);
     this.trafficPolicies.set(policy.id, policy);
     this.emit('traffic-policy:added', policy);
-    console.log(`✅ Traffic policy added: ${policy.name} for service ${policy.serviceId}`);
+    console.log(
+      `✅ Traffic policy added: ${policy.name} for service ${policy.serviceId}`
+    );
   }
 
   async removeTrafficPolicy(policyId: string): Promise<void> {
@@ -82,7 +92,7 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     if (!policy) {
       throw new Error(`Traffic policy ${policyId} not found`);
     }
-    
+
     this.trafficPolicies.delete(policyId);
     this.emit('traffic-policy:removed', policy);
     console.log(`✅ Traffic policy removed: ${policy.name}`);
@@ -109,7 +119,7 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     if (!policy) {
       throw new Error(`Security policy ${policyId} not found`);
     }
-    
+
     this.securityPolicies.delete(policyId);
     this.emit('security-policy:removed', policy);
     console.log(`✅ Security policy removed for service ${policyId}`);
@@ -125,24 +135,30 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
   async collectMetrics(metrics: IObservabilityMetrics): Promise<void> {
     const serviceMetrics = this.metricsStore.get(metrics.serviceId) || [];
     serviceMetrics.push(metrics);
-    
+
     // Keep only recent metrics (based on retention period)
-    const retentionTime = Date.now() - this.config.observability.retentionPeriod;
-    const filteredMetrics = serviceMetrics.filter(m => m.timestamp.getTime() > retentionTime);
-    
+    const retentionTime =
+      Date.now() - this.config.observability.retentionPeriod;
+    const filteredMetrics = serviceMetrics.filter(
+      m => m.timestamp.getTime() > retentionTime
+    );
+
     this.metricsStore.set(metrics.serviceId, filteredMetrics);
     this.emit('metrics:collected', metrics);
   }
 
-  async getMetrics(serviceId: string, timeRange?: ITimeRange): Promise<IObservabilityMetrics[]> {
+  async getMetrics(
+    serviceId: string,
+    timeRange?: ITimeRange
+  ): Promise<IObservabilityMetrics[]> {
     const metrics = this.metricsStore.get(serviceId) || [];
-    
+
     if (!timeRange) {
       return metrics;
     }
-    
-    return metrics.filter(m => 
-      m.timestamp >= timeRange.start && m.timestamp <= timeRange.end
+
+    return metrics.filter(
+      m => m.timestamp >= timeRange.start && m.timestamp <= timeRange.end
     );
   }
 
@@ -152,18 +168,18 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
   async performHealthCheck(instanceId: string): Promise<IInstanceHealth> {
     const instances = await this.serviceRegistry.getAllInstances();
     const instance = instances.find(i => i.id === instanceId);
-    
+
     if (!instance) {
       throw new Error(`Instance ${instanceId} not found`);
     }
-    
+
     const startTime = Date.now();
-    
+
     try {
       // Perform health check - simplified implementation
       const isHealthy = await this.checkInstanceHealth(instance);
       const responseTime = Date.now() - startTime;
-      
+
       const health: IInstanceHealth = {
         status: isHealthy ? 'healthy' : 'unhealthy',
         uptime: Date.now() - instance.registeredAt.getTime(),
@@ -173,12 +189,11 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
         errorRate: Math.random() * 0.1,
         requestRate: Math.random() * 1000,
         lastHealthCheck: new Date(),
-        issues: isHealthy ? [] : ['Health check failed']
+        issues: isHealthy ? [] : ['Health check failed'],
       };
-      
+
       await this.serviceRegistry.updateInstanceHealth(instanceId, health);
       return health;
-      
     } catch (error) {
       const health: IInstanceHealth = {
         status: 'unhealthy',
@@ -189,9 +204,9 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
         errorRate: 1.0,
         requestRate: 0,
         lastHealthCheck: new Date(),
-        issues: [`Health check error: ${error}`]
+        issues: [`Health check error: ${error}`],
       };
-      
+
       await this.serviceRegistry.updateInstanceHealth(instanceId, health);
       return health;
     }
@@ -199,11 +214,11 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
 
   setHealthCheckInterval(interval: number): void {
     this.config.registry.heartbeatInterval = interval;
-    
+
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
     }
-    
+
     if (this.started) {
       this.startHealthChecks();
     }
@@ -216,7 +231,10 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     return this.serviceRegistry.getAllInstances();
   }
 
-  watchService(serviceId: string, callback: (instances: IServiceInstance[]) => void): void {
+  watchService(
+    serviceId: string,
+    callback: (instances: IServiceInstance[]) => void
+  ): void {
     this.serviceRegistry.on(`service:${serviceId}:updated`, callback);
   }
 
@@ -232,11 +250,10 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
       this.startHealthChecks();
       this.startMetricsCollection();
       this.startServiceCleanup();
-      
+
       this.started = true;
       this.emit('service-mesh:started');
       console.log('✅ Service Mesh started successfully');
-      
     } catch (error) {
       console.error('❌ Failed to start Service Mesh:', error);
       throw error;
@@ -252,11 +269,10 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
       if (this.healthCheckInterval) {
         clearInterval(this.healthCheckInterval);
       }
-      
+
       this.started = false;
       this.emit('service-mesh:stopped');
       console.log('✅ Service Mesh stopped successfully');
-      
     } catch (error) {
       console.error('❌ Failed to stop Service Mesh:', error);
       throw error;
@@ -267,10 +283,12 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     if (!this.started) {
       return false;
     }
-    
+
     const instances = await this.serviceRegistry.getAllInstances();
-    const healthyInstances = instances.filter(i => i.health.status === 'healthy');
-    
+    const healthyInstances = instances.filter(
+      i => i.health.status === 'healthy'
+    );
+
     return healthyInstances.length > 0;
   }
 
@@ -289,28 +307,40 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     }
   }
 
-  private async checkInstanceHealth(_instance: IServiceInstance): Promise<boolean> {
+  private async checkInstanceHealth(
+    _instance: IServiceInstance
+  ): Promise<boolean> {
     // Simple health check - in production, implement proper HTTP/gRPC health checks
     return Math.random() > 0.1; // 90% success rate for mock
   }
 
   private setupEventHandlers(): void {
-    this.serviceRegistry.on('instance:registered', (instance: IServiceInstance) => {
-      this.emit('instance:registered', instance);
-      console.log(`🔗 Service instance registered: ${instance.name} (${instance.id})`);
-    });
-    
-    this.serviceRegistry.on('instance:unregistered', (instance: IServiceInstance) => {
-      this.emit('instance:unregistered', instance);
-      console.log(`🔌 Service instance unregistered: ${instance.name} (${instance.id})`);
-    });
+    this.serviceRegistry.on(
+      'instance:registered',
+      (instance: IServiceInstance) => {
+        this.emit('instance:registered', instance);
+        console.log(
+          `🔗 Service instance registered: ${instance.name} (${instance.id})`
+        );
+      }
+    );
+
+    this.serviceRegistry.on(
+      'instance:unregistered',
+      (instance: IServiceInstance) => {
+        this.emit('instance:unregistered', instance);
+        console.log(
+          `🔌 Service instance unregistered: ${instance.name} (${instance.id})`
+        );
+      }
+    );
   }
 
   private startHealthChecks(): void {
     this.healthCheckInterval = setInterval(async () => {
       try {
         const instances = await this.serviceRegistry.getAllInstances();
-        
+
         for (const instance of instances) {
           await this.performHealthCheck(instance.id);
         }
@@ -330,12 +360,15 @@ export class ServiceMesh extends EventEmitter implements IServiceMesh {
     setInterval(async () => {
       try {
         const instances = await this.serviceRegistry.getAllInstances();
-        const expiredThreshold = Date.now() - this.config.registry.instanceTimeout;
-        
+        const expiredThreshold =
+          Date.now() - this.config.registry.instanceTimeout;
+
         for (const instance of instances) {
           if (instance.lastHeartbeat.getTime() < expiredThreshold) {
             await this.serviceRegistry.unregisterInstance(instance.id);
-            console.log(`🧹 Cleaned up expired instance: ${instance.name} (${instance.id})`);
+            console.log(
+              `🧹 Cleaned up expired instance: ${instance.name} (${instance.id})`
+            );
           }
         }
       } catch (error) {
@@ -358,7 +391,10 @@ class ServiceRegistry extends EventEmitter implements IServiceRegistry {
   async registerInstance(instance: IServiceInstance): Promise<void> {
     this.instances.set(instance.id, instance);
     this.emit('instance:registered', instance);
-    this.emit(`service:${instance.serviceId}:updated`, await this.getInstances(instance.serviceId));
+    this.emit(
+      `service:${instance.serviceId}:updated`,
+      await this.getInstances(instance.serviceId)
+    );
   }
 
   async unregisterInstance(instanceId: string): Promise<void> {
@@ -366,12 +402,17 @@ class ServiceRegistry extends EventEmitter implements IServiceRegistry {
     if (instance) {
       this.instances.delete(instanceId);
       this.emit('instance:unregistered', instance);
-      this.emit(`service:${instance.serviceId}:updated`, await this.getInstances(instance.serviceId));
+      this.emit(
+        `service:${instance.serviceId}:updated`,
+        await this.getInstances(instance.serviceId)
+      );
     }
   }
 
   async getInstances(serviceId: string): Promise<IServiceInstance[]> {
-    return Array.from(this.instances.values()).filter(i => i.serviceId === serviceId);
+    return Array.from(this.instances.values()).filter(
+      i => i.serviceId === serviceId
+    );
   }
 
   async getAllInstances(): Promise<IServiceInstance[]> {
@@ -383,7 +424,10 @@ class ServiceRegistry extends EventEmitter implements IServiceRegistry {
     return instances.filter(i => i.health.status === 'healthy');
   }
 
-  async updateInstanceHealth(instanceId: string, health: Partial<IInstanceHealth>): Promise<void> {
+  async updateInstanceHealth(
+    instanceId: string,
+    health: Partial<IInstanceHealth>
+  ): Promise<void> {
     const instance = this.instances.get(instanceId);
     if (instance) {
       instance.health = { ...instance.health, ...health };
@@ -400,12 +444,18 @@ class LoadBalancer implements ILoadBalancer {
   private strategies: Map<string, ILoadBalancingStrategy> = new Map();
   private roundRobinCounters: Map<string, number> = new Map();
 
-  constructor(private serviceRegistry: IServiceRegistry, private config: any) {
+  constructor(
+    private serviceRegistry: IServiceRegistry,
+    private config: any
+  ) {
     this.initializeStrategies();
   }
 
-  async selectInstance(serviceId: string, strategy: LoadBalancingStrategy = this.config.defaultStrategy): Promise<IServiceInstance | null> {
-    const instances = this.config.healthCheckRequired 
+  async selectInstance(
+    serviceId: string,
+    strategy: LoadBalancingStrategy = this.config.defaultStrategy
+  ): Promise<IServiceInstance | null> {
+    const instances = this.config.healthCheckRequired
       ? await this.serviceRegistry.findHealthyInstances(serviceId)
       : await this.serviceRegistry.getInstances(serviceId);
 
@@ -433,38 +483,47 @@ class LoadBalancer implements ILoadBalancer {
     // Round Robin Strategy
     this.strategies.set('round-robin', {
       name: 'round-robin',
-      select: (instances: IServiceInstance[], _context?: IRequestContext): IServiceInstance | null => {
+      select: (
+        instances: IServiceInstance[],
+        _context?: IRequestContext
+      ): IServiceInstance | null => {
         const serviceId = instances[0]?.serviceId;
         if (!serviceId || instances.length === 0) return null;
-        
+
         const counter = this.roundRobinCounters.get(serviceId) || 0;
         const selectedInstance = instances[counter % instances.length];
         this.roundRobinCounters.set(serviceId, counter + 1);
-        
+
         return selectedInstance || null;
-      }
+      },
     });
 
     // Random Strategy
     this.strategies.set('random', {
       name: 'random',
-      select: (instances: IServiceInstance[], _context?: IRequestContext): IServiceInstance | null => {
+      select: (
+        instances: IServiceInstance[],
+        _context?: IRequestContext
+      ): IServiceInstance | null => {
         if (instances.length === 0) return null;
         return instances[Math.floor(Math.random() * instances.length)] || null;
-      }
+      },
     });
 
     // Least Connections Strategy (simplified)
     this.strategies.set('least-connections', {
       name: 'least-connections',
-      select: (instances: IServiceInstance[], _context?: IRequestContext): IServiceInstance | null => {
+      select: (
+        instances: IServiceInstance[],
+        _context?: IRequestContext
+      ): IServiceInstance | null => {
         if (instances.length === 0) return null;
         // In a real implementation, track active connections per instance
-        const selected = instances.reduce((prev, current) => 
-          (current.health.requestRate < prev.health.requestRate) ? current : prev
+        const selected = instances.reduce((prev, current) =>
+          current.health.requestRate < prev.health.requestRate ? current : prev
         );
         return selected || null;
-      }
+      },
     });
   }
 }
@@ -505,7 +564,9 @@ class CircuitBreaker implements ICircuitBreaker {
         this.state = 'half-open';
         this.successCount = 0;
       } else {
-        throw new Error(`Circuit breaker is OPEN for service ${this.serviceId}`);
+        throw new Error(
+          `Circuit breaker is OPEN for service ${this.serviceId}`
+        );
       }
     }
 
@@ -555,7 +616,7 @@ class CircuitBreaker implements ICircuitBreaker {
   private onFailure(): void {
     this.failureCount++;
     this.lastFailureTime = new Date();
-    
+
     if (this.failureCount >= this.failureThreshold) {
       this.state = 'open';
     }
@@ -565,36 +626,42 @@ class CircuitBreaker implements ICircuitBreaker {
     if (!this.lastFailureTime) {
       return true;
     }
-    
-    return (Date.now() - this.lastFailureTime.getTime()) >= this.recoveryTimeout;
+
+    return Date.now() - this.lastFailureTime.getTime() >= this.recoveryTimeout;
   }
 }
 
 const DEFAULT_SERVICE_MESH_CONFIG: IServiceMeshConfiguration = {
   registry: {
-    heartbeatInterval: 30000,    // 30 seconds
-    instanceTimeout: 90000,      // 90 seconds
-    cleanupInterval: 60000       // 60 seconds
+    heartbeatInterval: 30000, // 30 seconds
+    instanceTimeout: 90000, // 90 seconds
+    cleanupInterval: 60000, // 60 seconds
   },
   loadBalancer: {
     defaultStrategy: 'round-robin',
-    healthCheckRequired: true
+    healthCheckRequired: true,
   },
   circuitBreaker: {
     failureThreshold: 5,
-    recoveryTimeout: 60000,      // 60 seconds
-    successThreshold: 3
+    recoveryTimeout: 60000, // 60 seconds
+    successThreshold: 3,
   },
   observability: {
-    metricsInterval: 10000,      // 10 seconds
-    tracesSampling: 0.1,         // 10% sampling
-    retentionPeriod: 3600000     // 1 hour
+    metricsInterval: 10000, // 10 seconds
+    tracesSampling: 0.1, // 10% sampling
+    retentionPeriod: 3600000, // 1 hour
   },
   security: {
     defaultEncryption: true,
     certificateValidation: true,
-    rateLimitingEnabled: true
-  }
+    rateLimitingEnabled: true,
+  },
 };
 
-export { ServiceMesh as Mesh, ServiceRegistry, LoadBalancer, CircuitBreaker, DEFAULT_SERVICE_MESH_CONFIG };
+export {
+  ServiceMesh as Mesh,
+  ServiceRegistry,
+  LoadBalancer,
+  CircuitBreaker,
+  DEFAULT_SERVICE_MESH_CONFIG,
+};

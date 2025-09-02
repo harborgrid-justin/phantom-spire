@@ -61,13 +61,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   AppBar,
   Toolbar,
   Drawer,
@@ -149,7 +142,6 @@ import {
   ViewModule,
   FormatListBulleted,
   GridOn,
-  Scatter,
   BubbleChart,
   ShowChart,
   DonutLarge,
@@ -176,7 +168,9 @@ import {
   Bookmark,
   BookmarkBorder,
   Star,
-  StarBorder
+  StarBorder,
+  History,
+  ContentCopy as Copy
 } from '@mui/icons-material';
 
 import {
@@ -204,13 +198,9 @@ import {
   ComposedChart,
   ReferenceLine,
   Brush,
-  FunnelChart,
-  Funnel,
-  Treemap,
-  Sankey
+  Treemap
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
 
 // Behavioral analytics interfaces
 interface BehaviorProfile {
@@ -473,17 +463,6 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
   const [confidenceThreshold, setConfidenceThreshold] = useState(70);
   const [anomalyThreshold, setAnomalyThreshold] = useState(80);
 
-  // Initialize UI/UX Evaluation
-  useEffect(() => {
-    const evaluationController = addUIUXEvaluation('behavioral-analytics-anomaly-detection', {
-      continuous: true,
-      position: 'bottom-left',
-      minimized: true,
-      interval: 200000
-    });
-
-    return () => evaluationController.remove();
-  }, []);
 
   // Generate mock behavior profiles
   const generateMockProfiles = useCallback((): BehaviorProfile[] => {
@@ -676,7 +655,7 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
       });
     }
     
-    return anomalies.sort((a, b) => b.detectedAt.getTime() - a.detectedAt.getTime());
+    return anomalies.sort((a, b) => b.detection.detectedAt.getTime() - a.detection.detectedAt.getTime());
   }, []);
 
   // Generate mock detection models
@@ -1004,69 +983,84 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Anomaly Detection Timeline
         </Typography>
-        <Timeline>
+        <List>
           {filteredAnomalies.slice(0, 20).map((anomaly, index) => (
-            <TimelineItem key={anomaly.id}>
-              <TimelineOppositeContent sx={{ minWidth: 120 }}>
-                <Typography variant="caption" color="textSecondary">
-                  {anomaly.detectedAt.toLocaleString()}
-                </Typography>
-              </TimelineOppositeContent>
-              <TimelineSeparator>
-                <TimelineDot
+            <ListItem
+              key={anomaly.id}
+              onClick={() => {
+                setSelectedAnomaly(anomaly);
+                setAnomalyDetailsOpen(true);
+              }}
+              sx={{ 
+                mb: 1, 
+                border: 1, 
+                borderColor: 'divider', 
+                borderRadius: 1,
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <ListItemIcon>
+                <Avatar
                   sx={{
                     bgcolor: anomaly.severity === 'critical' ? theme.palette.error.main :
                             anomaly.severity === 'high' ? theme.palette.warning.main :
                             anomaly.severity === 'medium' ? theme.palette.info.main :
-                            theme.palette.success.main
+                            theme.palette.success.main,
+                    width: 32,
+                    height: 32
                   }}
                 >
                   {anomaly.severity === 'critical' ? <Error fontSize="small" /> :
                    anomaly.severity === 'high' ? <Warning fontSize="small" /> :
                    <Info fontSize="small" />}
-                </TimelineDot>
-                {index < filteredAnomalies.slice(0, 20).length - 1 && <TimelineConnector />}
-              </TimelineSeparator>
-              <TimelineContent>
-                <Box
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => {
-                    setSelectedAnomaly(anomaly);
-                    setAnomalyDetailsOpen(true);
-                  }}
-                >
-                  <Typography variant="subtitle2" fontWeight="bold">
-                    {anomaly.description}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Entity: {anomaly.entityId} • Type: {anomaly.type}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 0.5, mt: 1 }}>
-                    <Chip
-                      size="small"
-                      label={anomaly.severity}
-                      color={
-                        anomaly.severity === 'critical' ? 'error' :
-                        anomaly.severity === 'high' ? 'warning' :
-                        anomaly.severity === 'medium' ? 'info' : 'success'
-                      }
-                    />
-                    <Chip
-                      size="small"
-                      label={anomaly.investigation.status}
-                      variant="outlined"
-                    />
-                    <Chip
-                      size="small"
-                      label={`Score: ${anomaly.score}`}
-                      variant="outlined"
-                    />
+                </Avatar>
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                      {anomaly.description}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      {anomaly.detection.detectedAt.toLocaleString()}
+                    </Typography>
                   </Box>
-                </Box>
-              </TimelineContent>
-            </TimelineItem>
+                }
+                secondary={
+                  <Box>
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                      Entity: {anomaly.entityId} • Type: {anomaly.type}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Chip
+                        size="small"
+                        label={anomaly.severity}
+                        color={
+                          anomaly.severity === 'critical' ? 'error' :
+                          anomaly.severity === 'high' ? 'warning' :
+                          anomaly.severity === 'medium' ? 'info' : 'success'
+                        }
+                      />
+                      <Chip
+                        size="small"
+                        label={anomaly.investigation.status}
+                        variant="outlined"
+                      />
+                      <Chip
+                        size="small"
+                        label={`Score: ${anomaly.score}`}
+                        variant="outlined"
+                      />
+                    </Box>
+                  </Box>
+                }
+              />
+            </ListItem>
           ))}
-        </Timeline>
+        </List>
       </CardContent>
     </Card>
   );
@@ -1144,10 +1138,15 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
               {detectionModels.map(model => (
                 <ListItem
                   key={model.id}
-                  button
                   onClick={() => {
                     setSelectedModel(model);
                     setModelDetailsOpen(true);
+                  }}
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: 'action.hover'
+                    }
                   }}
                 >
                   <ListItemIcon>

@@ -185,24 +185,70 @@ router.use(authMiddleware);
  *       500:
  *         description: Server error
  */
-router.post('/', [
-  body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title must be 1-200 characters'),
-  body('description').trim().isLength({ min: 1, max: 5000 }).withMessage('Description must be 1-5000 characters'),
-  body('issueType').isIn(['bug', 'feature', 'incident', 'vulnerability', 'threat', 'investigation', 'compliance', 'enhancement'])
-    .withMessage('Invalid issue type'),
-  body('priority').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid priority'),
-  body('severity').optional().isIn(['critical', 'major', 'minor', 'cosmetic']).withMessage('Invalid severity'),
-  body('threatLevel').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid threat level'),
-  body('securityClassification').optional().isIn(['public', 'internal', 'confidential', 'restricted'])
-    .withMessage('Invalid security classification'),
-  body('affectedSystems').optional().isArray().withMessage('Affected systems must be an array'),
-  body('relatedIOCs').optional().isArray().withMessage('Related IOCs must be an array'),
-  body('relatedAlerts').optional().isArray().withMessage('Related alerts must be an array'),
-  body('labels').optional().isArray().withMessage('Labels must be an array'),
-  body('tags').optional().isArray().withMessage('Tags must be an array'),
-  body('complianceRequirements').optional().isArray().withMessage('Compliance requirements must be an array'),
-  body('dueDate').optional().isISO8601().withMessage('Due date must be valid ISO 8601 date'),
-], issueController.createIssue);
+router.post(
+  '/',
+  [
+    body('title')
+      .trim()
+      .isLength({ min: 1, max: 200 })
+      .withMessage('Title must be 1-200 characters'),
+    body('description')
+      .trim()
+      .isLength({ min: 1, max: 5000 })
+      .withMessage('Description must be 1-5000 characters'),
+    body('issueType')
+      .isIn([
+        'bug',
+        'feature',
+        'incident',
+        'vulnerability',
+        'threat',
+        'investigation',
+        'compliance',
+        'enhancement',
+      ])
+      .withMessage('Invalid issue type'),
+    body('priority')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid priority'),
+    body('severity')
+      .optional()
+      .isIn(['critical', 'major', 'minor', 'cosmetic'])
+      .withMessage('Invalid severity'),
+    body('threatLevel')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid threat level'),
+    body('securityClassification')
+      .optional()
+      .isIn(['public', 'internal', 'confidential', 'restricted'])
+      .withMessage('Invalid security classification'),
+    body('affectedSystems')
+      .optional()
+      .isArray()
+      .withMessage('Affected systems must be an array'),
+    body('relatedIOCs')
+      .optional()
+      .isArray()
+      .withMessage('Related IOCs must be an array'),
+    body('relatedAlerts')
+      .optional()
+      .isArray()
+      .withMessage('Related alerts must be an array'),
+    body('labels').optional().isArray().withMessage('Labels must be an array'),
+    body('tags').optional().isArray().withMessage('Tags must be an array'),
+    body('complianceRequirements')
+      .optional()
+      .isArray()
+      .withMessage('Compliance requirements must be an array'),
+    body('dueDate')
+      .optional()
+      .isISO8601()
+      .withMessage('Due date must be valid ISO 8601 date'),
+  ],
+  issueController.createIssue
+);
 
 /**
  * @swagger
@@ -341,12 +387,28 @@ router.post('/', [
  *                     totalPages:
  *                       type: integer
  */
-router.get('/search', [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be 1-100'),
-  query('sortOrder').optional().isIn(['asc', 'desc']).withMessage('Sort order must be asc or desc'),
-  query('includeResolved').optional().isBoolean().withMessage('Include resolved must be boolean'),
-], issueController.searchIssues);
+router.get(
+  '/search',
+  [
+    query('page')
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage('Page must be a positive integer'),
+    query('limit')
+      .optional()
+      .isInt({ min: 1, max: 100 })
+      .withMessage('Limit must be 1-100'),
+    query('sortOrder')
+      .optional()
+      .isIn(['asc', 'desc'])
+      .withMessage('Sort order must be asc or desc'),
+    query('includeResolved')
+      .optional()
+      .isBoolean()
+      .withMessage('Include resolved must be boolean'),
+  ],
+  issueController.searchIssues
+);
 
 /**
  * @swagger
@@ -411,10 +473,18 @@ router.get('/metrics', issueController.getIssueMetrics);
  *       200:
  *         description: Issue analytics
  */
-router.get('/analytics', [
-  query('startDate').isISO8601().withMessage('Start date must be valid ISO 8601 date'),
-  query('endDate').isISO8601().withMessage('End date must be valid ISO 8601 date'),
-], issueController.getIssueAnalytics);
+router.get(
+  '/analytics',
+  [
+    query('startDate')
+      .isISO8601()
+      .withMessage('Start date must be valid ISO 8601 date'),
+    query('endDate')
+      .isISO8601()
+      .withMessage('End date must be valid ISO 8601 date'),
+  ],
+  issueController.getIssueAnalytics
+);
 
 /**
  * @swagger
@@ -459,10 +529,16 @@ router.get('/analytics', [
  *       200:
  *         description: Issues updated successfully
  */
-router.put('/bulk/update', [
-  body('issueIds').isArray({ min: 1 }).withMessage('Issue IDs must be a non-empty array'),
-  body('issueIds.*').isString().withMessage('Each issue ID must be a string'),
-], issueController.bulkUpdateIssues);
+router.put(
+  '/bulk/update',
+  [
+    body('issueIds')
+      .isArray({ min: 1 })
+      .withMessage('Issue IDs must be a non-empty array'),
+    body('issueIds.*').isString().withMessage('Each issue ID must be a string'),
+  ],
+  issueController.bulkUpdateIssues
+);
 
 /**
  * @swagger
@@ -492,11 +568,17 @@ router.put('/bulk/update', [
  *       200:
  *         description: Issues assigned successfully
  */
-router.put('/bulk/assign', [
-  body('issueIds').isArray({ min: 1 }).withMessage('Issue IDs must be a non-empty array'),
-  body('issueIds.*').isString().withMessage('Each issue ID must be a string'),
-  body('assigneeId').isString().withMessage('Assignee ID must be a string'),
-], issueController.bulkAssignIssues);
+router.put(
+  '/bulk/assign',
+  [
+    body('issueIds')
+      .isArray({ min: 1 })
+      .withMessage('Issue IDs must be a non-empty array'),
+    body('issueIds.*').isString().withMessage('Each issue ID must be a string'),
+    body('assigneeId').isString().withMessage('Assignee ID must be a string'),
+  ],
+  issueController.bulkAssignIssues
+);
 
 /**
  * @swagger
@@ -532,9 +614,11 @@ router.put('/bulk/assign', [
  *       500:
  *         description: Server error
  */
-router.get('/:issueId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.getIssue);
+router.get(
+  '/:issueId',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.getIssue
+);
 
 /**
  * @swagger
@@ -613,16 +697,47 @@ router.get('/:issueId', [
  *       500:
  *         description: Server error
  */
-router.put('/:issueId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('title').optional().trim().isLength({ min: 1, max: 200 }).withMessage('Title must be 1-200 characters'),
-  body('description').optional().trim().isLength({ min: 1, max: 5000 }).withMessage('Description must be 1-5000 characters'),
-  body('status').optional().isIn(['open', 'in_progress', 'on_hold', 'resolved', 'closed', 'rejected', 'escalated'])
-    .withMessage('Invalid status'),
-  body('priority').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid priority'),
-  body('severity').optional().isIn(['critical', 'major', 'minor', 'cosmetic']).withMessage('Invalid severity'),
-  body('threatLevel').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid threat level'),
-], issueController.updateIssue);
+router.put(
+  '/:issueId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('title')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 200 })
+      .withMessage('Title must be 1-200 characters'),
+    body('description')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 5000 })
+      .withMessage('Description must be 1-5000 characters'),
+    body('status')
+      .optional()
+      .isIn([
+        'open',
+        'in_progress',
+        'on_hold',
+        'resolved',
+        'closed',
+        'rejected',
+        'escalated',
+      ])
+      .withMessage('Invalid status'),
+    body('priority')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid priority'),
+    body('severity')
+      .optional()
+      .isIn(['critical', 'major', 'minor', 'cosmetic'])
+      .withMessage('Invalid severity'),
+    body('threatLevel')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid threat level'),
+  ],
+  issueController.updateIssue
+);
 
 /**
  * @swagger
@@ -649,9 +764,11 @@ router.put('/:issueId', [
  *       500:
  *         description: Server error
  */
-router.delete('/:issueId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.deleteIssue);
+router.delete(
+  '/:issueId',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.deleteIssue
+);
 
 /**
  * @swagger
@@ -688,12 +805,25 @@ router.delete('/:issueId', [
  *       400:
  *         description: Invalid transition
  */
-router.put('/:issueId/status', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('status').isIn(['open', 'in_progress', 'on_hold', 'resolved', 'closed', 'rejected', 'escalated'])
-    .withMessage('Invalid status'),
-  body('notes').optional().isString().withMessage('Notes must be a string'),
-], issueController.transitionStatus);
+router.put(
+  '/:issueId/status',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('status')
+      .isIn([
+        'open',
+        'in_progress',
+        'on_hold',
+        'resolved',
+        'closed',
+        'rejected',
+        'escalated',
+      ])
+      .withMessage('Invalid status'),
+    body('notes').optional().isString().withMessage('Notes must be a string'),
+  ],
+  issueController.transitionStatus
+);
 
 /**
  * @swagger
@@ -714,9 +844,11 @@ router.put('/:issueId/status', [
  *       200:
  *         description: Available transitions
  */
-router.get('/:issueId/transitions', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.getAvailableTransitions);
+router.get(
+  '/:issueId/transitions',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.getAvailableTransitions
+);
 
 /**
  * @swagger
@@ -748,10 +880,14 @@ router.get('/:issueId/transitions', [
  *       200:
  *         description: Issue assigned successfully
  */
-router.put('/:issueId/assign', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('assigneeId').isString().withMessage('Assignee ID must be a string'),
-], issueController.assignIssue);
+router.put(
+  '/:issueId/assign',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('assigneeId').isString().withMessage('Assignee ID must be a string'),
+  ],
+  issueController.assignIssue
+);
 
 /**
  * @swagger
@@ -772,9 +908,11 @@ router.put('/:issueId/assign', [
  *       200:
  *         description: Issue unassigned successfully
  */
-router.put('/:issueId/unassign', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.unassignIssue);
+router.put(
+  '/:issueId/unassign',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.unassignIssue
+);
 
 /**
  * @swagger
@@ -806,10 +944,14 @@ router.put('/:issueId/unassign', [
  *       200:
  *         description: Watcher added successfully
  */
-router.post('/:issueId/watchers', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('watcherId').isString().withMessage('Watcher ID must be a string'),
-], issueController.addWatcher);
+router.post(
+  '/:issueId/watchers',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('watcherId').isString().withMessage('Watcher ID must be a string'),
+  ],
+  issueController.addWatcher
+);
 
 /**
  * @swagger
@@ -836,10 +978,14 @@ router.post('/:issueId/watchers', [
  *       200:
  *         description: Watcher removed successfully
  */
-router.delete('/:issueId/watchers/:watcherId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  param('watcherId').isString().withMessage('Watcher ID must be a string'),
-], issueController.removeWatcher);
+router.delete(
+  '/:issueId/watchers/:watcherId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    param('watcherId').isString().withMessage('Watcher ID must be a string'),
+  ],
+  issueController.removeWatcher
+);
 
 /**
  * @swagger
@@ -885,11 +1031,21 @@ router.delete('/:issueId/watchers/:watcherId', [
  *       201:
  *         description: Comment added successfully
  */
-router.post('/:issueId/comments', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('content').trim().isLength({ min: 1 }).withMessage('Content is required'),
-  body('isInternal').optional().isBoolean().withMessage('Is internal must be boolean'),
-], issueController.addComment);
+router.post(
+  '/:issueId/comments',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('content')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Content is required'),
+    body('isInternal')
+      .optional()
+      .isBoolean()
+      .withMessage('Is internal must be boolean'),
+  ],
+  issueController.addComment
+);
 
 /**
  * @swagger
@@ -927,11 +1083,18 @@ router.post('/:issueId/comments', [
  *       200:
  *         description: Comment updated successfully
  */
-router.put('/:issueId/comments/:commentId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  param('commentId').isString().withMessage('Comment ID must be a string'),
-  body('content').trim().isLength({ min: 1 }).withMessage('Content is required'),
-], issueController.updateComment);
+router.put(
+  '/:issueId/comments/:commentId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    param('commentId').isString().withMessage('Comment ID must be a string'),
+    body('content')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Content is required'),
+  ],
+  issueController.updateComment
+);
 
 /**
  * @swagger
@@ -958,10 +1121,14 @@ router.put('/:issueId/comments/:commentId', [
  *       200:
  *         description: Comment deleted successfully
  */
-router.delete('/:issueId/comments/:commentId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  param('commentId').isString().withMessage('Comment ID must be a string'),
-], issueController.deleteComment);
+router.delete(
+  '/:issueId/comments/:commentId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    param('commentId').isString().withMessage('Comment ID must be a string'),
+  ],
+  issueController.deleteComment
+);
 
 /**
  * @swagger
@@ -997,11 +1164,20 @@ router.delete('/:issueId/comments/:commentId', [
  *       200:
  *         description: Time logged successfully
  */
-router.post('/:issueId/time', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('hours').isFloat({ min: 0.1 }).withMessage('Hours must be a positive number'),
-  body('description').trim().isLength({ min: 1 }).withMessage('Description is required'),
-], issueController.logTime);
+router.post(
+  '/:issueId/time',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('hours')
+      .isFloat({ min: 0.1 })
+      .withMessage('Hours must be a positive number'),
+    body('description')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Description is required'),
+  ],
+  issueController.logTime
+);
 
 /**
  * @swagger
@@ -1022,9 +1198,11 @@ router.post('/:issueId/time', [
  *       200:
  *         description: Time spent retrieved
  */
-router.get('/:issueId/time', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.getTimeSpent);
+router.get(
+  '/:issueId/time',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.getTimeSpent
+);
 
 /**
  * @swagger
@@ -1056,10 +1234,17 @@ router.get('/:issueId/time', [
  *       200:
  *         description: Issue escalated successfully
  */
-router.put('/:issueId/escalate', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('reason').trim().isLength({ min: 1 }).withMessage('Escalation reason is required'),
-], issueController.escalateIssue);
+router.put(
+  '/:issueId/escalate',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('reason')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Escalation reason is required'),
+  ],
+  issueController.escalateIssue
+);
 
 /**
  * @swagger
@@ -1095,12 +1280,17 @@ router.put('/:issueId/escalate', [
  *       201:
  *         description: Issue linked to task successfully
  */
-router.post('/:issueId/tasks', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('taskId').isString().withMessage('Task ID must be a string'),
-  body('relationship').isIn(['spawned_from', 'resolves', 'blocks', 'related_to'])
-    .withMessage('Invalid relationship type'),
-], issueController.linkToTask);
+router.post(
+  '/:issueId/tasks',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('taskId').isString().withMessage('Task ID must be a string'),
+    body('relationship')
+      .isIn(['spawned_from', 'resolves', 'blocks', 'related_to'])
+      .withMessage('Invalid relationship type'),
+  ],
+  issueController.linkToTask
+);
 
 /**
  * @swagger
@@ -1127,10 +1317,14 @@ router.post('/:issueId/tasks', [
  *       200:
  *         description: Issue unlinked from task successfully
  */
-router.delete('/:issueId/tasks/:taskId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  param('taskId').isString().withMessage('Task ID must be a string'),
-], issueController.unlinkFromTask);
+router.delete(
+  '/:issueId/tasks/:taskId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    param('taskId').isString().withMessage('Task ID must be a string'),
+  ],
+  issueController.unlinkFromTask
+);
 
 /**
  * @swagger
@@ -1151,9 +1345,11 @@ router.delete('/:issueId/tasks/:taskId', [
  *       200:
  *         description: Related tasks retrieved
  */
-router.get('/:issueId/tasks', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.getRelatedTasks);
+router.get(
+  '/:issueId/tasks',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.getRelatedTasks
+);
 
 /**
  * @swagger
@@ -1194,12 +1390,20 @@ router.get('/:issueId/tasks', [
  *       200:
  *         description: Issue resolved successfully
  */
-router.put('/:issueId/resolve', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('resolution.type').isIn(['fixed', 'wont_fix', 'duplicate', 'invalid', 'works_as_designed'])
-    .withMessage('Invalid resolution type'),
-  body('resolution.description').trim().isLength({ min: 1 }).withMessage('Resolution description is required'),
-], issueController.resolveIssue);
+router.put(
+  '/:issueId/resolve',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('resolution.type')
+      .isIn(['fixed', 'wont_fix', 'duplicate', 'invalid', 'works_as_designed'])
+      .withMessage('Invalid resolution type'),
+    body('resolution.description')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Resolution description is required'),
+  ],
+  issueController.resolveIssue
+);
 
 /**
  * @swagger
@@ -1231,9 +1435,16 @@ router.put('/:issueId/resolve', [
  *       200:
  *         description: Issue reopened successfully
  */
-router.put('/:issueId/reopen', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('reason').trim().isLength({ min: 1 }).withMessage('Reopen reason is required'),
-], issueController.reopenIssue);
+router.put(
+  '/:issueId/reopen',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('reason')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Reopen reason is required'),
+  ],
+  issueController.reopenIssue
+);
 
 export default router;

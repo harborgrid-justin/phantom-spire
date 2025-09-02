@@ -28,7 +28,7 @@ import {
   TrendingUp,
   NetworkCheck
 } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const RealTimeOperationsCenter: React.FC = () => {
   useEffect(() => {

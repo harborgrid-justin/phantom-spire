@@ -17,7 +17,7 @@ export {
   type IEvaluationIssue,
   type IEvaluationReport,
   type IEvaluationSession,
-  type IEvaluationDashboard
+  type IEvaluationDashboard,
 } from './interfaces/IUIUXEvaluation.js';
 
 // React components (if React is available)
@@ -27,7 +27,7 @@ export { EvaluationWidget } from './components/EvaluationComponents.js';
 export {
   useUIUXEvaluation,
   createEvaluationStatusElement,
-  addUIUXEvaluation
+  addUIUXEvaluation,
 } from './hooks/useUIUXEvaluation.js';
 
 // Import for internal use
@@ -41,51 +41,54 @@ export const defaultEvaluationConfig = {
   evaluationInterval: 30000, // 30 seconds
   categories: [
     'accessibility',
-    'performance', 
+    'performance',
     'usability',
     'visual_design',
     'enterprise_standards',
-    'user_journey'
+    'user_journey',
   ],
   accessibility: {
     enabled: true,
     wcagLevel: 'AA' as const,
     checkColorContrast: true,
     checkKeyboardNav: true,
-    checkScreenReader: true
+    checkScreenReader: true,
   },
   performance: {
     enabled: true,
     targetLoadTime: 2000,
     targetInteractionTime: 100,
-    monitorFrameRate: true
+    monitorFrameRate: true,
   },
   usability: {
     enabled: true,
     trackUserActions: true,
     trackErrorRates: true,
-    trackCompletionTimes: true
+    trackCompletionTimes: true,
   },
   reporting: {
     enabled: true,
     autoGenerate: true,
-    retentionDays: 90
-  }
+    retentionDays: 90,
+  },
 };
 
 // Quick start function for immediate evaluation
-export const quickEvaluate = async (pageId: string, options?: {
-  continuous?: boolean;
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
-  minimized?: boolean;
-}) => {
+export const quickEvaluate = async (
+  pageId: string,
+  options?: {
+    continuous?: boolean;
+    position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+    minimized?: boolean;
+  }
+) => {
   console.log(`🚀 Quick UI/UX evaluation started for: ${pageId}`);
-  
+
   return addUIUXEvaluation(pageId, {
     autoStart: true,
     continuous: options?.continuous || false,
     position: options?.position || 'bottom-right',
-    minimized: options?.minimized || false
+    minimized: options?.minimized || false,
   });
 };
 
@@ -114,7 +117,7 @@ export class GlobalUIUXEvaluationManager {
 
     const evaluation = addUIUXEvaluation(pageId, options);
     this.evaluations.set(pageId, evaluation);
-    
+
     console.log(`✅ Started evaluation for ${pageId}`);
     return evaluation;
   }
@@ -154,4 +157,5 @@ export class GlobalUIUXEvaluationManager {
 }
 
 // Convenience export
-export const globalEvaluationManager = GlobalUIUXEvaluationManager.getInstance();
+export const globalEvaluationManager =
+  GlobalUIUXEvaluationManager.getInstance();

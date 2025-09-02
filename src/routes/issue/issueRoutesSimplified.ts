@@ -59,15 +59,44 @@ router.use(authMiddleware);
  *       500:
  *         description: Server error
  */
-router.post('/', [
-  body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title must be 1-200 characters'),
-  body('description').trim().isLength({ min: 1, max: 5000 }).withMessage('Description must be 1-5000 characters'),
-  body('issueType').isIn(['bug', 'feature', 'incident', 'vulnerability', 'threat', 'investigation', 'compliance', 'enhancement'])
-    .withMessage('Invalid issue type'),
-  body('priority').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid priority'),
-  body('severity').optional().isIn(['critical', 'major', 'minor', 'cosmetic']).withMessage('Invalid severity'),
-  body('threatLevel').optional().isIn(['critical', 'high', 'medium', 'low']).withMessage('Invalid threat level'),
-], issueController.createIssue);
+router.post(
+  '/',
+  [
+    body('title')
+      .trim()
+      .isLength({ min: 1, max: 200 })
+      .withMessage('Title must be 1-200 characters'),
+    body('description')
+      .trim()
+      .isLength({ min: 1, max: 5000 })
+      .withMessage('Description must be 1-5000 characters'),
+    body('issueType')
+      .isIn([
+        'bug',
+        'feature',
+        'incident',
+        'vulnerability',
+        'threat',
+        'investigation',
+        'compliance',
+        'enhancement',
+      ])
+      .withMessage('Invalid issue type'),
+    body('priority')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid priority'),
+    body('severity')
+      .optional()
+      .isIn(['critical', 'major', 'minor', 'cosmetic'])
+      .withMessage('Invalid severity'),
+    body('threatLevel')
+      .optional()
+      .isIn(['critical', 'high', 'medium', 'low'])
+      .withMessage('Invalid threat level'),
+  ],
+  issueController.createIssue
+);
 
 /**
  * @swagger
@@ -150,9 +179,11 @@ router.get('/metrics', issueController.getIssueMetrics);
  *       500:
  *         description: Server error
  */
-router.get('/:issueId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-], issueController.getIssue);
+router.get(
+  '/:issueId',
+  [param('issueId').isString().withMessage('Issue ID must be a string')],
+  issueController.getIssue
+);
 
 /**
  * @swagger
@@ -194,11 +225,23 @@ router.get('/:issueId', [
  *       404:
  *         description: Issue not found
  */
-router.put('/:issueId', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('title').optional().trim().isLength({ min: 1, max: 200 }).withMessage('Title must be 1-200 characters'),
-  body('description').optional().trim().isLength({ min: 1, max: 5000 }).withMessage('Description must be 1-5000 characters'),
-], issueController.updateIssue);
+router.put(
+  '/:issueId',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('title')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 200 })
+      .withMessage('Title must be 1-200 characters'),
+    body('description')
+      .optional()
+      .trim()
+      .isLength({ min: 1, max: 5000 })
+      .withMessage('Description must be 1-5000 characters'),
+  ],
+  issueController.updateIssue
+);
 
 /**
  * @swagger
@@ -233,10 +276,20 @@ router.put('/:issueId', [
  *       201:
  *         description: Comment added successfully
  */
-router.post('/:issueId/comments', [
-  param('issueId').isString().withMessage('Issue ID must be a string'),
-  body('content').trim().isLength({ min: 1 }).withMessage('Content is required'),
-  body('isInternal').optional().isBoolean().withMessage('Is internal must be boolean'),
-], issueController.addComment);
+router.post(
+  '/:issueId/comments',
+  [
+    param('issueId').isString().withMessage('Issue ID must be a string'),
+    body('content')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Content is required'),
+    body('isInternal')
+      .optional()
+      .isBoolean()
+      .withMessage('Is internal must be boolean'),
+  ],
+  issueController.addComment
+);
 
 export default router;

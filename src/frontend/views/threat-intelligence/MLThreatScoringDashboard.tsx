@@ -59,6 +59,9 @@ import {
   Step,
   StepLabel,
   StepContent,
+} from '@mui/material';
+
+import {
   Timeline,
   TimelineItem,
   TimelineSeparator,
@@ -66,7 +69,7 @@ import {
   TimelineContent,
   TimelineDot,
   TimelineOppositeContent
-} from '@mui/material';
+} from '@mui/lab';
 
 import {
   Psychology,
@@ -147,6 +150,7 @@ import {
   BarChart as RechartsBarChart,
   Bar,
   PieChart as RechartsPieChart,
+  Pie,
   Cell,
   XAxis,
   YAxis,
@@ -164,7 +168,7 @@ import {
   ReferenceLine
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced interfaces for ML threat scoring
 interface ThreatScore {
@@ -906,7 +910,7 @@ const MLThreatScoringDashboard: React.FC = () => {
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
               <RechartsPieChart>
-                <pie
+                <Pie
                   dataKey="value"
                   data={[
                     { name: 'Critical (80-100)', value: filteredScores.filter(s => s.score >= 80).length, fill: theme.palette.error.main },
@@ -927,7 +931,7 @@ const MLThreatScoringDashboard: React.FC = () => {
                   ].map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
-                </pie>
+                </Pie>
                 <RechartsTooltip />
               </RechartsPieChart>
             </ResponsiveContainer>
@@ -1238,7 +1242,7 @@ const MLThreatScoringDashboard: React.FC = () => {
                           </Typography>
                         </Box>
                         {stage.error && (
-                          <Alert severity="error" size="small" sx={{ mt: 1 }}>
+                          <Alert severity="error" sx={{ mt: 1 }}>
                             {stage.error}
                           </Alert>
                         )}

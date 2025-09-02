@@ -89,8 +89,9 @@ describe('IssueManagementService', () => {
 
       (Issue as any).mockImplementation(() => mockIssue);
 
-      await expect(service.createIssue(createRequest, mockContext))
-        .rejects.toThrow('Invalid issue type');
+      await expect(
+        service.createIssue(createRequest, mockContext)
+      ).rejects.toThrow('Invalid issue type');
     });
   });
 
@@ -130,8 +131,9 @@ describe('IssueManagementService', () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
       // User with analyst role shouldn't access restricted issues
-      await expect(service.getIssue('issue-123', mockContext))
-        .rejects.toThrow('Access denied to this issue');
+      await expect(service.getIssue('issue-123', mockContext)).rejects.toThrow(
+        'Access denied to this issue'
+      );
     });
   });
 
@@ -159,7 +161,11 @@ describe('IssueManagementService', () => {
 
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
-      const result = await service.updateIssue('issue-123', updates, mockContext);
+      const result = await service.updateIssue(
+        'issue-123',
+        updates,
+        mockContext
+      );
 
       expect(result).toBeDefined();
       expect(mockIssue.save).toHaveBeenCalled();
@@ -170,8 +176,9 @@ describe('IssueManagementService', () => {
     it('should throw error for non-existent issue', async () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(null);
 
-      await expect(service.updateIssue('non-existent', {}, mockContext))
-        .rejects.toThrow('Issue not found');
+      await expect(
+        service.updateIssue('non-existent', {}, mockContext)
+      ).rejects.toThrow('Issue not found');
     });
 
     it('should throw error for insufficient permissions', async () => {
@@ -189,8 +196,9 @@ describe('IssueManagementService', () => {
 
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
-      await expect(service.updateIssue('issue-123', {}, contextWithoutPermission))
-        .rejects.toThrow('Permission denied to update this issue');
+      await expect(
+        service.updateIssue('issue-123', {}, contextWithoutPermission)
+      ).rejects.toThrow('Permission denied to update this issue');
     });
   });
 
@@ -255,9 +263,9 @@ describe('IssueManagementService', () => {
       const mockIssue = {
         _id: 'issue-123',
         status: 'open',
-        workflowState: { 
+        workflowState: {
           currentStage: 'open',
-          stageHistory: [] 
+          stageHistory: [],
         },
         auditTrail: [],
         save: jest.fn().mockResolvedValue({
@@ -269,8 +277,8 @@ describe('IssueManagementService', () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
       const result = await service.transitionIssueStatus(
-        'issue-123', 
-        'in_progress', 
+        'issue-123',
+        'in_progress',
         mockContext,
         'Starting work on this issue'
       );
@@ -307,7 +315,11 @@ describe('IssueManagementService', () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
       await expect(
-        service.transitionIssueStatus('issue-123', 'resolved', contextWithoutPermissions)
+        service.transitionIssueStatus(
+          'issue-123',
+          'resolved',
+          contextWithoutPermissions
+        )
       ).rejects.toThrow('Insufficient permissions for this status transition');
     });
   });
@@ -350,8 +362,9 @@ describe('IssueManagementService', () => {
         content: 'Test comment',
       };
 
-      await expect(service.addComment(commentRequest, mockContext))
-        .rejects.toThrow('Issue not found');
+      await expect(
+        service.addComment(commentRequest, mockContext)
+      ).rejects.toThrow('Issue not found');
     });
   });
 
@@ -369,7 +382,11 @@ describe('IssueManagementService', () => {
 
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
-      const result = await service.assignIssue('issue-123', 'new-assignee', mockContext);
+      const result = await service.assignIssue(
+        'issue-123',
+        'new-assignee',
+        mockContext
+      );
 
       expect(result).toBeDefined();
       expect(mockIssue.save).toHaveBeenCalled();
@@ -394,8 +411,8 @@ describe('IssueManagementService', () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
       const result = await service.escalateIssue(
-        'issue-123', 
-        'Issue requires management attention', 
+        'issue-123',
+        'Issue requires management attention',
         mockContext
       );
 
@@ -427,7 +444,11 @@ describe('IssueManagementService', () => {
         description: 'Issue has been resolved by applying security patch',
       };
 
-      const result = await service.resolveIssue('issue-123', resolution, mockContext);
+      const result = await service.resolveIssue(
+        'issue-123',
+        resolution,
+        mockContext
+      );
 
       expect(result).toBeDefined();
       expect(mockIssue.save).toHaveBeenCalled();
@@ -455,9 +476,9 @@ describe('IssueManagementService', () => {
       (Issue.findById as jest.Mock) = jest.fn().mockResolvedValue(mockIssue);
 
       const result = await service.logTime(
-        'issue-123', 
-        2, 
-        'Investigated security logs', 
+        'issue-123',
+        2,
+        'Investigated security logs',
         mockContext
       );
 
@@ -471,27 +492,29 @@ describe('IssueManagementService', () => {
   describe('getIssueMetrics', () => {
     it('should return issue metrics', async () => {
       // Mock aggregation results
-      (Issue.countDocuments as jest.Mock) = jest.fn()
+      (Issue.countDocuments as jest.Mock) = jest
+        .fn()
         .mockResolvedValueOnce(100) // totalIssues
-        .mockResolvedValueOnce(30)  // openIssues
-        .mockResolvedValueOnce(60)  // resolvedIssues
-        .mockResolvedValueOnce(5);  // overdueIssues
+        .mockResolvedValueOnce(30) // openIssues
+        .mockResolvedValueOnce(60) // resolvedIssues
+        .mockResolvedValueOnce(5); // overdueIssues
 
-      (Issue.aggregate as jest.Mock) = jest.fn()
+      (Issue.aggregate as jest.Mock) = jest
+        .fn()
         .mockResolvedValueOnce([
           { _id: 'high', count: 20 },
           { _id: 'medium', count: 50 },
-          { _id: 'low', count: 30 }
+          { _id: 'low', count: 30 },
         ])
         .mockResolvedValueOnce([
           { _id: 'open', count: 30 },
           { _id: 'resolved', count: 60 },
-          { _id: 'closed', count: 10 }
+          { _id: 'closed', count: 10 },
         ])
         .mockResolvedValueOnce([
           { _id: 'incident', count: 40 },
           { _id: 'bug', count: 35 },
-          { _id: 'feature', count: 25 }
+          { _id: 'feature', count: 25 },
         ]);
 
       const result = await service.getIssueMetrics();

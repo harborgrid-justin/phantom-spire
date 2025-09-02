@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -106,9 +100,9 @@ import {
   Computer,
   CloudSync,
   Cloud,
-  Database,
+  Dataset,
   Router,
-  Server,
+  Storage as ServerIcon,
   DeviceHub,
   Hub,
   Security,
@@ -189,11 +183,13 @@ import {
   CloudDone,
   CloudOff,
   SyncProblem,
-  Sync
+  Sync,
+  AccountTree
 } from '@mui/icons-material';
 
-import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, TreeMap, ComposedChart, Pie } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
+// Note: UI/UX Evaluation service import - adjust path as needed
+// import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
 
 // Enhanced Interfaces for System Health Monitoring
 interface SystemComponent {
@@ -601,14 +597,14 @@ const SystemHealthMonitoring: React.FC = () => {
 
   // Initialize UI/UX Evaluation
   useEffect(() => {
-    const evaluationController = addUIUXEvaluation('system-health-monitoring', {
-      continuous: true,
-      position: 'bottom-right',
-      minimized: true,
-      interval: 220000
-    });
+    // const evaluationController = addUIUXEvaluation('system-health-monitoring', {
+    //   continuous: true,
+    //   position: 'bottom-right',
+    //   minimized: true,
+    //   interval: 220000
+    // });
 
-    return () => evaluationController.remove();
+    // return () => evaluationController.remove();
   }, []);
 
   // Load data

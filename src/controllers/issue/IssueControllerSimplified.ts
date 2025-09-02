@@ -90,7 +90,10 @@ export class IssueController {
         data: issue,
       });
     } catch (error) {
-      logger.error('Error retrieving issue', { error, issueId: req.params.issueId });
+      logger.error('Error retrieving issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve issue',
@@ -126,7 +129,11 @@ export class IssueController {
       const context = this.buildContext(req);
       const updates: IUpdateIssueRequest = req.body;
 
-      const issue = await this.issueService.updateIssue(issueId, updates, context);
+      const issue = await this.issueService.updateIssue(
+        issueId,
+        updates,
+        context
+      );
 
       res.json({
         success: true,
@@ -134,7 +141,10 @@ export class IssueController {
         message: `Issue ${issue.ticketId} updated successfully`,
       });
     } catch (error) {
-      logger.error('Error updating issue', { error, issueId: req.params.issueId });
+      logger.error('Error updating issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to update issue',
@@ -152,8 +162,8 @@ export class IssueController {
       const searchQuery: IIssueSearchQuery = {
         query: req.query.q as string,
         filters: this.buildFilters(req.query),
-        sortBy: req.query.sortBy as string || 'updatedAt',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc' || 'desc',
+        sortBy: (req.query.sortBy as string) || 'updatedAt',
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
         page: parseInt(req.query.page as string) || 1,
         limit: Math.min(parseInt(req.query.limit as string) || 50, 100),
         includeResolved: req.query.includeResolved === 'true',
@@ -178,7 +188,10 @@ export class IssueController {
   /**
    * Get issue metrics
    */
-  public getIssueMetrics = async (req: Request, res: Response): Promise<void> => {
+  public getIssueMetrics = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const context = this.buildContext(req);
       const filters = this.buildFilters(req.query);
@@ -240,7 +253,10 @@ export class IssueController {
         message: 'Comment added successfully',
       });
     } catch (error) {
-      logger.error('Error adding comment', { error, issueId: req.params.issueId });
+      logger.error('Error adding comment', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to add comment',
@@ -254,7 +270,7 @@ export class IssueController {
    */
   private buildContext(req: Request): IIssueContext {
     const user = (req as any).user; // Assuming user is attached by auth middleware
-    
+
     return {
       userId: user?.userId || user?.id || 'anonymous',
       userRole: user?.role || 'viewer',
@@ -269,18 +285,44 @@ export class IssueController {
   private buildFilters(query: any): any {
     const filters: any = {};
 
-    if (query.status) filters.status = Array.isArray(query.status) ? query.status : [query.status];
-    if (query.priority) filters.priority = Array.isArray(query.priority) ? query.priority : [query.priority];
-    if (query.severity) filters.severity = Array.isArray(query.severity) ? query.severity : [query.severity];
-    if (query.issueType) filters.issueType = Array.isArray(query.issueType) ? query.issueType : [query.issueType];
-    if (query.assignee) filters.assignee = Array.isArray(query.assignee) ? query.assignee : [query.assignee];
-    if (query.reporter) filters.reporter = Array.isArray(query.reporter) ? query.reporter : [query.reporter];
-    if (query.threatLevel) filters.threatLevel = Array.isArray(query.threatLevel) ? query.threatLevel : [query.threatLevel];
-    if (query.labels) filters.labels = Array.isArray(query.labels) ? query.labels : [query.labels];
-    if (query.tags) filters.tags = Array.isArray(query.tags) ? query.tags : [query.tags];
+    if (query.status)
+      filters.status = Array.isArray(query.status)
+        ? query.status
+        : [query.status];
+    if (query.priority)
+      filters.priority = Array.isArray(query.priority)
+        ? query.priority
+        : [query.priority];
+    if (query.severity)
+      filters.severity = Array.isArray(query.severity)
+        ? query.severity
+        : [query.severity];
+    if (query.issueType)
+      filters.issueType = Array.isArray(query.issueType)
+        ? query.issueType
+        : [query.issueType];
+    if (query.assignee)
+      filters.assignee = Array.isArray(query.assignee)
+        ? query.assignee
+        : [query.assignee];
+    if (query.reporter)
+      filters.reporter = Array.isArray(query.reporter)
+        ? query.reporter
+        : [query.reporter];
+    if (query.threatLevel)
+      filters.threatLevel = Array.isArray(query.threatLevel)
+        ? query.threatLevel
+        : [query.threatLevel];
+    if (query.labels)
+      filters.labels = Array.isArray(query.labels)
+        ? query.labels
+        : [query.labels];
+    if (query.tags)
+      filters.tags = Array.isArray(query.tags) ? query.tags : [query.tags];
 
     if (query.createdAfter) filters.createdAfter = new Date(query.createdAfter);
-    if (query.createdBefore) filters.createdBefore = new Date(query.createdBefore);
+    if (query.createdBefore)
+      filters.createdBefore = new Date(query.createdBefore);
     if (query.dueAfter) filters.dueAfter = new Date(query.dueAfter);
     if (query.dueBefore) filters.dueBefore = new Date(query.dueBefore);
 

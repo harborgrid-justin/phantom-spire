@@ -155,7 +155,15 @@ export const ISSUE_TEMPLATES = {
 // Workflow configurations for different issue types
 export const WORKFLOW_CONFIGURATIONS = {
   INCIDENT_RESPONSE: {
-    states: ['created', 'triaged', 'investigating', 'containing', 'eradicating', 'recovering', 'closed'],
+    states: [
+      'created',
+      'triaged',
+      'investigating',
+      'containing',
+      'eradicating',
+      'recovering',
+      'closed',
+    ],
     transitions: [
       { from: 'created', to: 'triaged' },
       { from: 'triaged', to: 'investigating' },
@@ -167,7 +175,17 @@ export const WORKFLOW_CONFIGURATIONS = {
   },
 
   VULNERABILITY_MANAGEMENT: {
-    states: ['identified', 'assessed', 'prioritized', 'assigned', 'patching', 'testing', 'deployed', 'verified', 'closed'],
+    states: [
+      'identified',
+      'assessed',
+      'prioritized',
+      'assigned',
+      'patching',
+      'testing',
+      'deployed',
+      'verified',
+      'closed',
+    ],
     transitions: [
       { from: 'identified', to: 'assessed' },
       { from: 'assessed', to: 'prioritized' },
@@ -181,7 +199,14 @@ export const WORKFLOW_CONFIGURATIONS = {
   },
 
   STANDARD_ISSUE: {
-    states: ['open', 'in_progress', 'on_hold', 'resolved', 'closed', 'rejected'],
+    states: [
+      'open',
+      'in_progress',
+      'on_hold',
+      'resolved',
+      'closed',
+      'rejected',
+    ],
     transitions: [
       { from: 'open', to: 'in_progress' },
       { from: 'open', to: 'on_hold' },
@@ -247,23 +272,41 @@ export const SECURITY_CLASSIFICATIONS = {
 // Role-based permissions configuration
 export const ROLE_PERMISSIONS = {
   admin: [
-    'create_issues', 'edit_issues', 'delete_issues', 'resolve_issues',
-    'close_issues', 'reject_issues', 'escalate_issues', 'assign_issues',
-    'view_all_issues', 'edit_all_comments', 'delete_all_comments',
-    'manage_workflows', 'view_metrics', 'export_data',
+    'create_issues',
+    'edit_issues',
+    'delete_issues',
+    'resolve_issues',
+    'close_issues',
+    'reject_issues',
+    'escalate_issues',
+    'assign_issues',
+    'view_all_issues',
+    'edit_all_comments',
+    'delete_all_comments',
+    'manage_workflows',
+    'view_metrics',
+    'export_data',
   ],
   security_manager: [
-    'create_issues', 'edit_issues', 'resolve_issues', 'close_issues',
-    'reject_issues', 'escalate_issues', 'assign_issues', 'view_all_issues',
+    'create_issues',
+    'edit_issues',
+    'resolve_issues',
+    'close_issues',
+    'reject_issues',
+    'escalate_issues',
+    'assign_issues',
+    'view_all_issues',
     'view_metrics',
   ],
   analyst: [
-    'create_issues', 'edit_issues', 'resolve_issues', 'escalate_issues',
-    'assign_issues', 'view_metrics',
+    'create_issues',
+    'edit_issues',
+    'resolve_issues',
+    'escalate_issues',
+    'assign_issues',
+    'view_metrics',
   ],
-  viewer: [
-    'view_issues',
-  ],
+  viewer: ['view_issues'],
 };
 
 // Integration helpers for CTI platform
@@ -275,7 +318,8 @@ export const CTI_INTEGRATION = {
     title: `Security Alert - ${alert.title}`,
     description: `Alert converted from security monitoring system\n\n${alert.description}`,
     issueType: 'incident' as const,
-    priority: alert.severity === 'critical' ? 'critical' as const : 'high' as const,
+    priority:
+      alert.severity === 'critical' ? ('critical' as const) : ('high' as const),
     threatLevel: alert.severity,
     affectedSystems: alert.affectedAssets || [],
     relatedAlerts: [alert.id],
@@ -297,7 +341,8 @@ export const CTI_INTEGRATION = {
    */
   createTaskFromIssue: (issue: any) => ({
     name: `Task for Issue ${issue.ticketId}`,
-    type: issue.issueType === 'incident' ? 'evidence_collection' : 'data_analysis',
+    type:
+      issue.issueType === 'incident' ? 'evidence_collection' : 'data_analysis',
     priority: issue.priority,
     relatedIssue: issue._id,
     description: `Automated task created for issue: ${issue.title}`,

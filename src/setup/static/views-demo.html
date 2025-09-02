@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Spire CTI Platform - Frontend Views Demo</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .navigation {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: #495057;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .view-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            min-height: 600px;
+        }
+
+        .view-panel {
+            display: none;
+        }
+
+        .view-panel.active {
+            display: block;
+        }
+
+        .view-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .view-description {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .feature-description {
+            color: #666;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #d4edda;
+            color: #155724;
+            margin-left: 1rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Phantom Spire CTI Platform</h1>
+            <p>Frontend Views Demonstration - Enterprise-grade Cyber Threat Intelligence Platform</p>
+            <span class="status-badge">✅ All Views Operational</span>
+        </div>
+
+        <div class="navigation">
+            <div class="nav-tabs" id="navTabs">
+                <!-- Navigation tabs will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="view-content">
+            <div id="viewPanels">
+                <!-- View panels will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define all the views from src/frontend/views
+        const views = [
+            {
+                id: 'dashboard',
+                title: '📊 Threat Intelligence Dashboard',
+                description: 'Enterprise-grade cyber threat intelligence platform providing comprehensive visibility into your security posture with real-time monitoring and analysis.',
+                features: [
+                    {
+                        icon: '📊',
+                        title: 'Real-time Threat Intelligence',
+                        description: 'Monitor and analyze threat intelligence data from multiple sources in real-time with advanced correlation capabilities.'
+                    },
+                    {
+                        icon: '🛡️',
+                        title: 'IOC Analysis',
+                        description: 'Advanced Indicator of Compromise analysis with machine learning capabilities and automated threat scoring.'
+                    },
+                    {
+                        icon: '🚨',
+                        title: 'Incident Response',
+                        description: 'Streamlined incident response workflows with automated playbooks and team collaboration tools.'
+                    },
+                    {
+                        icon: '🔍',
+                        title: 'Threat Hunting',
+                        description: 'Proactive threat hunting with advanced query capabilities and interactive visualizations.'
+                    }
+                ],
+                metrics: [
+                    { value: '1,247', label: 'Active IOCs' },
+                    { value: '23', label: 'Active Incidents' },
+                    { value: '156', label: 'Threat Feeds' },
+                    { value: '99.9%', label: 'System Uptime' }
+                ]
+            },
+            {
+                id: 'ioc',
+                title: '🛡️ IOC Management Console',
+                description: 'Comprehensive Indicator of Compromise management with advanced analysis, correlation, and enrichment capabilities.',
+                features: [
+                    {
+                        icon: '🔍',
+                        title: 'IOC Detection',
+                        description: 'Automated detection and classification of indicators of compromise with ML-powered analysis.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'IOC Analytics',
+                        description: 'Advanced analytics and correlation of IOC data across multiple sources and threat feeds.'
+                    },
+                    {
+                        icon: '🛡️',
+                        title: 'IOC Validation',
+                        description: 'Comprehensive validation and scoring of IOC reliability and relevance with confidence metrics.'
+                    },
+                    {
+                        icon: '📈',
+                        title: 'IOC Enrichment',
+                        description: 'Enrich IOC data with contextual information from threat intelligence feeds and OSINT sources.'
+                    }
+                ],
+                metrics: [
+                    { value: '45,892', label: 'Total IOCs' },
+                    { value: '1,247', label: 'High Confidence' },
+                    { value: '234', label: 'New Today' },
+                    { value: '89%', label: 'Accuracy Rate' }
+                ]
+            },
+            {
+                id: 'incidents',
+                title: '🚨 Incident Response Center',
+                description: 'Centralized incident response management with automated workflows, team collaboration, and comprehensive case tracking.',
+                features: [
+                    {
+                        icon: '🚨',
+                        title: 'Incident Detection',
+                        description: 'Automated incident detection with customizable alerting rules and severity classification.'
+                    },
+                    {
+                        icon: '📋',
+                        title: 'Response Playbooks',
+                        description: 'Pre-defined and customizable incident response playbooks with automated task assignment.'
+                    },
+                    {
+                        icon: '👥',
+                        title: 'Team Collaboration',
+                        description: 'Real-time collaboration tools for incident response teams with communication tracking.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Incident Analytics',
+                        description: 'Comprehensive analytics and reporting on incident response metrics and performance.'
+                    }
+                ],
+                metrics: [
+                    { value: '23', label: 'Active Incidents' },
+                    { value: '156', label: 'Resolved This Month' },
+                    { value: '2.3h', label: 'Avg Response Time' },
+                    { value: '94%', label: 'SLA Compliance' }
+                ]
+            },
+            {
+                id: 'hunting',
+                title: '🔍 Threat Hunting Workbench',
+                description: 'Advanced threat hunting platform with machine learning capabilities, interactive visualizations, and collaborative hunting workflows.',
+                features: [
+                    {
+                        icon: '🔍',
+                        title: 'Advanced Queries',
+                        description: 'Powerful query builder for complex threat hunting scenarios with natural language processing.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Data Visualization',
+                        description: 'Interactive visualizations for threat hunting analysis with customizable dashboards.'
+                    },
+                    {
+                        icon: '🤖',
+                        title: 'ML-Powered Hunting',
+                        description: 'Machine learning algorithms to identify suspicious patterns and anomalous behavior.'
+                    },
+                    {
+                        icon: '📈',
+                        title: 'Hunt Analytics',
+                        description: 'Comprehensive analytics on hunting activities, results, and threat discovery metrics.'
+                    }
+                ],
+                metrics: [
+                    { value: '47', label: 'Active Hunts' },
+                    { value: '12', label: 'Threats Found' },
+                    { value: '89%', label: 'Hunt Success Rate' },
+                    { value: '156', label: 'Hunt Queries' }
+                ]
+            },
+            {
+                id: 'analytics',
+                title: '📈 Analytics & Reporting',
+                description: 'Advanced analytics platform with predictive modeling, comprehensive reporting capabilities, and automated insights generation.',
+                features: [
+                    {
+                        icon: '📊',
+                        title: 'Threat Analytics',
+                        description: 'Comprehensive threat intelligence analytics and reporting with trend analysis.'
+                    },
+                    {
+                        icon: '📈',
+                        title: 'Trend Analysis',
+                        description: 'Advanced trend analysis and predictive modeling for threat landscape evolution.'
+                    },
+                    {
+                        icon: '🎯',
+                        title: 'Risk Assessment',
+                        description: 'Automated risk assessment and scoring capabilities with business impact analysis.'
+                    },
+                    {
+                        icon: '📋',
+                        title: 'Custom Reports',
+                        description: 'Customizable reporting with automated distribution and executive summaries.'
+                    }
+                ],
+                metrics: [
+                    { value: '234', label: 'Reports Generated' },
+                    { value: '45', label: 'Custom Dashboards' },
+                    { value: '12', label: 'Predictive Models' },
+                    { value: '98%', label: 'Report Accuracy' }
+                ]
+            },
+            {
+                id: 'feeds',
+                title: '📡 Feed Management',
+                description: 'Comprehensive threat intelligence feed management with real-time processing, normalization, and quality analytics.',
+                features: [
+                    {
+                        icon: '📡',
+                        title: 'Feed Integration',
+                        description: 'Integration with multiple threat intelligence feed sources and commercial providers.'
+                    },
+                    {
+                        icon: '⚙️',
+                        title: 'Feed Configuration',
+                        description: 'Flexible configuration and management of threat feeds with custom parsing rules.'
+                    },
+                    {
+                        icon: '🔄',
+                        title: 'Real-time Processing',
+                        description: 'Real-time processing and normalization of feed data with deduplication.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Feed Analytics',
+                        description: 'Analytics and quality metrics for threat intelligence feeds with performance monitoring.'
+                    }
+                ],
+                metrics: [
+                    { value: '156', label: 'Active Feeds' },
+                    { value: '2.3M', label: 'IOCs Processed' },
+                    { value: '99.2%', label: 'Feed Uptime' },
+                    { value: '45', label: 'Feed Sources' }
+                ]
+            },
+            {
+                id: 'investigation',
+                title: '🔬 Investigation Timeline',
+                description: 'Advanced investigation platform with timeline visualization, evidence correlation, and collaborative case management.',
+                features: [
+                    {
+                        icon: '🔬',
+                        title: 'Investigation Timeline',
+                        description: 'Interactive timeline for security investigations with event correlation and analysis.'
+                    },
+                    {
+                        icon: '🔗',
+                        title: 'Evidence Correlation',
+                        description: 'Advanced correlation of digital evidence and artifacts with relationship mapping.'
+                    },
+                    {
+                        icon: '📋',
+                        title: 'Case Management',
+                        description: 'Comprehensive case management and documentation with audit trails.'
+                    },
+                    {
+                        icon: '👥',
+                        title: 'Collaboration Tools',
+                        description: 'Team collaboration tools for investigation workflows with role-based access.'
+                    }
+                ],
+                metrics: [
+                    { value: '34', label: 'Active Cases' },
+                    { value: '127', label: 'Evidence Items' },
+                    { value: '89%', label: 'Case Closure Rate' },
+                    { value: '12', label: 'Investigators' }
+                ]
+            },
+            {
+                id: 'admin',
+                title: '⚙️ System Administration',
+                description: 'Comprehensive system administration with user management, access control, and system monitoring capabilities.',
+                features: [
+                    {
+                        icon: '👥',
+                        title: 'User Management',
+                        description: 'Comprehensive user and role management system with LDAP/AD integration.'
+                    },
+                    {
+                        icon: '🔐',
+                        title: 'Access Control',
+                        description: 'Role-based access control with fine-grained permissions and audit logging.'
+                    },
+                    {
+                        icon: '⚙️',
+                        title: 'System Configuration',
+                        description: 'System-wide configuration and settings management with change tracking.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'System Monitoring',
+                        description: 'Real-time system health monitoring and alerting with performance metrics.'
+                    }
+                ],
+                metrics: [
+                    { value: '245', label: 'Active Users' },
+                    { value: '12', label: 'User Roles' },
+                    { value: '99.9%', label: 'System Uptime' },
+                    { value: '34', label: 'Admin Actions' }
+                ]
+            },
+            {
+                id: 'operations',
+                title: '🎯 Real-Time Operations Center',
+                description: 'Centralized operations center with real-time monitoring, automated workflows, and comprehensive situational awareness.',
+                features: [
+                    {
+                        icon: '🎯',
+                        title: 'Operations Dashboard',
+                        description: 'Real-time operations center with comprehensive monitoring and situational awareness.'
+                    },
+                    {
+                        icon: '🚨',
+                        title: 'Alert Management',
+                        description: 'Centralized alert management and escalation workflows with priority handling.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Performance Metrics',
+                        description: 'Key performance indicators and operational metrics with trend analysis.'
+                    },
+                    {
+                        icon: '🔄',
+                        title: 'Workflow Automation',
+                        description: 'Automated operational workflows and processes with custom rule engines.'
+                    }
+                ],
+                metrics: [
+                    { value: '1,247', label: 'Active Alerts' },
+                    { value: '23', label: 'Critical Issues' },
+                    { value: '99.2%', label: 'Service Availability' },
+                    { value: '156', label: 'Automated Actions' }
+                ]
+            },
+            {
+                id: 'repository',
+                title: '📚 Threat Intelligence Repository',
+                description: 'Centralized threat intelligence repository with advanced search, correlation capabilities, and knowledge management.',
+                features: [
+                    {
+                        icon: '📚',
+                        title: 'Threat Intelligence Repository',
+                        description: 'Centralized repository for threat intelligence data with version control.'
+                    },
+                    {
+                        icon: '🔍',
+                        title: 'Advanced Search',
+                        description: 'Powerful search capabilities across all threat data with faceted search.'
+                    },
+                    {
+                        icon: '📊',
+                        title: 'Data Classification',
+                        description: 'Automated classification and tagging of threat data with ML-powered categorization.'
+                    },
+                    {
+                        icon: '🔗',
+                        title: 'Data Correlation',
+                        description: 'Advanced correlation and relationship mapping with graph-based analysis.'
+                    }
+                ],
+                metrics: [
+                    { value: '2.3M', label: 'Threat Records' },
+                    { value: '45,892', label: 'IOCs Stored' },
+                    { value: '156', label: 'Data Sources' },
+                    { value: '99.8%', label: 'Data Accuracy' }
+                ]
+            },
+            {
+                id: 'integrations',
+                title: '🔗 Integration Platform',
+                description: 'Comprehensive integration platform with support for leading security tools, custom connectors, and API management.',
+                features: [
+                    {
+                        icon: '🔗',
+                        title: 'Platform Integrations',
+                        description: 'Integration with leading security platforms and tools with pre-built connectors.'
+                    },
+                    {
+                        icon: '📡',
+                        title: 'API Management',
+                        description: 'Comprehensive API management and documentation with rate limiting and monitoring.'
+                    },
+                    {
+                        icon: '🔄',
+                        title: 'Data Synchronization',
+                        description: 'Real-time data synchronization across platforms with conflict resolution.'
+                    },
+                    {
+                        icon: '⚙️',
+                        title: 'Custom Connectors',
+                        description: 'Build custom connectors for proprietary systems with visual workflow designer.'
+                    }
+                ],
+                metrics: [
+                    { value: '45', label: 'Active Integrations' },
+                    { value: '234', label: 'API Endpoints' },
+                    { value: '99.5%', label: 'Sync Success Rate' },
+                    { value: '12', label: 'Custom Connectors' }
+                ]
+            }
+        ];
+
+        // Generate navigation tabs
+        function generateNavigation() {
+            const navTabs = document.getElementById('navTabs');
+            views.forEach((view, index) => {
+                const tab = document.createElement('button');
+                tab.className = `nav-tab ${index === 0 ? 'active' : ''}`;
+                tab.textContent = view.title;
+                tab.onclick = () => showView(view.id, tab);
+                navTabs.appendChild(tab);
+            });
+        }
+
+        // Generate view panels
+        function generateViewPanels() {
+            const viewPanels = document.getElementById('viewPanels');
+            views.forEach((view, index) => {
+                const panel = document.createElement('div');
+                panel.className = `view-panel ${index === 0 ? 'active' : ''}`;
+                panel.id = `panel-${view.id}`;
+                
+                let metricsHtml = '';
+                if (view.metrics) {
+                    metricsHtml = `
+                        <div class="metrics-grid">
+                            ${view.metrics.map(metric => `
+                                <div class="metric-card">
+                                    <div class="metric-value">${metric.value}</div>
+                                    <div class="metric-label">${metric.label}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                panel.innerHTML = `
+                    <div class="view-title">${view.title}</div>
+                    <div class="view-description">${view.description}</div>
+                    ${metricsHtml}
+                    <div class="features-grid">
+                        ${view.features.map(feature => `
+                            <div class="feature-card">
+                                <div class="feature-icon">${feature.icon}</div>
+                                <div class="feature-title">${feature.title}</div>
+                                <div class="feature-description">${feature.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                viewPanels.appendChild(panel);
+            });
+        }
+
+        // Show specific view
+        function showView(viewId, activeTab) {
+            // Hide all panels
+            document.querySelectorAll('.view-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected panel
+            document.getElementById(`panel-${viewId}`).classList.add('active');
+            
+            // Add active class to selected tab
+            activeTab.classList.add('active');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            generateNavigation();
+            generateViewPanels();
+        });
+    </script>
+</body>
+</html>

@@ -55,13 +55,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   AppBar,
   Toolbar,
   Drawer,
@@ -151,13 +144,12 @@ import {
   Sync,
   SyncProblem,
   Cloud,
+  CloudOff,
   CloudSync,
   CloudUpload,
   CloudDownload,
   Upload,
   Download,
-  Import,
-  Export,
   AttachFile,
   Attachment,
   Link as LinkIcon,
@@ -165,8 +157,8 @@ import {
   QrCode,
   Api,
   Code,
-  Integration,
   Extension,
+  Person,
   Settings,
   Edit,
   Delete,
@@ -207,7 +199,15 @@ import {
   FullscreenExit
 } from '@mui/icons-material';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineOppositeContent,
+} from '@mui/lab';
 
 // Collaboration interfaces
 interface Organization {
@@ -478,17 +478,6 @@ const IntelligenceSharingCollaboration: React.FC = () => {
   });
   const [shareExpiration, setShareExpiration] = useState<Date | null>(null);
 
-  // Initialize UI/UX Evaluation
-  useEffect(() => {
-    const evaluationController = addUIUXEvaluation('intelligence-sharing-collaboration', {
-      continuous: true,
-      position: 'top-left',
-      minimized: true,
-      interval: 180000
-    });
-
-    return () => evaluationController.remove();
-  }, []);
 
   // Generate mock organizations
   const generateMockOrganizations = useCallback((): Organization[] => {

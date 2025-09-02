@@ -10,7 +10,7 @@ import {
   IExtractionRequest,
   IExtractionResult,
   ITransformationRule,
-  ILoadResult
+  ILoadResult,
 } from '../interfaces/IDataConnector.js';
 import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource.js';
 
@@ -32,12 +32,14 @@ export abstract class BaseDataConnector implements IDataConnector {
       // Validate configuration
       const validation = await this.validate(config);
       if (!validation.isValid) {
-        throw new Error(`Configuration validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(
+          `Configuration validation failed: ${validation.errors.join(', ')}`
+        );
       }
 
       this.config = config;
       await this.performInitialization(config);
-      
+
       logger.info(`Initialized connector: ${this.name}`);
     } catch (error) {
       this.lastError = error as Error;
@@ -68,14 +70,18 @@ export abstract class BaseDataConnector implements IDataConnector {
 
     // Validate connection config
     if (config.connection) {
-      const connectionValidation = await this.validateConnection(config.connection);
+      const connectionValidation = await this.validateConnection(
+        config.connection
+      );
       errors.push(...connectionValidation.errors);
       warnings.push(...connectionValidation.warnings);
     }
 
     // Validate authentication if present
     if (config.authentication) {
-      const authValidation = await this.validateAuthentication(config.authentication);
+      const authValidation = await this.validateAuthentication(
+        config.authentication
+      );
       errors.push(...authValidation.errors);
       warnings.push(...authValidation.warnings);
     }
@@ -88,7 +94,7 @@ export abstract class BaseDataConnector implements IDataConnector {
     return {
       isValid: errors.length === 0,
       errors,
-      warnings
+      warnings,
     };
   }
 
@@ -121,7 +127,10 @@ export abstract class BaseDataConnector implements IDataConnector {
       logger.info(`Disconnected from data source: ${this.name}`);
     } catch (error) {
       this.lastError = error as Error;
-      logger.error(`Failed to disconnect from data source: ${this.name}`, error);
+      logger.error(
+        `Failed to disconnect from data source: ${this.name}`,
+        error
+      );
       throw error;
     }
   }
@@ -129,27 +138,32 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Extract data from the source
    */
-  public async extract(request: IExtractionRequest): Promise<IExtractionResult> {
+  public async extract(
+    request: IExtractionRequest
+  ): Promise<IExtractionResult> {
     if (!this.connected) {
       throw new Error('Connector not connected');
     }
 
     const startTime = Date.now();
-    
+
     try {
       logger.debug(`Extracting data from ${this.name}`, {
         filters: request.filters,
-        batchSize: request.batchSize
+        batchSize: request.batchSize,
       });
 
       const result = await this.performExtraction(request);
-      
+
       result.metadata.executionTime = Date.now() - startTime;
-      
-      logger.info(`Extracted ${result.metadata.extracted} records from ${this.name}`, {
-        total: result.metadata.total,
-        executionTime: result.metadata.executionTime
-      });
+
+      logger.info(
+        `Extracted ${result.metadata.extracted} records from ${this.name}`,
+        {
+          total: result.metadata.total,
+          executionTime: result.metadata.executionTime,
+        }
+      );
 
       return result;
     } catch (error) {
@@ -167,24 +181,29 @@ export abstract class BaseDataConnector implements IDataConnector {
     transformationRules: ITransformationRule[]
   ): Promise<IDataRecord[]> {
     const startTime = Date.now();
-    
+
     try {
-      logger.debug(`Transforming ${data.length} records with ${transformationRules.length} rules`);
+      logger.debug(
+        `Transforming ${data.length} records with ${transformationRules.length} rules`
+      );
 
       const transformed: IDataRecord[] = [];
-      
+
       for (const rawItem of data) {
-        const transformedItem = await this.transformSingleRecord(rawItem, transformationRules);
+        const transformedItem = await this.transformSingleRecord(
+          rawItem,
+          transformationRules
+        );
         if (transformedItem) {
           transformed.push(transformedItem);
         }
       }
 
       const executionTime = Date.now() - startTime;
-      
+
       logger.info(`Transformed ${transformed.length}/${data.length} records`, {
         executionTime,
-        successRate: (transformed.length / data.length) * 100
+        successRate: (transformed.length / data.length) * 100,
       });
 
       return transformed;
@@ -198,21 +217,27 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Load data into target system
    */
-  public async load(records: IDataRecord[], target: string): Promise<ILoadResult> {
+  public async load(
+    records: IDataRecord[],
+    target: string
+  ): Promise<ILoadResult> {
     const startTime = Date.now();
-    
+
     try {
       logger.debug(`Loading ${records.length} records to ${target}`);
 
       const result = await this.performLoad(records, target);
-      
+
       result.executionTime = Date.now() - startTime;
-      
-      logger.info(`Loaded ${result.loaded}/${records.length} records to ${target}`, {
-        failed: result.failed,
-        duplicates: result.duplicates,
-        executionTime: result.executionTime
-      });
+
+      logger.info(
+        `Loaded ${result.loaded}/${records.length} records to ${target}`,
+        {
+          failed: result.failed,
+          duplicates: result.duplicates,
+          executionTime: result.executionTime,
+        }
+      );
 
       return result;
     } catch (error) {
@@ -227,19 +252,19 @@ export abstract class BaseDataConnector implements IDataConnector {
    */
   public async healthCheck(): Promise<IHealthStatus> {
     const startTime = Date.now();
-    
+
     try {
       const status = await this.performHealthCheck();
       status.lastCheck = new Date();
       status.responseTime = Date.now() - startTime;
-      
+
       return status;
     } catch (error) {
       return {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: (error as Error).message
+        message: (error as Error).message,
       };
     }
   }
@@ -259,28 +284,41 @@ export abstract class BaseDataConnector implements IDataConnector {
       ...(this.lastError?.message && { lastError: this.lastError.message }),
       extractionCount: 0, // Would be tracked in production
       transformationCount: 0,
-      loadCount: 0
+      loadCount: 0,
     };
   }
 
   // Abstract methods to be implemented by concrete connectors
-  protected abstract performInitialization(config: IConnectorConfig): Promise<void>;
+  protected abstract performInitialization(
+    config: IConnectorConfig
+  ): Promise<void>;
   protected abstract performConnect(): Promise<void>;
   protected abstract performDisconnect(): Promise<void>;
-  protected abstract performExtraction(request: IExtractionRequest): Promise<IExtractionResult>;
-  protected abstract performLoad(records: IDataRecord[], target: string): Promise<ILoadResult>;
+  protected abstract performExtraction(
+    request: IExtractionRequest
+  ): Promise<IExtractionResult>;
+  protected abstract performLoad(
+    records: IDataRecord[],
+    target: string
+  ): Promise<ILoadResult>;
   protected abstract performHealthCheck(): Promise<IHealthStatus>;
 
   // Virtual methods that can be overridden
-  protected async validateConnection(_connection: any): Promise<IValidationResult> {
+  protected async validateConnection(
+    _connection: any
+  ): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
-  protected async validateAuthentication(_auth: any): Promise<IValidationResult> {
+  protected async validateAuthentication(
+    _auth: any
+  ): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
-  protected async performCustomValidation(_config: IConnectorConfig): Promise<IValidationResult> {
+  protected async performCustomValidation(
+    _config: IConnectorConfig
+  ): Promise<IValidationResult> {
     return { isValid: true, errors: [], warnings: [] };
   }
 
@@ -295,17 +333,23 @@ export abstract class BaseDataConnector implements IDataConnector {
       let transformedData = { ...rawData };
       const metadata: Record<string, any> = {
         originalData: rawData,
-        transformationsApplied: []
+        transformationsApplied: [],
       };
 
       for (const rule of rules) {
-        const ruleResult = await this.applyTransformationRule(transformedData, rule);
+        const ruleResult = await this.applyTransformationRule(
+          transformedData,
+          rule
+        );
         if (ruleResult.success) {
           transformedData = ruleResult.data;
           metadata.transformationsApplied.push(rule.name);
         } else {
-          logger.warn(`Transformation rule ${rule.name} failed`, ruleResult.error);
-          
+          logger.warn(
+            `Transformation rule ${rule.name} failed`,
+            ruleResult.error
+          );
+
           // If rule is critical and fails, skip the record
           if (rule.parameters?.critical) {
             return null;
@@ -328,15 +372,15 @@ export abstract class BaseDataConnector implements IDataConnector {
             name: rule.name,
             version: '1.0',
             appliedAt: new Date(),
-            ...(rule.parameters && { parameters: rule.parameters })
+            ...(rule.parameters && { parameters: rule.parameters }),
           })),
           quality: {
             completeness: this.calculateCompleteness(transformedData),
             accuracy: 1.0, // Would be calculated based on validation
             consistency: 1.0,
-            timeliness: this.calculateTimeliness(transformedData)
-          }
-        }
+            timeliness: this.calculateTimeliness(transformedData),
+          },
+        },
       };
 
       return dataRecord;
@@ -369,14 +413,14 @@ export abstract class BaseDataConnector implements IDataConnector {
           return {
             success: false,
             data,
-            error: `Unknown transformation rule type: ${rule.type}`
+            error: `Unknown transformation rule type: ${rule.type}`,
           };
       }
     } catch (error) {
       return {
         success: false,
         data,
-        error: (error as Error).message
+        error: (error as Error).message,
       };
     }
   }
@@ -384,9 +428,12 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Apply mapping transformation rule
    */
-  protected applyMappingRule(data: any, rule: ITransformationRule): { success: boolean; data: any; error?: string } {
+  protected applyMappingRule(
+    data: any,
+    rule: ITransformationRule
+  ): { success: boolean; data: any; error?: string } {
     const result = { ...data };
-    
+
     if (rule.source && rule.target) {
       const sourceValue = this.getNestedValue(data, rule.source);
       if (sourceValue !== undefined) {
@@ -400,31 +447,37 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Apply filter transformation rule
    */
-  protected applyFilterRule(data: any, rule: ITransformationRule): { success: boolean; data: any; error?: string } {
+  protected applyFilterRule(
+    data: any,
+    rule: ITransformationRule
+  ): { success: boolean; data: any; error?: string } {
     if (!rule.conditions) {
       return { success: true, data };
     }
 
     const passes = this.evaluateConditions(data, rule.conditions);
-    
+
     return {
       success: passes,
-      data: passes ? data : null
+      data: passes ? data : null,
     };
   }
 
   /**
    * Apply enrichment transformation rule
    */
-  protected async applyEnrichmentRule(data: any, rule: ITransformationRule): Promise<{ success: boolean; data: any; error?: string }> {
+  protected async applyEnrichmentRule(
+    data: any,
+    rule: ITransformationRule
+  ): Promise<{ success: boolean; data: any; error?: string }> {
     // Basic enrichment - add metadata
     const enriched = {
       ...data,
       _enrichment: {
         timestamp: new Date(),
         rule: rule.name,
-        connector: this.name
-      }
+        connector: this.name,
+      },
     };
 
     return { success: true, data: enriched };
@@ -433,13 +486,16 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Apply normalization transformation rule
    */
-  protected applyNormalizationRule(data: any, rule: ITransformationRule): { success: boolean; data: any; error?: string } {
+  protected applyNormalizationRule(
+    data: any,
+    rule: ITransformationRule
+  ): { success: boolean; data: any; error?: string } {
     const normalized = { ...data };
-    
+
     // Normalize common fields
     if (rule.source && normalized[rule.source]) {
       const value = normalized[rule.source];
-      
+
       // Normalize to lowercase if string
       if (typeof value === 'string') {
         normalized[rule.source] = value.toLowerCase().trim();
@@ -452,17 +508,20 @@ export abstract class BaseDataConnector implements IDataConnector {
   /**
    * Apply validation transformation rule
    */
-  protected applyValidationRule(data: any, rule: ITransformationRule): { success: boolean; data: any; error?: string } {
+  protected applyValidationRule(
+    data: any,
+    rule: ITransformationRule
+  ): { success: boolean; data: any; error?: string } {
     if (!rule.conditions) {
       return { success: true, data };
     }
 
     const isValid = this.evaluateConditions(data, rule.conditions);
-    
+
     return {
       success: isValid,
       data,
-      ...(isValid ? {} : { error: `Validation failed for rule: ${rule.name}` })
+      ...(isValid ? {} : { error: `Validation failed for rule: ${rule.name}` }),
     };
   }
 
@@ -478,16 +537,19 @@ export abstract class BaseDataConnector implements IDataConnector {
       if (!current[key]) current[key] = {};
       return current[key];
     }, obj);
-    
+
     if (lastKey) {
       target[lastKey] = value;
     }
   }
 
-  protected evaluateConditions(data: any, conditions: Record<string, any>): boolean {
+  protected evaluateConditions(
+    data: any,
+    conditions: Record<string, any>
+  ): boolean {
     for (const [field, condition] of Object.entries(conditions)) {
       const value = this.getNestedValue(data, field);
-      
+
       if (typeof condition === 'object') {
         // Handle operators like $eq, $ne, $gt, etc.
         for (const [operator, operand] of Object.entries(condition)) {
@@ -502,11 +564,15 @@ export abstract class BaseDataConnector implements IDataConnector {
         }
       }
     }
-    
+
     return true;
   }
 
-  protected evaluateOperator(value: any, operator: string, operand: any): boolean {
+  protected evaluateOperator(
+    value: any,
+    operator: string,
+    operand: any
+  ): boolean {
     switch (operator) {
       case '$eq':
         return value === operand;
@@ -542,23 +608,23 @@ export abstract class BaseDataConnector implements IDataConnector {
   }
 
   protected extractTimestamp(data: any): Date {
-    const timestamp = data.timestamp || data.createdAt || data.created || data.time;
-    
+    const timestamp =
+      data.timestamp || data.createdAt || data.created || data.time;
+
     if (timestamp) {
       return new Date(timestamp);
     }
-    
+
     return new Date();
   }
 
   protected calculateCompleteness(data: any): number {
     const fields = Object.keys(data);
-    const filledFields = fields.filter(field => 
-      data[field] !== null && 
-      data[field] !== undefined && 
-      data[field] !== ''
+    const filledFields = fields.filter(
+      field =>
+        data[field] !== null && data[field] !== undefined && data[field] !== ''
     );
-    
+
     return fields.length > 0 ? filledFields.length / fields.length : 1.0;
   }
 
@@ -567,7 +633,7 @@ export abstract class BaseDataConnector implements IDataConnector {
     const now = new Date();
     const ageMs = now.getTime() - timestamp.getTime();
     const ageHours = ageMs / (1000 * 60 * 60);
-    
+
     // Timeliness decreases with age, but never goes below 0.1
     return Math.max(0.1, Math.exp(-ageHours / 24));
   }

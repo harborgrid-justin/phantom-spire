@@ -5,10 +5,11 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && npm run copy:static",
+    "build": "tsc",
     "copy:static": "node scripts/copy-static.js",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "npm run build && npm start",
+    "dev:simple": "tsc src/simple-server.ts --outDir dist --target ES2020 --module ESNext --moduleResolution bundler && node dist/simple-server.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -52,7 +53,9 @@
     "npm": ">=8.0.0"
   },
   "dependencies": {
+    "@mui/lab": "^6.0.0-beta.11",
     "@mui/x-data-grid": "^8.11.0",
+    "@mui/x-tree-view": "^8.11.0",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.1",

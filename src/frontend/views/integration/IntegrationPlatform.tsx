@@ -32,7 +32,7 @@ import {
   Storage,
   Webhook
 } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const IntegrationPlatform: React.FC = () => {
   useEffect(() => {

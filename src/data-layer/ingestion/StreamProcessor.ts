@@ -22,22 +22,22 @@ export interface IStreamConfig {
   bufferSize: number;
   backpressureThreshold: number;
   flushIntervalMs: number;
-  
+
   // Processing Options
   enableBatching: boolean;
   batchSize: number;
   batchTimeoutMs: number;
-  
+
   // Error Handling
   maxRetries: number;
   retryBackoffMs: number;
   deadLetterQueueSize: number;
-  
+
   // Performance Tuning
   enableCompression: boolean;
   enableDeduplication: boolean;
   deduplicationWindowMs: number;
-  
+
   // Monitoring
   enableMetrics: boolean;
   metricsIntervalMs: number;
@@ -109,7 +109,7 @@ export class StreamProcessor extends EventEmitter {
   constructor(config: IStreamConfig) {
     super();
     this.config = config;
-    
+
     this.metrics = {
       streamsActive: 0,
       recordsProcessed: 0,
@@ -162,7 +162,6 @@ export class StreamProcessor extends EventEmitter {
 
       this.emit('started');
       logger.info('StreamProcessor started successfully');
-
     } catch (error) {
       this.isRunning = false;
       const errorMessage = `Failed to start StreamProcessor: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -201,7 +200,6 @@ export class StreamProcessor extends EventEmitter {
 
       this.emit('stopped');
       logger.info('StreamProcessor stopped successfully');
-
     } catch (error) {
       const errorMessage = `Error during StreamProcessor shutdown: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -216,7 +214,7 @@ export class StreamProcessor extends EventEmitter {
   public async registerSource(source: IStreamSource): Promise<void> {
     try {
       this.sources.set(source.id, source);
-      
+
       if (source.isActive && this.isRunning) {
         await this.startStreamForSource(source);
       }
@@ -230,7 +228,6 @@ export class StreamProcessor extends EventEmitter {
       });
 
       this.emit('sourceRegistered', source);
-
     } catch (error) {
       const errorMessage = `Failed to register stream source ${source.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -244,7 +241,7 @@ export class StreamProcessor extends EventEmitter {
   public async registerSink(sink: IStreamSink): Promise<void> {
     try {
       this.sinks.set(sink.id, sink);
-      
+
       logger.info('Stream sink registered', {
         sinkId: sink.id,
         sinkName: sink.name,
@@ -253,7 +250,6 @@ export class StreamProcessor extends EventEmitter {
       });
 
       this.emit('sinkRegistered', sink);
-
     } catch (error) {
       const errorMessage = `Failed to register stream sink ${sink.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -303,11 +299,11 @@ export class StreamProcessor extends EventEmitter {
         pipeline(
           sourceStream,
           this.createDeduplicationTransform(),
-          this.createBatchingTransform(), 
+          this.createBatchingTransform(),
           transformStream,
           this.createMetricsTransform(),
           sinkStream,
-          (err) => {
+          err => {
             if (err) reject(err);
             else resolve();
           }
@@ -316,7 +312,6 @@ export class StreamProcessor extends EventEmitter {
 
       logger.info('Stream processing completed', { streamId });
       this.emit('streamCompleted', { streamId, sourceId, sinkId });
-
     } catch (error) {
       const errorMessage = `Stream processing failed for ${streamId}: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -346,7 +341,7 @@ export class StreamProcessor extends EventEmitter {
    */
   public async retryDeadLetterRecord(recordId: string): Promise<void> {
     const recordIndex = this.deadLetterQueue.findIndex(r => r.id === recordId);
-    
+
     if (recordIndex === -1) {
       throw new Error(`Dead letter record ${recordId} not found`);
     }
@@ -357,17 +352,22 @@ export class StreamProcessor extends EventEmitter {
     try {
       // Attempt to reprocess the record
       await this.processRecord(record);
-      
+
       // Remove from dead letter queue on success
       this.deadLetterQueue.splice(recordIndex, 1);
-      
-      logger.info('Dead letter record retry succeeded', { recordId });
 
+      logger.info('Dead letter record retry succeeded', { recordId });
     } catch (error) {
       if (record.retryCount >= this.config.maxRetries) {
-        logger.error('Dead letter record retry limit exceeded', { recordId, retryCount: record.retryCount });
+        logger.error('Dead letter record retry limit exceeded', {
+          recordId,
+          retryCount: record.retryCount,
+        });
       } else {
-        logger.warn('Dead letter record retry failed', { recordId, error: error instanceof Error ? error.message : 'Unknown error' });
+        logger.warn('Dead letter record retry failed', {
+          recordId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
       }
       throw error;
     }
@@ -378,8 +378,10 @@ export class StreamProcessor extends EventEmitter {
    */
 
   private async startActiveStreams(): Promise<void> {
-    const activeSources = Array.from(this.sources.values()).filter(source => source.isActive);
-    
+    const activeSources = Array.from(this.sources.values()).filter(
+      source => source.isActive
+    );
+
     for (const source of activeSources) {
       try {
         await this.startStreamForSource(source);
@@ -393,14 +395,16 @@ export class StreamProcessor extends EventEmitter {
   }
 
   private async stopActiveStreams(): Promise<void> {
-    const streamPromises = Array.from(this.activeStreams.values()).map(stream => {
-      return new Promise<void>((resolve) => {
-        if ('destroy' in stream && typeof stream.destroy === 'function') {
-          stream.destroy();
-        }
-        resolve();
-      });
-    });
+    const streamPromises = Array.from(this.activeStreams.values()).map(
+      stream => {
+        return new Promise<void>(resolve => {
+          if ('destroy' in stream && typeof stream.destroy === 'function') {
+            stream.destroy();
+          }
+          resolve();
+        });
+      }
+    );
 
     await Promise.all(streamPromises);
     this.activeStreams.clear();
@@ -456,11 +460,13 @@ export class StreamProcessor extends EventEmitter {
               recordId: record.id,
               timestamp: record.timestamp,
             });
-            
+
             if (result.success) {
               transformedData = result.stages[result.stages.length - 1];
             } else {
-              throw new Error(`Pipeline execution failed: ${result.errors?.join(', ')}`);
+              throw new Error(
+                `Pipeline execution failed: ${result.errors?.join(', ')}`
+              );
             }
           }
 
@@ -470,7 +476,6 @@ export class StreamProcessor extends EventEmitter {
           };
 
           callback(null, transformedRecord);
-
         } catch (error) {
           logger.error('Transform stream error', {
             recordId: record.id,
@@ -484,7 +489,10 @@ export class StreamProcessor extends EventEmitter {
 
   private createDeduplicationTransform(): Transform {
     if (!this.config.enableDeduplication) {
-      return new Transform({ objectMode: true, transform: (chunk, encoding, callback) => callback(null, chunk) });
+      return new Transform({
+        objectMode: true,
+        transform: (chunk, encoding, callback) => callback(null, chunk),
+      });
     }
 
     return new Transform({
@@ -492,7 +500,7 @@ export class StreamProcessor extends EventEmitter {
       transform: (record: IStreamRecord, encoding, callback) => {
         const recordHash = this.generateRecordHash(record);
         const now = Date.now();
-        
+
         if (this.deduplicationCache.has(recordHash)) {
           this.metrics.duplicatesFiltered++;
           callback(); // Skip duplicate
@@ -507,7 +515,10 @@ export class StreamProcessor extends EventEmitter {
 
   private createBatchingTransform(): Transform {
     if (!this.config.enableBatching) {
-      return new Transform({ objectMode: true, transform: (chunk, encoding, callback) => callback(null, chunk) });
+      return new Transform({
+        objectMode: true,
+        transform: (chunk, encoding, callback) => callback(null, chunk),
+      });
     }
 
     let batch: IStreamRecord[] = [];
@@ -544,12 +555,15 @@ export class StreamProcessor extends EventEmitter {
           flushBatch(callback);
         } else {
           if (!batchTimer) {
-            batchTimer = setTimeout(() => flushBatch(callback), this.config.batchTimeoutMs);
+            batchTimer = setTimeout(
+              () => flushBatch(callback),
+              this.config.batchTimeoutMs
+            );
           }
           callback();
         }
       },
-      flush: (callback) => {
+      flush: callback => {
         flushBatch(callback);
       },
     });
@@ -562,7 +576,7 @@ export class StreamProcessor extends EventEmitter {
         // Update processing metrics
         this.metrics.recordsProcessed++;
         this.metrics.bytesProcessed += JSON.stringify(record.data).length;
-        
+
         callback(null, record);
       },
     });
@@ -655,7 +669,7 @@ export class StreamProcessor extends EventEmitter {
     this.cleanupInterval = setInterval(() => {
       const now = Date.now();
       const cutoff = now - this.config.deduplicationWindowMs;
-      
+
       for (const [hash, timestamp] of this.deduplicationCache) {
         if (timestamp < cutoff) {
           this.deduplicationCache.delete(hash);
@@ -666,14 +680,17 @@ export class StreamProcessor extends EventEmitter {
 
   private collectMetrics(): void {
     this.metrics.streamsActive = this.activeStreams.size;
-    this.metrics.bufferUtilization = (this.deadLetterQueue.length / this.config.deadLetterQueueSize) * 100;
+    this.metrics.bufferUtilization =
+      (this.deadLetterQueue.length / this.config.deadLetterQueueSize) * 100;
     this.metrics.lastUpdated = new Date();
-    
+
     // Calculate rates (would be more sophisticated in production)
     const timeDiff = Date.now() - this.metrics.lastUpdated.getTime();
     if (timeDiff > 0) {
-      this.metrics.recordsPerSecond = this.metrics.recordsProcessed / (timeDiff / 1000);
-      this.metrics.bytesPerSecond = this.metrics.bytesProcessed / (timeDiff / 1000);
+      this.metrics.recordsPerSecond =
+        this.metrics.recordsProcessed / (timeDiff / 1000);
+      this.metrics.bytesPerSecond =
+        this.metrics.bytesProcessed / (timeDiff / 1000);
     }
 
     logger.debug('Stream metrics collected', this.metrics);
@@ -685,7 +702,7 @@ export class StreamProcessor extends EventEmitter {
       source: record.source,
       data: record.data,
     });
-    
+
     return Buffer.from(data).toString('base64').substring(0, 32);
   }
 

@@ -13,8 +13,8 @@ import {
   IEvaluationReport,
   IEvaluationSession,
   EvaluationCategory,
-  EvaluationSeverity
-} from '../interfaces/IUIUXEvaluation.js';
+  EvaluationSeverity,
+} from '../interfaces/IUIUXEvaluation';
 
 export class UIUXEvaluationService implements IUIUXEvaluationService {
   private config: IUIUXEvaluationConfig;
@@ -23,8 +23,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   private metrics: Map<string, IEvaluationMetric[]> = new Map();
   private issues: Map<string, IEvaluationIssue[]> = new Map();
   private reports: IEvaluationReport[] = [];
-  private subscribers: Map<string, (evaluation: IPageEvaluation) => void> = new Map();
-  private continuousEvaluationIntervals: Map<string, NodeJS.Timeout> = new Map();
+  private subscribers: Map<string, (evaluation: IPageEvaluation) => void> =
+    new Map();
+  private continuousEvaluationIntervals: Map<string, NodeJS.Timeout> =
+    new Map();
 
   constructor() {
     this.config = {
@@ -37,25 +39,25 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         wcagLevel: 'AA',
         checkColorContrast: true,
         checkKeyboardNav: true,
-        checkScreenReader: true
+        checkScreenReader: true,
       },
       performance: {
         enabled: true,
         targetLoadTime: 2000,
         targetInteractionTime: 100,
-        monitorFrameRate: true
+        monitorFrameRate: true,
       },
       usability: {
         enabled: true,
         trackUserActions: true,
         trackErrorRates: true,
-        trackCompletionTimes: true
+        trackCompletionTimes: true,
       },
       reporting: {
         enabled: true,
         autoGenerate: true,
-        retentionDays: 90
-      }
+        retentionDays: 90,
+      },
     };
   }
 
@@ -67,10 +69,13 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     return { ...this.config };
   }
 
-  async evaluatePage(pageId: string, element?: HTMLElement): Promise<IPageEvaluation> {
+  async evaluatePage(
+    pageId: string,
+    element?: HTMLElement
+  ): Promise<IPageEvaluation> {
     const startTime = Date.now();
     const timestamp = new Date();
-    
+
     // Initialize metrics and issues arrays
     const metrics: IEvaluationMetric[] = [];
     const issues: IEvaluationIssue[] = [];
@@ -79,7 +84,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     try {
       // Accessibility evaluation
       if (this.config.accessibility.enabled) {
-        const accessibilityResults = await this.evaluateAccessibility(pageId, element);
+        const accessibilityResults = await this.evaluateAccessibility(
+          pageId,
+          element
+        );
         metrics.push(...accessibilityResults.metrics);
         issues.push(...accessibilityResults.issues);
         recommendations.push(...accessibilityResults.recommendations);
@@ -87,7 +95,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
       // Performance evaluation
       if (this.config.performance.enabled) {
-        const performanceResults = await this.evaluatePerformance(pageId, element);
+        const performanceResults = await this.evaluatePerformance(
+          pageId,
+          element
+        );
         metrics.push(...performanceResults.metrics);
         issues.push(...performanceResults.issues);
         recommendations.push(...performanceResults.recommendations);
@@ -108,36 +119,50 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       recommendations.push(...visualResults.recommendations);
 
       // Enterprise standards evaluation
-      const enterpriseResults = await this.evaluateEnterpriseStandards(pageId, element);
+      const enterpriseResults = await this.evaluateEnterpriseStandards(
+        pageId,
+        element
+      );
       metrics.push(...enterpriseResults.metrics);
       issues.push(...enterpriseResults.issues);
       recommendations.push(...enterpriseResults.recommendations);
 
       // Feature availability evaluation
-      const featureMetrics = await this.checkFeatureAvailability(pageId, element);
+      const featureMetrics = await this.checkFeatureAvailability(
+        pageId,
+        element
+      );
       metrics.push(...featureMetrics);
-      
+
       // Add feature availability issues if score is low
-      const featureScore = featureMetrics.find(m => m.name === 'Feature Availability Score');
+      const featureScore = featureMetrics.find(
+        m => m.name === 'Feature Availability Score'
+      );
       if (featureScore && featureScore.value < 80) {
         const missingFeatures = featureScore.metadata?.missingFeatures || [];
         if (missingFeatures.length > 0) {
           issues.push({
             id: uuidv4(),
             category: EvaluationCategory.USABILITY,
-            severity: featureScore.value < 50 ? EvaluationSeverity.HIGH : EvaluationSeverity.MEDIUM,
+            severity:
+              featureScore.value < 50
+                ? EvaluationSeverity.HIGH
+                : EvaluationSeverity.MEDIUM,
             title: 'Missing Expected Features',
             description: `${missingFeatures.length} expected features are not available: ${missingFeatures.join(', ')}`,
-            recommendation: 'Ensure all expected features are implemented and accessible to users',
+            recommendation:
+              'Ensure all expected features are implemented and accessible to users',
             timestamp: new Date(),
             resolved: false,
-            metadata: { 
-              missingFeatures, 
+            metadata: {
+              missingFeatures,
               availabilityScore: featureScore.value,
-              totalExpected: featureScore.metadata?.totalFeatures 
-            }
+              totalExpected: featureScore.metadata?.totalFeatures,
+            },
           });
-          recommendations.push('Review and implement missing expected features');
+          recommendations.push(
+            'Review and implement missing expected features'
+          );
         }
       }
 
@@ -164,8 +189,8 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         compliance: {
           wcag: wcagCompliance,
           enterprise: enterpriseCompliance,
-          responsive: responsiveCompliance
-        }
+          responsive: responsiveCompliance,
+        },
       };
 
       // Store evaluation
@@ -183,13 +208,18 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
       return evaluation;
     } catch (error) {
-      throw new Error(`Failed to evaluate page ${pageId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to evaluate page ${pageId}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
-  async startContinuousEvaluation(pageId: string, element?: HTMLElement): Promise<string> {
+  async startContinuousEvaluation(
+    pageId: string,
+    element?: HTMLElement
+  ): Promise<string> {
     const sessionId = uuidv4();
-    
+
     const interval = setInterval(async () => {
       try {
         await this.evaluatePage(pageId, element);
@@ -199,7 +229,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     }, this.config.evaluationInterval);
 
     this.continuousEvaluationIntervals.set(sessionId, interval);
-    
+
     // Create session
     const session: IEvaluationSession = {
       id: sessionId,
@@ -210,8 +240,8 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       performance: {
         loadTime: 0,
         interactionTimes: [],
-        frameRate: []
-      }
+        frameRate: [],
+      },
     };
 
     this.sessions.set(sessionId, session);
@@ -233,11 +263,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     }
   }
 
-  async collectMetric(pageId: string, metric: Omit<IEvaluationMetric, 'id' | 'timestamp'>): Promise<void> {
+  async collectMetric(
+    pageId: string,
+    metric: Omit<IEvaluationMetric, 'id' | 'timestamp'>
+  ): Promise<void> {
     const fullMetric: IEvaluationMetric = {
       ...metric,
       id: uuidv4(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     if (!this.metrics.has(pageId)) {
@@ -246,7 +279,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     this.metrics.get(pageId)!.push(fullMetric);
   }
 
-  async getMetrics(pageId: string, category?: EvaluationCategory): Promise<IEvaluationMetric[]> {
+  async getMetrics(
+    pageId: string,
+    category?: EvaluationCategory
+  ): Promise<IEvaluationMetric[]> {
     const pageMetrics = this.metrics.get(pageId) || [];
     if (category) {
       return pageMetrics.filter(metric => metric.category === category);
@@ -254,12 +290,15 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     return pageMetrics;
   }
 
-  async reportIssue(pageId: string, issue: Omit<IEvaluationIssue, 'id' | 'timestamp' | 'resolved'>): Promise<void> {
+  async reportIssue(
+    pageId: string,
+    issue: Omit<IEvaluationIssue, 'id' | 'timestamp' | 'resolved'>
+  ): Promise<void> {
     const fullIssue: IEvaluationIssue = {
       ...issue,
       id: uuidv4(),
       timestamp: new Date(),
-      resolved: false
+      resolved: false,
     };
 
     if (!this.issues.has(pageId)) {
@@ -268,7 +307,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     this.issues.get(pageId)!.push(fullIssue);
   }
 
-  async getIssues(pageId: string, severity?: EvaluationSeverity): Promise<IEvaluationIssue[]> {
+  async getIssues(
+    pageId: string,
+    severity?: EvaluationSeverity
+  ): Promise<IEvaluationIssue[]> {
     const pageIssues = this.issues.get(pageId) || [];
     if (severity) {
       return pageIssues.filter(issue => issue.severity === severity);
@@ -307,14 +349,17 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       pages,
       summary,
       trends,
-      exportFormats: ['pdf', 'json', 'csv', 'xlsx']
+      exportFormats: ['pdf', 'json', 'csv', 'xlsx'],
     };
 
     this.reports.push(report);
     return report;
   }
 
-  async exportReport(reportId: string, format: 'pdf' | 'json' | 'csv' | 'xlsx'): Promise<Buffer | string> {
+  async exportReport(
+    reportId: string,
+    format: 'pdf' | 'json' | 'csv' | 'xlsx'
+  ): Promise<Buffer | string> {
     const report = this.reports.find(r => r.id === reportId);
     if (!report) {
       throw new Error(`Report with ID ${reportId} not found`);
@@ -334,7 +379,9 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     return [...this.reports];
   }
 
-  async subscribe(callback: (evaluation: IPageEvaluation) => void): Promise<string> {
+  async subscribe(
+    callback: (evaluation: IPageEvaluation) => void
+  ): Promise<string> {
     const subscriptionId = uuidv4();
     this.subscribers.set(subscriptionId, callback);
     return subscriptionId;
@@ -344,7 +391,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     this.subscribers.delete(subscriptionId);
   }
 
-  calculateScore(metrics: IEvaluationMetric[], issues: IEvaluationIssue[]): number {
+  calculateScore(
+    metrics: IEvaluationMetric[],
+    issues: IEvaluationIssue[]
+  ): number {
     if (metrics.length === 0 && issues.length === 0) {
       return 0;
     }
@@ -365,7 +415,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       [EvaluationSeverity.HIGH]: 10,
       [EvaluationSeverity.MEDIUM]: 5,
       [EvaluationSeverity.LOW]: 2,
-      [EvaluationSeverity.INFO]: 0
+      [EvaluationSeverity.INFO]: 0,
     };
 
     const totalPenalty = issues.reduce((sum, issue) => {
@@ -375,7 +425,9 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     return Math.max(0, Math.min(100, metricScore - totalPenalty));
   }
 
-  async validateWCAGCompliance(element: HTMLElement): Promise<IEvaluationIssue[]> {
+  async validateWCAGCompliance(
+    element: HTMLElement
+  ): Promise<IEvaluationIssue[]> {
     const issues: IEvaluationIssue[] = [];
 
     // Basic WCAG checks
@@ -391,7 +443,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         recommendation: 'Add aria-label or ensure element has visible text',
         wcagLevel: 'A',
         timestamp: new Date(),
-        resolved: false
+        resolved: false,
       });
     }
 
@@ -406,7 +458,11 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
   // Performance measurement methods
   private measurePageLoadTime(): number {
-    if (typeof window === 'undefined' || !window.performance || !window.performance.timing) {
+    if (
+      typeof window === 'undefined' ||
+      !window.performance ||
+      !window.performance.timing
+    ) {
       return 2000; // Default fallback
     }
 
@@ -422,7 +478,9 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
     try {
       const paintEntries = window.performance.getEntriesByType('paint');
-      const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+      const fcpEntry = paintEntries.find(
+        entry => entry.name === 'first-contentful-paint'
+      );
       return fcpEntry ? fcpEntry.startTime : 1200;
     } catch (error) {
       return 1200;
@@ -436,10 +494,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
     try {
       // Try to get Time to Interactive from Long Tasks API
-      const longTaskObserver = new PerformanceObserver((list) => {
+      const longTaskObserver = new PerformanceObserver(list => {
         // This would be handled in a real implementation
       });
-      
+
       // For now, estimate based on load time
       const loadTime = this.measurePageLoadTime();
       return Math.max(loadTime * 1.2, 2000);
@@ -449,7 +507,11 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   }
 
   private measureRenderTime(): number {
-    if (typeof window === 'undefined' || !window.performance || !window.performance.timing) {
+    if (
+      typeof window === 'undefined' ||
+      !window.performance ||
+      !window.performance.timing
+    ) {
       return 800; // Default fallback
     }
 
@@ -459,7 +521,11 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   }
 
   private measureNetworkTime(): number {
-    if (typeof window === 'undefined' || !window.performance || !window.performance.timing) {
+    if (
+      typeof window === 'undefined' ||
+      !window.performance ||
+      !window.performance.timing
+    ) {
       return 300; // Default fallback
     }
 
@@ -469,12 +535,17 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   }
 
   private measureDOMContentLoadTime(): number {
-    if (typeof window === 'undefined' || !window.performance || !window.performance.timing) {
+    if (
+      typeof window === 'undefined' ||
+      !window.performance ||
+      !window.performance.timing
+    ) {
       return 1500; // Default fallback
     }
 
     const timing = window.performance.timing;
-    const domLoadTime = timing.domContentLoadedEventEnd - timing.navigationStart;
+    const domLoadTime =
+      timing.domContentLoadedEventEnd - timing.navigationStart;
     return domLoadTime > 0 ? domLoadTime : 1500;
   }
 
@@ -488,7 +559,8 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       if (resources.length === 0) return 3000;
 
       const totalResourceTime = resources.reduce((total, resource) => {
-        return total + (resource.responseEnd - resource.startTime);
+        const resourceEntry = resource as PerformanceResourceTiming;
+        return total + (resourceEntry.responseEnd - resourceEntry.startTime);
       }, 0);
 
       return totalResourceTime / resources.length;
@@ -498,33 +570,42 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   }
 
   // Feature availability checking methods
-  async checkFeatureAvailability(pageId: string, element?: HTMLElement): Promise<IEvaluationMetric[]> {
+  async checkFeatureAvailability(
+    pageId: string,
+    element?: HTMLElement
+  ): Promise<IEvaluationMetric[]> {
     const metrics: IEvaluationMetric[] = [];
-    
+
     try {
       const features = this.getExpectedFeatures(pageId);
-      const availableFeatures = await this.scanAvailableFeatures(element || document.body);
-      const missingFeatures = features.filter(feature => !availableFeatures.includes(feature));
-      
-      const availabilityScore = ((features.length - missingFeatures.length) / features.length) * 100;
-      
+      const availableFeatures = await this.scanAvailableFeatures(
+        element || document.body
+      );
+      const missingFeatures = features.filter(
+        feature => !availableFeatures.includes(feature)
+      );
+
+      const availabilityScore =
+        ((features.length - missingFeatures.length) / features.length) * 100;
+
       metrics.push({
         id: uuidv4(),
         name: 'Feature Availability Score',
         category: EvaluationCategory.USABILITY,
-        description: 'Percentage of expected features that are available and functional',
+        description:
+          'Percentage of expected features that are available and functional',
         value: availabilityScore,
         maxValue: 100,
         unit: '%',
         threshold: { excellent: 95, good: 85, acceptable: 70, poor: 50 },
         timestamp: new Date(),
-        metadata: { 
+        metadata: {
           expectedFeatures: features,
           availableFeatures,
           missingFeatures,
           totalFeatures: features.length,
-          availableCount: availableFeatures.length
-        }
+          availableCount: availableFeatures.length,
+        },
       });
 
       // Add individual feature availability metrics
@@ -540,10 +621,9 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
           unit: 'boolean',
           threshold: { excellent: 1, good: 1, acceptable: 0, poor: 0 },
           timestamp: new Date(),
-          metadata: { featureName: feature, available: isAvailable }
+          metadata: { featureName: feature, available: isAvailable },
         });
       }
-
     } catch (error) {
       console.warn('Feature availability check failed:', error);
       metrics.push({
@@ -556,7 +636,10 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         unit: '%',
         threshold: { excellent: 95, good: 85, acceptable: 70, poor: 50 },
         timestamp: new Date(),
-        metadata: { error: error.message, source: 'feature-availability-check' }
+        metadata: {
+          error: error.message,
+          source: 'feature-availability-check',
+        },
       });
     }
 
@@ -566,34 +649,83 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   private getExpectedFeatures(pageId: string): string[] {
     const featureSets: Record<string, string[]> = {
       'enterprise-realtime-dashboard': [
-        'data-grid', 'charts', 'filters', 'search', 'export', 'refresh', 
-        'notifications', 'user-menu', 'settings', 'help'
+        'data-grid',
+        'charts',
+        'filters',
+        'search',
+        'export',
+        'refresh',
+        'notifications',
+        'user-menu',
+        'settings',
+        'help',
       ],
       'enterprise-workflow-designer': [
-        'drag-drop', 'canvas', 'toolbar', 'properties-panel', 'save', 
-        'load', 'export', 'validation', 'undo-redo', 'zoom'
+        'drag-drop',
+        'canvas',
+        'toolbar',
+        'properties-panel',
+        'save',
+        'load',
+        'export',
+        'validation',
+        'undo-redo',
+        'zoom',
       ],
       'enterprise-notification-center': [
-        'notification-list', 'filters', 'mark-read', 'delete', 'search',
-        'pagination', 'settings', 'categories', 'priority-sorting'
+        'notification-list',
+        'filters',
+        'mark-read',
+        'delete',
+        'search',
+        'pagination',
+        'settings',
+        'categories',
+        'priority-sorting',
       ],
       'analytics-reporting': [
-        'report-templates', 'data-visualization', 'filters', 'export',
-        'scheduling', 'sharing', 'customization'
+        'report-templates',
+        'data-visualization',
+        'filters',
+        'export',
+        'scheduling',
+        'sharing',
+        'customization',
       ],
       'threat-intelligence-dashboard': [
-        'threat-feed', 'indicators', 'alerts', 'analysis', 'correlation',
-        'timeline', 'maps', 'search', 'export'
+        'threat-feed',
+        'indicators',
+        'alerts',
+        'analysis',
+        'correlation',
+        'timeline',
+        'maps',
+        'search',
+        'export',
       ],
       'ioc-management': [
-        'ioc-list', 'create-ioc', 'edit-ioc', 'delete-ioc', 'search',
-        'filters', 'bulk-operations', 'enrichment', 'validation'
-      ]
+        'ioc-list',
+        'create-ioc',
+        'edit-ioc',
+        'delete-ioc',
+        'search',
+        'filters',
+        'bulk-operations',
+        'enrichment',
+        'validation',
+      ],
     };
 
-    return featureSets[pageId] || [
-      'navigation', 'search', 'filters', 'export', 'help', 'settings'
-    ];
+    return (
+      featureSets[pageId] || [
+        'navigation',
+        'search',
+        'filters',
+        'export',
+        'help',
+        'settings',
+      ]
+    );
   }
 
   private async scanAvailableFeatures(element: HTMLElement): Promise<string[]> {
@@ -602,32 +734,35 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     try {
       // Check for common UI elements that indicate features
       const selectors = {
-        'data-grid': 'table, .data-grid, .ag-grid, .mui-data-grid, [role="grid"]',
-        'charts': 'canvas, svg, .chart, .recharts, .highcharts',
-        'filters': '.filter, [role="combobox"], select, .dropdown',
-        'search': 'input[type="search"], .search, [placeholder*="search" i]',
-        'export': 'button[title*="export" i], .export, [aria-label*="export" i]',
-        'refresh': 'button[title*="refresh" i], .refresh, [aria-label*="refresh" i]',
-        'notifications': '.notification, .alert, .toast, [role="alert"]',
+        'data-grid':
+          'table, .data-grid, .ag-grid, .mui-data-grid, [role="grid"]',
+        charts: 'canvas, svg, .chart, .recharts, .highcharts',
+        filters: '.filter, [role="combobox"], select, .dropdown',
+        search: 'input[type="search"], .search, [placeholder*="search" i]',
+        export: 'button[title*="export" i], .export, [aria-label*="export" i]',
+        refresh:
+          'button[title*="refresh" i], .refresh, [aria-label*="refresh" i]',
+        notifications: '.notification, .alert, .toast, [role="alert"]',
         'user-menu': '.user-menu, .profile, .avatar',
-        'settings': 'button[title*="setting" i], .settings, [aria-label*="setting" i]',
-        'help': 'button[title*="help" i], .help, [aria-label*="help" i]',
+        settings:
+          'button[title*="setting" i], .settings, [aria-label*="setting" i]',
+        help: 'button[title*="help" i], .help, [aria-label*="help" i]',
         'drag-drop': '[draggable="true"], .draggable, .droppable',
-        'canvas': 'canvas, .canvas, .diagram, .workflow',
-        'toolbar': '.toolbar, .tool-bar, .action-bar',
+        canvas: 'canvas, .canvas, .diagram, .workflow',
+        toolbar: '.toolbar, .tool-bar, .action-bar',
         'properties-panel': '.properties, .panel, .sidebar',
-        'save': 'button[title*="save" i], .save, [aria-label*="save" i]',
-        'load': 'button[title*="load" i], .load, [aria-label*="load" i]',
-        'validation': '.error, .warning, .validation, [aria-invalid]',
+        save: 'button[title*="save" i], .save, [aria-label*="save" i]',
+        load: 'button[title*="load" i], .load, [aria-label*="load" i]',
+        validation: '.error, .warning, .validation, [aria-invalid]',
         'undo-redo': 'button[title*="undo" i], button[title*="redo" i]',
-        'zoom': 'button[title*="zoom" i], .zoom, .scale',
+        zoom: 'button[title*="zoom" i], .zoom, .scale',
         'notification-list': '.notification-list, .notifications, .alerts',
         'mark-read': 'button[title*="read" i], .mark-read',
-        'delete': 'button[title*="delete" i], .delete, [aria-label*="delete" i]',
-        'pagination': '.pagination, .paging, [role="navigation"]',
-        'categories': '.categories, .tags, .labels',
+        delete: 'button[title*="delete" i], .delete, [aria-label*="delete" i]',
+        pagination: '.pagination, .paging, [role="navigation"]',
+        categories: '.categories, .tags, .labels',
         'priority-sorting': '.priority, .sort, [role="columnheader"]',
-        'navigation': 'nav, .navigation, .nav, [role="navigation"]'
+        navigation: 'nav, .navigation, .nav, [role="navigation"]',
       };
 
       for (const [feature, selector] of Object.entries(selectors)) {
@@ -643,17 +778,20 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       }
 
       // Check for interactive elements
-      const interactiveElements = element.querySelectorAll('button, input, select, textarea, [role="button"], [tabindex]');
+      const interactiveElements = element.querySelectorAll(
+        'button, input, select, textarea, [role="button"], [tabindex]'
+      );
       if (interactiveElements.length > 0) {
         features.push('interactive-elements');
       }
 
       // Check for accessibility features
-      const accessibleElements = element.querySelectorAll('[aria-label], [aria-describedby], [role]');
+      const accessibleElements = element.querySelectorAll(
+        '[aria-label], [aria-describedby], [role]'
+      );
       if (accessibleElements.length > 0) {
         features.push('accessibility-features');
       }
-
     } catch (error) {
       console.warn('Feature scanning error:', error);
     }
@@ -677,7 +815,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       maxValue: 21,
       unit: 'ratio',
       threshold: { excellent: 7, good: 4.5, acceptable: 3, poor: 2 },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return { metrics, issues, recommendations };
@@ -694,7 +832,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       const interactionTime = this.measureInteractionTime();
       const renderTime = this.measureRenderTime();
       const networkTime = this.measureNetworkTime();
-      
+
       // Page Load Time metric
       metrics.push({
         id: uuidv4(),
@@ -704,9 +842,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         value: loadTime,
         maxValue: 5000,
         unit: 'ms',
-        threshold: { excellent: 1000, good: 2000, acceptable: 3000, poor: 5000 },
+        threshold: {
+          excellent: 1000,
+          good: 2000,
+          acceptable: 3000,
+          poor: 5000,
+        },
         timestamp: new Date(),
-        metadata: { source: 'NavigationTiming API' }
+        metadata: { source: 'NavigationTiming API' },
       });
 
       // First Contentful Paint
@@ -720,9 +863,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
           value: fcpTime,
           maxValue: 2500,
           unit: 'ms',
-          threshold: { excellent: 800, good: 1200, acceptable: 1800, poor: 2500 },
+          threshold: {
+            excellent: 800,
+            good: 1200,
+            acceptable: 1800,
+            poor: 2500,
+          },
           timestamp: new Date(),
-          metadata: { source: 'Performance API' }
+          metadata: { source: 'Performance API' },
         });
       }
 
@@ -736,9 +884,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
           value: interactionTime,
           maxValue: 4000,
           unit: 'ms',
-          threshold: { excellent: 1500, good: 2500, acceptable: 3500, poor: 4000 },
+          threshold: {
+            excellent: 1500,
+            good: 2500,
+            acceptable: 3500,
+            poor: 4000,
+          },
           timestamp: new Date(),
-          metadata: { source: 'Performance Observer' }
+          metadata: { source: 'Performance Observer' },
         });
       }
 
@@ -753,9 +906,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
           value: domContentLoadTime,
           maxValue: 3000,
           unit: 'ms',
-          threshold: { excellent: 800, good: 1500, acceptable: 2200, poor: 3000 },
+          threshold: {
+            excellent: 800,
+            good: 1500,
+            acceptable: 2200,
+            poor: 3000,
+          },
           timestamp: new Date(),
-          metadata: { source: 'NavigationTiming API' }
+          metadata: { source: 'NavigationTiming API' },
         });
       }
 
@@ -770,9 +928,14 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
           value: resourceLoadTime,
           maxValue: 6000,
           unit: 'ms',
-          threshold: { excellent: 2000, good: 3500, acceptable: 5000, poor: 6000 },
+          threshold: {
+            excellent: 2000,
+            good: 3500,
+            acceptable: 5000,
+            poor: 6000,
+          },
           timestamp: new Date(),
-          metadata: { source: 'Resource Timing API' }
+          metadata: { source: 'Resource Timing API' },
         });
       }
 
@@ -781,13 +944,17 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         issues.push({
           id: uuidv4(),
           category: EvaluationCategory.PERFORMANCE,
-          severity: loadTime > 5000 ? EvaluationSeverity.CRITICAL : EvaluationSeverity.HIGH,
+          severity:
+            loadTime > 5000
+              ? EvaluationSeverity.CRITICAL
+              : EvaluationSeverity.HIGH,
           title: 'Slow Page Load Time',
           description: `Page load time of ${loadTime}ms exceeds acceptable threshold`,
-          recommendation: 'Optimize images, minify CSS/JS, enable compression, use CDN',
+          recommendation:
+            'Optimize images, minify CSS/JS, enable compression, use CDN',
           timestamp: new Date(),
           resolved: false,
-          metadata: { actualValue: loadTime, threshold: 3000 }
+          metadata: { actualValue: loadTime, threshold: 3000 },
         });
         recommendations.push('Optimize page resources and loading strategy');
       }
@@ -796,19 +963,25 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         issues.push({
           id: uuidv4(),
           category: EvaluationCategory.PERFORMANCE,
-          severity: fcpTime > 2500 ? EvaluationSeverity.HIGH : EvaluationSeverity.MEDIUM,
+          severity:
+            fcpTime > 2500
+              ? EvaluationSeverity.HIGH
+              : EvaluationSeverity.MEDIUM,
           title: 'Slow First Contentful Paint',
           description: `First Contentful Paint of ${fcpTime}ms is too slow`,
-          recommendation: 'Minimize render-blocking resources, optimize critical rendering path',
+          recommendation:
+            'Minimize render-blocking resources, optimize critical rendering path',
           timestamp: new Date(),
           resolved: false,
-          metadata: { actualValue: fcpTime, threshold: 1800 }
+          metadata: { actualValue: fcpTime, threshold: 1800 },
         });
       }
-
     } catch (error) {
       // Fallback to estimated values if performance APIs aren't available
-      console.warn('Performance measurement failed, using estimated values:', error);
+      console.warn(
+        'Performance measurement failed, using estimated values:',
+        error
+      );
       metrics.push({
         id: uuidv4(),
         name: 'Page Load Time (Estimated)',
@@ -817,9 +990,17 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
         value: 2000,
         maxValue: 5000,
         unit: 'ms',
-        threshold: { excellent: 1000, good: 2000, acceptable: 3000, poor: 5000 },
+        threshold: {
+          excellent: 1000,
+          good: 2000,
+          acceptable: 3000,
+          poor: 5000,
+        },
         timestamp: new Date(),
-        metadata: { source: 'estimated', reason: 'performance APIs unavailable' }
+        metadata: {
+          source: 'estimated',
+          reason: 'performance APIs unavailable',
+        },
       });
     }
 
@@ -841,7 +1022,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       maxValue: 100,
       unit: '%',
       threshold: { excellent: 95, good: 85, acceptable: 75, poor: 65 },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return { metrics, issues, recommendations };
@@ -862,13 +1043,16 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       maxValue: 100,
       unit: 'score',
       threshold: { excellent: 95, good: 85, acceptable: 75, poor: 65 },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return { metrics, issues, recommendations };
   }
 
-  private async evaluateEnterpriseStandards(pageId: string, element?: HTMLElement) {
+  private async evaluateEnterpriseStandards(
+    pageId: string,
+    element?: HTMLElement
+  ) {
     const metrics: IEvaluationMetric[] = [];
     const issues: IEvaluationIssue[] = [];
     const recommendations: string[] = [];
@@ -883,28 +1067,45 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       maxValue: 100,
       unit: 'score',
       threshold: { excellent: 95, good: 85, acceptable: 75, poor: 65 },
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     return { metrics, issues, recommendations };
   }
 
-  private calculateCategoryScores(metrics: IEvaluationMetric[], issues: IEvaluationIssue[]): Record<EvaluationCategory, number> {
-    const categoryScores: Record<EvaluationCategory, number> = {} as Record<EvaluationCategory, number>;
+  private calculateCategoryScores(
+    metrics: IEvaluationMetric[],
+    issues: IEvaluationIssue[]
+  ): Record<EvaluationCategory, number> {
+    const categoryScores: Record<EvaluationCategory, number> = {} as Record<
+      EvaluationCategory,
+      number
+    >;
 
     for (const category of Object.values(EvaluationCategory)) {
       const categoryMetrics = metrics.filter(m => m.category === category);
       const categoryIssues = issues.filter(i => i.category === category);
-      categoryScores[category] = this.calculateScore(categoryMetrics, categoryIssues);
+      categoryScores[category] = this.calculateScore(
+        categoryMetrics,
+        categoryIssues
+      );
     }
 
     return categoryScores;
   }
 
-  private determineWCAGCompliance(issues: IEvaluationIssue[]): 'A' | 'AA' | 'AAA' | 'Non-compliant' {
-    const accessibilityIssues = issues.filter(i => i.category === EvaluationCategory.ACCESSIBILITY);
-    const criticalIssues = accessibilityIssues.filter(i => i.severity === EvaluationSeverity.CRITICAL);
-    const highIssues = accessibilityIssues.filter(i => i.severity === EvaluationSeverity.HIGH);
+  private determineWCAGCompliance(
+    issues: IEvaluationIssue[]
+  ): 'A' | 'AA' | 'AAA' | 'Non-compliant' {
+    const accessibilityIssues = issues.filter(
+      i => i.category === EvaluationCategory.ACCESSIBILITY
+    );
+    const criticalIssues = accessibilityIssues.filter(
+      i => i.severity === EvaluationSeverity.CRITICAL
+    );
+    const highIssues = accessibilityIssues.filter(
+      i => i.severity === EvaluationSeverity.HIGH
+    );
 
     if (criticalIssues.length > 0) return 'Non-compliant';
     if (highIssues.length > 2) return 'A';
@@ -913,8 +1114,12 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
   }
 
   private determineEnterpriseCompliance(issues: IEvaluationIssue[]): boolean {
-    const enterpriseIssues = issues.filter(i => i.category === EvaluationCategory.ENTERPRISE_STANDARDS);
-    const criticalIssues = enterpriseIssues.filter(i => i.severity === EvaluationSeverity.CRITICAL);
+    const enterpriseIssues = issues.filter(
+      i => i.category === EvaluationCategory.ENTERPRISE_STANDARDS
+    );
+    const criticalIssues = enterpriseIssues.filter(
+      i => i.severity === EvaluationSeverity.CRITICAL
+    );
     return criticalIssues.length === 0;
   }
 
@@ -927,7 +1132,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     const pageNames: Record<string, string> = {
       'enterprise-realtime-dashboard': 'Enterprise Realtime Dashboard',
       'enterprise-workflow-designer': 'Enterprise Workflow Designer',
-      'enterprise-notification-center': 'Enterprise Notification Center'
+      'enterprise-notification-center': 'Enterprise Notification Center',
     };
     return pageNames[pageId] || pageId;
   }
@@ -936,7 +1141,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     const componentNames: Record<string, string> = {
       'enterprise-realtime-dashboard': 'EnterpriseRealtimeDashboard',
       'enterprise-workflow-designer': 'EnterpriseWorkflowDesigner',
-      'enterprise-notification-center': 'EnterpriseNotificationCenter'
+      'enterprise-notification-center': 'EnterpriseNotificationCenter',
     };
     return componentNames[pageId] || pageId;
   }
@@ -949,15 +1154,24 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
 
   private calculateReportSummary(pages: IPageEvaluation[]) {
     const totalPages = pages.length;
-    const overallScore = pages.length > 0 
-      ? pages.reduce((sum, page) => sum + page.overallScore, 0) / pages.length 
-      : 0;
+    const overallScore =
+      pages.length > 0
+        ? pages.reduce((sum, page) => sum + page.overallScore, 0) / pages.length
+        : 0;
 
     const allIssues = pages.flatMap(page => page.issues);
-    const criticalIssues = allIssues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length;
-    const highIssues = allIssues.filter(i => i.severity === EvaluationSeverity.HIGH).length;
-    const mediumIssues = allIssues.filter(i => i.severity === EvaluationSeverity.MEDIUM).length;
-    const lowIssues = allIssues.filter(i => i.severity === EvaluationSeverity.LOW).length;
+    const criticalIssues = allIssues.filter(
+      i => i.severity === EvaluationSeverity.CRITICAL
+    ).length;
+    const highIssues = allIssues.filter(
+      i => i.severity === EvaluationSeverity.HIGH
+    ).length;
+    const mediumIssues = allIssues.filter(
+      i => i.severity === EvaluationSeverity.MEDIUM
+    ).length;
+    const lowIssues = allIssues.filter(
+      i => i.severity === EvaluationSeverity.LOW
+    ).length;
 
     return {
       totalPages,
@@ -965,7 +1179,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       criticalIssues,
       highIssues,
       mediumIssues,
-      lowIssues
+      lowIssues,
     };
   }
 
@@ -973,7 +1187,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
     // Mock trend calculation - in real implementation, compare with previous reports
     return {
       scoreImprovement: 5.2,
-      issuesReduced: 3
+      issuesReduced: 3,
     };
   }
 
@@ -984,7 +1198,7 @@ export class UIUXEvaluationService implements IUIUXEvaluationService {
       page.overallScore.toString(),
       page.issues.length.toString(),
       page.compliance.wcag,
-      page.compliance.enterprise.toString()
+      page.compliance.enterprise.toString(),
     ]);
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');

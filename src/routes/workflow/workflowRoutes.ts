@@ -49,21 +49,24 @@ router.use(authenticate);
  */
 router.get('/definitions', async (req: AuthRequest, res: Response) => {
   try {
-    const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+    const orchestrator = req.app.locals
+      .workflowOrchestrator as WorkflowBPMOrchestrator;
     const definitions = await orchestrator.getWorkflowDefinitions();
-    
+
     // Apply filters if provided
     let filteredDefinitions = definitions;
-    
+
     if (req.query.category) {
-      filteredDefinitions = filteredDefinitions.filter(def => 
-        def.category === req.query.category
+      filteredDefinitions = filteredDefinitions.filter(
+        def => def.category === req.query.category
       );
     }
-    
+
     if (req.query.tags) {
-      const tags = Array.isArray(req.query.tags) ? req.query.tags : [req.query.tags];
-      filteredDefinitions = filteredDefinitions.filter(def => 
+      const tags = Array.isArray(req.query.tags)
+        ? req.query.tags
+        : [req.query.tags];
+      filteredDefinitions = filteredDefinitions.filter(def =>
         tags.some((tag: string) => def.tags.includes(tag))
       );
     }
@@ -71,18 +74,18 @@ router.get('/definitions', async (req: AuthRequest, res: Response) => {
     res.json({
       success: true,
       data: filteredDefinitions,
-      count: filteredDefinitions.length
+      count: filteredDefinitions.length,
     });
   } catch (error) {
     logger.error('Failed to get workflow definitions', {
       error: (error as Error).message,
-      query: req.query
+      query: req.query,
     });
-    
+
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve workflow definitions',
-      error: (error as Error).message
+      error: (error as Error).message,
     });
   }
 });
@@ -107,26 +110,28 @@ router.get('/definitions', async (req: AuthRequest, res: Response) => {
  *       400:
  *         description: Invalid workflow definition
  */
-router.post('/definitions',
+router.post(
+  '/definitions',
   [
     body('id').notEmpty().withMessage('Workflow ID is required'),
     body('name').notEmpty().withMessage('Workflow name is required'),
     body('version').notEmpty().withMessage('Workflow version is required'),
     body('description').notEmpty().withMessage('Description is required'),
     body('steps').isArray().withMessage('Steps must be an array'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const definition = req.body;
-      
+
       // Add metadata
       definition.metadata = {
         ...definition.metadata,
         author: req.user?.id || 'system',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       await orchestrator.registerWorkflowDefinition(definition);
@@ -134,25 +139,25 @@ router.post('/definitions',
       logger.info('Workflow definition registered via API', {
         workflowId: definition.id,
         version: definition.version,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.status(201).json({
         success: true,
         message: 'Workflow definition registered successfully',
-        data: { id: definition.id, version: definition.version }
+        data: { id: definition.id, version: definition.version },
       });
     } catch (error) {
       logger.error('Failed to register workflow definition', {
         error: (error as Error).message,
         workflowId: req.body.id,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
+
       res.status(500).json({
         success: false,
         message: 'Failed to register workflow definition',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -198,15 +203,18 @@ router.post('/definitions',
  */
 router.get('/instances', async (req: AuthRequest, res: Response) => {
   try {
-    const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
-    
+    const orchestrator = req.app.locals
+      .workflowOrchestrator as WorkflowBPMOrchestrator;
+
     const filters = {
       workflowId: req.query.workflowId as string,
-      status: req.query.status ? 
-        (Array.isArray(req.query.status) ? req.query.status : [req.query.status]) as string[] : 
-        undefined,
+      status: req.query.status
+        ? ((Array.isArray(req.query.status)
+            ? req.query.status
+            : [req.query.status]) as string[])
+        : undefined,
       limit: parseInt(req.query.limit as string) || 100,
-      offset: parseInt(req.query.offset as string) || 0
+      offset: parseInt(req.query.offset as string) || 0,
     };
 
     const instances = await orchestrator.listWorkflowInstances(filters);
@@ -217,19 +225,19 @@ router.get('/instances', async (req: AuthRequest, res: Response) => {
       count: instances.length,
       pagination: {
         limit: filters.limit,
-        offset: filters.offset
-      }
+        offset: filters.offset,
+      },
     });
   } catch (error) {
     logger.error('Failed to get workflow instances', {
       error: (error as Error).message,
-      query: req.query
+      query: req.query,
     });
-    
+
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve workflow instances',
-      error: (error as Error).message
+      error: (error as Error).message,
     });
   }
 });
@@ -263,24 +271,30 @@ router.get('/instances', async (req: AuthRequest, res: Response) => {
  *       400:
  *         description: Invalid request
  */
-router.post('/instances',
+router.post(
+  '/instances',
   [
     body('workflowId').notEmpty().withMessage('Workflow ID is required'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { workflowId, parameters = {} } = req.body;
       const initiatedBy = req.user?.id || 'api-user';
 
-      const instance = await orchestrator.startWorkflow(workflowId, parameters, initiatedBy);
+      const instance = await orchestrator.startWorkflow(
+        workflowId,
+        parameters,
+        initiatedBy
+      );
 
       logger.info('Workflow started via API', {
         instanceId: instance.id,
         workflowId,
         initiatedBy,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.status(201).json({
@@ -290,20 +304,20 @@ router.post('/instances',
           instanceId: instance.id,
           workflowId: instance.workflowId,
           status: instance.status,
-          startedAt: instance.startedAt
-        }
+          startedAt: instance.startedAt,
+        },
       });
     } catch (error) {
       logger.error('Failed to start workflow', {
         error: (error as Error).message,
         workflowId: req.body.workflowId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
+
       res.status(500).json({
         success: false,
         message: 'Failed to start workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -330,33 +344,37 @@ router.post('/instances',
  *       404:
  *         description: Workflow instance not found
  */
-router.get('/instances/:instanceId',
+router.get(
+  '/instances/:instanceId',
   [
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
 
       const instance = await orchestrator.getWorkflowInstance(instanceId);
 
       res.json({
         success: true,
-        data: instance
+        data: instance,
       });
     } catch (error) {
       logger.error('Failed to get workflow instance', {
         error: (error as Error).message,
-        instanceId: req.params.instanceId
+        instanceId: req.params.instanceId,
       });
-      
-      const statusCode = (error as Error).message.includes('not found') ? 404 : 500;
+
+      const statusCode = (error as Error).message.includes('not found')
+        ? 404
+        : 500;
       res.status(statusCode).json({
         success: false,
         message: 'Failed to retrieve workflow instance',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -383,39 +401,43 @@ router.get('/instances/:instanceId',
  *       404:
  *         description: Workflow instance not found
  */
-router.post('/instances/:instanceId/pause',
+router.post(
+  '/instances/:instanceId/pause',
   [
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
 
       await orchestrator.pauseWorkflow(instanceId);
 
       logger.info('Workflow paused via API', {
         instanceId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.json({
         success: true,
-        message: 'Workflow paused successfully'
+        message: 'Workflow paused successfully',
       });
     } catch (error) {
       logger.error('Failed to pause workflow', {
         error: (error as Error).message,
         instanceId: req.params.instanceId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
-      const statusCode = (error as Error).message.includes('not found') ? 404 : 500;
+
+      const statusCode = (error as Error).message.includes('not found')
+        ? 404
+        : 500;
       res.status(statusCode).json({
         success: false,
         message: 'Failed to pause workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -442,39 +464,43 @@ router.post('/instances/:instanceId/pause',
  *       404:
  *         description: Workflow instance not found
  */
-router.post('/instances/:instanceId/resume',
+router.post(
+  '/instances/:instanceId/resume',
   [
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
 
       await orchestrator.resumeWorkflow(instanceId);
 
       logger.info('Workflow resumed via API', {
         instanceId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.json({
         success: true,
-        message: 'Workflow resumed successfully'
+        message: 'Workflow resumed successfully',
       });
     } catch (error) {
       logger.error('Failed to resume workflow', {
         error: (error as Error).message,
         instanceId: req.params.instanceId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
-      const statusCode = (error as Error).message.includes('not found') ? 404 : 500;
+
+      const statusCode = (error as Error).message.includes('not found')
+        ? 404
+        : 500;
       res.status(statusCode).json({
         success: false,
         message: 'Failed to resume workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -510,14 +536,16 @@ router.post('/instances/:instanceId/resume',
  *       404:
  *         description: Workflow instance not found
  */
-router.post('/instances/:instanceId/cancel',
+router.post(
+  '/instances/:instanceId/cancel',
   [
     param('instanceId').notEmpty().withMessage('Instance ID is required'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { instanceId } = req.params;
       const { reason } = req.body;
 
@@ -526,25 +554,27 @@ router.post('/instances/:instanceId/cancel',
       logger.info('Workflow cancelled via API', {
         instanceId,
         reason,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.json({
         success: true,
-        message: 'Workflow cancelled successfully'
+        message: 'Workflow cancelled successfully',
       });
     } catch (error) {
       logger.error('Failed to cancel workflow', {
         error: (error as Error).message,
         instanceId: req.params.instanceId,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
-      const statusCode = (error as Error).message.includes('not found') ? 404 : 500;
+
+      const statusCode = (error as Error).message.includes('not found')
+        ? 404
+        : 500;
       res.status(statusCode).json({
         success: false,
         message: 'Failed to cancel workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -582,24 +612,30 @@ router.post('/instances/:instanceId/cancel',
  *       201:
  *         description: APT response workflow started
  */
-router.post('/cti/apt-response',
+router.post(
+  '/cti/apt-response',
   [
     body('indicators').isArray().withMessage('Indicators must be an array'),
     body('event').isObject().withMessage('Event must be an object'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { indicators, event } = req.body;
       const initiatedBy = req.user?.id || 'api-user';
 
-      const instance = await orchestrator.startAPTResponseWorkflow(indicators, event, initiatedBy);
+      const instance = await orchestrator.startAPTResponseWorkflow(
+        indicators,
+        event,
+        initiatedBy
+      );
 
       logger.info('APT response workflow started via API', {
         instanceId: instance.id,
         indicatorCount: indicators.length,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.status(201).json({
@@ -608,19 +644,19 @@ router.post('/cti/apt-response',
         data: {
           instanceId: instance.id,
           workflowId: instance.workflowId,
-          status: instance.status
-        }
+          status: instance.status,
+        },
       });
     } catch (error) {
       logger.error('Failed to start APT response workflow', {
         error: (error as Error).message,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
+
       res.status(500).json({
         success: false,
         message: 'Failed to start APT response workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -650,23 +686,28 @@ router.post('/cti/apt-response',
  *       201:
  *         description: Malware analysis workflow started
  */
-router.post('/cti/malware-analysis',
+router.post(
+  '/cti/malware-analysis',
   [
     body('sample').isObject().withMessage('Sample must be an object'),
-    validateRequest
+    validateRequest,
   ],
   async (req: AuthRequest, res: Response) => {
     try {
-      const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
+      const orchestrator = req.app.locals
+        .workflowOrchestrator as WorkflowBPMOrchestrator;
       const { sample } = req.body;
       const initiatedBy = req.user?.id || 'api-user';
 
-      const instance = await orchestrator.startMalwareAnalysisWorkflow(sample, initiatedBy);
+      const instance = await orchestrator.startMalwareAnalysisWorkflow(
+        sample,
+        initiatedBy
+      );
 
       logger.info('Malware analysis workflow started via API', {
         instanceId: instance.id,
         sampleId: sample.id,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
 
       res.status(201).json({
@@ -675,19 +716,19 @@ router.post('/cti/malware-analysis',
         data: {
           instanceId: instance.id,
           workflowId: instance.workflowId,
-          status: instance.status
-        }
+          status: instance.status,
+        },
       });
     } catch (error) {
       logger.error('Failed to start malware analysis workflow', {
         error: (error as Error).message,
-        userId: req.user?.id
+        userId: req.user?.id,
       });
-      
+
       res.status(500).json({
         success: false,
         message: 'Failed to start malware analysis workflow',
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -707,8 +748,9 @@ router.post('/cti/malware-analysis',
  */
 router.get('/metrics', async (req: AuthRequest, res: Response) => {
   try {
-    const orchestrator = req.app.locals.workflowOrchestrator as WorkflowBPMOrchestrator;
-    
+    const orchestrator = req.app.locals
+      .workflowOrchestrator as WorkflowBPMOrchestrator;
+
     const performanceMetrics = orchestrator.getPerformanceMetrics();
     const engineMetrics = await orchestrator.getEngineMetrics();
 
@@ -717,18 +759,18 @@ router.get('/metrics', async (req: AuthRequest, res: Response) => {
       data: {
         performance: performanceMetrics,
         engine: engineMetrics,
-        timestamp: new Date()
-      }
+        timestamp: new Date(),
+      },
     });
   } catch (error) {
     logger.error('Failed to get workflow metrics', {
-      error: (error as Error).message
+      error: (error as Error).message,
     });
-    
+
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve workflow metrics',
-      error: (error as Error).message
+      error: (error as Error).message,
     });
   }
 });

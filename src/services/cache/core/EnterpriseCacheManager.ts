@@ -4,20 +4,23 @@
  */
 
 import { EventEmitter } from 'events';
-import { 
-  ICacheManager, 
-  ICacheOptions, 
-  ICacheMetrics, 
+import {
+  ICacheManager,
+  ICacheOptions,
+  ICacheMetrics,
   ICacheConfiguration,
   CacheLayer,
-  CacheStrategy
+  CacheStrategy,
 } from '../interfaces/ICacheManager.js';
 import { MemoryCacheProvider } from '../providers/MemoryCacheProvider.js';
 import { RedisCacheProvider } from '../providers/RedisCacheProvider.js';
 import { logger } from '../../../utils/logger.js';
 import { config } from '../../../config/config.js';
 
-export class EnterpriseCacheManager extends EventEmitter implements ICacheManager {
+export class EnterpriseCacheManager
+  extends EventEmitter
+  implements ICacheManager
+{
   private memoryProvider: MemoryCacheProvider;
   private redisProvider: RedisCacheProvider;
   private configuration: ICacheConfiguration;
@@ -26,7 +29,7 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
 
   constructor(customConfig?: Partial<ICacheConfiguration>) {
     super();
-    
+
     // Default configuration
     this.configuration = {
       maxSize: 10000,
@@ -34,38 +37,38 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
       strategy: CacheStrategy.LRU,
       compression: {
         enabled: false,
-        threshold: 1024 // 1KB
+        threshold: 1024, // 1KB
       },
       encryption: {
         enabled: false,
-        algorithm: 'aes-256-gcm'
+        algorithm: 'aes-256-gcm',
       },
       layers: {
         memory: {
           enabled: true,
           maxSize: 1000,
-          ttl: 60000 // 1 minute
+          ttl: 60000, // 1 minute
         },
         redis: {
           enabled: true,
           ttl: 900000, // 15 minutes
-          keyPrefix: 'phantomspire:cache:'
+          keyPrefix: 'phantomspire:cache:',
         },
         persistent: {
           enabled: false,
           ttl: 3600000, // 1 hour
-          collection: 'cache_entries'
-        }
+          collection: 'cache_entries',
+        },
       },
       monitoring: {
         enabled: true,
         metricsInterval: 30000, // 30 seconds
         alertThresholds: {
           hitRateBelow: 0.7,
-          memoryUsageAbove: 0.9
-        }
+          memoryUsageAbove: 0.9,
+        },
       },
-      ...customConfig
+      ...customConfig,
     };
 
     // Initialize providers
@@ -149,9 +152,13 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
         if (redisResult !== null) {
           // Backfill memory cache
           if (this.configuration.layers.memory.enabled) {
-            await this.memoryProvider.set(namespacedKey, redisResult, this.configuration.layers.memory.ttl);
+            await this.memoryProvider.set(
+              namespacedKey,
+              redisResult,
+              this.configuration.layers.memory.ttl
+            );
           }
-          
+
           this.emit('hit', { key, layer: CacheLayer.REDIS });
           return redisResult;
         }
@@ -176,12 +183,24 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
 
       // Set in memory cache
       if (this.configuration.layers.memory.enabled) {
-        promises.push(this.memoryProvider.set(namespacedKey, value, Math.min(ttl, this.configuration.layers.memory.ttl)));
+        promises.push(
+          this.memoryProvider.set(
+            namespacedKey,
+            value,
+            Math.min(ttl, this.configuration.layers.memory.ttl)
+          )
+        );
       }
 
       // Set in Redis cache
       if (this.configuration.layers.redis.enabled) {
-        promises.push(this.redisProvider.set(namespacedKey, value, Math.min(ttl, this.configuration.layers.redis.ttl)));
+        promises.push(
+          this.redisProvider.set(
+            namespacedKey,
+            value,
+            Math.min(ttl, this.configuration.layers.redis.ttl)
+          )
+        );
       }
 
       await Promise.all(promises);
@@ -249,7 +268,10 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async getMultiple<T>(keys: string[], options?: ICacheOptions): Promise<Map<string, T>> {
+  async getMultiple<T>(
+    keys: string[],
+    options?: ICacheOptions
+  ): Promise<Map<string, T>> {
     const namespace = options?.namespace || 'default';
     const namespacedKeys = keys.map(key => `${namespace}:${key}`);
     const result = new Map<string, T>();
@@ -272,8 +294,12 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
       // Get remaining keys from Redis
       const remainingKeys = keys.filter(key => !result.has(key));
       if (remainingKeys.length > 0 && this.configuration.layers.redis.enabled) {
-        const remainingNamespacedKeys = remainingKeys.map(key => `${namespace}:${key}`);
-        const redisResults = await this.redisProvider.getMultiple<T>(remainingNamespacedKeys);
+        const remainingNamespacedKeys = remainingKeys.map(
+          key => `${namespace}:${key}`
+        );
+        const redisResults = await this.redisProvider.getMultiple<T>(
+          remainingNamespacedKeys
+        );
 
         // Process Redis results
         let index = 0;
@@ -284,7 +310,11 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
 
             // Backfill memory cache
             if (this.configuration.layers.memory.enabled) {
-              await this.memoryProvider.set(namespacedKey, value, this.configuration.layers.memory.ttl);
+              await this.memoryProvider.set(
+                namespacedKey,
+                value,
+                this.configuration.layers.memory.ttl
+              );
             }
           }
           index++;
@@ -300,7 +330,10 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async setMultiple<T>(entries: Map<string, T>, options?: ICacheOptions): Promise<void> {
+  async setMultiple<T>(
+    entries: Map<string, T>,
+    options?: ICacheOptions
+  ): Promise<void> {
     const namespace = options?.namespace || 'default';
     const ttl = options?.ttl || this.configuration.defaultTTL;
 
@@ -311,7 +344,13 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
       if (this.configuration.layers.memory.enabled) {
         for (const [key, value] of entries) {
           const namespacedKey = `${namespace}:${key}`;
-          promises.push(this.memoryProvider.set(namespacedKey, value, Math.min(ttl, this.configuration.layers.memory.ttl)));
+          promises.push(
+            this.memoryProvider.set(
+              namespacedKey,
+              value,
+              Math.min(ttl, this.configuration.layers.memory.ttl)
+            )
+          );
         }
       }
 
@@ -321,7 +360,12 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
         for (const [key, value] of entries) {
           namespacedEntries.set(`${namespace}:${key}`, value);
         }
-        promises.push(this.redisProvider.setMultiple(namespacedEntries, Math.min(ttl, this.configuration.layers.redis.ttl)));
+        promises.push(
+          this.redisProvider.setMultiple(
+            namespacedEntries,
+            Math.min(ttl, this.configuration.layers.redis.ttl)
+          )
+        );
       }
 
       await Promise.all(promises);
@@ -333,7 +377,10 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async deleteMultiple(keys: string[], options?: ICacheOptions): Promise<number> {
+  async deleteMultiple(
+    keys: string[],
+    options?: ICacheOptions
+  ): Promise<number> {
     let deletedCount = 0;
 
     try {
@@ -342,7 +389,10 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
         if (deleted) deletedCount++;
       }
 
-      this.emit('deleteMultiple', { requested: keys.length, deleted: deletedCount });
+      this.emit('deleteMultiple', {
+        requested: keys.length,
+        deleted: deletedCount,
+      });
       return deletedCount;
     } catch (error) {
       logger.error('Cache deleteMultiple error:', error);
@@ -351,17 +401,22 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async getByPattern<T>(pattern: string, options?: ICacheOptions): Promise<Map<string, T>> {
+  async getByPattern<T>(
+    pattern: string,
+    options?: ICacheOptions
+  ): Promise<Map<string, T>> {
     const namespace = options?.namespace || 'default';
     const namespacedPattern = `${namespace}:${pattern}`;
     const result = new Map<string, T>();
 
     try {
       // Get keys matching pattern from all layers
-      const memoryKeys = this.configuration.layers.memory.enabled ? 
-        await this.memoryProvider.getKeys(namespacedPattern) : [];
-      const redisKeys = this.configuration.layers.redis.enabled ? 
-        await this.redisProvider.getKeys(namespacedPattern) : [];
+      const memoryKeys = this.configuration.layers.memory.enabled
+        ? await this.memoryProvider.getKeys(namespacedPattern)
+        : [];
+      const redisKeys = this.configuration.layers.redis.enabled
+        ? await this.redisProvider.getKeys(namespacedPattern)
+        : [];
 
       const allKeys = Array.from(new Set([...memoryKeys, ...redisKeys]));
 
@@ -384,13 +439,19 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async deleteByPattern(pattern: string, options?: ICacheOptions): Promise<number> {
+  async deleteByPattern(
+    pattern: string,
+    options?: ICacheOptions
+  ): Promise<number> {
     const entries = await this.getByPattern(pattern, options);
     return await this.deleteMultiple(Array.from(entries.keys()), options);
   }
 
   // Tag-based operations (simplified implementation)
-  async getByTags<T>(tags: string[], options?: ICacheOptions): Promise<Map<string, T>> {
+  async getByTags<T>(
+    tags: string[],
+    options?: ICacheOptions
+  ): Promise<Map<string, T>> {
     // For now, implement as pattern matching on tag namespace
     const tagPattern = `tags:${tags.join('|')}:*`;
     return await this.getByPattern<T>(tagPattern, options);
@@ -427,7 +488,7 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
           hitRate: (memoryMetrics.hitRate + redisMetrics.hitRate) / 2,
           size: memoryMetrics.size + redisMetrics.size,
           memoryUsage: memoryMetrics.memoryUsage + redisMetrics.memoryUsage,
-          lastUpdated: new Date()
+          lastUpdated: new Date(),
         };
       }
     } catch (error) {
@@ -441,14 +502,19 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     return metrics.hitRate;
   }
 
-  async getTopKeys(limit: number = 10): Promise<Array<{ key: string; accessCount: number }>> {
+  async getTopKeys(
+    limit: number = 10
+  ): Promise<Array<{ key: string; accessCount: number }>> {
     // Get top keys from memory cache (most detailed access tracking)
     return this.memoryProvider.getTopKeys(limit);
   }
 
-  async warm(keys: string[], loader: (key: string) => Promise<any>): Promise<void> {
+  async warm(
+    keys: string[],
+    loader: (key: string) => Promise<any>
+  ): Promise<void> {
     try {
-      const promises = keys.map(async (key) => {
+      const promises = keys.map(async key => {
         try {
           const value = await loader(key);
           if (value !== null && value !== undefined) {
@@ -504,7 +570,9 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
     }
   }
 
-  async updateConfiguration(config: Partial<ICacheConfiguration>): Promise<void> {
+  async updateConfiguration(
+    config: Partial<ICacheConfiguration>
+  ): Promise<void> {
     this.configuration = { ...this.configuration, ...config };
     this.emit('configUpdated', { config });
   }
@@ -515,31 +583,55 @@ export class EnterpriseCacheManager extends EventEmitter implements ICacheManage
 
   private setupEventHandlers(): void {
     // Memory provider events
-    this.memoryProvider.on('hit', (data) => this.emit('hit', { ...data, layer: CacheLayer.MEMORY }));
-    this.memoryProvider.on('miss', (data) => this.emit('miss', { ...data, layer: CacheLayer.MEMORY }));
-    this.memoryProvider.on('set', (data) => this.emit('set', { ...data, layer: CacheLayer.MEMORY }));
-    this.memoryProvider.on('delete', (data) => this.emit('delete', { ...data, layer: CacheLayer.MEMORY }));
-    this.memoryProvider.on('evict', (data) => this.emit('evicted', { ...data, layer: CacheLayer.MEMORY }));
+    this.memoryProvider.on('hit', data =>
+      this.emit('hit', { ...data, layer: CacheLayer.MEMORY })
+    );
+    this.memoryProvider.on('miss', data =>
+      this.emit('miss', { ...data, layer: CacheLayer.MEMORY })
+    );
+    this.memoryProvider.on('set', data =>
+      this.emit('set', { ...data, layer: CacheLayer.MEMORY })
+    );
+    this.memoryProvider.on('delete', data =>
+      this.emit('delete', { ...data, layer: CacheLayer.MEMORY })
+    );
+    this.memoryProvider.on('evict', data =>
+      this.emit('evicted', { ...data, layer: CacheLayer.MEMORY })
+    );
 
     // Redis provider events
-    this.redisProvider.on('hit', (data) => this.emit('hit', { ...data, layer: CacheLayer.REDIS }));
-    this.redisProvider.on('miss', (data) => this.emit('miss', { ...data, layer: CacheLayer.REDIS }));
-    this.redisProvider.on('set', (data) => this.emit('set', { ...data, layer: CacheLayer.REDIS }));
-    this.redisProvider.on('delete', (data) => this.emit('delete', { ...data, layer: CacheLayer.REDIS }));
-    this.redisProvider.on('error', (error) => this.emit('error', { ...error, layer: CacheLayer.REDIS }));
+    this.redisProvider.on('hit', data =>
+      this.emit('hit', { ...data, layer: CacheLayer.REDIS })
+    );
+    this.redisProvider.on('miss', data =>
+      this.emit('miss', { ...data, layer: CacheLayer.REDIS })
+    );
+    this.redisProvider.on('set', data =>
+      this.emit('set', { ...data, layer: CacheLayer.REDIS })
+    );
+    this.redisProvider.on('delete', data =>
+      this.emit('delete', { ...data, layer: CacheLayer.REDIS })
+    );
+    this.redisProvider.on('error', error =>
+      this.emit('error', { ...error, layer: CacheLayer.REDIS })
+    );
   }
 
   private startMetricsCollection(): void {
     this.metricsInterval = setInterval(async () => {
       try {
         const metrics = await this.getMetrics();
-        
+
         // Check alert thresholds
-        if (metrics.hitRate < this.configuration.monitoring.alertThresholds.hitRateBelow) {
-          this.emit('alert', { 
-            type: 'low_hit_rate', 
-            value: metrics.hitRate, 
-            threshold: this.configuration.monitoring.alertThresholds.hitRateBelow 
+        if (
+          metrics.hitRate <
+          this.configuration.monitoring.alertThresholds.hitRateBelow
+        ) {
+          this.emit('alert', {
+            type: 'low_hit_rate',
+            value: metrics.hitRate,
+            threshold:
+              this.configuration.monitoring.alertThresholds.hitRateBelow,
           });
         }
 

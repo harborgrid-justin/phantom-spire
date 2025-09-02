@@ -40,14 +40,14 @@ describe('Enterprise Cache and State Management', () => {
       const ttl = 100; // 100ms
 
       await cacheManager.set(key, value, { ttl });
-      
+
       // Should exist immediately
       const immediate = await cacheManager.get(key);
       expect(immediate).toBe(value);
 
       // Wait for expiration
       await new Promise(resolve => setTimeout(resolve, 150));
-      
+
       const expired = await cacheManager.get(key);
       expect(expired).toBeNull();
     });
@@ -71,11 +71,11 @@ describe('Enterprise Cache and State Management', () => {
       const entries = new Map([
         ['key1', 'value1'],
         ['key2', 'value2'],
-        ['key3', 'value3']
+        ['key3', 'value3'],
       ]);
 
       await cacheManager.setMultiple(entries);
-      
+
       const keys = Array.from(entries.keys());
       const retrieved = await cacheManager.getMultiple(keys);
 
@@ -163,7 +163,7 @@ describe('Enterprise Cache and State Management', () => {
         theme: 'dark', // Updated
         lang: 'en', // Preserved
         notifications: true, // Preserved
-        fontSize: 14 // Added
+        fontSize: 14, // Added
       });
     });
 
@@ -171,8 +171,16 @@ describe('Enterprise Cache and State Management', () => {
       const key = 'counter';
       await stateManager.set(StateScope.APPLICATION, key, 0);
 
-      await stateManager.update(StateScope.APPLICATION, key, (current: number) => current + 1);
-      await stateManager.update(StateScope.APPLICATION, key, (current: number) => current * 2);
+      await stateManager.update(
+        StateScope.APPLICATION,
+        key,
+        (current: number) => current + 1
+      );
+      await stateManager.update(
+        StateScope.APPLICATION,
+        key,
+        (current: number) => current * 2
+      );
 
       const final = await stateManager.get(StateScope.APPLICATION, key);
       expect(final).toBe(2); // (0 + 1) * 2
@@ -182,13 +190,16 @@ describe('Enterprise Cache and State Management', () => {
       const entries = new Map([
         ['setting1', 'value1'],
         ['setting2', 'value2'],
-        ['setting3', 'value3']
+        ['setting3', 'value3'],
       ]);
 
       await stateManager.setMultiple(StateScope.APPLICATION, entries);
-      
+
       const keys = Array.from(entries.keys());
-      const retrieved = await stateManager.getMultiple(StateScope.APPLICATION, keys);
+      const retrieved = await stateManager.getMultiple(
+        StateScope.APPLICATION,
+        keys
+      );
 
       expect(retrieved.size).toBe(3);
       entries.forEach((value, key) => {
@@ -226,12 +237,22 @@ describe('Enterprise Cache and State Management', () => {
 
     it('should support pattern-based state queries', async () => {
       await stateManager.set(StateScope.USER, 'user:1:name', 'Alice');
-      await stateManager.set(StateScope.USER, 'user:1:email', 'alice@example.com');
+      await stateManager.set(
+        StateScope.USER,
+        'user:1:email',
+        'alice@example.com'
+      );
       await stateManager.set(StateScope.USER, 'user:2:name', 'Bob');
       await stateManager.set(StateScope.USER, 'setting:theme', 'dark');
 
-      const userOneData = await stateManager.getByPattern(StateScope.USER, 'user:1:*');
-      const allUserData = await stateManager.getByPattern(StateScope.USER, 'user:*');
+      const userOneData = await stateManager.getByPattern(
+        StateScope.USER,
+        'user:1:*'
+      );
+      const allUserData = await stateManager.getByPattern(
+        StateScope.USER,
+        'user:*'
+      );
 
       expect(userOneData.size).toBe(2);
       expect(allUserData.size).toBe(3); // user:1:name, user:1:email, user:2:name
@@ -247,25 +268,28 @@ describe('Enterprise Cache and State Management', () => {
       // Set application state
       await stateManager.set(StateScope.APPLICATION, 'cache-config', {
         ttl: 300000,
-        enabled: true
+        enabled: true,
       });
 
       // Cache some IOC statistics
       const stats = {
         total: 1000,
         processed: 950,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
 
       await cacheManager.set('ioc-stats', stats, {
         namespace: 'ioc-statistics',
-        ttl: 300000
+        ttl: 300000,
       });
 
       // Retrieve and verify
-      const config = await stateManager.get(StateScope.APPLICATION, 'cache-config');
-      const cachedStats = await cacheManager.get('ioc-stats', { 
-        namespace: 'ioc-statistics' 
+      const config = await stateManager.get(
+        StateScope.APPLICATION,
+        'cache-config'
+      );
+      const cachedStats = await cacheManager.get('ioc-stats', {
+        namespace: 'ioc-statistics',
       });
 
       expect(config).toEqual({ ttl: 300000, enabled: true });

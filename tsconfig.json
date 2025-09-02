@@ -2,12 +2,13 @@
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["ES2020", "DOM"],
-    "module": "node16",
-    "moduleResolution": "node16",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": false,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
@@ -24,7 +25,17 @@
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": false,
     "downlevelIteration": true,
-    "jsx": "react"
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": false,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@/components/*": ["frontend/components/*"],
+      "@/types/*": ["frontend/types/*"],
+      "@/context/*": ["frontend/context/*"],
+      "@/views/*": ["frontend/views/*"],
+      "@/services/*": ["services/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]

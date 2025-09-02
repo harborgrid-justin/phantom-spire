@@ -74,7 +74,7 @@ import {
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { DataGrid, GridColDef, GridRowSelectionModel, GridActionsCellItem } from '@mui/x-data-grid';
 import { ThreatIndicator, IOCType, ConfidenceLevel, ThreatSeverity, TLPLevel } from '../../types/common';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 interface IOCFilter {
   type?: IOCType;
@@ -116,7 +116,7 @@ export const IOCManagementConsole: React.FC = () => {
   const [indicators, setIndicators] = useState<ThreatIndicator[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<IOCFilter>({});
-  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>({} as GridRowSelectionModel);
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<IOCSearchResult | null>(null);
   const [page, setPage] = useState(0);
@@ -468,9 +468,9 @@ export const IOCManagementConsole: React.FC = () => {
             <Button
               variant="outlined"
               startIcon={<Download />}
-              disabled={selectedRows.length === 0}
+              disabled={!Array.isArray(selectedRows) || selectedRows.length === 0}
             >
-              Export ({selectedRows.length})
+              Export ({Array.isArray(selectedRows) ? selectedRows.length : 0})
             </Button>
           </Box>
         </Box>
@@ -561,7 +561,7 @@ export const IOCManagementConsole: React.FC = () => {
       </Paper>
 
       {/* Bulk Actions Bar */}
-      {selectedRows.length > 0 && (
+      {Array.isArray(selectedRows) && selectedRows.length > 0 && (
         <Alert
           severity="info"
           sx={{ mb: 2 }}
@@ -575,7 +575,7 @@ export const IOCManagementConsole: React.FC = () => {
               </Button>
               <Button
                 size="small"
-                onClick={() => setSelectedRows([])}
+                onClick={() => setSelectedRows({} as GridRowSelectionModel)}
               >
                 Clear Selection
               </Button>

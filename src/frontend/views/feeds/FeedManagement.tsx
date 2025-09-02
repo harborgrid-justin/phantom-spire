@@ -21,7 +21,7 @@ import {
   Switch
 } from '@mui/material';
 import { RssFeed, CheckCircle, Error, Schedule } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const FeedManagement: React.FC = () => {
   const [feeds, setFeeds] = useState([

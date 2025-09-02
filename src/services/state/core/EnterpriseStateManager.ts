@@ -13,13 +13,16 @@ import {
   IStateOptions,
   IStateScope,
   StateScope,
-  StateAction
+  StateAction,
 } from '../interfaces/IStateManager.js';
 import { cacheManager } from '../../cache/core/EnterpriseCacheManager.js';
 import { logger } from '../../../utils/logger.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export class EnterpriseStateManager extends EventEmitter implements IStateManager {
+export class EnterpriseStateManager
+  extends EventEmitter
+  implements IStateManager
+{
   private configuration: IStateConfiguration;
   private subscriptions: Map<string, IStateSubscription> = new Map();
   private eventHistory: IStateEvent[] = [];
@@ -29,7 +32,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     totalStates: 0,
     totalEvents: 0,
     syncErrors: 0,
-    lastSyncTime: null as Date | null
+    lastSyncTime: null as Date | null,
   };
 
   constructor(customConfig?: Partial<IStateConfiguration>) {
@@ -39,31 +42,31 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       persistence: {
         enabled: true,
         strategy: 'hybrid', // Use both Redis and memory
-        syncInterval: 30000 // 30 seconds
+        syncInterval: 30000, // 30 seconds
       },
       serialization: {
         enabled: true,
-        format: 'json'
+        format: 'json',
       },
       versioning: {
         enabled: true,
-        maxVersions: 10
+        maxVersions: 10,
       },
       validation: {
         enabled: true,
-        strict: false
+        strict: false,
       },
       monitoring: {
         enabled: true,
         trackChanges: true,
-        metricsInterval: 60000 // 1 minute
+        metricsInterval: 60000, // 1 minute
       },
       security: {
         enabled: true,
         encryption: false, // Will be handled by cache layer
-        accessControl: true
+        accessControl: true,
       },
-      ...customConfig
+      ...customConfig,
     };
   }
 
@@ -75,23 +78,32 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       await cacheManager.start();
 
       // Start periodic sync if persistence is enabled
-      if (this.configuration.persistence.enabled && this.configuration.persistence.syncInterval > 0) {
-        setInterval(() => this.syncStates(), this.configuration.persistence.syncInterval);
+      if (
+        this.configuration.persistence.enabled &&
+        this.configuration.persistence.syncInterval > 0
+      ) {
+        setInterval(
+          () => this.syncStates(),
+          this.configuration.persistence.syncInterval
+        );
       }
 
       // Start metrics collection
       if (this.configuration.monitoring.enabled) {
-        setInterval(() => this.collectMetrics(), this.configuration.monitoring.metricsInterval);
+        setInterval(
+          () => this.collectMetrics(),
+          this.configuration.monitoring.metricsInterval
+        );
       }
 
       this.isStarted = true;
       logger.info('Enterprise State Manager started successfully');
-      
+
       const startEvent: Omit<IStateEvent, 'id' | 'timestamp'> = {
         scope: StateScope.APPLICATION,
         action: StateAction.CREATE,
         key: 'system:started',
-        newValue: { timestamp: new Date() }
+        newValue: { timestamp: new Date() },
       };
       await this.emitStateEvent(startEvent);
     } catch (error) {
@@ -111,12 +123,12 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
 
       this.isStarted = false;
       logger.info('Enterprise State Manager stopped successfully');
-      
+
       const stopEvent: Omit<IStateEvent, 'id' | 'timestamp'> = {
         scope: StateScope.APPLICATION,
         action: StateAction.DELETE,
         key: 'system:stopped',
-        previousValue: { timestamp: new Date() }
+        previousValue: { timestamp: new Date() },
       };
       await this.emitStateEvent(stopEvent);
     } catch (error) {
@@ -125,12 +137,16 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async get<T>(scope: StateScope, key: string, defaultValue?: T): Promise<T | null> {
+  async get<T>(
+    scope: StateScope,
+    key: string,
+    defaultValue?: T
+  ): Promise<T | null> {
     try {
       const stateKey = this.buildStateKey(scope, key);
       const cached = await cacheManager.get<T>(stateKey, {
         namespace: 'state',
-        ttl: this.getStateTTL(scope)
+        ttl: this.getStateTTL(scope),
       });
 
       if (cached !== null) {
@@ -150,7 +166,12 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async set<T>(scope: StateScope, key: string, value: T, options?: IStateOptions): Promise<void> {
+  async set<T>(
+    scope: StateScope,
+    key: string,
+    value: T,
+    options?: IStateOptions
+  ): Promise<void> {
     try {
       const stateKey = this.buildStateKey(scope, key);
 
@@ -158,7 +179,10 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       const previousValue = await this.get(scope, key);
 
       // Validate if validation is enabled
-      if (this.configuration.validation.enabled && options?.validate !== false) {
+      if (
+        this.configuration.validation.enabled &&
+        options?.validate !== false
+      ) {
         const isValid = await this.validate(scope, key, value);
         if (!isValid && this.configuration.validation.strict) {
           throw new Error(`State validation failed for key: ${key}`);
@@ -169,7 +193,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       await cacheManager.set(stateKey, value, {
         namespace: 'state',
         ttl: options?.ttl || this.getStateTTL(scope),
-        tags: ['state', scope]
+        tags: ['state', scope],
       });
 
       // Store version if versioning is enabled
@@ -180,11 +204,12 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       // Emit state change event
       const event: Omit<IStateEvent, 'id' | 'timestamp'> = {
         scope,
-        action: previousValue === null ? StateAction.CREATE : StateAction.UPDATE,
+        action:
+          previousValue === null ? StateAction.CREATE : StateAction.UPDATE,
         key,
         previousValue,
         newValue: value,
-        metadata: options?.metadata
+        metadata: options?.metadata,
       };
       await this.emitStateEvent(event);
 
@@ -201,7 +226,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       const previousValue = await this.get(scope, key);
 
       const deleted = await cacheManager.delete(stateKey, {
-        namespace: 'state'
+        namespace: 'state',
       });
 
       if (deleted) {
@@ -211,7 +236,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
           action: StateAction.DELETE,
           key,
           previousValue,
-          newValue: null
+          newValue: null,
         };
 
         await this.emitStateEvent(event);
@@ -234,10 +259,15 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async getMultiple<T>(scope: StateScope, keys: string[]): Promise<Map<string, T>> {
+  async getMultiple<T>(
+    scope: StateScope,
+    keys: string[]
+  ): Promise<Map<string, T>> {
     try {
       const stateKeys = keys.map(key => this.buildStateKey(scope, key));
-      const cached = await cacheManager.getMultiple<T>(stateKeys, { namespace: 'state' });
+      const cached = await cacheManager.getMultiple<T>(stateKeys, {
+        namespace: 'state',
+      });
 
       // Convert back to original keys
       const result = new Map<string, T>();
@@ -253,7 +283,11 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async setMultiple<T>(scope: StateScope, entries: Map<string, T>, options?: IStateOptions): Promise<void> {
+  async setMultiple<T>(
+    scope: StateScope,
+    entries: Map<string, T>,
+    options?: IStateOptions
+  ): Promise<void> {
     try {
       const promises = Array.from(entries.entries()).map(([key, value]) =>
         this.set(scope, key, value, options)
@@ -280,10 +314,15 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async getByPattern<T>(scope: StateScope, pattern: string): Promise<Map<string, T>> {
+  async getByPattern<T>(
+    scope: StateScope,
+    pattern: string
+  ): Promise<Map<string, T>> {
     try {
       const statePattern = this.buildStateKey(scope, pattern);
-      const cached = await cacheManager.getByPattern<T>(statePattern, { namespace: 'state' });
+      const cached = await cacheManager.getByPattern<T>(statePattern, {
+        namespace: 'state',
+      });
 
       // Convert back to original keys
       const result = new Map<string, T>();
@@ -302,18 +341,28 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
   async deleteByPattern(scope: StateScope, pattern: string): Promise<number> {
     try {
       const statePattern = this.buildStateKey(scope, pattern);
-      return await cacheManager.deleteByPattern(statePattern, { namespace: 'state' });
+      return await cacheManager.deleteByPattern(statePattern, {
+        namespace: 'state',
+      });
     } catch (error) {
       logger.error('State deleteByPattern error:', error);
       throw error;
     }
   }
 
-  async merge<T>(scope: StateScope, key: string, value: Partial<T>): Promise<void> {
+  async merge<T>(
+    scope: StateScope,
+    key: string,
+    value: Partial<T>
+  ): Promise<void> {
     try {
       const currentValue = await this.get<T>(scope, key);
-      
-      if (currentValue && typeof currentValue === 'object' && !Array.isArray(currentValue)) {
+
+      if (
+        currentValue &&
+        typeof currentValue === 'object' &&
+        !Array.isArray(currentValue)
+      ) {
         const mergedValue = { ...currentValue, ...value } as T;
         await this.set(scope, key, mergedValue);
       } else {
@@ -326,7 +375,11 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async update<T>(scope: StateScope, key: string, updater: (current: T) => T): Promise<void> {
+  async update<T>(
+    scope: StateScope,
+    key: string,
+    updater: (current: T) => T
+  ): Promise<void> {
     try {
       const currentValue = await this.get<T>(scope, key);
       if (currentValue !== null) {
@@ -339,7 +392,10 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async createScope(scope: StateScope, identifier: string): Promise<IStateScope> {
+  async createScope(
+    scope: StateScope,
+    identifier: string
+  ): Promise<IStateScope> {
     return new StateScope_Implementation(this, scope, identifier);
   }
 
@@ -358,7 +414,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     try {
       const pattern = `${scope}:*`;
       const states = await this.getByPattern(scope, pattern);
-      
+
       const scopes = new Set<string>();
       for (const key of states.keys()) {
         const parts = key.split(':');
@@ -366,7 +422,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
           scopes.add(parts[1]);
         }
       }
-      
+
       return Array.from(scopes);
     } catch (error) {
       logger.error('State listScopes error:', error);
@@ -374,11 +430,13 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async subscribe(subscription: Omit<IStateSubscription, 'id'>): Promise<string> {
+  async subscribe(
+    subscription: Omit<IStateSubscription, 'id'>
+  ): Promise<string> {
     const id = uuidv4();
     const fullSubscription: IStateSubscription = {
       id,
-      ...subscription
+      ...subscription,
     };
 
     this.subscriptions.set(id, fullSubscription);
@@ -388,7 +446,7 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
       if (this.matchesSubscription(event, fullSubscription)) {
         try {
           await fullSubscription.callback(event);
-          
+
           // Remove subscription if it's a one-time subscription
           if (fullSubscription.once) {
             this.subscriptions.delete(id);
@@ -406,15 +464,24 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     return this.subscriptions.delete(subscriptionId);
   }
 
-  async publishEvent(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void> {
+  async publishEvent(
+    event: Omit<IStateEvent, 'id' | 'timestamp'>
+  ): Promise<void> {
     await this.emitStateEvent(event);
   }
 
   // Implementation of IStateManager.emit - using method overloading to handle both signatures
   emit(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void>;
   emit(eventName: string | symbol, ...args: any[]): boolean;
-  emit(eventOrName: Omit<IStateEvent, 'id' | 'timestamp'> | string | symbol, ...args: any[]): Promise<void> | boolean {
-    if (typeof eventOrName === 'object' && eventOrName !== null && 'scope' in eventOrName) {
+  emit(
+    eventOrName: Omit<IStateEvent, 'id' | 'timestamp'> | string | symbol,
+    ...args: any[]
+  ): Promise<void> | boolean {
+    if (
+      typeof eventOrName === 'object' &&
+      eventOrName !== null &&
+      'scope' in eventOrName
+    ) {
       // This is a state event
       return this.publishEvent(eventOrName);
     } else {
@@ -460,36 +527,51 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async getVersion(scope: StateScope, key: string, version?: number): Promise<any> {
+  async getVersion(
+    scope: StateScope,
+    key: string,
+    version?: number
+  ): Promise<any> {
     try {
       if (!this.configuration.versioning.enabled) {
         return await this.get(scope, key);
       }
 
       const versionKey = this.buildVersionKey(scope, key, version);
-      return await cacheManager.get(versionKey, { namespace: 'state-versions' });
+      return await cacheManager.get(versionKey, {
+        namespace: 'state-versions',
+      });
     } catch (error) {
       logger.error('State getVersion error:', error);
       throw error;
     }
   }
 
-  async getVersions(scope: StateScope, key: string): Promise<Array<{ version: number; timestamp: Date; value: any }>> {
+  async getVersions(
+    scope: StateScope,
+    key: string
+  ): Promise<Array<{ version: number; timestamp: Date; value: any }>> {
     try {
       if (!this.configuration.versioning.enabled) {
         return [];
       }
 
       const pattern = this.buildVersionKey(scope, key, '*');
-      const versions = await cacheManager.getByPattern(pattern, { namespace: 'state-versions' });
-      
-      const result = Array.from(versions.entries()).map(([versionKey, value]) => {
-        const versionMatch = versionKey.match(/:v(\d+):(\d+)$/);
-        const version = versionMatch ? parseInt(versionMatch[1], 10) : 0;
-        const timestamp = versionMatch ? new Date(parseInt(versionMatch[2], 10)) : new Date();
-        
-        return { version, timestamp, value };
+      const versions = await cacheManager.getByPattern(pattern, {
+        namespace: 'state-versions',
       });
+
+      const result = Array.from(versions.entries()).map(
+        ([versionKey, value]) => {
+          const versionMatch = versionKey.match(/:v(\d+):(\d+)$/);
+          const version = versionMatch ? parseInt(versionMatch[1], 10) : 0;
+          const timestamp = versionMatch
+            ? new Date(parseInt(versionMatch[2], 10))
+            : new Date();
+
+          return { version, timestamp, value };
+        }
+      );
 
       return result.sort((a, b) => b.version - a.version);
     } catch (error) {
@@ -514,18 +596,22 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
 
   async getMetrics(): Promise<IStateMetrics> {
     const cacheMetrics = await cacheManager.getMetrics();
-    
+
     return {
       totalStates: this.metrics.totalStates,
       totalEvents: this.metrics.totalEvents,
       memoryUsage: cacheMetrics.memoryUsage,
       lastSyncTime: this.metrics.lastSyncTime,
       syncErrors: this.metrics.syncErrors,
-      subscriptions: this.subscriptions.size
+      subscriptions: this.subscriptions.size,
     };
   }
 
-  async getStateHistory(scope: StateScope, key: string, limit: number = 100): Promise<IStateEvent[]> {
+  async getStateHistory(
+    scope: StateScope,
+    key: string,
+    limit: number = 100
+  ): Promise<IStateEvent[]> {
     const stateKey = this.buildStateKey(scope, key);
     return this.eventHistory
       .filter(event => event.scope === scope && event.key === key)
@@ -540,7 +626,9 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
   async clear(scope?: StateScope): Promise<void> {
     try {
       if (scope) {
-        await cacheManager.deleteByPattern(`${scope}:*`, { namespace: 'state' });
+        await cacheManager.deleteByPattern(`${scope}:*`, {
+          namespace: 'state',
+        });
       } else {
         await cacheManager.clearNamespace('state');
       }
@@ -552,15 +640,19 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  async validate<T>(scope: StateScope, key: string, value: T): Promise<boolean> {
+  async validate<T>(
+    scope: StateScope,
+    key: string,
+    value: T
+  ): Promise<boolean> {
     // Basic validation - can be extended with custom validators
     return value !== null && value !== undefined;
   }
 
   serialize(value: any): string {
-    return this.configuration.serialization.format === 'json' ? 
-      JSON.stringify(value) : 
-      JSON.stringify(value); // For now, only JSON is supported
+    return this.configuration.serialization.format === 'json'
+      ? JSON.stringify(value)
+      : JSON.stringify(value); // For now, only JSON is supported
   }
 
   deserialize<T>(data: string): T {
@@ -577,7 +669,11 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     return parts.slice(1).join(':');
   }
 
-  private buildVersionKey(scope: StateScope, key: string, version?: number | string): string {
+  private buildVersionKey(
+    scope: StateScope,
+    key: string,
+    version?: number | string
+  ): string {
     if (version === undefined || version === '*') {
       return `${scope}:${key}:v*`;
     }
@@ -600,26 +696,39 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  private async storeVersion<T>(scope: StateScope, key: string, value: T): Promise<void> {
+  private async storeVersion<T>(
+    scope: StateScope,
+    key: string,
+    value: T
+  ): Promise<void> {
     if (!this.configuration.versioning.enabled) return;
 
     try {
       // Get current version count
       const versions = await this.getVersions(scope, key);
-      const newVersion = versions.length > 0 ? Math.max(...versions.map(v => v.version)) + 1 : 1;
+      const newVersion =
+        versions.length > 0 ? Math.max(...versions.map(v => v.version)) + 1 : 1;
 
       const versionKey = this.buildVersionKey(scope, key, newVersion);
       await cacheManager.set(versionKey, value, {
         namespace: 'state-versions',
-        ttl: this.getStateTTL(scope)
+        ttl: this.getStateTTL(scope),
       });
 
       // Clean up old versions if exceeded max
       if (versions.length >= this.configuration.versioning.maxVersions) {
-        const versionsToDelete = versions.slice(this.configuration.versioning.maxVersions - 1);
+        const versionsToDelete = versions.slice(
+          this.configuration.versioning.maxVersions - 1
+        );
         for (const versionToDelete of versionsToDelete) {
-          const oldVersionKey = this.buildVersionKey(scope, key, versionToDelete.version);
-          await cacheManager.delete(oldVersionKey, { namespace: 'state-versions' });
+          const oldVersionKey = this.buildVersionKey(
+            scope,
+            key,
+            versionToDelete.version
+          );
+          await cacheManager.delete(oldVersionKey, {
+            namespace: 'state-versions',
+          });
         }
       }
     } catch (error) {
@@ -627,11 +736,13 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
   }
 
-  private async emitStateEvent(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void> {
+  private async emitStateEvent(
+    event: Omit<IStateEvent, 'id' | 'timestamp'>
+  ): Promise<void> {
     const fullEvent: IStateEvent = {
       id: uuidv4(),
       timestamp: new Date(),
-      ...event
+      ...event,
     };
 
     // Add to event history
@@ -641,14 +752,17 @@ export class EnterpriseStateManager extends EventEmitter implements IStateManage
     }
 
     this.metrics.totalEvents++;
-    
+
     // Emit event
     this.emitEventEmitter('stateChanged', fullEvent);
   }
 
-  private matchesSubscription(event: IStateEvent, subscription: IStateSubscription): boolean {
+  private matchesSubscription(
+    event: IStateEvent,
+    subscription: IStateSubscription
+  ): boolean {
     if (event.scope !== subscription.scope) return false;
-    
+
     if (subscription.pattern) {
       const regex = new RegExp(subscription.pattern.replace(/\*/g, '.*'));
       return regex.test(event.key);
@@ -709,7 +823,9 @@ class StateScope_Implementation implements IStateScope {
   async keys(): Promise<string[]> {
     const pattern = `${this.identifier}:*`;
     const states = await this.stateManager.getByPattern(this.scope, pattern);
-    return Array.from(states.keys()).map(key => key.replace(`${this.identifier}:`, ''));
+    return Array.from(states.keys()).map(key =>
+      key.replace(`${this.identifier}:`, '')
+    );
   }
 
   async size(): Promise<number> {

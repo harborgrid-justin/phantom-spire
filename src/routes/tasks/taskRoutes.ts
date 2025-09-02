@@ -4,7 +4,13 @@
  */
 
 import { Router } from 'express';
-import { TaskController, createTaskValidation, updateTaskValidation, scheduleTaskValidation, taskIdValidation } from '../../controllers/tasks/taskController.js';
+import {
+  TaskController,
+  createTaskValidation,
+  updateTaskValidation,
+  scheduleTaskValidation,
+  taskIdValidation,
+} from '../../controllers/tasks/taskController.js';
 import { authenticate } from '../../middleware/auth.js';
 import { ITaskManager } from '../../data-layer/tasks/interfaces/ITaskManager.js';
 
@@ -455,7 +461,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *                 message:
    *                   type: string
    */
-  router.post('/tasks/:taskId/execute', taskIdValidation, taskController.executeTask);
+  router.post(
+    '/tasks/:taskId/execute',
+    taskIdValidation,
+    taskController.executeTask
+  );
 
   /**
    * @swagger
@@ -478,7 +488,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       404:
    *         description: Task not found or cannot be cancelled
    */
-  router.post('/tasks/:taskId/cancel', taskIdValidation, taskController.cancelTask);
+  router.post(
+    '/tasks/:taskId/cancel',
+    taskIdValidation,
+    taskController.cancelTask
+  );
 
   /**
    * @swagger
@@ -501,7 +515,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       404:
    *         description: Task not found or cannot be paused
    */
-  router.post('/tasks/:taskId/pause', taskIdValidation, taskController.pauseTask);
+  router.post(
+    '/tasks/:taskId/pause',
+    taskIdValidation,
+    taskController.pauseTask
+  );
 
   /**
    * @swagger
@@ -524,7 +542,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       404:
    *         description: Task not found or cannot be resumed
    */
-  router.post('/tasks/:taskId/resume', taskIdValidation, taskController.resumeTask);
+  router.post(
+    '/tasks/:taskId/resume',
+    taskIdValidation,
+    taskController.resumeTask
+  );
 
   /**
    * @swagger
@@ -556,7 +578,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *                 message:
    *                   type: string
    */
-  router.post('/tasks/:taskId/retry', taskIdValidation, taskController.retryTask);
+  router.post(
+    '/tasks/:taskId/retry',
+    taskIdValidation,
+    taskController.retryTask
+  );
 
   /**
    * @swagger
@@ -602,7 +628,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       404:
    *         description: Task not found
    */
-  router.post('/tasks/:taskId/schedule', scheduleTaskValidation, taskController.scheduleTask);
+  router.post(
+    '/tasks/:taskId/schedule',
+    scheduleTaskValidation,
+    taskController.scheduleTask
+  );
 
   /**
    * @swagger
@@ -637,7 +667,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *                     status:
    *                       type: string
    */
-  router.get('/tasks/:taskId/status', taskIdValidation, taskController.getTaskStatus);
+  router.get(
+    '/tasks/:taskId/status',
+    taskIdValidation,
+    taskController.getTaskStatus
+  );
 
   /**
    * @swagger
@@ -658,7 +692,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       200:
    *         description: Task metrics
    */
-  router.get('/tasks/:taskId/metrics', taskIdValidation, taskController.getTaskMetrics);
+  router.get(
+    '/tasks/:taskId/metrics',
+    taskIdValidation,
+    taskController.getTaskMetrics
+  );
 
   /**
    * @swagger
@@ -679,7 +717,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       200:
    *         description: Task execution history
    */
-  router.get('/tasks/:taskId/history', taskIdValidation, taskController.getTaskHistory);
+  router.get(
+    '/tasks/:taskId/history',
+    taskIdValidation,
+    taskController.getTaskHistory
+  );
 
   /**
    * @swagger
@@ -706,7 +748,11 @@ export function createTaskRoutes(taskManager: ITaskManager): Router {
    *       200:
    *         description: Task logs
    */
-  router.get('/tasks/:taskId/logs', taskIdValidation, taskController.getTaskLogs);
+  router.get(
+    '/tasks/:taskId/logs',
+    taskIdValidation,
+    taskController.getTaskLogs
+  );
 
   /**
    * @swagger

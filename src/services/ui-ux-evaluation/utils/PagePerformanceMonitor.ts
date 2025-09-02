@@ -3,7 +3,7 @@
  * Real-time performance monitoring for GUI pages
  */
 
-import { PerformanceMonitor } from '../../../utils/serviceUtils.js';
+import { PerformanceMonitor } from '../../../utils/serviceUtils';
 
 export interface IPageLoadMetrics {
   pageId: string;
@@ -45,8 +45,10 @@ export class PagePerformanceMonitor {
    * Monitor page load performance
    */
   async monitorPageLoad(pageId: string): Promise<IPageLoadMetrics> {
-    const measurement = PerformanceMonitor.startMeasurement(`page-load-${pageId}`);
-    
+    const measurement = PerformanceMonitor.startMeasurement(
+      `page-load-${pageId}`
+    );
+
     const metrics: IPageLoadMetrics = {
       pageId,
       loadTime: this.measurePageLoadTime(),
@@ -58,7 +60,8 @@ export class PagePerformanceMonitor {
       renderTime: this.measureRenderTime(),
       timestamp: new Date(),
       url: typeof window !== 'undefined' ? window.location.href : '',
-      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'
+      userAgent:
+        typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
     };
 
     // Store metrics
@@ -74,14 +77,24 @@ export class PagePerformanceMonitor {
   /**
    * Check feature availability for a page
    */
-  async checkFeatureAvailability(pageId: string, element?: HTMLElement): Promise<IFeatureAvailabilityReport> {
+  async checkFeatureAvailability(
+    pageId: string,
+    element?: HTMLElement
+  ): Promise<IFeatureAvailabilityReport> {
     const expectedFeatures = this.getExpectedFeatures(pageId);
-    const availableFeatures = await this.scanAvailableFeatures(element || document.body);
-    const missingFeatures = expectedFeatures.filter(feature => !availableFeatures.includes(feature));
-    
-    const availabilityScore = expectedFeatures.length > 0 
-      ? ((expectedFeatures.length - missingFeatures.length) / expectedFeatures.length) * 100 
-      : 100;
+    const availableFeatures = await this.scanAvailableFeatures(
+      element || document.body
+    );
+    const missingFeatures = expectedFeatures.filter(
+      feature => !availableFeatures.includes(feature)
+    );
+
+    const availabilityScore =
+      expectedFeatures.length > 0
+        ? ((expectedFeatures.length - missingFeatures.length) /
+            expectedFeatures.length) *
+          100
+        : 100;
 
     const details: Record<string, boolean> = {};
     expectedFeatures.forEach(feature => {
@@ -95,7 +108,7 @@ export class PagePerformanceMonitor {
       missingFeatures,
       availabilityScore,
       timestamp: new Date(),
-      details
+      details,
     };
 
     // Store report
@@ -124,13 +137,16 @@ export class PagePerformanceMonitor {
         averageFCP: 0,
         averageTTI: 0,
         measurements: 0,
-        trend: 'stable'
+        trend: 'stable',
       };
     }
 
-    const averageLoadTime = data.reduce((sum, d) => sum + d.loadTime, 0) / data.length;
-    const averageFCP = data.reduce((sum, d) => sum + d.firstContentfulPaint, 0) / data.length;
-    const averageTTI = data.reduce((sum, d) => sum + d.timeToInteractive, 0) / data.length;
+    const averageLoadTime =
+      data.reduce((sum, d) => sum + d.loadTime, 0) / data.length;
+    const averageFCP =
+      data.reduce((sum, d) => sum + d.firstContentfulPaint, 0) / data.length;
+    const averageTTI =
+      data.reduce((sum, d) => sum + d.timeToInteractive, 0) / data.length;
 
     // Calculate trend based on recent measurements
     let trend: 'improving' | 'degrading' | 'stable' = 'stable';
@@ -138,10 +154,12 @@ export class PagePerformanceMonitor {
       const recent = data.slice(-3);
       const older = data.slice(-6, -3);
       if (older.length > 0) {
-        const recentAvg = recent.reduce((sum, d) => sum + d.loadTime, 0) / recent.length;
-        const olderAvg = older.reduce((sum, d) => sum + d.loadTime, 0) / older.length;
+        const recentAvg =
+          recent.reduce((sum, d) => sum + d.loadTime, 0) / recent.length;
+        const olderAvg =
+          older.reduce((sum, d) => sum + d.loadTime, 0) / older.length;
         const improvement = ((olderAvg - recentAvg) / olderAvg) * 100;
-        
+
         if (improvement > 5) trend = 'improving';
         else if (improvement < -5) trend = 'degrading';
       }
@@ -152,7 +170,7 @@ export class PagePerformanceMonitor {
       averageFCP,
       averageTTI,
       measurements: data.length,
-      trend
+      trend,
     };
   }
 
@@ -170,17 +188,21 @@ export class PagePerformanceMonitor {
   getPageReport(pageId: string) {
     const performanceStats = this.getPerformanceStats(pageId);
     const featureReport = this.getLatestFeatureReport(pageId);
-    const recentMetrics = this.performanceData.get(pageId)?.slice(-1)[0] || null;
+    const recentMetrics =
+      this.performanceData.get(pageId)?.slice(-1)[0] || null;
 
     return {
       pageId,
       timestamp: new Date(),
       performance: {
         ...performanceStats,
-        latest: recentMetrics
+        latest: recentMetrics,
       },
       features: featureReport,
-      overallHealth: this.calculateOverallHealth(performanceStats, featureReport)
+      overallHealth: this.calculateOverallHealth(
+        performanceStats,
+        featureReport
+      ),
     };
   }
 
@@ -226,7 +248,8 @@ export class PagePerformanceMonitor {
     }
 
     const timing = window.performance.timing;
-    const domLoadTime = timing.domContentLoadedEventEnd - timing.navigationStart;
+    const domLoadTime =
+      timing.domContentLoadedEventEnd - timing.navigationStart;
     return domLoadTime > 0 ? domLoadTime : 1500;
   }
 
@@ -237,7 +260,9 @@ export class PagePerformanceMonitor {
 
     try {
       const paintEntries = window.performance.getEntriesByType('paint');
-      const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+      const fcpEntry = paintEntries.find(
+        entry => entry.name === 'first-contentful-paint'
+      );
       return fcpEntry ? fcpEntry.startTime : 1200;
     } catch (error) {
       return 1200;
@@ -264,7 +289,8 @@ export class PagePerformanceMonitor {
       if (resources.length === 0) return 3000;
 
       const totalResourceTime = resources.reduce((total, resource) => {
-        return total + (resource.responseEnd - resource.startTime);
+        const resourceEntry = resource as PerformanceResourceTiming;
+        return total + (resourceEntry.responseEnd - resourceEntry.startTime);
       }, 0);
 
       return totalResourceTime / resources.length;
@@ -295,30 +321,71 @@ export class PagePerformanceMonitor {
 
   private getExpectedFeatures(pageId: string): string[] {
     const featureSets: Record<string, string[]> = {
-      'dashboard': [
-        'data-visualization', 'filters', 'search', 'export', 'refresh', 
-        'notifications', 'user-menu', 'settings', 'help', 'navigation'
+      dashboard: [
+        'data-visualization',
+        'filters',
+        'search',
+        'export',
+        'refresh',
+        'notifications',
+        'user-menu',
+        'settings',
+        'help',
+        'navigation',
       ],
-      'analytics': [
-        'charts', 'reports', 'data-grid', 'filters', 'export', 'scheduling',
-        'customization', 'sharing', 'drill-down', 'time-range'
+      analytics: [
+        'charts',
+        'reports',
+        'data-grid',
+        'filters',
+        'export',
+        'scheduling',
+        'customization',
+        'sharing',
+        'drill-down',
+        'time-range',
       ],
-      'admin': [
-        'user-management', 'settings', 'system-health', 'monitoring',
-        'configurations', 'backup', 'security', 'audit-logs'
+      admin: [
+        'user-management',
+        'settings',
+        'system-health',
+        'monitoring',
+        'configurations',
+        'backup',
+        'security',
+        'audit-logs',
       ],
-      'workflow': [
-        'drag-drop', 'canvas', 'toolbar', 'properties-panel', 'save',
-        'validation', 'export', 'templates', 'collaboration'
+      workflow: [
+        'drag-drop',
+        'canvas',
+        'toolbar',
+        'properties-panel',
+        'save',
+        'validation',
+        'export',
+        'templates',
+        'collaboration',
       ],
-      'incident': [
-        'incident-list', 'create-incident', 'timeline', 'assignments',
-        'status-updates', 'communications', 'escalation', 'reporting'
+      incident: [
+        'incident-list',
+        'create-incident',
+        'timeline',
+        'assignments',
+        'status-updates',
+        'communications',
+        'escalation',
+        'reporting',
       ],
       'threat-intelligence': [
-        'threat-feed', 'indicators', 'analysis', 'correlation',
-        'timeline', 'attribution', 'sharing', 'validation'
-      ]
+        'threat-feed',
+        'indicators',
+        'analysis',
+        'correlation',
+        'timeline',
+        'attribution',
+        'sharing',
+        'validation',
+      ],
     };
 
     // Try to match pageId with known patterns
@@ -330,8 +397,14 @@ export class PagePerformanceMonitor {
 
     // Default expected features
     return [
-      'navigation', 'search', 'filters', 'export', 'help', 
-      'settings', 'loading-indicators', 'error-handling'
+      'navigation',
+      'search',
+      'filters',
+      'export',
+      'help',
+      'settings',
+      'loading-indicators',
+      'error-handling',
     ];
   }
 
@@ -341,52 +414,54 @@ export class PagePerformanceMonitor {
     const selectors = {
       'data-visualization': 'canvas, svg, .chart, .graph, .visualization',
       'data-grid': 'table, .data-grid, .grid, [role="grid"]',
-      'filters': '.filter, .filters, select, [role="combobox"]',
-      'search': 'input[type="search"], .search, [placeholder*="search" i]',
-      'export': 'button[title*="export" i], .export, [aria-label*="export" i]',
-      'refresh': 'button[title*="refresh" i], .refresh, [aria-label*="refresh" i]',
-      'notifications': '.notification, .alert, .toast, [role="alert"]',
+      filters: '.filter, .filters, select, [role="combobox"]',
+      search: 'input[type="search"], .search, [placeholder*="search" i]',
+      export: 'button[title*="export" i], .export, [aria-label*="export" i]',
+      refresh:
+        'button[title*="refresh" i], .refresh, [aria-label*="refresh" i]',
+      notifications: '.notification, .alert, .toast, [role="alert"]',
       'user-menu': '.user-menu, .profile, .avatar',
-      'settings': 'button[title*="setting" i], .settings, [aria-label*="setting" i]',
-      'help': 'button[title*="help" i], .help, [aria-label*="help" i]',
-      'navigation': 'nav, .navigation, .nav, [role="navigation"]',
-      'charts': 'canvas, svg, .chart, .recharts',
-      'reports': '.report, .reports, .report-template',
-      'scheduling': '.schedule, .scheduler, [title*="schedule" i]',
-      'customization': '.customize, .config, .preferences',
-      'sharing': 'button[title*="share" i], .share, [aria-label*="share" i]',
+      settings:
+        'button[title*="setting" i], .settings, [aria-label*="setting" i]',
+      help: 'button[title*="help" i], .help, [aria-label*="help" i]',
+      navigation: 'nav, .navigation, .nav, [role="navigation"]',
+      charts: 'canvas, svg, .chart, .recharts',
+      reports: '.report, .reports, .report-template',
+      scheduling: '.schedule, .scheduler, [title*="schedule" i]',
+      customization: '.customize, .config, .preferences',
+      sharing: 'button[title*="share" i], .share, [aria-label*="share" i]',
       'drill-down': '[title*="drill" i], .drill-down, .expand',
       'time-range': '.time-range, .date-picker, input[type="date"]',
       'user-management': '.user-management, .users, .user-list',
       'system-health': '.health, .status, .monitoring',
-      'monitoring': '.monitor, .metrics, .dashboard',
-      'configurations': '.config, .configuration, .settings',
-      'backup': 'button[title*="backup" i], .backup',
-      'security': '.security, .permissions, .access',
+      monitoring: '.monitor, .metrics, .dashboard',
+      configurations: '.config, .configuration, .settings',
+      backup: 'button[title*="backup" i], .backup',
+      security: '.security, .permissions, .access',
       'audit-logs': '.audit, .logs, .history',
       'drag-drop': '[draggable="true"], .draggable, .droppable',
-      'canvas': 'canvas, .canvas, .workspace',
-      'toolbar': '.toolbar, .tools, .action-bar',
+      canvas: 'canvas, .canvas, .workspace',
+      toolbar: '.toolbar, .tools, .action-bar',
       'properties-panel': '.properties, .panel, .inspector',
-      'save': 'button[title*="save" i], .save, [aria-label*="save" i]',
-      'validation': '.error, .warning, .validation, [aria-invalid]',
-      'templates': '.template, .templates, .preset',
-      'collaboration': '.collaborate, .share, .team',
+      save: 'button[title*="save" i], .save, [aria-label*="save" i]',
+      validation: '.error, .warning, .validation, [aria-invalid]',
+      templates: '.template, .templates, .preset',
+      collaboration: '.collaborate, .share, .team',
       'incident-list': '.incident-list, .incidents, .cases',
       'create-incident': 'button[title*="create" i], .create, .new',
-      'timeline': '.timeline, .history, .sequence',
-      'assignments': '.assign, .assignment, .owner',
+      timeline: '.timeline, .history, .sequence',
+      assignments: '.assign, .assignment, .owner',
       'status-updates': '.status, .update, .progress',
-      'communications': '.comment, .message, .communication',
-      'escalation': '.escalate, .priority, .urgent',
-      'reporting': '.report, .reports, .analytics',
+      communications: '.comment, .message, .communication',
+      escalation: '.escalate, .priority, .urgent',
+      reporting: '.report, .reports, .analytics',
       'threat-feed': '.feed, .threats, .intelligence',
-      'indicators': '.indicator, .ioc, .observable',
-      'analysis': '.analysis, .analyze, .investigation',
-      'correlation': '.correlation, .relate, .connection',
-      'attribution': '.attribution, .actor, .campaign',
+      indicators: '.indicator, .ioc, .observable',
+      analysis: '.analysis, .analyze, .investigation',
+      correlation: '.correlation, .relate, .connection',
+      attribution: '.attribution, .actor, .campaign',
       'loading-indicators': '.loading, .spinner, .progress',
-      'error-handling': '.error, .warning, .alert'
+      'error-handling': '.error, .warning, .alert',
     };
 
     for (const [feature, selector] of Object.entries(selectors)) {
@@ -436,7 +511,9 @@ export class PagePerformanceMonitor {
     if (featureReport) {
       if (featureReport.availabilityScore < 80) {
         score -= 20;
-        issues.push(`Missing features: ${featureReport.missingFeatures.join(', ')}`);
+        issues.push(
+          `Missing features: ${featureReport.missingFeatures.join(', ')}`
+        );
       } else if (featureReport.availabilityScore < 90) {
         score -= 10;
       }

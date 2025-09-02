@@ -18,17 +18,22 @@ export interface User {
   preferences?: UserPreferences;
 }
 
-export type UserRole = 'admin' | 'analyst' | 'investigator' | 'viewer' | 'manager';
+export type UserRole =
+  | 'admin'
+  | 'analyst'
+  | 'investigator'
+  | 'viewer'
+  | 'manager';
 
-export type Permission = 
-  | 'read' 
-  | 'write' 
-  | 'delete' 
-  | 'investigate' 
-  | 'admin' 
-  | 'export' 
-  | 'manage_users' 
-  | 'manage_feeds' 
+export type Permission =
+  | 'read'
+  | 'write'
+  | 'delete'
+  | 'investigate'
+  | 'admin'
+  | 'export'
+  | 'manage_users'
+  | 'manage_feeds'
   | 'manage_incidents';
 
 export interface UserPreferences {
@@ -48,11 +53,11 @@ export interface NotificationPreferences {
 }
 
 // System Status Types
-export type SystemStatus = 
-  | 'initializing' 
-  | 'operational' 
-  | 'degraded' 
-  | 'maintenance' 
+export type SystemStatus =
+  | 'initializing'
+  | 'operational'
+  | 'degraded'
+  | 'maintenance'
   | 'error';
 
 export type NotificationLevel = 'success' | 'info' | 'warning' | 'error';
@@ -77,25 +82,30 @@ export interface ThreatIndicator {
   enrichment?: IOCEnrichment;
 }
 
-export type IOCType = 
-  | 'ip' 
-  | 'domain' 
-  | 'url' 
-  | 'hash_md5' 
-  | 'hash_sha1' 
-  | 'hash_sha256' 
-  | 'email' 
-  | 'file_name' 
-  | 'registry_key' 
-  | 'mutex' 
-  | 'user_agent' 
-  | 'certificate' 
-  | 'bitcoin_address' 
+export type IOCType =
+  | 'ip'
+  | 'domain'
+  | 'url'
+  | 'hash_md5'
+  | 'hash_sha1'
+  | 'hash_sha256'
+  | 'email'
+  | 'file_name'
+  | 'registry_key'
+  | 'mutex'
+  | 'user_agent'
+  | 'certificate'
+  | 'bitcoin_address'
   | 'cve';
 
 export type ConfidenceLevel = 'low' | 'medium' | 'high' | 'very_high';
 
-export type ThreatSeverity = 'informational' | 'low' | 'medium' | 'high' | 'critical';
+export type ThreatSeverity =
+  | 'informational'
+  | 'low'
+  | 'medium'
+  | 'high'
+  | 'critical';
 
 export type TLPLevel = 'white' | 'green' | 'amber' | 'red';
 
@@ -231,16 +241,16 @@ export interface SecurityIncident {
   impact?: ImpactAssessment;
 }
 
-export type IncidentStatus = 
-  | 'new' 
-  | 'assigned' 
-  | 'in_progress' 
-  | 'investigating' 
-  | 'containment' 
-  | 'eradication' 
-  | 'recovery' 
-  | 'resolved' 
-  | 'closed' 
+export type IncidentStatus =
+  | 'new'
+  | 'assigned'
+  | 'in_progress'
+  | 'investigating'
+  | 'containment'
+  | 'eradication'
+  | 'recovery'
+  | 'resolved'
+  | 'closed'
   | 'false_positive';
 
 export type IncidentPriority = 'low' | 'medium' | 'high' | 'critical';
@@ -257,14 +267,14 @@ export interface IncidentArtifact {
   analysis?: ArtifactAnalysis;
 }
 
-export type ArtifactType = 
-  | 'file' 
-  | 'memory_dump' 
-  | 'network_capture' 
-  | 'log_file' 
-  | 'screenshot' 
-  | 'document' 
-  | 'email' 
+export type ArtifactType =
+  | 'file'
+  | 'memory_dump'
+  | 'network_capture'
+  | 'log_file'
+  | 'screenshot'
+  | 'document'
+  | 'email'
   | 'registry_export';
 
 export interface ArtifactAnalysis {
@@ -325,11 +335,28 @@ export interface ThreatFeed {
   statistics: FeedStatistics;
 }
 
-export type FeedType = 'commercial' | 'opensource' | 'government' | 'internal' | 'community';
+export type FeedType =
+  | 'commercial'
+  | 'opensource'
+  | 'government'
+  | 'internal'
+  | 'community';
 
-export type FeedFormat = 'stix' | 'taxii' | 'json' | 'csv' | 'xml' | 'misp' | 'custom';
+export type FeedFormat =
+  | 'stix'
+  | 'taxii'
+  | 'json'
+  | 'csv'
+  | 'xml'
+  | 'misp'
+  | 'custom';
 
-export type FeedStatus = 'active' | 'inactive' | 'error' | 'pending' | 'maintenance';
+export type FeedStatus =
+  | 'active'
+  | 'inactive'
+  | 'error'
+  | 'pending'
+  | 'maintenance';
 
 export interface FeedConfiguration {
   enabled: boolean;
@@ -432,16 +459,16 @@ export interface DashboardWidget {
   data?: any;
 }
 
-export type WidgetType = 
-  | 'threat_overview' 
-  | 'recent_indicators' 
-  | 'incident_summary' 
-  | 'feed_status' 
-  | 'analytics_chart' 
-  | 'threat_map' 
-  | 'campaign_tracker' 
-  | 'ioc_timeline' 
-  | 'system_health' 
+export type WidgetType =
+  | 'threat_overview'
+  | 'recent_indicators'
+  | 'incident_summary'
+  | 'feed_status'
+  | 'analytics_chart'
+  | 'threat_map'
+  | 'campaign_tracker'
+  | 'ioc_timeline'
+  | 'system_health'
   | 'user_activity';
 
 export interface WidgetPosition {
@@ -573,5 +600,4 @@ export interface WorkflowCondition {
   logicalOperator: 'AND' | 'OR';
 }
 
-// Export all types
-export type * from './common';
+// Export all types - removed circular reference

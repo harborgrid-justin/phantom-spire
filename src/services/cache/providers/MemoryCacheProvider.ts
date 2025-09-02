@@ -14,7 +14,10 @@ interface MemoryCacheEntry<T = any> {
   accessCount: number;
 }
 
-export class MemoryCacheProvider extends EventEmitter implements ICacheProvider {
+export class MemoryCacheProvider
+  extends EventEmitter
+  implements ICacheProvider
+{
   private cache: Map<string, MemoryCacheEntry> = new Map();
   private maxSize: number;
   private defaultTTL: number;
@@ -23,21 +26,22 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
     misses: 0,
     sets: 0,
     deletes: 0,
-    evictions: 0
+    evictions: 0,
   };
 
-  constructor(maxSize: number = 1000, defaultTTL: number = 300000) { // 5 minutes default
+  constructor(maxSize: number = 1000, defaultTTL: number = 300000) {
+    // 5 minutes default
     super();
     this.maxSize = maxSize;
     this.defaultTTL = defaultTTL;
-    
+
     // Cleanup expired entries every 30 seconds
     setInterval(() => this.cleanup(), 30000);
   }
 
   async get<T>(key: string): Promise<T | null> {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       this.metrics.misses++;
       this.emit('miss', { key });
@@ -72,7 +76,7 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
       value,
       createdAt: Date.now(),
       lastAccessed: Date.now(),
-      accessCount: 0
+      accessCount: 0,
     };
 
     if (effectiveTTL > 0) {
@@ -96,13 +100,13 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
   async exists(key: string): Promise<boolean> {
     const entry = this.cache.get(key);
     if (!entry) return false;
-    
+
     // Check if expired
     if (entry.expiresAt && entry.expiresAt < Date.now()) {
       this.cache.delete(key);
       return false;
     }
-    
+
     return true;
   }
 
@@ -115,22 +119,22 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
   async getMetrics(): Promise<ICacheMetrics> {
     const now = Date.now();
     const total = this.metrics.hits + this.metrics.misses;
-    
+
     return {
       hitCount: this.metrics.hits,
       missCount: this.metrics.misses,
       hitRate: total > 0 ? this.metrics.hits / total : 0,
       size: this.cache.size,
       memoryUsage: this.estimateMemoryUsage(),
-      lastUpdated: new Date(now)
+      lastUpdated: new Date(now),
     };
   }
 
   async getKeys(pattern?: string): Promise<string[]> {
     const keys = Array.from(this.cache.keys());
-    
+
     if (!pattern) return keys;
-    
+
     const regex = new RegExp(pattern.replace(/\*/g, '.*'));
     return keys.filter(key => regex.test(key));
   }
@@ -186,16 +190,18 @@ export class MemoryCacheProvider extends EventEmitter implements ICacheProvider 
       size: this.cache.size,
       maxSize: this.maxSize,
       ...this.metrics,
-      memoryUsage: this.estimateMemoryUsage()
+      memoryUsage: this.estimateMemoryUsage(),
     };
   }
 
-  getTopKeys(limit: number = 10): Array<{ key: string; accessCount: number; lastAccessed: Date }> {
+  getTopKeys(
+    limit: number = 10
+  ): Array<{ key: string; accessCount: number; lastAccessed: Date }> {
     const entries = Array.from(this.cache.entries())
       .map(([key, entry]) => ({
         key,
         accessCount: entry.accessCount,
-        lastAccessed: new Date(entry.lastAccessed)
+        lastAccessed: new Date(entry.lastAccessed),
       }))
       .sort((a, b) => b.accessCount - a.accessCount)
       .slice(0, limit);

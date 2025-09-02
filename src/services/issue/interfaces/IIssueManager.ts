@@ -8,7 +8,15 @@ import { IIssue } from '../../../models/Issue.js';
 export interface ICreateIssueRequest {
   title: string;
   description: string;
-  issueType: 'bug' | 'feature' | 'incident' | 'vulnerability' | 'threat' | 'investigation' | 'compliance' | 'enhancement';
+  issueType:
+    | 'bug'
+    | 'feature'
+    | 'incident'
+    | 'vulnerability'
+    | 'threat'
+    | 'investigation'
+    | 'compliance'
+    | 'enhancement';
   priority?: 'critical' | 'high' | 'medium' | 'low';
   severity?: 'critical' | 'major' | 'minor' | 'cosmetic';
   assignee?: string;
@@ -23,15 +31,34 @@ export interface ICreateIssueRequest {
   tags?: string[];
   customFields?: Record<string, any>;
   dueDate?: Date;
-  securityClassification?: 'public' | 'internal' | 'confidential' | 'restricted';
+  securityClassification?:
+    | 'public'
+    | 'internal'
+    | 'confidential'
+    | 'restricted';
   complianceRequirements?: string[];
 }
 
 export interface IUpdateIssueRequest {
   title?: string;
   description?: string;
-  issueType?: 'bug' | 'feature' | 'incident' | 'vulnerability' | 'threat' | 'investigation' | 'compliance' | 'enhancement';
-  status?: 'open' | 'in_progress' | 'on_hold' | 'resolved' | 'closed' | 'rejected' | 'escalated';
+  issueType?:
+    | 'bug'
+    | 'feature'
+    | 'incident'
+    | 'vulnerability'
+    | 'threat'
+    | 'investigation'
+    | 'compliance'
+    | 'enhancement';
+  status?:
+    | 'open'
+    | 'in_progress'
+    | 'on_hold'
+    | 'resolved'
+    | 'closed'
+    | 'rejected'
+    | 'escalated';
   priority?: 'critical' | 'high' | 'medium' | 'low';
   severity?: 'critical' | 'major' | 'minor' | 'cosmetic';
   assignee?: string;
@@ -112,7 +139,12 @@ export interface IWorkflowTransition {
   notifications?: string[];
   conditions?: Array<{
     field: string;
-    operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains';
+    operator:
+      | 'equals'
+      | 'not_equals'
+      | 'greater_than'
+      | 'less_than'
+      | 'contains';
     value: any;
   }>;
 }
@@ -126,7 +158,12 @@ export interface IEscalationRule {
     value: any;
   }>;
   actions: Array<{
-    type: 'assign' | 'notify' | 'change_priority' | 'change_status' | 'create_task';
+    type:
+      | 'assign'
+      | 'notify'
+      | 'change_priority'
+      | 'change_status'
+      | 'create_task';
     parameters: Record<string, any>;
   }>;
   enabled: boolean;
@@ -153,7 +190,13 @@ export interface IIssueContext {
 }
 
 export interface IIssueNotification {
-  type: 'created' | 'assigned' | 'status_changed' | 'comment_added' | 'escalated' | 'resolved';
+  type:
+    | 'created'
+    | 'assigned'
+    | 'status_changed'
+    | 'comment_added'
+    | 'escalated'
+    | 'resolved';
   issueId: string;
   recipientIds: string[];
   content: string;
@@ -182,11 +225,14 @@ export interface IIssueAnalytics {
     userId: string;
     issuesResolved: number;
   }>;
-  teamPerformance: Record<string, {
-    totalIssues: number;
-    averageResolutionTime: number;
-    slaCompliance: number;
-  }>;
+  teamPerformance: Record<
+    string,
+    {
+      totalIssues: number;
+      averageResolutionTime: number;
+      slaCompliance: number;
+    }
+  >;
 }
 
 /**
@@ -194,60 +240,154 @@ export interface IIssueAnalytics {
  */
 export interface IIssueManager {
   // Core CRUD Operations
-  createIssue(request: ICreateIssueRequest, context: IIssueContext): Promise<IIssue>;
+  createIssue(
+    request: ICreateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue>;
   getIssue(issueId: string, context: IIssueContext): Promise<IIssue | null>;
-  updateIssue(issueId: string, updates: IUpdateIssueRequest, context: IIssueContext): Promise<IIssue>;
+  updateIssue(
+    issueId: string,
+    updates: IUpdateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue>;
   deleteIssue(issueId: string, context: IIssueContext): Promise<boolean>;
-  
+
   // Search and Query
-  searchIssues(query: IIssueSearchQuery, context: IIssueContext): Promise<{
+  searchIssues(
+    query: IIssueSearchQuery,
+    context: IIssueContext
+  ): Promise<{
     issues: IIssue[];
     totalCount: number;
     page: number;
     totalPages: number;
   }>;
-  getIssuesByFilter(filter: IIssueFilter, context: IIssueContext): Promise<IIssue[]>;
-  
+  getIssuesByFilter(
+    filter: IIssueFilter,
+    context: IIssueContext
+  ): Promise<IIssue[]>;
+
   // Workflow Management
-  transitionIssueStatus(issueId: string, newStatus: string, context: IIssueContext, notes?: string): Promise<IIssue>;
-  getAvailableTransitions(issueId: string, context: IIssueContext): Promise<IWorkflowTransition[]>;
-  
+  transitionIssueStatus(
+    issueId: string,
+    newStatus: string,
+    context: IIssueContext,
+    notes?: string
+  ): Promise<IIssue>;
+  getAvailableTransitions(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<IWorkflowTransition[]>;
+
   // Assignment and Ownership
-  assignIssue(issueId: string, assigneeId: string, context: IIssueContext): Promise<IIssue>;
+  assignIssue(
+    issueId: string,
+    assigneeId: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
   unassignIssue(issueId: string, context: IIssueContext): Promise<IIssue>;
-  addWatcher(issueId: string, watcherId: string, context: IIssueContext): Promise<IIssue>;
-  removeWatcher(issueId: string, watcherId: string, context: IIssueContext): Promise<IIssue>;
-  
+  addWatcher(
+    issueId: string,
+    watcherId: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
+  removeWatcher(
+    issueId: string,
+    watcherId: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
+
   // Comments and Communication
-  addComment(request: IAddCommentRequest, context: IIssueContext): Promise<IIssue>;
-  updateComment(issueId: string, commentId: string, content: string, context: IIssueContext): Promise<IIssue>;
-  deleteComment(issueId: string, commentId: string, context: IIssueContext): Promise<IIssue>;
-  
+  addComment(
+    request: IAddCommentRequest,
+    context: IIssueContext
+  ): Promise<IIssue>;
+  updateComment(
+    issueId: string,
+    commentId: string,
+    content: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
+  deleteComment(
+    issueId: string,
+    commentId: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
+
   // Time Tracking
-  logTime(issueId: string, hours: number, description: string, context: IIssueContext): Promise<IIssue>;
+  logTime(
+    issueId: string,
+    hours: number,
+    description: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
   getTimeSpent(issueId: string, context: IIssueContext): Promise<number>;
-  
+
   // Escalation
-  escalateIssue(issueId: string, reason: string, context: IIssueContext): Promise<IIssue>;
+  escalateIssue(
+    issueId: string,
+    reason: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
   processEscalationRules(): Promise<void>;
-  
+
   // Integration
-  linkToTask(issueId: string, taskId: string, relationship: string, context: IIssueContext): Promise<ITaskIntegration>;
-  unlinkFromTask(issueId: string, taskId: string, context: IIssueContext): Promise<boolean>;
-  getRelatedTasks(issueId: string, context: IIssueContext): Promise<ITaskIntegration[]>;
-  
+  linkToTask(
+    issueId: string,
+    taskId: string,
+    relationship: string,
+    context: IIssueContext
+  ): Promise<ITaskIntegration>;
+  unlinkFromTask(
+    issueId: string,
+    taskId: string,
+    context: IIssueContext
+  ): Promise<boolean>;
+  getRelatedTasks(
+    issueId: string,
+    context: IIssueContext
+  ): Promise<ITaskIntegration[]>;
+
   // Analytics and Reporting
-  getIssueMetrics(filter?: IIssueFilter, context?: IIssueContext): Promise<IIssueMetrics>;
-  getIssueAnalytics(startDate: Date, endDate: Date, context?: IIssueContext): Promise<IIssueAnalytics>;
-  
+  getIssueMetrics(
+    filter?: IIssueFilter,
+    context?: IIssueContext
+  ): Promise<IIssueMetrics>;
+  getIssueAnalytics(
+    startDate: Date,
+    endDate: Date,
+    context?: IIssueContext
+  ): Promise<IIssueAnalytics>;
+
   // Bulk Operations
-  bulkUpdateIssues(issueIds: string[], updates: IUpdateIssueRequest, context: IIssueContext): Promise<IIssue[]>;
-  bulkAssignIssues(issueIds: string[], assigneeId: string, context: IIssueContext): Promise<IIssue[]>;
-  
+  bulkUpdateIssues(
+    issueIds: string[],
+    updates: IUpdateIssueRequest,
+    context: IIssueContext
+  ): Promise<IIssue[]>;
+  bulkAssignIssues(
+    issueIds: string[],
+    assigneeId: string,
+    context: IIssueContext
+  ): Promise<IIssue[]>;
+
   // Resolution
-  resolveIssue(issueId: string, resolution: {
-    type: 'fixed' | 'wont_fix' | 'duplicate' | 'invalid' | 'works_as_designed';
-    description: string;
-  }, context: IIssueContext): Promise<IIssue>;
-  reopenIssue(issueId: string, reason: string, context: IIssueContext): Promise<IIssue>;
+  resolveIssue(
+    issueId: string,
+    resolution: {
+      type:
+        | 'fixed'
+        | 'wont_fix'
+        | 'duplicate'
+        | 'invalid'
+        | 'works_as_designed';
+      description: string;
+    },
+    context: IIssueContext
+  ): Promise<IIssue>;
+  reopenIssue(
+    issueId: string,
+    reason: string,
+    context: IIssueContext
+  ): Promise<IIssue>;
 }

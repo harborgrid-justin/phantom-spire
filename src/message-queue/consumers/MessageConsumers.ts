@@ -4,11 +4,11 @@
  */
 
 import { logger } from '../../utils/logger.js';
-import { 
-  IMessageHandler, 
-  IMessage, 
-  IMessageContext, 
-  IHandlerResult 
+import {
+  IMessageHandler,
+  IMessage,
+  IMessageContext,
+  IHandlerResult,
 } from '../interfaces/IMessageQueue.js';
 import {
   IIOCEnrichmentRequest,
@@ -18,7 +18,7 @@ import {
   IDataIngestionRequest,
   IDataIngestionResult,
   IThreatAlertNotification,
-  IAnalyticsPipelineRequest
+  IAnalyticsPipelineRequest,
 } from '../interfaces/IMessageTypes.js';
 import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator.js';
 import { EnhancedIOCService } from '../../services/enhancedIOCService.js';
@@ -31,9 +31,9 @@ import { v4 as uuidv4 } from 'uuid';
  * Base Message Consumer
  * Provides common functionality for all message consumers
  */
-export abstract class BaseMessageConsumer<T = Record<string, unknown>> 
-  implements IMessageHandler<T> {
-  
+export abstract class BaseMessageConsumer<T = Record<string, unknown>>
+  implements IMessageHandler<T>
+{
   protected readonly serviceName: string;
   protected readonly dataLayer: DataLayerOrchestrator;
 
@@ -46,14 +46,16 @@ export abstract class BaseMessageConsumer<T = Record<string, unknown>>
    * Abstract method to be implemented by concrete consumers
    */
   public abstract handle(
-    message: IMessage<T>, 
+    message: IMessage<T>,
     context: IMessageContext
   ): Promise<IHandlerResult>;
 
   /**
    * Create success result
    */
-  protected createSuccessResult(metrics?: Record<string, number>): IHandlerResult {
+  protected createSuccessResult(
+    metrics?: Record<string, number>
+  ): IHandlerResult {
     return {
       success: true,
       ...(metrics && { metrics }),
@@ -64,7 +66,7 @@ export abstract class BaseMessageConsumer<T = Record<string, unknown>>
    * Create error result
    */
   protected createErrorResult(
-    error: Error, 
+    error: Error,
     retryable: boolean = true,
     metrics?: Record<string, number>
   ): IHandlerResult {
@@ -79,7 +81,10 @@ export abstract class BaseMessageConsumer<T = Record<string, unknown>>
   /**
    * Log processing start
    */
-  protected logProcessingStart(message: IMessage<T>, context: IMessageContext): void {
+  protected logProcessingStart(
+    message: IMessage<T>,
+    context: IMessageContext
+  ): void {
     logger.info(`Processing message: ${message.type}`, {
       messageId: message.id,
       type: message.type,
@@ -94,12 +99,12 @@ export abstract class BaseMessageConsumer<T = Record<string, unknown>>
    * Log processing completion
    */
   protected logProcessingComplete(
-    message: IMessage<T>, 
-    result: IHandlerResult, 
+    message: IMessage<T>,
+    result: IHandlerResult,
     processingTime: number
   ): void {
     const logMethod = result.success ? logger.info : logger.error;
-    
+
     logMethod(`Completed processing message: ${message.type}`, {
       messageId: message.id,
       type: message.type,
@@ -116,9 +121,7 @@ export abstract class BaseMessageConsumer<T = Record<string, unknown>>
  * IOC Enrichment Request Consumer
  * Processes IOC enrichment requests using the enhanced IOC service
  */
-export class IOCEnrichmentRequestConsumer 
-  extends BaseMessageConsumer<IIOCEnrichmentRequest> {
-  
+export class IOCEnrichmentRequestConsumer extends BaseMessageConsumer<IIOCEnrichmentRequest> {
   private readonly enhancedIOCService: EnhancedIOCService;
 
   constructor(dataLayer: DataLayerOrchestrator) {
@@ -127,7 +130,7 @@ export class IOCEnrichmentRequestConsumer
   }
 
   public async handle(
-    message: IMessage<IIOCEnrichmentRequest>, 
+    message: IMessage<IIOCEnrichmentRequest>,
     context: IMessageContext
   ): Promise<IHandlerResult> {
     const startTime = Date.now();
@@ -137,23 +140,23 @@ export class IOCEnrichmentRequestConsumer
       const { ioc, enrichmentOptions, context: queryContext } = message.payload;
 
       // Perform IOC enrichment (we'll use a simpler approach since the actual enrichment method has different signature)
-      
+
       // Create enrichment result
       const result: IIOCEnrichmentResult = {
         iocId: message.payload.iocId,
         originalIoc: ioc,
         enrichedData: {
-          ...(enrichmentOptions.includeReputation && { 
-            reputation: await this.getReputationData(ioc) 
+          ...(enrichmentOptions.includeReputation && {
+            reputation: await this.getReputationData(ioc),
           }),
-          ...(enrichmentOptions.includeGeolocation && { 
-            geolocation: await this.getGeolocationData(ioc) 
+          ...(enrichmentOptions.includeGeolocation && {
+            geolocation: await this.getGeolocationData(ioc),
           }),
-          ...(enrichmentOptions.includeMalwareAnalysis && { 
-            malwareAnalysis: await this.getMalwareAnalysis(ioc) 
+          ...(enrichmentOptions.includeMalwareAnalysis && {
+            malwareAnalysis: await this.getMalwareAnalysis(ioc),
           }),
-          ...(enrichmentOptions.includeRelationships && { 
-            relationships: await this.getRelationshipData(ioc, queryContext) 
+          ...(enrichmentOptions.includeRelationships && {
+            relationships: await this.getRelationshipData(ioc, queryContext),
           }),
         },
         sources: ['enhanced-ioc-service'],
@@ -172,7 +175,6 @@ export class IOCEnrichmentRequestConsumer
 
       this.logProcessingComplete(message, handlerResult, processingTime);
       return handlerResult;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createErrorResult(
@@ -229,16 +231,20 @@ export class IOCEnrichmentRequestConsumer
   private async getRelationshipData(ioc: IIOC, context: any): Promise<any[]> {
     // Simple relationship discovery - in a real implementation this would use the enhanced IOC service
     // For now, we'll return a mock structure to satisfy the interface
-    
-    return [{
-      relatedIocId: 'mock-related-id',
-      relationshipType: 'infrastructure',
-      confidence: 0.8,
-      evidence: ['correlation-analysis', 'temporal-proximity'],
-    }];
+
+    return [
+      {
+        relatedIocId: 'mock-related-id',
+        relationshipType: 'infrastructure',
+        confidence: 0.8,
+        evidence: ['correlation-analysis', 'temporal-proximity'],
+      },
+    ];
   }
 
-  private async storeEnrichedIOC(enrichmentResult: IIOCEnrichmentResult): Promise<void> {
+  private async storeEnrichedIOC(
+    enrichmentResult: IIOCEnrichmentResult
+  ): Promise<void> {
     // Implementation would store the enriched IOC data
     logger.debug('Storing enriched IOC', {
       iocId: enrichmentResult.iocId,
@@ -252,15 +258,17 @@ export class IOCEnrichmentRequestConsumer
  * IOC Validation Request Consumer
  * Processes IOC validation requests
  */
-export class IOCValidationRequestConsumer 
-  extends BaseMessageConsumer<{ iocId: string; ioc: IIOC; validationRules: string[] }> {
-
+export class IOCValidationRequestConsumer extends BaseMessageConsumer<{
+  iocId: string;
+  ioc: IIOC;
+  validationRules: string[];
+}> {
   constructor(dataLayer: DataLayerOrchestrator) {
     super('IOCValidationRequestConsumer', dataLayer);
   }
 
   public async handle(
-    message: IMessage<{ iocId: string; ioc: IIOC; validationRules: string[] }>, 
+    message: IMessage<{ iocId: string; ioc: IIOC; validationRules: string[] }>,
     context: IMessageContext
   ): Promise<IHandlerResult> {
     const startTime = Date.now();
@@ -292,7 +300,6 @@ export class IOCValidationRequestConsumer
 
       this.logProcessingComplete(message, handlerResult, processingTime);
       return handlerResult;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createErrorResult(
@@ -307,8 +314,8 @@ export class IOCValidationRequestConsumer
   }
 
   private async applyCustomValidationRule(
-    ioc: IIOC, 
-    rule: string, 
+    ioc: IIOC,
+    rule: string,
     validationResult: any
   ): Promise<void> {
     // Implementation would apply custom validation rules
@@ -318,12 +325,16 @@ export class IOCValidationRequestConsumer
     });
   }
 
-  private async storeValidationResult(iocId: string, validationResult: any): Promise<void> {
+  private async storeValidationResult(
+    iocId: string,
+    validationResult: any
+  ): Promise<void> {
     // Implementation would store validation results
     logger.debug('Storing validation result', {
       iocId,
       isValid: validationResult.isValid,
-      validationCount: validationResult.errors.length + validationResult.warnings.length,
+      validationCount:
+        validationResult.errors.length + validationResult.warnings.length,
     });
   }
 }
@@ -332,27 +343,25 @@ export class IOCValidationRequestConsumer
  * Threat Analysis Request Consumer
  * Processes threat analysis requests
  */
-export class ThreatAnalysisRequestConsumer 
-  extends BaseMessageConsumer<IThreatAnalysisRequest> {
-
+export class ThreatAnalysisRequestConsumer extends BaseMessageConsumer<IThreatAnalysisRequest> {
   constructor(dataLayer: DataLayerOrchestrator) {
     super('ThreatAnalysisRequestConsumer', dataLayer);
   }
 
   public async handle(
-    message: IMessage<IThreatAnalysisRequest>, 
+    message: IMessage<IThreatAnalysisRequest>,
     context: IMessageContext
   ): Promise<IHandlerResult> {
     const startTime = Date.now();
     this.logProcessingStart(message, context);
 
     try {
-      const { 
-        analysisId, 
-        iocs, 
-        analysisType, 
-        options, 
-        context: queryContext 
+      const {
+        analysisId,
+        iocs,
+        analysisType,
+        options,
+        context: queryContext,
       } = message.payload;
 
       // Perform threat analysis based on type
@@ -361,36 +370,36 @@ export class ThreatAnalysisRequestConsumer
       switch (analysisType) {
         case 'campaign':
           analysisResult = await this.performCampaignAnalysis(
-            analysisId, 
-            iocs, 
-            options, 
+            analysisId,
+            iocs,
+            options,
             queryContext
           );
           break;
 
         case 'attribution':
           analysisResult = await this.performAttributionAnalysis(
-            analysisId, 
-            iocs, 
-            options, 
+            analysisId,
+            iocs,
+            options,
             queryContext
           );
           break;
 
         case 'behavioral':
           analysisResult = await this.performBehavioralAnalysis(
-            analysisId, 
-            iocs, 
-            options, 
+            analysisId,
+            iocs,
+            options,
             queryContext
           );
           break;
 
         case 'infrastructure':
           analysisResult = await this.performInfrastructureAnalysis(
-            analysisId, 
-            iocs, 
-            options, 
+            analysisId,
+            iocs,
+            options,
             queryContext
           );
           break;
@@ -412,7 +421,6 @@ export class ThreatAnalysisRequestConsumer
 
       this.logProcessingComplete(message, handlerResult, processingTime);
       return handlerResult;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createErrorResult(
@@ -444,7 +452,9 @@ export class ThreatAnalysisRequestConsumer
     );
 
     // Analyze patterns for campaign indicators
-    const campaignFindings = this.identifyCampaignPatterns(relationshipDiscovery);
+    const campaignFindings = this.identifyCampaignPatterns(
+      relationshipDiscovery
+    );
 
     return {
       analysisId,
@@ -481,7 +491,7 @@ export class ThreatAnalysisRequestConsumer
     return {
       analysisId,
       findings: [],
-      confidence: 0.80,
+      confidence: 0.8,
       analysisTime: new Date(),
     };
   }
@@ -493,14 +503,14 @@ export class ThreatAnalysisRequestConsumer
     context: any
   ): Promise<IThreatAnalysisResult> {
     // Use IOC analysis service for infrastructure relationships
-    const infrastructureIOCs = iocs.filter(ioc => 
+    const infrastructureIOCs = iocs.filter(ioc =>
       ['ip', 'domain', 'url'].includes(ioc.type)
     );
 
     const findings = [];
     for (const ioc of infrastructureIOCs) {
       const relatedIOCs = await IOCAnalysisService.findCorrelatedIOCs(ioc);
-      
+
       if (relatedIOCs.length > 0) {
         findings.push({
           id: uuidv4(),
@@ -533,7 +543,9 @@ export class ThreatAnalysisRequestConsumer
     return [];
   }
 
-  private async storeAnalysisResult(result: IThreatAnalysisResult): Promise<void> {
+  private async storeAnalysisResult(
+    result: IThreatAnalysisResult
+  ): Promise<void> {
     // Implementation would store analysis results
     logger.debug('Storing threat analysis result', {
       analysisId: result.analysisId,
@@ -547,33 +559,34 @@ export class ThreatAnalysisRequestConsumer
  * Data Ingestion Request Consumer
  * Processes data ingestion requests
  */
-export class DataIngestionRequestConsumer 
-  extends BaseMessageConsumer<IDataIngestionRequest> {
-
+export class DataIngestionRequestConsumer extends BaseMessageConsumer<IDataIngestionRequest> {
   constructor(dataLayer: DataLayerOrchestrator) {
     super('DataIngestionRequestConsumer', dataLayer);
   }
 
   public async handle(
-    message: IMessage<IDataIngestionRequest>, 
+    message: IMessage<IDataIngestionRequest>,
     context: IMessageContext
   ): Promise<IHandlerResult> {
     const startTime = Date.now();
     this.logProcessingStart(message, context);
 
     try {
-      const { 
-        sourceId, 
-        sourceName, 
-        dataType, 
-        format, 
-        data, 
-        metadata, 
-        validationRules 
+      const {
+        sourceId,
+        sourceName,
+        dataType,
+        format,
+        data,
+        metadata,
+        validationRules,
       } = message.payload;
 
       // Validate incoming data
-      const validationResult = await this.validateIncomingData(data, validationRules || []);
+      const validationResult = await this.validateIncomingData(
+        data,
+        validationRules || []
+      );
 
       // Transform data to internal format
       const transformedData = await this.transformData(data, format, dataType);
@@ -604,7 +617,6 @@ export class DataIngestionRequestConsumer
 
       this.logProcessingComplete(message, handlerResult, processingTime);
       return handlerResult;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createErrorResult(
@@ -618,7 +630,10 @@ export class DataIngestionRequestConsumer
     }
   }
 
-  private async validateIncomingData(data: unknown[], validationRules: any[]): Promise<{
+  private async validateIncomingData(
+    data: unknown[],
+    validationRules: any[]
+  ): Promise<{
     valid: unknown[];
     invalid: unknown[];
     errors: any[];
@@ -632,8 +647,8 @@ export class DataIngestionRequestConsumer
   }
 
   private async transformData(
-    data: unknown[], 
-    format: string, 
+    data: unknown[],
+    format: string,
     dataType: string
   ): Promise<any[]> {
     // Implementation for data transformation based on format and type
@@ -650,7 +665,10 @@ export class DataIngestionRequestConsumer
     }));
   }
 
-  private async storeProcessedData(data: any[], sourceId: string): Promise<void> {
+  private async storeProcessedData(
+    data: any[],
+    sourceId: string
+  ): Promise<void> {
     // Implementation would use the data layer to store processed data
     logger.debug('Storing processed data', {
       sourceId,
@@ -663,15 +681,13 @@ export class DataIngestionRequestConsumer
  * Threat Alert Notification Consumer
  * Processes threat alert notifications for distribution and escalation
  */
-export class ThreatAlertNotificationConsumer 
-  extends BaseMessageConsumer<IThreatAlertNotification> {
-
+export class ThreatAlertNotificationConsumer extends BaseMessageConsumer<IThreatAlertNotification> {
   constructor(dataLayer: DataLayerOrchestrator) {
     super('ThreatAlertNotificationConsumer', dataLayer);
   }
 
   public async handle(
-    message: IMessage<IThreatAlertNotification>, 
+    message: IMessage<IThreatAlertNotification>,
     context: IMessageContext
   ): Promise<IHandlerResult> {
     const startTime = Date.now();
@@ -702,7 +718,6 @@ export class ThreatAlertNotificationConsumer
 
       this.logProcessingComplete(message, handlerResult, processingTime);
       return handlerResult;
-
     } catch (error) {
       const processingTime = Date.now() - startTime;
       const handlerResult = this.createErrorResult(
@@ -716,7 +731,9 @@ export class ThreatAlertNotificationConsumer
     }
   }
 
-  private async handleHighPriorityAlert(alert: IThreatAlertNotification): Promise<void> {
+  private async handleHighPriorityAlert(
+    alert: IThreatAlertNotification
+  ): Promise<void> {
     // Implementation for high-priority alert handling
     logger.warn('Processing high-priority threat alert', {
       alertId: alert.alertId,
@@ -729,7 +746,9 @@ export class ThreatAlertNotificationConsumer
     await this.triggerAutomatedResponses(alert);
   }
 
-  private async handleStandardAlert(alert: IThreatAlertNotification): Promise<void> {
+  private async handleStandardAlert(
+    alert: IThreatAlertNotification
+  ): Promise<void> {
     // Implementation for standard alert handling
     logger.info('Processing standard threat alert', {
       alertId: alert.alertId,
@@ -738,17 +757,21 @@ export class ThreatAlertNotificationConsumer
     });
   }
 
-  private async triggerAutomatedResponses(alert: IThreatAlertNotification): Promise<void> {
+  private async triggerAutomatedResponses(
+    alert: IThreatAlertNotification
+  ): Promise<void> {
     // Implementation for automated responses
-    const automatedActions = alert.recommendedActions.filter(action => action.automated);
-    
+    const automatedActions = alert.recommendedActions.filter(
+      action => action.automated
+    );
+
     for (const action of automatedActions) {
       logger.info('Triggering automated response', {
         alertId: alert.alertId,
         action: action.action,
         description: action.description,
       });
-      
+
       // Implementation would trigger actual automated responses
     }
   }
@@ -762,7 +785,9 @@ export class ThreatAlertNotificationConsumer
     });
   }
 
-  private async distributeAlert(alert: IThreatAlertNotification): Promise<void> {
+  private async distributeAlert(
+    alert: IThreatAlertNotification
+  ): Promise<void> {
     // Implementation would distribute alert to appropriate channels
     // (email, Slack, SIEM, etc.)
     logger.debug('Distributing threat alert', {

@@ -1,6 +1,6 @@
 /**
  * Error Boundary Component
- * Enterprise-grade error handling and recovery
+ * Catches and handles React errors gracefully
  */
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
@@ -8,61 +8,62 @@ import {
   Box,
   Typography,
   Button,
-  Paper,
   Alert,
-  Divider,
-  Collapse,
+  AlertTitle,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Chip,
+  Stack,
+  Paper,
   IconButton,
-  Chip
+  Tooltip
 } from '@mui/material';
 import {
-  Error,
+  Error as ErrorIcon,
   Refresh,
   BugReport,
   ExpandMore,
-  ExpandLess,
-  Security
+  ContentCopy,
+  Home,
+  Warning
 } from '@mui/icons-material';
 
-interface ErrorBoundaryState {
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorId: string;
-  showDetails: boolean;
 }
 
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback?: ReactNode;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
-  level?: 'page' | 'component' | 'critical';
-}
-
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: '',
-      showDetails: false
+      errorId: ''
     };
   }
 
-  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     // Update state so the next render will show the fallback UI
     return {
       hasError: true,
       error,
-      errorId: `ERR-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
+      errorId: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log the error
+    // Log error details
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     this.setState({
@@ -70,39 +71,41 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       errorInfo
     });
 
-    // Call custom error handler
+    // Call custom error handler if provided
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
 
-    // Log to error reporting service
-    this.logErrorToService(error, errorInfo);
+    // Send error to monitoring service
+    this.reportError(error, errorInfo);
   }
 
-  private logErrorToService = (error: Error, errorInfo: ErrorInfo) => {
-    // In a real application, this would send to an error reporting service
-    const errorReport = {
-      errorId: this.state.errorId,
-      message: error.message,
-      stack: error.stack,
-      componentStack: errorInfo.componentStack,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-      level: this.props.level || 'component'
-    };
+  private reportError = (error: Error, errorInfo: ErrorInfo) => {
+    try {
+      // In production, send to error monitoring service
+      const errorReport = {
+        errorId: this.state.errorId,
+        message: error.message,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        userId: localStorage.getItem('user_id') || 'anonymous'
+      };
 
-    // Simulate API call to error reporting service
-    console.log('Error reported to service:', errorReport);
-    
-    // Store in localStorage for debugging
-    const existingErrors = JSON.parse(localStorage.getItem('phantom-spire-errors') || '[]');
-    existingErrors.push(errorReport);
-    // Keep only last 10 errors
-    if (existingErrors.length > 10) {
-      existingErrors.splice(0, existingErrors.length - 10);
+      // Send to monitoring service (e.g., Sentry, LogRocket, etc.)
+      console.log('Error Report:', errorReport);
+      
+      // You can also send to your backend
+      // fetch('/api/errors', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(errorReport)
+      // });
+    } catch (reportingError) {
+      console.error('Failed to report error:', reportingError);
     }
-    localStorage.setItem('phantom-spire-errors', JSON.stringify(existingErrors));
   };
 
   private handleRetry = () => {
@@ -110,8 +113,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: '',
-      showDetails: false
+      errorId: ''
     });
   };
 
@@ -119,226 +121,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     window.location.reload();
   };
 
-  private toggleDetails = () => {
-    this.setState(prevState => ({
-      showDetails: !prevState.showDetails
-    }));
+  private handleGoHome = () => {
+    window.location.href = '/';
   };
 
-  private renderErrorDetails = () => {
-    const { error, errorInfo, errorId } = this.state;
-    
-    if (!error || !errorInfo) return null;
-
-    return (
-      <Box sx={{ mt: 2 }}>
-        <Collapse in={this.state.showDetails}>
-          <Paper variant="outlined" sx={{ p: 2, backgroundColor: 'grey.50' }}>
-            <Typography variant="subtitle2" gutterBottom>
-              Error Details
-            </Typography>
-            
-            <Box sx={{ mb: 2 }}>
-              <Chip 
-                label={`Error ID: ${errorId}`}
-                size="small"
-                variant="outlined"
-                sx={{ mb: 1 }}
-              />
-            </Box>
-
-            <Typography variant="body2" component="div" sx={{ mb: 2 }}>
-              <strong>Message:</strong>
-              <Box component="pre" sx={{ 
-                whiteSpace: 'pre-wrap', 
-                fontSize: '0.8rem',
-                backgroundColor: 'white',
-                p: 1,
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                mt: 0.5
-              }}>
-                {error.message}
-              </Box>
-            </Typography>
-
-            <Typography variant="body2" component="div" sx={{ mb: 2 }}>
-              <strong>Stack Trace:</strong>
-              <Box component="pre" sx={{ 
-                whiteSpace: 'pre-wrap', 
-                fontSize: '0.7rem',
-                backgroundColor: 'white',
-                p: 1,
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                mt: 0.5,
-                maxHeight: 200,
-                overflow: 'auto'
-              }}>
-                {error.stack}
-              </Box>
-            </Typography>
-
-            <Typography variant="body2" component="div">
-              <strong>Component Stack:</strong>
-              <Box component="pre" sx={{ 
-                whiteSpace: 'pre-wrap', 
-                fontSize: '0.7rem',
-                backgroundColor: 'white',
-                p: 1,
-                borderRadius: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                mt: 0.5,
-                maxHeight: 200,
-                overflow: 'auto'
-              }}>
-                {errorInfo.componentStack}
-              </Box>
-            </Typography>
-          </Paper>
-        </Collapse>
-      </Box>
-    );
-  };
-
-  private renderErrorUI = () => {
-    const { level = 'component' } = this.props;
-    const { errorId } = this.state;
-
-    const severityConfig = {
-      critical: {
-        color: 'error' as const,
-        icon: <Error />,
-        title: 'Critical System Error',
-        description: 'A critical error has occurred that requires immediate attention.'
-      },
-      page: {
-        color: 'warning' as const,
-        icon: <BugReport />,
-        title: 'Page Error',
-        description: 'This page encountered an error and cannot be displayed.'
-      },
-      component: {
-        color: 'info' as const,
-        icon: <BugReport />,
-        title: 'Component Error',
-        description: 'A component error occurred. Some functionality may be limited.'
-      }
+  private copyErrorDetails = () => {
+    const errorDetails = {
+      errorId: this.state.errorId,
+      message: this.state.error?.message,
+      stack: this.state.error?.stack,
+      componentStack: this.state.errorInfo?.componentStack,
+      timestamp: new Date().toISOString()
     };
 
-    const config = severityConfig[level];
-
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: level === 'critical' ? '100vh' : level === 'page' ? '50vh' : '200px',
-          p: 3,
-          textAlign: 'center'
-        }}
-      >
-        <Paper 
-          elevation={3}
-          sx={{ 
-            p: 4, 
-            maxWidth: 600, 
-            width: '100%',
-            backgroundColor: 'background.paper'
-          }}
-        >
-          {/* Header */}
-          <Box sx={{ mb: 3 }}>
-            <Box
-              sx={{
-                width: 64,
-                height: 64,
-                borderRadius: 2,
-                backgroundColor: level === 'critical' ? 'error.main' : 'warning.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                mx: 'auto',
-                mb: 2
-              }}
-            >
-              {level === 'critical' ? (
-                <Security sx={{ fontSize: 32 }} />
-              ) : (
-                React.cloneElement(config.icon, { sx: { fontSize: 32 } })
-              )}
-            </Box>
-
-            <Typography variant="h5" fontWeight="bold" gutterBottom>
-              {config.title}
-            </Typography>
-            
-            <Typography variant="body1" color="textSecondary" paragraph>
-              {config.description}
-            </Typography>
-          </Box>
-
-          {/* Error Information */}
-          <Alert severity={config.color} sx={{ mb: 3 }}>
-            <Typography variant="body2">
-              <strong>Error ID:</strong> {errorId}
-            </Typography>
-            <Typography variant="body2">
-              <strong>Time:</strong> {new Date().toLocaleString()}
-            </Typography>
-          </Alert>
-
-          {/* Actions */}
-          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mb: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<Refresh />}
-              onClick={this.handleRetry}
-            >
-              Try Again
-            </Button>
-            
-            {level === 'critical' && (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={this.handleReload}
-              >
-                Reload Application
-              </Button>
-            )}
-          </Box>
-
-          {/* Error Details Toggle */}
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Button
-              size="small"
-              color="inherit"
-              startIcon={this.state.showDetails ? <ExpandLess /> : <ExpandMore />}
-              onClick={this.toggleDetails}
-            >
-              {this.state.showDetails ? 'Hide Details' : 'Show Technical Details'}
-            </Button>
-          </Box>
-
-          {this.renderErrorDetails()}
-
-          {/* Help Information */}
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="body2" color="textSecondary">
-            If this error persists, please contact your system administrator or 
-            report this issue to the support team with the Error ID provided above.
-          </Typography>
-        </Paper>
-      </Box>
-    );
+    navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2))
+      .then(() => {
+        console.log('Error details copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy error details:', err);
+      });
   };
 
   render() {
@@ -349,31 +151,215 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       // Default error UI
-      return this.renderErrorUI();
+      return (
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 3,
+            backgroundColor: 'background.default'
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              maxWidth: 600,
+              width: '100%',
+              p: 4,
+              textAlign: 'center'
+            }}
+          >
+            {/* Error Icon */}
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mb: 3
+              }}
+            >
+              <Box
+                sx={{
+                  width: 80,
+                  height: 80,
+                  borderRadius: '50%',
+                  backgroundColor: 'error.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}
+              >
+                <ErrorIcon sx={{ fontSize: 40 }} />
+              </Box>
+            </Box>
+
+            {/* Error Title */}
+            <Typography variant="h4" gutterBottom color="error">
+              Something went wrong
+            </Typography>
+
+            <Typography variant="body1" color="textSecondary" paragraph>
+              We're sorry, but something unexpected happened. The error has been logged 
+              and our team has been notified.
+            </Typography>
+
+            {/* Error ID */}
+            <Box sx={{ mb: 3 }}>
+              <Chip
+                label={`Error ID: ${this.state.errorId}`}
+                variant="outlined"
+                size="small"
+                icon={<BugReport />}
+              />
+            </Box>
+
+            {/* Action Buttons */}
+            <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 3 }}>
+              <Button
+                variant="contained"
+                startIcon={<Refresh />}
+                onClick={this.handleRetry}
+              >
+                Try Again
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Home />}
+                onClick={this.handleGoHome}
+              >
+                Go Home
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={this.handleReload}
+              >
+                Reload Page
+              </Button>
+            </Stack>
+
+            {/* Error Details (Expandable) */}
+            {(this.state.error || this.state.errorInfo) && (
+              <Accordion>
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  aria-controls="error-details-content"
+                  id="error-details-header"
+                >
+                  <Typography variant="subtitle2">
+                    <Warning sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    Technical Details
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ textAlign: 'left' }}>
+                    {/* Copy Button */}
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                      <Tooltip title="Copy error details">
+                        <IconButton size="small" onClick={this.copyErrorDetails}>
+                          <ContentCopy />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
+
+                    {/* Error Message */}
+                    {this.state.error && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        <AlertTitle>Error Message</AlertTitle>
+                        <Typography variant="body2" component="pre" sx={{ whiteSpace: 'pre-wrap' }}>
+                          {this.state.error.message}
+                        </Typography>
+                      </Alert>
+                    )}
+
+                    {/* Stack Trace */}
+                    {this.state.error?.stack && (
+                      <Alert severity="warning" sx={{ mb: 2 }}>
+                        <AlertTitle>Stack Trace</AlertTitle>
+                        <Typography 
+                          variant="body2" 
+                          component="pre" 
+                          sx={{ 
+                            whiteSpace: 'pre-wrap',
+                            fontSize: '0.75rem',
+                            maxHeight: 200,
+                            overflow: 'auto'
+                          }}
+                        >
+                          {this.state.error.stack}
+                        </Typography>
+                      </Alert>
+                    )}
+
+                    {/* Component Stack */}
+                    {this.state.errorInfo?.componentStack && (
+                      <Alert severity="info">
+                        <AlertTitle>Component Stack</AlertTitle>
+                        <Typography 
+                          variant="body2" 
+                          component="pre" 
+                          sx={{ 
+                            whiteSpace: 'pre-wrap',
+                            fontSize: '0.75rem',
+                            maxHeight: 200,
+                            overflow: 'auto'
+                          }}
+                        >
+                          {this.state.errorInfo.componentStack}
+                        </Typography>
+                      </Alert>
+                    )}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            )}
+
+            {/* Help Text */}
+            <Typography variant="caption" color="textSecondary" sx={{ mt: 2, display: 'block' }}>
+              If this problem persists, please contact support with the Error ID above.
+            </Typography>
+          </Paper>
+        </Box>
+      );
     }
 
     return this.props.children;
   }
 }
 
-// Functional component wrapper for hooks
-export const ErrorBoundaryWrapper: React.FC<{
-  children: ReactNode;
-  level?: 'page' | 'component' | 'critical';
-}> = ({ children, level = 'component' }) => {
-  const handleError = (error: Error, errorInfo: ErrorInfo) => {
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error caught by boundary:', error, errorInfo);
-    }
-
-    // In production, send to monitoring service
-    // Example: Sentry, LogRocket, etc.
-  };
-
-  return (
-    <ErrorBoundary level={level} onError={handleError}>
-      {children}
+// Higher-order component for easier usage
+export const withErrorBoundary = <P extends object>(
+  Component: React.ComponentType<P>,
+  errorBoundaryProps?: Omit<Props, 'children'>
+) => {
+  const WrappedComponent = (props: P) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <Component {...props} />
     </ErrorBoundary>
   );
+
+  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
+  
+  return WrappedComponent;
+};
+
+// Hook for error reporting in functional components
+export const useErrorHandler = () => {
+  const reportError = (error: Error, context?: string) => {
+    console.error(`Error in ${context || 'component'}:`, error);
+    
+    // You can integrate with error reporting service here
+    const errorReport = {
+      message: error.message,
+      stack: error.stack,
+      context,
+      timestamp: new Date().toISOString(),
+      url: window.location.href
+    };
+    
+    console.log('Error Report:', errorReport);
+  };
+
+  return { reportError };
 };

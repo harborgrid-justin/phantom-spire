@@ -93,7 +93,10 @@ export class IssueController {
         data: issue,
       });
     } catch (error) {
-      this.logger.error('Error retrieving issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error retrieving issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve issue',
@@ -129,7 +132,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.updateIssue(issueId, updates, context);
+      const issue = await this.issueService.updateIssue(
+        issueId,
+        updates,
+        context
+      );
 
       res.json({
         success: true,
@@ -137,7 +144,10 @@ export class IssueController {
         message: `Issue ${issue.ticketId} updated successfully`,
       });
     } catch (error) {
-      this.logger.error('Error updating issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error updating issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to update issue',
@@ -177,7 +187,10 @@ export class IssueController {
         message: 'Issue deleted successfully',
       });
     } catch (error) {
-      this.logger.error('Error deleting issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error deleting issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to delete issue',
@@ -195,8 +208,8 @@ export class IssueController {
       const searchQuery: IIssueSearchQuery = {
         query: req.query.q as string,
         filters: this.buildFilters(req.query),
-        sortBy: req.query.sortBy as string || 'updatedAt',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc' || 'desc',
+        sortBy: (req.query.sortBy as string) || 'updatedAt',
+        sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'desc',
         page: parseInt(req.query.page as string) || 1,
         limit: Math.min(parseInt(req.query.limit as string) || 50, 100),
         includeResolved: req.query.includeResolved === 'true',
@@ -221,7 +234,10 @@ export class IssueController {
   /**
    * Transition issue status
    */
-  public transitionStatus = async (req: Request, res: Response): Promise<void> => {
+  public transitionStatus = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const issueId = this.validateParam(req.params.issueId, 'Issue ID');
       const { status, notes } = req.body;
@@ -235,7 +251,12 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.transitionIssueStatus(issueId, status, context, notes);
+      const issue = await this.issueService.transitionIssueStatus(
+        issueId,
+        status,
+        context,
+        notes
+      );
 
       res.json({
         success: true,
@@ -243,7 +264,10 @@ export class IssueController {
         message: `Issue status changed to ${status}`,
       });
     } catch (error) {
-      this.logger.error('Error transitioning issue status', { error, issueId: req.params.issueId });
+      this.logger.error('Error transitioning issue status', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(400).json({
         success: false,
         message: 'Failed to transition status',
@@ -255,19 +279,28 @@ export class IssueController {
   /**
    * Get available transitions
    */
-  public getAvailableTransitions = async (req: Request, res: Response): Promise<void> => {
+  public getAvailableTransitions = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { issueId } = req.params;
       const context = this.buildContext(req);
 
-      const transitions = await this.issueService.getAvailableTransitions(issueId, context);
+      const transitions = await this.issueService.getAvailableTransitions(
+        issueId,
+        context
+      );
 
       res.json({
         success: true,
         data: transitions,
       });
     } catch (error) {
-      this.logger.error('Error getting available transitions', { error, issueId: req.params.issueId });
+      this.logger.error('Error getting available transitions', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get available transitions',
@@ -293,7 +326,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.assignIssue(issueId, assigneeId, context);
+      const issue = await this.issueService.assignIssue(
+        issueId,
+        assigneeId,
+        context
+      );
 
       res.json({
         success: true,
@@ -301,7 +338,10 @@ export class IssueController {
         message: 'Issue assigned successfully',
       });
     } catch (error) {
-      this.logger.error('Error assigning issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error assigning issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to assign issue',
@@ -326,7 +366,10 @@ export class IssueController {
         message: 'Issue unassigned successfully',
       });
     } catch (error) {
-      this.logger.error('Error unassigning issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error unassigning issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to unassign issue',
@@ -352,7 +395,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.addWatcher(issueId, watcherId, context);
+      const issue = await this.issueService.addWatcher(
+        issueId,
+        watcherId,
+        context
+      );
 
       res.json({
         success: true,
@@ -360,7 +407,10 @@ export class IssueController {
         message: 'Watcher added successfully',
       });
     } catch (error) {
-      this.logger.error('Error adding watcher', { error, issueId: req.params.issueId });
+      this.logger.error('Error adding watcher', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to add watcher',
@@ -377,7 +427,11 @@ export class IssueController {
       const { issueId, watcherId } = req.params;
       const context = this.buildContext(req);
 
-      const issue = await this.issueService.removeWatcher(issueId, watcherId, context);
+      const issue = await this.issueService.removeWatcher(
+        issueId,
+        watcherId,
+        context
+      );
 
       res.json({
         success: true,
@@ -385,7 +439,10 @@ export class IssueController {
         message: 'Watcher removed successfully',
       });
     } catch (error) {
-      this.logger.error('Error removing watcher', { error, issueId: req.params.issueId });
+      this.logger.error('Error removing watcher', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to remove watcher',
@@ -427,7 +484,10 @@ export class IssueController {
         message: 'Comment added successfully',
       });
     } catch (error) {
-      this.logger.error('Error adding comment', { error, issueId: req.params.issueId });
+      this.logger.error('Error adding comment', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to add comment',
@@ -453,7 +513,12 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.updateComment(issueId, commentId, content, context);
+      const issue = await this.issueService.updateComment(
+        issueId,
+        commentId,
+        content,
+        context
+      );
 
       res.json({
         success: true,
@@ -461,7 +526,10 @@ export class IssueController {
         message: 'Comment updated successfully',
       });
     } catch (error) {
-      this.logger.error('Error updating comment', { error, issueId: req.params.issueId });
+      this.logger.error('Error updating comment', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to update comment',
@@ -478,7 +546,11 @@ export class IssueController {
       const { issueId, commentId } = req.params;
       const context = this.buildContext(req);
 
-      const issue = await this.issueService.deleteComment(issueId, commentId, context);
+      const issue = await this.issueService.deleteComment(
+        issueId,
+        commentId,
+        context
+      );
 
       res.json({
         success: true,
@@ -486,7 +558,10 @@ export class IssueController {
         message: 'Comment deleted successfully',
       });
     } catch (error) {
-      this.logger.error('Error deleting comment', { error, issueId: req.params.issueId });
+      this.logger.error('Error deleting comment', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to delete comment',
@@ -512,7 +587,12 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.logTime(issueId, hours, description, context);
+      const issue = await this.issueService.logTime(
+        issueId,
+        hours,
+        description,
+        context
+      );
 
       res.json({
         success: true,
@@ -520,7 +600,10 @@ export class IssueController {
         message: 'Time logged successfully',
       });
     } catch (error) {
-      this.logger.error('Error logging time', { error, issueId: req.params.issueId });
+      this.logger.error('Error logging time', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to log time',
@@ -544,7 +627,10 @@ export class IssueController {
         data: { timeSpent },
       });
     } catch (error) {
-      this.logger.error('Error getting time spent', { error, issueId: req.params.issueId });
+      this.logger.error('Error getting time spent', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get time spent',
@@ -570,7 +656,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.escalateIssue(issueId, reason, context);
+      const issue = await this.issueService.escalateIssue(
+        issueId,
+        reason,
+        context
+      );
 
       res.json({
         success: true,
@@ -578,7 +668,10 @@ export class IssueController {
         message: 'Issue escalated successfully',
       });
     } catch (error) {
-      this.logger.error('Error escalating issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error escalating issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to escalate issue',
@@ -604,7 +697,12 @@ export class IssueController {
         return;
       }
 
-      const integration = await this.issueService.linkToTask(issueId, taskId, relationship, context);
+      const integration = await this.issueService.linkToTask(
+        issueId,
+        taskId,
+        relationship,
+        context
+      );
 
       res.status(201).json({
         success: true,
@@ -612,7 +710,10 @@ export class IssueController {
         message: 'Issue linked to task successfully',
       });
     } catch (error) {
-      this.logger.error('Error linking issue to task', { error, issueId: req.params.issueId });
+      this.logger.error('Error linking issue to task', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to link issue to task',
@@ -624,12 +725,19 @@ export class IssueController {
   /**
    * Unlink issue from task
    */
-  public unlinkFromTask = async (req: Request, res: Response): Promise<void> => {
+  public unlinkFromTask = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { issueId, taskId } = req.params;
       const context = this.buildContext(req);
 
-      const unlinked = await this.issueService.unlinkFromTask(issueId, taskId, context);
+      const unlinked = await this.issueService.unlinkFromTask(
+        issueId,
+        taskId,
+        context
+      );
 
       res.json({
         success: true,
@@ -637,7 +745,10 @@ export class IssueController {
         message: 'Issue unlinked from task successfully',
       });
     } catch (error) {
-      this.logger.error('Error unlinking issue from task', { error, issueId: req.params.issueId });
+      this.logger.error('Error unlinking issue from task', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to unlink issue from task',
@@ -649,7 +760,10 @@ export class IssueController {
   /**
    * Get related tasks for issue
    */
-  public getRelatedTasks = async (req: Request, res: Response): Promise<void> => {
+  public getRelatedTasks = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { issueId } = req.params;
       const context = this.buildContext(req);
@@ -661,7 +775,10 @@ export class IssueController {
         data: tasks,
       });
     } catch (error) {
-      this.logger.error('Error getting related tasks', { error, issueId: req.params.issueId });
+      this.logger.error('Error getting related tasks', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get related tasks',
@@ -673,7 +790,10 @@ export class IssueController {
   /**
    * Get issue metrics
    */
-  public getIssueMetrics = async (req: Request, res: Response): Promise<void> => {
+  public getIssueMetrics = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const context = this.buildContext(req);
       const filters = this.buildFilters(req.query);
@@ -697,7 +817,10 @@ export class IssueController {
   /**
    * Get issue analytics
    */
-  public getIssueAnalytics = async (req: Request, res: Response): Promise<void> => {
+  public getIssueAnalytics = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { startDate, endDate } = req.query;
       const context = this.buildContext(req);
@@ -733,7 +856,10 @@ export class IssueController {
   /**
    * Bulk update issues
    */
-  public bulkUpdateIssues = async (req: Request, res: Response): Promise<void> => {
+  public bulkUpdateIssues = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { issueIds, updates } = req.body;
       const context = this.buildContext(req);
@@ -746,7 +872,11 @@ export class IssueController {
         return;
       }
 
-      const updatedIssues = await this.issueService.bulkUpdateIssues(issueIds, updates, context);
+      const updatedIssues = await this.issueService.bulkUpdateIssues(
+        issueIds,
+        updates,
+        context
+      );
 
       res.json({
         success: true,
@@ -766,7 +896,10 @@ export class IssueController {
   /**
    * Bulk assign issues
    */
-  public bulkAssignIssues = async (req: Request, res: Response): Promise<void> => {
+  public bulkAssignIssues = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const { issueIds, assigneeId } = req.body;
       const context = this.buildContext(req);
@@ -787,7 +920,11 @@ export class IssueController {
         return;
       }
 
-      const assignedIssues = await this.issueService.bulkAssignIssues(issueIds, assigneeId, context);
+      const assignedIssues = await this.issueService.bulkAssignIssues(
+        issueIds,
+        assigneeId,
+        context
+      );
 
       res.json({
         success: true,
@@ -821,7 +958,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.resolveIssue(issueId, resolution, context);
+      const issue = await this.issueService.resolveIssue(
+        issueId,
+        resolution,
+        context
+      );
 
       res.json({
         success: true,
@@ -829,7 +970,10 @@ export class IssueController {
         message: 'Issue resolved successfully',
       });
     } catch (error) {
-      this.logger.error('Error resolving issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error resolving issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to resolve issue',
@@ -855,7 +999,11 @@ export class IssueController {
         return;
       }
 
-      const issue = await this.issueService.reopenIssue(issueId, reason, context);
+      const issue = await this.issueService.reopenIssue(
+        issueId,
+        reason,
+        context
+      );
 
       res.json({
         success: true,
@@ -863,7 +1011,10 @@ export class IssueController {
         message: 'Issue reopened successfully',
       });
     } catch (error) {
-      this.logger.error('Error reopening issue', { error, issueId: req.params.issueId });
+      this.logger.error('Error reopening issue', {
+        error,
+        issueId: req.params.issueId,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to reopen issue',
@@ -877,7 +1028,7 @@ export class IssueController {
    */
   private buildContext(req: Request): IIssueContext {
     const user = (req as any).user; // Assuming user is attached by auth middleware
-    
+
     return {
       userId: user?.userId || user?.id || 'anonymous',
       userRole: user?.role || 'viewer',
@@ -902,28 +1053,56 @@ export class IssueController {
   private buildFilters(query: any): any {
     const filters: any = {};
 
-    if (query.status) filters.status = Array.isArray(query.status) ? query.status : [query.status];
-    if (query.priority) filters.priority = Array.isArray(query.priority) ? query.priority : [query.priority];
-    if (query.severity) filters.severity = Array.isArray(query.severity) ? query.severity : [query.severity];
-    if (query.issueType) filters.issueType = Array.isArray(query.issueType) ? query.issueType : [query.issueType];
-    if (query.assignee) filters.assignee = Array.isArray(query.assignee) ? query.assignee : [query.assignee];
-    if (query.reporter) filters.reporter = Array.isArray(query.reporter) ? query.reporter : [query.reporter];
-    if (query.threatLevel) filters.threatLevel = Array.isArray(query.threatLevel) ? query.threatLevel : [query.threatLevel];
-    if (query.labels) filters.labels = Array.isArray(query.labels) ? query.labels : [query.labels];
-    if (query.tags) filters.tags = Array.isArray(query.tags) ? query.tags : [query.tags];
+    if (query.status)
+      filters.status = Array.isArray(query.status)
+        ? query.status
+        : [query.status];
+    if (query.priority)
+      filters.priority = Array.isArray(query.priority)
+        ? query.priority
+        : [query.priority];
+    if (query.severity)
+      filters.severity = Array.isArray(query.severity)
+        ? query.severity
+        : [query.severity];
+    if (query.issueType)
+      filters.issueType = Array.isArray(query.issueType)
+        ? query.issueType
+        : [query.issueType];
+    if (query.assignee)
+      filters.assignee = Array.isArray(query.assignee)
+        ? query.assignee
+        : [query.assignee];
+    if (query.reporter)
+      filters.reporter = Array.isArray(query.reporter)
+        ? query.reporter
+        : [query.reporter];
+    if (query.threatLevel)
+      filters.threatLevel = Array.isArray(query.threatLevel)
+        ? query.threatLevel
+        : [query.threatLevel];
+    if (query.labels)
+      filters.labels = Array.isArray(query.labels)
+        ? query.labels
+        : [query.labels];
+    if (query.tags)
+      filters.tags = Array.isArray(query.tags) ? query.tags : [query.tags];
     if (query.securityClassification) {
-      filters.securityClassification = Array.isArray(query.securityClassification) 
-        ? query.securityClassification 
+      filters.securityClassification = Array.isArray(
+        query.securityClassification
+      )
+        ? query.securityClassification
         : [query.securityClassification];
     }
     if (query.teamAssignment) {
-      filters.teamAssignment = Array.isArray(query.teamAssignment) 
-        ? query.teamAssignment 
+      filters.teamAssignment = Array.isArray(query.teamAssignment)
+        ? query.teamAssignment
         : [query.teamAssignment];
     }
 
     if (query.createdAfter) filters.createdAfter = new Date(query.createdAfter);
-    if (query.createdBefore) filters.createdBefore = new Date(query.createdBefore);
+    if (query.createdBefore)
+      filters.createdBefore = new Date(query.createdBefore);
     if (query.dueAfter) filters.dueAfter = new Date(query.dueAfter);
     if (query.dueBefore) filters.dueBefore = new Date(query.dueBefore);
 

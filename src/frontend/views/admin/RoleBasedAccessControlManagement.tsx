@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -90,10 +84,22 @@ import {
   ListSubheader,
   CardActions,
   CardHeader,
-  AvatarGroup,
-  TreeView,
-  TreeItem
+  AvatarGroup
 } from '@mui/material';
+
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot
+} from '@mui/lab';
+
+import {
+  SimpleTreeView as TreeView,
+  TreeItem
+} from '@mui/x-tree-view';
 
 import {
   Security,
@@ -187,11 +193,12 @@ import {
   Comment,
   BugReport,
   Build,
-  Engineering
+  Engineering,
+  AccountTree
 } from '@mui/icons-material';
 
-import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, TreeMap, ComposedChart, Pie } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced Interfaces for RBAC and Permissions Management
 interface Role {

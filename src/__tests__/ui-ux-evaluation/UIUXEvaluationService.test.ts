@@ -8,7 +8,7 @@ import {
   EvaluationCategory,
   EvaluationSeverity,
   IPageEvaluation,
-  IUIUXEvaluationConfig
+  IUIUXEvaluationConfig,
 } from '../../services/ui-ux-evaluation/interfaces/IUIUXEvaluation.js';
 
 describe('UIUXEvaluationService', () => {
@@ -21,7 +21,7 @@ describe('UIUXEvaluationService', () => {
   describe('Service Configuration', () => {
     test('should initialize with default configuration', async () => {
       const config = await evaluationService.getConfig();
-      
+
       expect(config.enabled).toBe(true);
       expect(config.autoEvaluate).toBe(true);
       expect(config.evaluationInterval).toBe(30000);
@@ -33,7 +33,7 @@ describe('UIUXEvaluationService', () => {
     test('should update configuration', async () => {
       const newConfig: Partial<IUIUXEvaluationConfig> = {
         enabled: false,
-        evaluationInterval: 60000
+        evaluationInterval: 60000,
       };
 
       await evaluationService.configure(newConfig);
@@ -76,8 +76,8 @@ describe('UIUXEvaluationService', () => {
           maxValue: 100,
           unit: 'score',
           threshold: { excellent: 90, good: 75, acceptable: 60, poor: 40 },
-          timestamp: new Date()
-        }
+          timestamp: new Date(),
+        },
       ];
 
       const issues = [
@@ -89,12 +89,12 @@ describe('UIUXEvaluationService', () => {
           description: 'Test issue description',
           recommendation: 'Fix this issue',
           timestamp: new Date(),
-          resolved: false
-        }
+          resolved: false,
+        },
       ];
 
       const score = evaluationService.calculateScore(metrics, issues);
-      
+
       expect(score).toBeGreaterThanOrEqual(0);
       expect(score).toBeLessThanOrEqual(100);
       expect(score).toBeLessThan(80); // Should be less than metric value due to penalty
@@ -102,13 +102,24 @@ describe('UIUXEvaluationService', () => {
 
     test('should handle known page IDs with correct names', async () => {
       const testCases = [
-        { pageId: 'enterprise-realtime-dashboard', expectedName: 'Enterprise Realtime Dashboard' },
-        { pageId: 'enterprise-workflow-designer', expectedName: 'Enterprise Workflow Designer' },
-        { pageId: 'enterprise-notification-center', expectedName: 'Enterprise Notification Center' }
+        {
+          pageId: 'enterprise-realtime-dashboard',
+          expectedName: 'Enterprise Realtime Dashboard',
+        },
+        {
+          pageId: 'enterprise-workflow-designer',
+          expectedName: 'Enterprise Workflow Designer',
+        },
+        {
+          pageId: 'enterprise-notification-center',
+          expectedName: 'Enterprise Notification Center',
+        },
       ];
 
       for (const testCase of testCases) {
-        const evaluation = await evaluationService.evaluatePage(testCase.pageId);
+        const evaluation = await evaluationService.evaluatePage(
+          testCase.pageId
+        );
         expect(evaluation.pageName).toBe(testCase.expectedName);
       }
     });
@@ -117,7 +128,7 @@ describe('UIUXEvaluationService', () => {
   describe('Report Generation', () => {
     test('should generate report for evaluated pages', async () => {
       const pageIds = ['test-page-1', 'test-page-2'];
-      
+
       // Evaluate pages first
       for (const pageId of pageIds) {
         await evaluationService.evaluatePage(pageId);

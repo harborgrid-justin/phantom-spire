@@ -17,21 +17,21 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     misses: 0,
     sets: 0,
     deletes: 0,
-    errors: 0
+    errors: 0,
   };
 
   constructor(redisUrl: string, keyPrefix: string = 'phantomspire:cache:') {
     super();
     this.keyPrefix = keyPrefix;
     this.client = Redis.createClient({ url: redisUrl });
-    
+
     this.client.on('connect', () => {
       this.isConnected = true;
       logger.info('Redis cache provider connected');
       this.emit('connected');
     });
 
-    this.client.on('error', (error) => {
+    this.client.on('error', error => {
       this.metrics.errors++;
       logger.error('Redis cache provider error:', error);
       this.emit('error', error);
@@ -68,7 +68,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
 
     try {
       const value = await this.client.get(this.getKey(key));
-      
+
       if (value === null) {
         this.metrics.misses++;
         this.emit('miss', { key });
@@ -77,7 +77,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
 
       this.metrics.hits++;
       this.emit('hit', { key });
-      
+
       try {
         if (typeof value === 'string') {
           return JSON.parse(value) as T;
@@ -101,11 +101,16 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     }
 
     try {
-      const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
+      const serializedValue =
+        typeof value === 'string' ? value : JSON.stringify(value);
       const redisKey = this.getKey(key);
 
       if (ttl && ttl > 0) {
-        await this.client.setEx(redisKey, Math.floor(ttl / 1000), serializedValue);
+        await this.client.setEx(
+          redisKey,
+          Math.floor(ttl / 1000),
+          serializedValue
+        );
       } else {
         await this.client.set(redisKey, serializedValue);
       }
@@ -127,12 +132,12 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     try {
       const result = await this.client.del(this.getKey(key));
       const deleted = result > 0;
-      
+
       if (deleted) {
         this.metrics.deletes++;
         this.emit('delete', { key });
       }
-      
+
       return deleted;
     } catch (error) {
       this.metrics.errors++;
@@ -164,7 +169,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     try {
       const pattern = `${this.keyPrefix}*`;
       const keys = await this.client.keys(pattern);
-      
+
       if (keys.length > 0) {
         await this.client.del(keys);
         this.emit('clear', { clearedCount: keys.length });
@@ -204,7 +209,7 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
       hitRate: total > 0 ? this.metrics.hits / total : 0,
       size,
       memoryUsage,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
   }
 
@@ -214,12 +219,12 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     }
 
     try {
-      const searchPattern = pattern ? 
-        `${this.keyPrefix}${pattern}` : 
-        `${this.keyPrefix}*`;
-      
+      const searchPattern = pattern
+        ? `${this.keyPrefix}${pattern}`
+        : `${this.keyPrefix}*`;
+
       const keys = await this.client.keys(searchPattern);
-      
+
       // Remove prefix from keys
       return keys.map(key => key.replace(this.keyPrefix, ''));
     } catch (error) {
@@ -237,11 +242,12 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
 
     try {
       const pipeline = this.client.multi();
-      
+
       for (const [key, value] of entries) {
-        const serializedValue = typeof value === 'string' ? value : JSON.stringify(value);
+        const serializedValue =
+          typeof value === 'string' ? value : JSON.stringify(value);
         const redisKey = this.getKey(key);
-        
+
         if (ttl && ttl > 0) {
           pipeline.setEx(redisKey, Math.floor(ttl / 1000), serializedValue);
         } else {
@@ -267,9 +273,9 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     try {
       const redisKeys = keys.map(key => this.getKey(key));
       const values = await this.client.mGet(redisKeys);
-      
+
       const result = new Map<string, T>();
-      
+
       for (let i = 0; i < keys.length; i++) {
         const value = values[i];
         const key = keys[i];
@@ -305,7 +311,10 @@ export class RedisCacheProvider extends EventEmitter implements ICacheProvider {
     }
 
     try {
-      const result = await this.client.expire(this.getKey(key), Math.floor(ttl / 1000));
+      const result = await this.client.expire(
+        this.getKey(key),
+        Math.floor(ttl / 1000)
+      );
       return result === 1;
     } catch (error) {
       this.metrics.errors++;

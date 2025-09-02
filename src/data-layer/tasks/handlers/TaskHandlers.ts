@@ -31,9 +31,15 @@ export abstract class BaseTaskHandler implements ITaskHandler {
     logger.info(`Shutting down task handler: ${this.name}`);
   }
 
-  public abstract execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult>;
+  public abstract execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult>;
 
-  public async beforeExecute(task: ITask, context: ITaskExecutionContext): Promise<void> {
+  public async beforeExecute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<void> {
     logger.debug(`Starting execution of task: ${task.id}`, {
       taskName: task.name,
       taskType: task.type,
@@ -66,7 +72,10 @@ export abstract class BaseTaskHandler implements ITaskHandler {
     });
 
     // Default retry logic - retry if error is retryable and we haven't exceeded max attempts
-    return error.retryable && task.currentExecution!.attempt < task.definition.retryPolicy.maxAttempts;
+    return (
+      error.retryable &&
+      task.currentExecution!.attempt < task.definition.retryPolicy.maxAttempts
+    );
   }
 
   protected createSuccessResult(data?: any, summary?: string): ITaskResult {
@@ -78,7 +87,10 @@ export abstract class BaseTaskHandler implements ITaskHandler {
     };
   }
 
-  protected createErrorResult(message: string, code: string = 'TASK_ERROR'): ITaskError {
+  protected createErrorResult(
+    message: string,
+    code: string = 'TASK_ERROR'
+  ): ITaskError {
     return {
       code,
       message,
@@ -98,12 +110,17 @@ export class DataIngestionTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.DATA_INGESTION];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { source, pipeline, parameters } = task.definition.parameters;
 
       if (!source || !pipeline) {
-        throw new Error('Data source and pipeline are required for ingestion tasks');
+        throw new Error(
+          'Data source and pipeline are required for ingestion tasks'
+        );
       }
 
       logger.info('Starting data ingestion', {
@@ -116,7 +133,7 @@ export class DataIngestionTaskHandler extends BaseTaskHandler {
       // Simulate data ingestion process
       // In a real implementation, this would integrate with the DataIngestionEngine
       const startTime = Date.now();
-      
+
       // Mock ingestion metrics
       const recordsProcessed = Math.floor(Math.random() * 10000) + 1000;
       const processingTime = Date.now() - startTime;
@@ -138,9 +155,11 @@ export class DataIngestionTaskHandler extends BaseTaskHandler {
     }
   }
 
-  public async estimateResources(parameters: Record<string, any>): Promise<IResourceRequirements> {
+  public async estimateResources(
+    parameters: Record<string, any>
+  ): Promise<IResourceRequirements> {
     const recordCount = parameters.expectedRecords || 1000;
-    
+
     // Estimate resources based on record count
     return {
       memory: Math.min(Math.max(recordCount / 100, 256), 2048), // 256MB - 2GB
@@ -159,7 +178,10 @@ export class ThreatAnalysisTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.THREAT_ANALYSIS];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { indicators, analysisType, options } = task.definition.parameters;
 
@@ -175,7 +197,7 @@ export class ThreatAnalysisTaskHandler extends BaseTaskHandler {
 
       // Simulate threat analysis
       const startTime = Date.now();
-      
+
       // Mock analysis results
       const analysisResults = {
         totalIndicators: indicators.length,
@@ -205,9 +227,11 @@ export class ThreatAnalysisTaskHandler extends BaseTaskHandler {
     }
   }
 
-  public async estimateResources(parameters: Record<string, any>): Promise<IResourceRequirements> {
+  public async estimateResources(
+    parameters: Record<string, any>
+  ): Promise<IResourceRequirements> {
     const indicatorCount = parameters.indicators?.length || 100;
-    
+
     return {
       memory: Math.min(Math.max(indicatorCount * 2, 512), 4096), // 512MB - 4GB
       cpu: Math.min(indicatorCount / 1000, 4), // Up to 4 CPU units
@@ -225,7 +249,10 @@ export class IOCProcessingTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.IOC_PROCESSING];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { iocs, operations, enrichment } = task.definition.parameters;
 
@@ -241,7 +268,7 @@ export class IOCProcessingTaskHandler extends BaseTaskHandler {
       });
 
       const startTime = Date.now();
-      
+
       // Mock IOC processing results
       const processingResults = {
         totalIOCs: iocs.length,
@@ -285,12 +312,17 @@ export class EvidenceCollectionTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.EVIDENCE_COLLECTION];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { sources, types, preservationLevel } = task.definition.parameters;
 
       if (!sources || !Array.isArray(sources)) {
-        throw new Error('Evidence sources are required for evidence collection');
+        throw new Error(
+          'Evidence sources are required for evidence collection'
+        );
       }
 
       logger.info('Starting evidence collection', {
@@ -301,7 +333,7 @@ export class EvidenceCollectionTaskHandler extends BaseTaskHandler {
       });
 
       const startTime = Date.now();
-      
+
       // Mock evidence collection results
       const collectionResults = {
         totalSources: sources.length,
@@ -347,12 +379,17 @@ export class ReportGenerationTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.REPORT_GENERATION];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { template, data, format, recipients } = task.definition.parameters;
 
       if (!template || !data) {
-        throw new Error('Report template and data are required for report generation');
+        throw new Error(
+          'Report template and data are required for report generation'
+        );
       }
 
       logger.info('Starting report generation', {
@@ -363,14 +400,19 @@ export class ReportGenerationTaskHandler extends BaseTaskHandler {
       });
 
       const startTime = Date.now();
-      
+
       // Mock report generation
       const reportResults = {
         template,
         format: format || 'pdf',
         pages: Math.floor(Math.random() * 50) + 10,
         sizeBytes: Math.floor(Math.random() * 5000000) + 100000,
-        sections: ['executive_summary', 'findings', 'recommendations', 'appendices'],
+        sections: [
+          'executive_summary',
+          'findings',
+          'recommendations',
+          'appendices',
+        ],
         charts: Math.floor(Math.random() * 10) + 5,
         tables: Math.floor(Math.random() * 20) + 10,
         recipients: recipients || [],
@@ -405,12 +447,18 @@ export class AlertingTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.ALERTING];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
-      const { alertType, severity, recipients, channels, conditions } = task.definition.parameters;
+      const { alertType, severity, recipients, channels, conditions } =
+        task.definition.parameters;
 
       if (!alertType || !recipients) {
-        throw new Error('Alert type and recipients are required for alerting tasks');
+        throw new Error(
+          'Alert type and recipients are required for alerting tasks'
+        );
       }
 
       logger.info('Starting alerting task', {
@@ -422,7 +470,7 @@ export class AlertingTaskHandler extends BaseTaskHandler {
       });
 
       const startTime = Date.now();
-      
+
       // Mock alert delivery
       const alertResults = {
         alertType,
@@ -467,7 +515,10 @@ export class DataEnrichmentTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.DATA_ENRICHMENT];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
       const { data, sources, enrichmentTypes } = task.definition.parameters;
 
@@ -479,20 +530,30 @@ export class DataEnrichmentTaskHandler extends BaseTaskHandler {
         taskId: task.id,
         dataCount: Array.isArray(data) ? data.length : 1,
         sources,
-        enrichmentTypes: enrichmentTypes || ['geolocation', 'reputation', 'metadata'],
+        enrichmentTypes: enrichmentTypes || [
+          'geolocation',
+          'reputation',
+          'metadata',
+        ],
       });
 
       const startTime = Date.now();
-      
+
       // Mock enrichment results
       const enrichmentResults = {
         totalItems: Array.isArray(data) ? data.length : 1,
         enrichedItems: Array.isArray(data) ? Math.floor(data.length * 0.85) : 1,
         failedItems: Array.isArray(data) ? Math.floor(data.length * 0.15) : 0,
         sources,
-        enrichmentTypes: enrichmentTypes || ['geolocation', 'reputation', 'metadata'],
+        enrichmentTypes: enrichmentTypes || [
+          'geolocation',
+          'reputation',
+          'metadata',
+        ],
         enrichmentStats: {
-          geolocation: Math.floor((Array.isArray(data) ? data.length : 1) * 0.7),
+          geolocation: Math.floor(
+            (Array.isArray(data) ? data.length : 1) * 0.7
+          ),
           reputation: Math.floor((Array.isArray(data) ? data.length : 1) * 0.8),
           metadata: Math.floor((Array.isArray(data) ? data.length : 1) * 0.9),
         },
@@ -525,9 +586,13 @@ export class CorrelationAnalysisTaskHandler extends BaseTaskHandler {
   public readonly version = '1.0.0';
   public readonly supportedTypes = [TaskType.CORRELATION_ANALYSIS];
 
-  public async execute(task: ITask, context: ITaskExecutionContext): Promise<ITaskResult> {
+  public async execute(
+    task: ITask,
+    context: ITaskExecutionContext
+  ): Promise<ITaskResult> {
     try {
-      const { datasets, correlationTypes, threshold } = task.definition.parameters;
+      const { datasets, correlationTypes, threshold } =
+        task.definition.parameters;
 
       if (!datasets || !Array.isArray(datasets)) {
         throw new Error('Datasets array is required for correlation analysis');
@@ -536,17 +601,28 @@ export class CorrelationAnalysisTaskHandler extends BaseTaskHandler {
       logger.info('Starting correlation analysis', {
         taskId: task.id,
         datasetCount: datasets.length,
-        correlationTypes: correlationTypes || ['temporal', 'attributional', 'behavioral'],
+        correlationTypes: correlationTypes || [
+          'temporal',
+          'attributional',
+          'behavioral',
+        ],
         threshold: threshold || 0.7,
       });
 
       const startTime = Date.now();
-      
+
       // Mock correlation results
       const correlationResults = {
         totalDatasets: datasets.length,
-        totalRecords: datasets.reduce((sum: number, ds: any) => sum + (ds.recordCount || 100), 0),
-        correlationTypes: correlationTypes || ['temporal', 'attributional', 'behavioral'],
+        totalRecords: datasets.reduce(
+          (sum: number, ds: any) => sum + (ds.recordCount || 100),
+          0
+        ),
+        correlationTypes: correlationTypes || [
+          'temporal',
+          'attributional',
+          'behavioral',
+        ],
         threshold: threshold || 0.7,
         correlations: {
           found: Math.floor(Math.random() * 50) + 10,

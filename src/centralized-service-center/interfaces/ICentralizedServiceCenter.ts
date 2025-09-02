@@ -51,7 +51,13 @@ export interface IUnifiedPlatformService {
   name: string;
   description: string;
   version: string;
-  category: 'core' | 'analytics' | 'intelligence' | 'workflow' | 'integration' | 'security';
+  category:
+    | 'core'
+    | 'analytics'
+    | 'intelligence'
+    | 'workflow'
+    | 'integration'
+    | 'security';
   status: 'active' | 'inactive' | 'maintenance' | 'error';
   capabilities: string[];
   endpoints: IServiceEndpoint[];
@@ -260,7 +266,9 @@ export interface ICentralizedServiceCenter extends EventEmitter {
   /**
    * Execute operation on any service
    */
-  executeOperation(request: IServiceOperationRequest): Promise<IUnifiedResponse>;
+  executeOperation(
+    request: IServiceOperationRequest
+  ): Promise<IUnifiedResponse>;
 
   /**
    * Get platform-wide status
@@ -285,7 +293,9 @@ export interface ICentralizedServiceCenter extends EventEmitter {
   /**
    * Search services by capability
    */
-  findServicesByCapability(capability: string): Promise<IUnifiedPlatformService[]>;
+  findServicesByCapability(
+    capability: string
+  ): Promise<IUnifiedPlatformService[]>;
 
   /**
    * Get service dependencies

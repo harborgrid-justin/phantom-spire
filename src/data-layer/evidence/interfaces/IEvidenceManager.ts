@@ -3,39 +3,94 @@
  * Fortune 100-grade service layer for evidence operations
  */
 
-import { IEvidence, EvidenceType, EvidenceSourceType, ClassificationLevel, IRetentionPolicy } from './IEvidence.js';
+import {
+  IEvidence,
+  EvidenceType,
+  EvidenceSourceType,
+  ClassificationLevel,
+  IRetentionPolicy,
+} from './IEvidence.js';
 import { IQueryContext, IDataRecord } from '../../interfaces/IDataSource.js';
 
 export interface IEvidenceManager {
   // Core evidence operations
-  createEvidence(evidence: ICreateEvidenceRequest, context: IEvidenceContext): Promise<IEvidence>;
-  getEvidence(evidenceId: string, context: IEvidenceContext): Promise<IEvidence | null>;
-  updateEvidence(evidenceId: string, updates: IUpdateEvidenceRequest, context: IEvidenceContext): Promise<IEvidence>;
+  createEvidence(
+    evidence: ICreateEvidenceRequest,
+    context: IEvidenceContext
+  ): Promise<IEvidence>;
+  getEvidence(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<IEvidence | null>;
+  updateEvidence(
+    evidenceId: string,
+    updates: IUpdateEvidenceRequest,
+    context: IEvidenceContext
+  ): Promise<IEvidence>;
   deleteEvidence(evidenceId: string, context: IEvidenceContext): Promise<void>;
-  
+
   // Evidence search and query
-  searchEvidence(query: IEvidenceQuery, context: IEvidenceContext): Promise<IEvidenceSearchResult>;
-  findRelatedEvidence(evidenceId: string, context: IEvidenceContext): Promise<IEvidence[]>;
-  
+  searchEvidence(
+    query: IEvidenceQuery,
+    context: IEvidenceContext
+  ): Promise<IEvidenceSearchResult>;
+  findRelatedEvidence(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<IEvidence[]>;
+
   // Chain of custody operations
-  addCustodyEntry(evidenceId: string, entry: IAddCustodyEntryRequest, context: IEvidenceContext): Promise<void>;
-  getCustodyChain(evidenceId: string, context: IEvidenceContext): Promise<IChainOfCustodyEntry[]>;
-  verifyCustodyChain(evidenceId: string, context: IEvidenceContext): Promise<ICustodyVerificationResult>;
-  
+  addCustodyEntry(
+    evidenceId: string,
+    entry: IAddCustodyEntryRequest,
+    context: IEvidenceContext
+  ): Promise<void>;
+  getCustodyChain(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<IChainOfCustodyEntry[]>;
+  verifyCustodyChain(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<ICustodyVerificationResult>;
+
   // Evidence integrity
-  verifyIntegrity(evidenceId: string, context: IEvidenceContext): Promise<IIntegrityVerificationResult>;
-  recalculateHash(evidenceId: string, context: IEvidenceContext): Promise<string>;
-  
+  verifyIntegrity(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<IIntegrityVerificationResult>;
+  recalculateHash(
+    evidenceId: string,
+    context: IEvidenceContext
+  ): Promise<string>;
+
   // Evidence relationships
-  addRelationship(sourceId: string, targetId: string, relationship: IAddRelationshipRequest, context: IEvidenceContext): Promise<void>;
-  removeRelationship(relationshipId: string, context: IEvidenceContext): Promise<void>;
-  
+  addRelationship(
+    sourceId: string,
+    targetId: string,
+    relationship: IAddRelationshipRequest,
+    context: IEvidenceContext
+  ): Promise<void>;
+  removeRelationship(
+    relationshipId: string,
+    context: IEvidenceContext
+  ): Promise<void>;
+
   // Bulk operations
-  bulkCreateEvidence(evidenceList: ICreateEvidenceRequest[], context: IEvidenceContext): Promise<IBulkOperationResult>;
-  bulkUpdateEvidence(updates: IBulkUpdateRequest[], context: IEvidenceContext): Promise<IBulkOperationResult>;
-  
+  bulkCreateEvidence(
+    evidenceList: ICreateEvidenceRequest[],
+    context: IEvidenceContext
+  ): Promise<IBulkOperationResult>;
+  bulkUpdateEvidence(
+    updates: IBulkUpdateRequest[],
+    context: IEvidenceContext
+  ): Promise<IBulkOperationResult>;
+
   // Analytics and reporting
-  generateEvidenceReport(query: IEvidenceReportQuery, context: IEvidenceContext): Promise<IEvidenceReport>;
+  generateEvidenceReport(
+    query: IEvidenceReportQuery,
+    context: IEvidenceContext
+  ): Promise<IEvidenceReport>;
   getEvidenceMetrics(timeRange?: ITimeRange): Promise<IEvidenceMetrics>;
 }
 

@@ -7,11 +7,11 @@ import { EvidenceManagementService } from '../../data-layer/evidence/services/Ev
 import {
   EvidenceType,
   EvidenceSourceType,
-  ClassificationLevel
+  ClassificationLevel,
 } from '../../data-layer/evidence/interfaces/IEvidence.js';
 import {
   IEvidenceContext,
-  ICreateEvidenceRequest
+  ICreateEvidenceRequest,
 } from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
 
 describe('Evidence Management Service - Basic Tests', () => {
@@ -20,14 +20,14 @@ describe('Evidence Management Service - Basic Tests', () => {
 
   beforeEach(() => {
     evidenceService = new EvidenceManagementService();
-    
+
     testContext = {
       userId: 'test-user-123',
       userRole: 'analyst',
       permissions: ['evidence:read', 'evidence:write'],
       classification: ClassificationLevel.TLP_AMBER,
       sessionId: 'test-session-456',
-      ipAddress: '192.168.1.100'
+      ipAddress: '192.168.1.100',
     };
   });
 
@@ -40,19 +40,22 @@ describe('Evidence Management Service - Basic Tests', () => {
         sourceSystem: 'phantom-spire-test',
         data: {
           value: '192.168.1.100',
-          type: 'ip'
+          type: 'ip',
         },
         metadata: {
           title: 'Test Evidence',
           description: 'Test evidence for basic functionality',
           severity: 'medium',
           confidence: 75,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_AMBER
+        classification: ClassificationLevel.TLP_AMBER,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
 
       expect(evidence).toBeDefined();
       expect(evidence.id).toBeDefined();
@@ -71,20 +74,26 @@ describe('Evidence Management Service - Basic Tests', () => {
         sourceSystem: 'test-system',
         data: {
           threat_actor: 'test-actor',
-          campaign: 'test-campaign'
+          campaign: 'test-campaign',
         },
         metadata: {
           title: 'Threat Intelligence',
           description: 'Test threat intelligence',
           severity: 'high',
           confidence: 90,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_GREEN
+        classification: ClassificationLevel.TLP_GREEN,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
-      const retrieved = await evidenceService.getEvidence(evidence.id, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
+      const retrieved = await evidenceService.getEvidence(
+        evidence.id,
+        testContext
+      );
 
       expect(retrieved).toBeDefined();
       expect(retrieved!.id).toBe(evidence.id);
@@ -100,17 +109,17 @@ describe('Evidence Management Service - Basic Tests', () => {
         sourceSystem: 'test-system',
         data: {
           value: 'evil.domain.com',
-          type: 'domain'
+          type: 'domain',
         },
         metadata: {
           title: 'Evil Domain',
           description: 'Malicious domain for testing',
           severity: 'high',
           confidence: 85,
-          format: 'json'
+          format: 'json',
         },
         classification: ClassificationLevel.TLP_GREEN,
-        tags: ['malware', 'domain']
+        tags: ['malware', 'domain'],
       };
 
       await evidenceService.createEvidence(request, testContext);
@@ -119,7 +128,7 @@ describe('Evidence Management Service - Basic Tests', () => {
         {
           types: [EvidenceType.IOC_EVIDENCE],
           tags: ['malware'],
-          limit: 10
+          limit: 10,
         },
         testContext
       );
@@ -143,9 +152,9 @@ describe('Evidence Management Service - Basic Tests', () => {
             description: 'Test for metrics',
             severity: 'medium',
             confidence: 70,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_GREEN
+          classification: ClassificationLevel.TLP_GREEN,
         },
         {
           type: EvidenceType.VULNERABILITY,
@@ -158,10 +167,10 @@ describe('Evidence Management Service - Basic Tests', () => {
             description: 'Test for metrics',
             severity: 'high',
             confidence: 85,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_AMBER
-        }
+          classification: ClassificationLevel.TLP_AMBER,
+        },
       ];
 
       for (const request of requests) {
@@ -187,20 +196,26 @@ describe('Evidence Management Service - Basic Tests', () => {
         sourceSystem: 'test',
         data: {
           filename: 'test.exe',
-          hash: 'abc123def456'
+          hash: 'abc123def456',
         },
         metadata: {
           title: 'Integrity Test',
           description: 'Test for integrity verification',
           severity: 'medium',
           confidence: 80,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_WHITE
+        classification: ClassificationLevel.TLP_WHITE,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
-      const integrityResult = await evidenceService.verifyIntegrity(evidence.id, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
+      const integrityResult = await evidenceService.verifyIntegrity(
+        evidence.id,
+        testContext
+      );
 
       expect(integrityResult.isValid).toBe(true);
       expect(integrityResult.algorithm).toBe('sha256');
@@ -220,9 +235,9 @@ describe('Evidence Management Service - Basic Tests', () => {
             description: 'Bulk operation test',
             severity: 'low',
             confidence: 60,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_WHITE
+          classification: ClassificationLevel.TLP_WHITE,
         },
         {
           type: EvidenceType.IOC_EVIDENCE,
@@ -235,13 +250,16 @@ describe('Evidence Management Service - Basic Tests', () => {
             description: 'Bulk operation test',
             severity: 'low',
             confidence: 65,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_WHITE
-        }
+          classification: ClassificationLevel.TLP_WHITE,
+        },
       ];
 
-      const result = await evidenceService.bulkCreateEvidence(requests, testContext);
+      const result = await evidenceService.bulkCreateEvidence(
+        requests,
+        testContext
+      );
 
       expect(result.successful).toBe(2);
       expect(result.failed).toBe(0);
@@ -257,32 +275,41 @@ describe('Evidence Management Service - Basic Tests', () => {
         sourceId: 'classified-test',
         sourceSystem: 'test',
         data: {
-          sensitive_info: 'classified data'
+          sensitive_info: 'classified data',
         },
         metadata: {
           title: 'Classified Evidence',
           description: 'Evidence with high classification',
           severity: 'critical',
           confidence: 95,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.SECRET
+        classification: ClassificationLevel.SECRET,
       };
 
       // Create evidence with high classification context
       const highClassContext = {
         ...testContext,
-        classification: ClassificationLevel.SECRET
+        classification: ClassificationLevel.SECRET,
       };
-      
-      const evidence = await evidenceService.createEvidence(request, highClassContext);
+
+      const evidence = await evidenceService.createEvidence(
+        request,
+        highClassContext
+      );
 
       // Try to access with lower classification - should be denied
-      const retrieved = await evidenceService.getEvidence(evidence.id, testContext);
+      const retrieved = await evidenceService.getEvidence(
+        evidence.id,
+        testContext
+      );
       expect(retrieved).toBeNull();
 
       // Access with proper classification - should succeed
-      const retrievedWithAccess = await evidenceService.getEvidence(evidence.id, highClassContext);
+      const retrievedWithAccess = await evidenceService.getEvidence(
+        evidence.id,
+        highClassContext
+      );
       expect(retrievedWithAccess).toBeDefined();
       expect(retrievedWithAccess!.id).toBe(evidence.id);
     });

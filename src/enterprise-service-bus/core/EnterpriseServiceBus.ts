@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { v4 as uuidv4 } from 'uuid';
-import { 
+import {
   IEnterpriseServiceBus,
   IServiceDefinition,
   IServiceRequest,
@@ -15,14 +15,17 @@ import {
   IMessageTransformation,
   IServiceBusMetrics,
   IServiceHealth,
-  ITransformRule
+  ITransformRule,
 } from '../interfaces/IEnterpriseServiceBus.js';
 
 /**
  * Central Enterprise Service Bus implementation
  * Provides comprehensive service integration, routing, and transformation
  */
-export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseServiceBus {
+export class EnterpriseServiceBus
+  extends EventEmitter
+  implements IEnterpriseServiceBus
+{
   private services: Map<string, IServiceDefinition> = new Map();
   private routingRules: Map<string, IRoutingRule> = new Map();
   private transformations: Map<string, IMessageTransformation> = new Map();
@@ -47,18 +50,18 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     try {
       // Validate service definition
       this.validateServiceDefinition(definition);
-      
+
       // Register service
       this.services.set(definition.id, definition);
-      
+
       // Initialize circuit breaker
       this.circuitBreakers.set(definition.id, {
         state: 'closed',
         failureCount: 0,
         lastFailureTime: null,
-        successCount: 0
+        successCount: 0,
       });
-      
+
       // Initialize health check
       this.healthChecks.set(definition.id, {
         serviceId: definition.id,
@@ -67,12 +70,13 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
         lastCheck: new Date(),
         responseTime: 0,
         errorRate: 0,
-        issues: []
+        issues: [],
       });
 
       this.emit('service:registered', definition);
-      console.log(`✅ Service registered: ${definition.name} (${definition.id})`);
-      
+      console.log(
+        `✅ Service registered: ${definition.name} (${definition.id})`
+      );
     } catch (error) {
       console.error(`❌ Failed to register service ${definition.id}:`, error);
       throw error;
@@ -89,17 +93,19 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
       this.services.delete(serviceId);
       this.circuitBreakers.delete(serviceId);
       this.healthChecks.delete(serviceId);
-      
+
       // Remove related routing rules
       for (const [ruleId, rule] of Array.from(this.routingRules.entries())) {
-        if (rule.sourceService === serviceId || rule.targetServices.includes(serviceId)) {
+        if (
+          rule.sourceService === serviceId ||
+          rule.targetServices.includes(serviceId)
+        ) {
           this.routingRules.delete(ruleId);
         }
       }
 
       this.emit('service:unregistered', service);
       console.log(`✅ Service unregistered: ${service.name} (${serviceId})`);
-      
     } catch (error) {
       console.error(`❌ Failed to unregister service ${serviceId}:`, error);
       throw error;
@@ -119,39 +125,47 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
    */
   async processRequest(request: IServiceRequest): Promise<IServiceResponse> {
     const startTime = Date.now();
-    
+
     try {
       // Validate request
       this.validateRequest(request);
-      
+
       // Check circuit breaker
       const circuitBreakerState = this.circuitBreakers.get(request.serviceId);
       if (circuitBreakerState?.state === 'open') {
-        throw new Error(`Circuit breaker open for service ${request.serviceId}`);
+        throw new Error(
+          `Circuit breaker open for service ${request.serviceId}`
+        );
       }
-      
+
       // Apply routing rules
       const targetServices = this.applyRoutingRules(request);
-      
+
       // Apply transformations
       const transformedRequest = await this.applyTransformations(request);
-      
+
       // Process request
-      const response = await this.executeRequest(transformedRequest, targetServices);
-      
+      const response = await this.executeRequest(
+        transformedRequest,
+        targetServices
+      );
+
       // Update metrics and circuit breaker on success
       this.updateMetricsOnSuccess(request.serviceId, Date.now() - startTime);
       this.updateCircuitBreakerOnSuccess(request.serviceId);
-      
-      this.emit('request:processed', { request, response, processingTime: Date.now() - startTime });
-      
+
+      this.emit('request:processed', {
+        request,
+        response,
+        processingTime: Date.now() - startTime,
+      });
+
       return response;
-      
     } catch (error) {
       // Update metrics and circuit breaker on failure
       this.updateMetricsOnError(request.serviceId);
       this.updateCircuitBreakerOnFailure(request.serviceId);
-      
+
       const errorResponse: IServiceResponse = {
         id: uuidv4(),
         requestId: request.id,
@@ -160,16 +174,24 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
         headers: {},
         payload: null,
         processingTime: Date.now() - startTime,
-        error: error as Error
+        error: error as Error,
       };
-      
-      this.emit('request:failed', { request, error, processingTime: Date.now() - startTime });
-      
+
+      this.emit('request:failed', {
+        request,
+        error,
+        processingTime: Date.now() - startTime,
+      });
+
       return errorResponse;
     }
   }
 
-  async processAsyncMessage(serviceId: string, message: unknown, context: IRequestContext): Promise<void> {
+  async processAsyncMessage(
+    serviceId: string,
+    message: unknown,
+    context: IRequestContext
+  ): Promise<void> {
     try {
       const service = this.services.get(serviceId);
       if (!service) {
@@ -186,17 +208,22 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
         payload: message,
         context,
         timeout: 30000,
-        retries: 3
+        retries: 3,
       };
 
       // Process asynchronously
       this.processRequest(request).catch(error => {
-        console.error(`❌ Async message processing failed for ${serviceId}:`, error);
+        console.error(
+          `❌ Async message processing failed for ${serviceId}:`,
+          error
+        );
         this.emit('async:failed', { serviceId, message, error });
       });
-      
     } catch (error) {
-      console.error(`❌ Failed to process async message for ${serviceId}:`, error);
+      console.error(
+        `❌ Failed to process async message for ${serviceId}:`,
+        error
+      );
       throw error;
     }
   }
@@ -216,17 +243,21 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!rule) {
       throw new Error(`Routing rule ${ruleId} not found`);
     }
-    
+
     this.routingRules.delete(ruleId);
     this.emit('routing:rule:removed', rule);
     console.log(`✅ Routing rule removed: ${rule.name} (${ruleId})`);
   }
 
-  async addTransformation(transformation: IMessageTransformation): Promise<void> {
+  async addTransformation(
+    transformation: IMessageTransformation
+  ): Promise<void> {
     this.validateTransformation(transformation);
     this.transformations.set(transformation.id, transformation);
     this.emit('transformation:added', transformation);
-    console.log(`✅ Transformation added: ${transformation.name} (${transformation.id})`);
+    console.log(
+      `✅ Transformation added: ${transformation.name} (${transformation.id})`
+    );
   }
 
   async removeTransformation(transformationId: string): Promise<void> {
@@ -234,10 +265,12 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!transformation) {
       throw new Error(`Transformation ${transformationId} not found`);
     }
-    
+
     this.transformations.delete(transformationId);
     this.emit('transformation:removed', transformation);
-    console.log(`✅ Transformation removed: ${transformation.name} (${transformationId})`);
+    console.log(
+      `✅ Transformation removed: ${transformation.name} (${transformationId})`
+    );
   }
 
   /**
@@ -252,10 +285,10 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!health) {
       throw new Error(`Service ${serviceId} not found`);
     }
-    
+
     // Perform live health check
     await this.performHealthCheck(serviceId);
-    
+
     return this.healthChecks.get(serviceId)!;
   }
 
@@ -272,17 +305,16 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
       if (this.messageQueueManager) {
         await this.initializeMessageQueueIntegration();
       }
-      
+
       // Start health check interval
       this.startHealthCheckInterval();
-      
+
       // Start metrics collection
       this.startMetricsCollection();
-      
+
       this.started = true;
       this.emit('esb:started');
       console.log('✅ Enterprise Service Bus started successfully');
-      
     } catch (error) {
       console.error('❌ Failed to start Enterprise Service Bus:', error);
       throw error;
@@ -298,7 +330,6 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
       this.started = false;
       this.emit('esb:stopped');
       console.log('✅ Enterprise Service Bus stopped successfully');
-      
     } catch (error) {
       console.error('❌ Failed to stop Enterprise Service Bus:', error);
       throw error;
@@ -309,14 +340,14 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!this.started) {
       return false;
     }
-    
+
     // Check if any services are unhealthy
     for (const health of Array.from(this.healthChecks.values())) {
       if (health.status === 'unhealthy') {
         return false;
       }
     }
-    
+
     return true;
   }
 
@@ -327,7 +358,7 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!definition.id || !definition.name || !definition.version) {
       throw new Error('Service definition must have id, name, and version');
     }
-    
+
     if (this.services.has(definition.id)) {
       throw new Error(`Service ${definition.id} already registered`);
     }
@@ -337,20 +368,29 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!request.id || !request.serviceId || !request.context) {
       throw new Error('Invalid request: missing required fields');
     }
-    
+
     if (!this.services.has(request.serviceId)) {
       throw new Error(`Service ${request.serviceId} not registered`);
     }
   }
 
   private validateRoutingRule(rule: IRoutingRule): void {
-    if (!rule.id || !rule.name || !rule.sourceService || !rule.targetServices.length) {
+    if (
+      !rule.id ||
+      !rule.name ||
+      !rule.sourceService ||
+      !rule.targetServices.length
+    ) {
       throw new Error('Invalid routing rule: missing required fields');
     }
   }
 
   private validateTransformation(transformation: IMessageTransformation): void {
-    if (!transformation.id || !transformation.name || !transformation.transformRules.length) {
+    if (
+      !transformation.id ||
+      !transformation.name ||
+      !transformation.transformRules.length
+    ) {
       throw new Error('Invalid transformation: missing required fields');
     }
   }
@@ -365,37 +405,48 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
         return rule.targetServices;
       }
     }
-    
+
     return [request.serviceId]; // Default to original service
   }
 
-  private evaluateRoutingCondition(condition: string, _request: IServiceRequest): boolean {
+  private evaluateRoutingCondition(
+    condition: string,
+    _request: IServiceRequest
+  ): boolean {
     // Simple condition evaluation - in production, use a proper expression evaluator
     if (condition === 'always') return true;
     if (condition === 'never') return false;
-    
+
     // Add more sophisticated condition evaluation logic here
     return true;
   }
 
-  private async applyTransformations(request: IServiceRequest): Promise<IServiceRequest> {
-    const applicableTransformations = Array.from(this.transformations.values())
-      .filter(t => t.sourceFormat === 'request');
+  private async applyTransformations(
+    request: IServiceRequest
+  ): Promise<IServiceRequest> {
+    const applicableTransformations = Array.from(
+      this.transformations.values()
+    ).filter(t => t.sourceFormat === 'request');
 
     let transformedRequest = { ...request };
 
     for (const transformation of applicableTransformations) {
-      transformedRequest = await this.applyTransformation(transformedRequest, transformation);
+      transformedRequest = await this.applyTransformation(
+        transformedRequest,
+        transformation
+      );
     }
 
     return transformedRequest;
   }
 
   private async applyTransformation(
-    request: IServiceRequest, 
+    request: IServiceRequest,
     transformation: IMessageTransformation
   ): Promise<IServiceRequest> {
-    const transformedPayload = { ...request.payload as Record<string, unknown> };
+    const transformedPayload = {
+      ...(request.payload as Record<string, unknown>),
+    };
 
     for (const rule of transformation.transformRules) {
       await this.applyTransformRule(transformedPayload, rule);
@@ -404,7 +455,10 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     return { ...request, payload: transformedPayload };
   }
 
-  private async applyTransformRule(payload: Record<string, unknown>, rule: ITransformRule): Promise<void> {
+  private async applyTransformRule(
+    payload: Record<string, unknown>,
+    rule: ITransformRule
+  ): Promise<void> {
     switch (rule.operation) {
       case 'copy':
         if (payload[rule.sourceField] !== undefined) {
@@ -425,16 +479,19 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     }
   }
 
-  private async executeRequest(request: IServiceRequest, targetServices: string[]): Promise<IServiceResponse> {
+  private async executeRequest(
+    request: IServiceRequest,
+    targetServices: string[]
+  ): Promise<IServiceResponse> {
     // Simple implementation - in production, implement proper load balancing
     const targetService = targetServices[0];
-    
+
     if (!targetService) {
       throw new Error('No target service specified');
     }
-    
+
     const service = this.services.get(targetService);
-    
+
     if (!service) {
       throw new Error(`Target service ${targetService} not found`);
     }
@@ -447,13 +504,17 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
       statusCode: 200,
       headers: {},
       payload: { result: 'processed', serviceId: targetService },
-      processingTime: Math.random() * 100 + 10 // 10-110ms
+      processingTime: Math.random() * 100 + 10, // 10-110ms
     };
   }
 
-  private updateMetricsOnSuccess(_serviceId: string, processingTime: number): void {
+  private updateMetricsOnSuccess(
+    _serviceId: string,
+    processingTime: number
+  ): void {
     this.metrics.messagesProcessed++;
-    this.metrics.averageLatency = (this.metrics.averageLatency + processingTime) / 2;
+    this.metrics.averageLatency =
+      (this.metrics.averageLatency + processingTime) / 2;
     this.updateThroughput();
   }
 
@@ -471,7 +532,10 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     const circuitBreaker = this.circuitBreakers.get(serviceId);
     if (circuitBreaker) {
       circuitBreaker.successCount++;
-      if (circuitBreaker.state === 'half-open' && circuitBreaker.successCount >= 3) {
+      if (
+        circuitBreaker.state === 'half-open' &&
+        circuitBreaker.successCount >= 3
+      ) {
         circuitBreaker.state = 'closed';
         circuitBreaker.failureCount = 0;
       }
@@ -483,7 +547,7 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (circuitBreaker) {
       circuitBreaker.failureCount++;
       circuitBreaker.lastFailureTime = new Date();
-      
+
       if (circuitBreaker.failureCount >= 5) {
         circuitBreaker.state = 'open';
       }
@@ -495,17 +559,16 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
     if (!health) return;
 
     const startTime = Date.now();
-    
+
     try {
       // Perform actual health check - simplified implementation
       const isHealthy = true; // In production, perform real health check
       const responseTime = Date.now() - startTime;
-      
+
       health.status = isHealthy ? 'healthy' : 'unhealthy';
       health.lastCheck = new Date();
       health.responseTime = responseTime;
       health.issues = isHealthy ? [] : ['Health check failed'];
-      
     } catch (error) {
       health.status = 'unhealthy';
       health.lastCheck = new Date();
@@ -522,12 +585,12 @@ export class EnterpriseServiceBus extends EventEmitter implements IEnterpriseSer
       throughput: 0,
       activeConnections: 0,
       queueDepth: 0,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
   private setupEventHandlers(): void {
-    this.on('error', (error) => {
+    this.on('error', error => {
       console.error('🚨 ESB Error:', error);
     });
   }
@@ -570,9 +633,9 @@ interface IESBConfiguration {
 
 const DEFAULT_ESB_CONFIG: IESBConfiguration = {
   healthCheckInterval: 30000, // 30 seconds
-  metricsInterval: 10000,     // 10 seconds
+  metricsInterval: 10000, // 10 seconds
   circuitBreakerThreshold: 5,
-  defaultTimeout: 30000       // 30 seconds
+  defaultTimeout: 30000, // 30 seconds
 };
 
 export { EnterpriseServiceBus as ESB, IESBConfiguration, DEFAULT_ESB_CONFIG };

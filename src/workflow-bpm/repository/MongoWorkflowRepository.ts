@@ -3,7 +3,10 @@
  * Fortune 100-Grade persistence layer for workflow definitions and instances with app-specific logger
  */
 
-import { IWorkflowDefinition, IWorkflowInstance } from '../interfaces/IWorkflowEngine.js';
+import {
+  IWorkflowDefinition,
+  IWorkflowInstance,
+} from '../interfaces/IWorkflowEngine.js';
 import { logger } from '../../utils/logger.js';
 
 export class MongoWorkflowRepository {
@@ -41,13 +44,20 @@ export class MongoWorkflowRepository {
     return null;
   }
 
-  async getWorkflowInstancesByWorkflowId(workflowId: string): Promise<IWorkflowInstance[]> {
-    this.logger.info(`Retrieving workflow instances for workflow: ${workflowId}`);
+  async getWorkflowInstancesByWorkflowId(
+    workflowId: string
+  ): Promise<IWorkflowInstance[]> {
+    this.logger.info(
+      `Retrieving workflow instances for workflow: ${workflowId}`
+    );
     // TODO: Implement MongoDB retrieval logic
     return [];
   }
 
-  async updateWorkflowInstanceStatus(id: string, status: string): Promise<void> {
+  async updateWorkflowInstanceStatus(
+    id: string,
+    status: string
+  ): Promise<void> {
     this.logger.info(`Updating workflow instance ${id} status to: ${status}`);
     // TODO: Implement MongoDB update logic
   }

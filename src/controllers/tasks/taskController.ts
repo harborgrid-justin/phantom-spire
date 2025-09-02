@@ -34,7 +34,7 @@ export class TaskController {
 
       const taskDefinition = req.body;
 
-      // Add security context from request  
+      // Add security context from request
       taskDefinition.createdBy = (req as any).user?.id || 'anonymous';
       taskDefinition.permissions = (req as any).user?.permissions || [];
 
@@ -71,7 +71,7 @@ export class TaskController {
         res.status(400).json({ error: 'Task ID is required' });
         return;
       }
-      
+
       const task = await this.taskManager.getTask(taskId);
 
       if (!task) {
@@ -114,7 +114,7 @@ export class TaskController {
         res.status(400).json({ error: 'Task ID is required' });
         return;
       }
-      
+
       const updates = req.body;
 
       const task = await this.taskManager.updateTask(taskId, updates);
@@ -130,7 +130,10 @@ export class TaskController {
         message: 'Task updated successfully',
       });
     } catch (error) {
-      logger.error('Failed to update task', { error, taskId: req.params.taskId });
+      logger.error('Failed to update task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to update task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -148,7 +151,7 @@ export class TaskController {
         res.status(400).json({ error: 'Task ID is required' });
         return;
       }
-      
+
       const deleted = await this.taskManager.deleteTask(taskId);
 
       if (!deleted) {
@@ -166,7 +169,10 @@ export class TaskController {
         message: 'Task deleted successfully',
       });
     } catch (error) {
-      logger.error('Failed to delete task', { error, taskId: req.params.taskId });
+      logger.error('Failed to delete task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to delete task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -184,7 +190,7 @@ export class TaskController {
         res.status(400).json({ error: 'Task ID is required' });
         return;
       }
-      
+
       const context = req.body.context || {};
 
       // Add user context
@@ -204,7 +210,10 @@ export class TaskController {
         message: 'Task execution started',
       });
     } catch (error) {
-      logger.error('Failed to execute task', { error, taskId: req.params.taskId });
+      logger.error('Failed to execute task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to execute task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -239,7 +248,10 @@ export class TaskController {
         message: 'Task cancelled successfully',
       });
     } catch (error) {
-      logger.error('Failed to cancel task', { error, taskId: req.params.taskId });
+      logger.error('Failed to cancel task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to cancel task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -274,7 +286,10 @@ export class TaskController {
         message: 'Task paused successfully',
       });
     } catch (error) {
-      logger.error('Failed to pause task', { error, taskId: req.params.taskId });
+      logger.error('Failed to pause task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to pause task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -309,7 +324,10 @@ export class TaskController {
         message: 'Task resumed successfully',
       });
     } catch (error) {
-      logger.error('Failed to resume task', { error, taskId: req.params.taskId });
+      logger.error('Failed to resume task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to resume task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -340,7 +358,10 @@ export class TaskController {
         message: 'Task retry initiated',
       });
     } catch (error) {
-      logger.error('Failed to retry task', { error, taskId: req.params.taskId });
+      logger.error('Failed to retry task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to retry task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -357,20 +378,20 @@ export class TaskController {
 
       // Parse query parameters
       if (req.query.types) {
-        query.types = Array.isArray(req.query.types) 
-          ? req.query.types as TaskType[] 
+        query.types = Array.isArray(req.query.types)
+          ? (req.query.types as TaskType[])
           : [req.query.types as TaskType];
       }
 
       if (req.query.statuses) {
-        query.statuses = Array.isArray(req.query.statuses) 
-          ? req.query.statuses as TaskStatus[] 
+        query.statuses = Array.isArray(req.query.statuses)
+          ? (req.query.statuses as TaskStatus[])
           : [req.query.statuses as TaskStatus];
       }
 
       if (req.query.priorities) {
-        query.priorities = Array.isArray(req.query.priorities) 
-          ? req.query.priorities as TaskPriority[] 
+        query.priorities = Array.isArray(req.query.priorities)
+          ? (req.query.priorities as TaskPriority[])
           : [req.query.priorities as TaskPriority];
       }
 
@@ -383,8 +404,8 @@ export class TaskController {
       }
 
       if (req.query.tags) {
-        query.tags = Array.isArray(req.query.tags) 
-          ? req.query.tags as string[] 
+        query.tags = Array.isArray(req.query.tags)
+          ? (req.query.tags as string[])
           : [req.query.tags as string];
       }
 
@@ -443,7 +464,7 @@ export class TaskController {
   public searchTasks = async (req: Request, res: Response): Promise<void> => {
     try {
       const { q } = req.query;
-      
+
       if (!q || typeof q !== 'string') {
         res.status(400).json({
           error: 'Search query is required',
@@ -453,8 +474,12 @@ export class TaskController {
       }
 
       const options = {
-        fields: req.query.fields ? (req.query.fields as string).split(',') : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+        fields: req.query.fields
+          ? (req.query.fields as string).split(',')
+          : undefined,
+        limit: req.query.limit
+          ? parseInt(req.query.limit as string, 10)
+          : undefined,
       };
 
       const result = await this.taskManager.searchTasks(q, options);
@@ -495,7 +520,10 @@ export class TaskController {
         data: { taskId, status },
       });
     } catch (error) {
-      logger.error('Failed to get task status', { error, taskId: req.params.taskId });
+      logger.error('Failed to get task status', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to get task status',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -506,7 +534,10 @@ export class TaskController {
   /**
    * Get task metrics
    */
-  public getTaskMetrics = async (req: Request, res: Response): Promise<void> => {
+  public getTaskMetrics = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const taskId = req.params.taskId;
       if (!taskId) {
@@ -520,7 +551,10 @@ export class TaskController {
         data: { taskId, metrics },
       });
     } catch (error) {
-      logger.error('Failed to get task metrics', { error, taskId: req.params.taskId });
+      logger.error('Failed to get task metrics', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to get task metrics',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -531,7 +565,10 @@ export class TaskController {
   /**
    * Get task execution history
    */
-  public getTaskHistory = async (req: Request, res: Response): Promise<void> => {
+  public getTaskHistory = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const taskId = req.params.taskId;
       if (!taskId) {
@@ -545,7 +582,10 @@ export class TaskController {
         data: { taskId, history },
       });
     } catch (error) {
-      logger.error('Failed to get task history', { error, taskId: req.params.taskId });
+      logger.error('Failed to get task history', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to get task history',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -564,9 +604,9 @@ export class TaskController {
         return;
       }
       const { executionId } = req.query;
-      
+
       const logs = await this.taskManager.getTaskLogs(
-        taskId, 
+        taskId,
         executionId as string | undefined
       );
 
@@ -575,7 +615,10 @@ export class TaskController {
         data: { taskId, executionId, logs },
       });
     } catch (error) {
-      logger.error('Failed to get task logs', { error, taskId: req.params.taskId });
+      logger.error('Failed to get task logs', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to get task logs',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -622,7 +665,10 @@ export class TaskController {
         data: { taskId, schedule },
       });
     } catch (error) {
-      logger.error('Failed to schedule task', { error, taskId: req.params.taskId });
+      logger.error('Failed to schedule task', {
+        error,
+        taskId: req.params.taskId,
+      });
       res.status(500).json({
         error: 'Failed to schedule task',
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -633,7 +679,10 @@ export class TaskController {
   /**
    * Get system health and metrics
    */
-  public getSystemHealth = async (req: Request, res: Response): Promise<void> => {
+  public getSystemHealth = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const health = await this.taskManager.healthCheck();
       const metrics = await this.taskManager.getSystemMetrics();
@@ -658,7 +707,10 @@ export class TaskController {
   /**
    * Get resource usage information
    */
-  public getResourceUsage = async (req: Request, res: Response): Promise<void> => {
+  public getResourceUsage = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const usage = await this.taskManager.getResourceUsage();
       const available = await this.taskManager.getAvailableResources();
@@ -686,14 +738,33 @@ export class TaskController {
  */
 export const createTaskValidation = [
   body('name').isString().notEmpty().withMessage('Task name is required'),
-  body('type').isIn(Object.values(TaskType)).withMessage('Valid task type is required'),
-  body('definition').isObject().notEmpty().withMessage('Task definition is required'),
-  body('definition.handler').isString().notEmpty().withMessage('Task handler is required'),
-  body('definition.parameters').isObject().withMessage('Task parameters must be an object'),
-  body('definition.timeout').optional().isInt({ min: 1000 }).withMessage('Timeout must be at least 1000ms'),
-  body('priority').optional().isIn(Object.values(TaskPriority)).withMessage('Invalid task priority'),
+  body('type')
+    .isIn(Object.values(TaskType))
+    .withMessage('Valid task type is required'),
+  body('definition')
+    .isObject()
+    .notEmpty()
+    .withMessage('Task definition is required'),
+  body('definition.handler')
+    .isString()
+    .notEmpty()
+    .withMessage('Task handler is required'),
+  body('definition.parameters')
+    .isObject()
+    .withMessage('Task parameters must be an object'),
+  body('definition.timeout')
+    .optional()
+    .isInt({ min: 1000 })
+    .withMessage('Timeout must be at least 1000ms'),
+  body('priority')
+    .optional()
+    .isIn(Object.values(TaskPriority))
+    .withMessage('Invalid task priority'),
   body('tags').optional().isArray().withMessage('Tags must be an array'),
-  body('metadata').optional().isObject().withMessage('Metadata must be an object'),
+  body('metadata')
+    .optional()
+    .isObject()
+    .withMessage('Metadata must be an object'),
 ];
 
 /**
@@ -701,10 +772,20 @@ export const createTaskValidation = [
  */
 export const updateTaskValidation = [
   param('taskId').isUUID().withMessage('Valid task ID is required'),
-  body('name').optional().isString().notEmpty().withMessage('Task name must be a non-empty string'),
-  body('priority').optional().isIn(Object.values(TaskPriority)).withMessage('Invalid task priority'),
+  body('name')
+    .optional()
+    .isString()
+    .notEmpty()
+    .withMessage('Task name must be a non-empty string'),
+  body('priority')
+    .optional()
+    .isIn(Object.values(TaskPriority))
+    .withMessage('Invalid task priority'),
   body('tags').optional().isArray().withMessage('Tags must be an array'),
-  body('metadata').optional().isObject().withMessage('Metadata must be an object'),
+  body('metadata')
+    .optional()
+    .isObject()
+    .withMessage('Metadata must be an object'),
 ];
 
 /**
@@ -712,10 +793,21 @@ export const updateTaskValidation = [
  */
 export const scheduleTaskValidation = [
   param('taskId').isUUID().withMessage('Valid task ID is required'),
-  body('type').isIn(['once', 'recurring', 'event_driven']).withMessage('Valid schedule type is required'),
-  body('executeAt').optional().isISO8601().withMessage('Execute at must be a valid ISO8601 date'),
-  body('cronExpression').optional().isString().withMessage('Cron expression must be a string'),
-  body('interval').optional().isInt({ min: 1000 }).withMessage('Interval must be at least 1000ms'),
+  body('type')
+    .isIn(['once', 'recurring', 'event_driven'])
+    .withMessage('Valid schedule type is required'),
+  body('executeAt')
+    .optional()
+    .isISO8601()
+    .withMessage('Execute at must be a valid ISO8601 date'),
+  body('cronExpression')
+    .optional()
+    .isString()
+    .withMessage('Cron expression must be a string'),
+  body('interval')
+    .optional()
+    .isInt({ min: 1000 })
+    .withMessage('Interval must be at least 1000ms'),
 ];
 
 /**

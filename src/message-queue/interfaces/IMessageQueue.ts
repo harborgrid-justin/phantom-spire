@@ -119,7 +119,10 @@ export interface IPublishResult {
 }
 
 export interface IMessageHandler<T = Record<string, unknown>> {
-  handle(message: IMessage<T>, context: IMessageContext): Promise<IHandlerResult>;
+  handle(
+    message: IMessage<T>,
+    context: IMessageContext
+  ): Promise<IHandlerResult>;
 }
 
 export interface IMessageContext {

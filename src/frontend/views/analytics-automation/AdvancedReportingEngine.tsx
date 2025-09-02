@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -76,8 +70,6 @@ import {
   MenuItem as MenuItemComponent,
   ListItemButton,
   Collapse,
-  TreeView,
-  TreeItem,
   Breadcrumbs,
   Link,
   RadioGroup,
@@ -85,9 +77,6 @@ import {
   FormLabel,
   Checkbox,
   FormGroup,
-  DatePicker,
-  TimePicker,
-  DateTimePicker
 } from '@mui/material';
 
 import {
@@ -112,8 +101,8 @@ import {
   Edit,
   Delete,
   Add,
-  Copy,
-  Paste,
+  ContentCopy,
+  ContentPaste,
   Save,
   SaveAs,
   FolderOpen,
@@ -188,7 +177,10 @@ import {
   InsertChart,
   InsertDriveFile,
   InsertLink,
-  InsertPhoto
+  InsertPhoto,
+  History,
+  Star,
+  ContentCopy as Copy
 } from '@mui/icons-material';
 
 import {
@@ -220,7 +212,6 @@ import {
   LabelList
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
 
 // Report template interfaces
 interface ReportTemplate {
@@ -416,17 +407,6 @@ const AdvancedReportingEngine: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [authorFilter, setAuthorFilter] = useState<string>('all');
 
-  // Initialize UI/UX Evaluation
-  useEffect(() => {
-    const evaluationController = addUIUXEvaluation('advanced-reporting-engine', {
-      continuous: true,
-      position: 'top-right',
-      minimized: true,
-      interval: 180000
-    });
-
-    return () => evaluationController.remove();
-  }, []);
 
   // Generate mock report templates
   const generateMockTemplates = useCallback((): ReportTemplate[] => {

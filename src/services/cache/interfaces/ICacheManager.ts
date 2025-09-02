@@ -6,14 +6,14 @@
 export enum CacheLayer {
   MEMORY = 'memory',
   REDIS = 'redis',
-  PERSISTENT = 'persistent'
+  PERSISTENT = 'persistent',
 }
 
 export enum CacheStrategy {
   LRU = 'lru',
   LFU = 'lfu',
   FIFO = 'fifo',
-  TTL = 'ttl'
+  TTL = 'ttl',
 }
 
 export interface ICacheOptions {
@@ -93,42 +93,59 @@ export interface ICacheManager {
   set<T>(key: string, value: T, options?: ICacheOptions): Promise<void>;
   delete(key: string, options?: ICacheOptions): Promise<boolean>;
   exists(key: string, options?: ICacheOptions): Promise<boolean>;
-  
+
   // Bulk operations
-  getMultiple<T>(keys: string[], options?: ICacheOptions): Promise<Map<string, T>>;
-  setMultiple<T>(entries: Map<string, T>, options?: ICacheOptions): Promise<void>;
+  getMultiple<T>(
+    keys: string[],
+    options?: ICacheOptions
+  ): Promise<Map<string, T>>;
+  setMultiple<T>(
+    entries: Map<string, T>,
+    options?: ICacheOptions
+  ): Promise<void>;
   deleteMultiple(keys: string[], options?: ICacheOptions): Promise<number>;
-  
+
   // Pattern operations
-  getByPattern<T>(pattern: string, options?: ICacheOptions): Promise<Map<string, T>>;
+  getByPattern<T>(
+    pattern: string,
+    options?: ICacheOptions
+  ): Promise<Map<string, T>>;
   deleteByPattern(pattern: string, options?: ICacheOptions): Promise<number>;
-  
+
   // Tag operations
-  getByTags<T>(tags: string[], options?: ICacheOptions): Promise<Map<string, T>>;
+  getByTags<T>(
+    tags: string[],
+    options?: ICacheOptions
+  ): Promise<Map<string, T>>;
   deleteByTags(tags: string[], options?: ICacheOptions): Promise<number>;
-  
+
   // Namespace operations
   clearNamespace(namespace: string): Promise<number>;
   getNamespaceSize(namespace: string): Promise<number>;
-  
+
   // Analytics and monitoring
   getMetrics(layer?: CacheLayer): Promise<ICacheMetrics>;
   getHitRate(timeWindow?: number): Promise<number>;
-  getTopKeys(limit?: number): Promise<Array<{ key: string; accessCount: number }>>;
-  
+  getTopKeys(
+    limit?: number
+  ): Promise<Array<{ key: string; accessCount: number }>>;
+
   // Cache warming and management
   warm(keys: string[], loader: (key: string) => Promise<any>): Promise<void>;
   invalidate(pattern?: string, tags?: string[]): Promise<number>;
   clear(layer?: CacheLayer): Promise<void>;
-  
+
   // Configuration and lifecycle
   updateConfiguration(config: Partial<ICacheConfiguration>): Promise<void>;
   getConfiguration(): ICacheConfiguration;
   start(): Promise<void>;
   stop(): Promise<void>;
-  
+
   // Events
-  on(event: 'hit' | 'miss' | 'set' | 'delete' | 'error', callback: Function): void;
+  on(
+    event: 'hit' | 'miss' | 'set' | 'delete' | 'error',
+    callback: Function
+  ): void;
   off(event: string, callback: Function): void;
 }
 

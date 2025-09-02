@@ -5,12 +5,12 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { EnterpriseServiceBus } from '../../enterprise-service-bus/core/EnterpriseServiceBus.js';
-import { 
-  IServiceDefinition, 
-  IServiceRequest, 
+import {
+  IServiceDefinition,
+  IServiceRequest,
   IRequestContext,
   IRoutingRule,
-  IMessageTransformation
+  IMessageTransformation,
 } from '../../enterprise-service-bus/interfaces/IEnterpriseServiceBus.js';
 
 describe('EnterpriseServiceBus', () => {
@@ -19,7 +19,7 @@ describe('EnterpriseServiceBus', () => {
 
   beforeEach(() => {
     esb = new EnterpriseServiceBus();
-    
+
     mockService = {
       id: 'test-service',
       name: 'Test Service',
@@ -38,19 +38,19 @@ describe('EnterpriseServiceBus', () => {
             required: true,
             type: 'jwt',
             roles: ['user'],
-            permissions: ['test:read']
+            permissions: ['test:read'],
           },
           rateLimiting: {
             enabled: true,
             requests: 100,
             windowMs: 60000,
-            skipSuccessfulRequests: false
-          }
-        }
+            skipSuccessfulRequests: false,
+          },
+        },
       ],
       capabilities: ['processing'],
       dependencies: [],
-      metadata: { category: 'test' }
+      metadata: { category: 'test' },
     };
   });
 
@@ -63,32 +63,38 @@ describe('EnterpriseServiceBus', () => {
   describe('Service Management', () => {
     test('should register a service successfully', async () => {
       await expect(esb.registerService(mockService)).resolves.toBeUndefined();
-      
+
       const retrievedService = await esb.getService('test-service');
       expect(retrievedService).toEqual(mockService);
     });
 
     test('should throw error when registering duplicate service', async () => {
       await esb.registerService(mockService);
-      
-      await expect(esb.registerService(mockService)).rejects.toThrow('Service test-service already registered');
+
+      await expect(esb.registerService(mockService)).rejects.toThrow(
+        'Service test-service already registered'
+      );
     });
 
     test('should unregister a service successfully', async () => {
       await esb.registerService(mockService);
-      await expect(esb.unregisterService('test-service')).resolves.toBeUndefined();
-      
+      await expect(
+        esb.unregisterService('test-service')
+      ).resolves.toBeUndefined();
+
       const retrievedService = await esb.getService('test-service');
       expect(retrievedService).toBeNull();
     });
 
     test('should throw error when unregistering non-existent service', async () => {
-      await expect(esb.unregisterService('non-existent')).rejects.toThrow('Service non-existent not found');
+      await expect(esb.unregisterService('non-existent')).rejects.toThrow(
+        'Service non-existent not found'
+      );
     });
 
     test('should list all registered services', async () => {
       await esb.registerService(mockService);
-      
+
       const services = await esb.listServices();
       expect(services).toHaveLength(1);
       expect(services[0]).toEqual(mockService);
@@ -96,9 +102,10 @@ describe('EnterpriseServiceBus', () => {
 
     test('should validate service definition', async () => {
       const invalidService = { ...mockService, id: '' };
-      
-      await expect(esb.registerService(invalidService as IServiceDefinition))
-        .rejects.toThrow('Service definition must have id, name, and version');
+
+      await expect(
+        esb.registerService(invalidService as IServiceDefinition)
+      ).rejects.toThrow('Service definition must have id, name, and version');
     });
   });
 
@@ -118,11 +125,11 @@ describe('EnterpriseServiceBus', () => {
         payload: { data: 'test' },
         context: createMockContext(),
         timeout: 30000,
-        retries: 3
+        retries: 3,
       };
 
       const response = await esb.processRequest(request);
-      
+
       expect(response.requestId).toBe(request.id);
       expect(response.status).toBe('success');
       expect(response.statusCode).toBe(200);
@@ -138,11 +145,11 @@ describe('EnterpriseServiceBus', () => {
         payload: { data: 'test' },
         context: createMockContext(),
         timeout: 30000,
-        retries: 3
+        retries: 3,
       };
 
       const response = await esb.processRequest(request);
-      
+
       expect(response.status).toBe('error');
       expect(response.error).toBeDefined();
     });
@@ -150,10 +157,12 @@ describe('EnterpriseServiceBus', () => {
     test('should validate request format', async () => {
       const invalidRequest = {
         // Missing required fields
-        serviceId: 'test-service'
+        serviceId: 'test-service',
       };
 
-      const response = await esb.processRequest(invalidRequest as IServiceRequest);
+      const response = await esb.processRequest(
+        invalidRequest as IServiceRequest
+      );
       expect(response.status).toBe('error');
     });
 
@@ -161,8 +170,9 @@ describe('EnterpriseServiceBus', () => {
       const mockMessage = { type: 'test', data: 'async-test' };
       const context = createMockContext();
 
-      await expect(esb.processAsyncMessage('test-service', mockMessage, context))
-        .resolves.toBeUndefined();
+      await expect(
+        esb.processAsyncMessage('test-service', mockMessage, context)
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -181,7 +191,7 @@ describe('EnterpriseServiceBus', () => {
         targetServices: ['test-service'],
         loadBalancing: 'round-robin',
         failover: true,
-        priority: 100
+        priority: 100,
       };
 
       await expect(esb.addRoutingRule(rule)).resolves.toBeUndefined();
@@ -196,7 +206,7 @@ describe('EnterpriseServiceBus', () => {
         targetServices: ['test-service'],
         loadBalancing: 'round-robin',
         failover: true,
-        priority: 100
+        priority: 100,
       };
 
       await esb.addRoutingRule(rule);
@@ -204,8 +214,9 @@ describe('EnterpriseServiceBus', () => {
     });
 
     test('should throw error when removing non-existent rule', async () => {
-      await expect(esb.removeRoutingRule('non-existent'))
-        .rejects.toThrow('Routing rule non-existent not found');
+      await expect(esb.removeRoutingRule('non-existent')).rejects.toThrow(
+        'Routing rule non-existent not found'
+      );
     });
   });
 
@@ -225,12 +236,14 @@ describe('EnterpriseServiceBus', () => {
           {
             sourceField: 'data',
             targetField: 'payload',
-            operation: 'copy'
-          }
-        ]
+            operation: 'copy',
+          },
+        ],
       };
 
-      await expect(esb.addTransformation(transformation)).resolves.toBeUndefined();
+      await expect(
+        esb.addTransformation(transformation)
+      ).resolves.toBeUndefined();
     });
 
     test('should remove transformation successfully', async () => {
@@ -243,13 +256,15 @@ describe('EnterpriseServiceBus', () => {
           {
             sourceField: 'data',
             targetField: 'payload',
-            operation: 'copy'
-          }
-        ]
+            operation: 'copy',
+          },
+        ],
       };
 
       await esb.addTransformation(transformation);
-      await expect(esb.removeTransformation('test-transform')).resolves.toBeUndefined();
+      await expect(
+        esb.removeTransformation('test-transform')
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -261,7 +276,7 @@ describe('EnterpriseServiceBus', () => {
 
     test('should return metrics', async () => {
       const metrics = await esb.getMetrics();
-      
+
       expect(metrics).toHaveProperty('messagesProcessed');
       expect(metrics).toHaveProperty('averageLatency');
       expect(metrics).toHaveProperty('errorRate');
@@ -271,7 +286,7 @@ describe('EnterpriseServiceBus', () => {
 
     test('should return service health', async () => {
       const health = await esb.getServiceHealth('test-service');
-      
+
       expect(health).toHaveProperty('serviceId', 'test-service');
       expect(health).toHaveProperty('status');
       expect(health).toHaveProperty('uptime');
@@ -279,8 +294,9 @@ describe('EnterpriseServiceBus', () => {
     });
 
     test('should throw error for non-existent service health', async () => {
-      await expect(esb.getServiceHealth('non-existent'))
-        .rejects.toThrow('Service non-existent not found');
+      await expect(esb.getServiceHealth('non-existent')).rejects.toThrow(
+        'Service non-existent not found'
+      );
     });
   });
 
@@ -319,7 +335,7 @@ describe('EnterpriseServiceBus', () => {
         payload: { data: 'test' },
         context: createMockContext(),
         timeout: 30000,
-        retries: 3
+        retries: 3,
       };
 
       const response = await esb.processRequest(request);
@@ -340,6 +356,6 @@ function createMockContext(): IRequestContext {
     spanId: uuidv4(),
     timestamp: new Date(),
     source: 'test',
-    priority: 'normal'
+    priority: 'normal',
   };
 }

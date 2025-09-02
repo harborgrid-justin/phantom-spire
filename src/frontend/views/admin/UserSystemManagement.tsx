@@ -24,20 +24,21 @@ import {
   Avatar
 } from '@mui/material';
 import { AdminPanelSettings, Group, Settings, Security } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+// Note: UI/UX Evaluation service import - adjust path as needed
+// import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
 
 export const UserSystemManagement: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState(0);
 
   useEffect(() => {
-    const evaluationController = addUIUXEvaluation('user-system-management', {
-      continuous: true,
-      position: 'bottom-left',
-      minimized: true,
-      interval: 180000
-    });
+    // const evaluationController = addUIUXEvaluation('user-system-management', {
+    //   continuous: true,
+    //   position: 'bottom-left',
+    //   minimized: true,
+    //   interval: 180000
+    // });
 
-    return () => evaluationController.remove();
+    // return () => evaluationController.remove();
   }, []);
 
   const users = [

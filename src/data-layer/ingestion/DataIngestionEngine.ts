@@ -19,22 +19,22 @@ export interface IIngestionConfig {
   defaultBatchSize: number;
   retryAttempts: number;
   retryBackoffMs: number;
-  
+
   // Performance Tuning
   memoryLimitMB: number;
   processingTimeoutMs: number;
   enableParallelProcessing: boolean;
-  
+
   // Quality Assurance
   enableDataValidation: boolean;
   enableDuplicateDetection: boolean;
   validationRules: IValidationRuleSet[];
-  
+
   // Monitoring
   enableMetrics: boolean;
   metricsIntervalMs: number;
   alertThresholds: IAlertThresholds;
-  
+
   // Security
   enableEncryption: boolean;
   auditLevel: 'minimal' | 'standard' | 'comprehensive';
@@ -120,7 +120,7 @@ export class DataIngestionEngine extends EventEmitter {
     super();
     this.config = config;
     this.messageQueueManager = messageQueueManager;
-    
+
     this.metrics = {
       totalRecordsProcessed: 0,
       recordsPerSecond: 0,
@@ -134,7 +134,7 @@ export class DataIngestionEngine extends EventEmitter {
 
     // Initialize error handling
     this.setupErrorHandling();
-    
+
     // Initialize metrics collection
     if (config.enableMetrics) {
       this.setupMetricsCollection();
@@ -158,7 +158,7 @@ export class DataIngestionEngine extends EventEmitter {
 
     try {
       this.isRunning = true;
-      
+
       // Start metrics collection if enabled
       if (this.config.enableMetrics && !this.metricsInterval) {
         this.metricsInterval = setInterval(
@@ -175,7 +175,6 @@ export class DataIngestionEngine extends EventEmitter {
 
       this.emit('started');
       logger.info('DataIngestionEngine started successfully');
-
     } catch (error) {
       this.isRunning = false;
       const errorMessage = `Failed to start DataIngestionEngine: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -211,7 +210,6 @@ export class DataIngestionEngine extends EventEmitter {
 
       this.emit('stopped');
       logger.info('DataIngestionEngine stopped successfully');
-
     } catch (error) {
       const errorMessage = `Error during DataIngestionEngine shutdown: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -229,7 +227,7 @@ export class DataIngestionEngine extends EventEmitter {
       await this.validateSourceConfig(source);
 
       this.sources.set(source.id, source);
-      
+
       logger.info('Data source registered', {
         sourceId: source.id,
         sourceName: source.name,
@@ -238,7 +236,6 @@ export class DataIngestionEngine extends EventEmitter {
       });
 
       this.emit('sourceRegistered', source);
-
     } catch (error) {
       const errorMessage = `Failed to register data source ${source.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
@@ -259,7 +256,7 @@ export class DataIngestionEngine extends EventEmitter {
     await this.cancelJobsBySource(sourceId);
 
     this.sources.delete(sourceId);
-    
+
     logger.info('Data source unregistered', { sourceId });
     this.emit('sourceUnregistered', sourceId);
   }
@@ -292,7 +289,7 @@ export class DataIngestionEngine extends EventEmitter {
     };
 
     this.jobs.set(jobId, job);
-    
+
     logger.info('Ingestion job submitted', {
       jobId,
       sourceId,
@@ -333,8 +330,8 @@ export class DataIngestionEngine extends EventEmitter {
    * List active jobs
    */
   public listActiveJobs(): IIngestionJob[] {
-    return Array.from(this.jobs.values()).filter(job => 
-      job.status === 'pending' || job.status === 'running'
+    return Array.from(this.jobs.values()).filter(
+      job => job.status === 'pending' || job.status === 'running'
     );
   }
 
@@ -343,9 +340,9 @@ export class DataIngestionEngine extends EventEmitter {
    */
 
   private setupErrorHandling(): void {
-    this.on('error', (error) => {
+    this.on('error', error => {
       logger.error('DataIngestionEngine error', error);
-      
+
       if (this.config.auditLevel === 'comprehensive') {
         // Log detailed audit information
         logger.info('Ingestion engine error audit', {
@@ -368,7 +365,7 @@ export class DataIngestionEngine extends EventEmitter {
   private async collectMetrics(): Promise<void> {
     try {
       const startTime = Date.now();
-      
+
       // Collect basic metrics
       this.metrics.activePipelines = this.runningPipelines.size;
       this.metrics.memoryUsageMB = process.memoryUsage().heapUsed / 1024 / 1024;
@@ -378,8 +375,9 @@ export class DataIngestionEngine extends EventEmitter {
       await this.checkAlertThresholds();
 
       const collectionTime = Date.now() - startTime;
-      logger.debug('Metrics collection completed', { collectionTimeMs: collectionTime });
-
+      logger.debug('Metrics collection completed', {
+        collectionTimeMs: collectionTime,
+      });
     } catch (error) {
       logger.error('Failed to collect metrics', error);
     }
@@ -387,7 +385,7 @@ export class DataIngestionEngine extends EventEmitter {
 
   private async checkAlertThresholds(): Promise<void> {
     const { alertThresholds } = this.config;
-    
+
     if (this.metrics.errorRate > alertThresholds.errorRate) {
       this.emit('alert', {
         type: 'errorRate',
@@ -418,7 +416,9 @@ export class DataIngestionEngine extends EventEmitter {
     try {
       const health = await source.connector.healthCheck();
       if (health.responseTime !== undefined && health.responseTime > 5000) {
-        throw new Error(`Source connector health check slow: ${health.responseTime}ms`);
+        throw new Error(
+          `Source connector health check slow: ${health.responseTime}ms`
+        );
       }
     } catch (error) {
       logger.warn('Source connector health check failed during registration', {
@@ -439,27 +439,37 @@ export class DataIngestionEngine extends EventEmitter {
   }
 
   private async cancelAllRunningJobs(): Promise<void> {
-    const runningJobs = Array.from(this.jobs.values()).filter(job => job.status === 'running');
-    
+    const runningJobs = Array.from(this.jobs.values()).filter(
+      job => job.status === 'running'
+    );
+
     for (const job of runningJobs) {
       try {
         job.status = 'cancelled';
         this.emit('jobCancelled', job);
         logger.info('Job cancelled during shutdown', { jobId: job.id });
       } catch (error) {
-        logger.error('Failed to cancel job during shutdown', { jobId: job.id, error });
+        logger.error('Failed to cancel job during shutdown', {
+          jobId: job.id,
+          error,
+        });
       }
     }
   }
 
   private async cancelJobsBySource(sourceId: string): Promise<void> {
-    const sourceJobs = Array.from(this.jobs.values()).filter(job => job.sourceId === sourceId);
-    
+    const sourceJobs = Array.from(this.jobs.values()).filter(
+      job => job.sourceId === sourceId
+    );
+
     for (const job of sourceJobs) {
       if (job.status === 'pending' || job.status === 'running') {
         job.status = 'cancelled';
         this.emit('jobCancelled', job);
-        logger.info('Job cancelled due to source unregistration', { jobId: job.id, sourceId });
+        logger.info('Job cancelled due to source unregistration', {
+          jobId: job.id,
+          sourceId,
+        });
       }
     }
   }

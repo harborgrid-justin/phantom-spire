@@ -9,7 +9,7 @@ import {
   IQuery,
   IQueryContext,
   IQueryResult,
-  IHealthStatus
+  IHealthStatus,
 } from '../interfaces/IDataSource.js';
 
 export abstract class BaseDataSource implements IDataSource {
@@ -48,7 +48,10 @@ export abstract class BaseDataSource implements IDataSource {
       this.connected = false;
       logger.info(`Disconnected from data source: ${this.name}`);
     } catch (error) {
-      logger.error(`Failed to disconnect from data source: ${this.name}`, error);
+      logger.error(
+        `Failed to disconnect from data source: ${this.name}`,
+        error
+      );
       throw error;
     }
   }
@@ -56,39 +59,42 @@ export abstract class BaseDataSource implements IDataSource {
   /**
    * Execute a query against the data source
    */
-  public async query(query: IQuery, context: IQueryContext): Promise<IQueryResult> {
+  public async query(
+    query: IQuery,
+    context: IQueryContext
+  ): Promise<IQueryResult> {
     if (!this.connected) {
       throw new Error(`Data source ${this.name} is not connected`);
     }
 
     const startTime = Date.now();
-    
+
     try {
       // Validate query
       this.validateQuery(query);
-      
+
       // Apply security filters based on context
       const secureQuery = this.applySecurityFilters(query, context);
-      
+
       // Execute the query
       const result = await this.performQuery(secureQuery, context);
-      
+
       // Add execution metadata
       result.metadata.executionTime = Date.now() - startTime;
       result.metadata.source = this.name;
-      
+
       logger.debug(`Query executed on ${this.name}`, {
         executionTime: result.metadata.executionTime,
-        resultCount: result.data.length
+        resultCount: result.data.length,
       });
-      
+
       return result;
     } catch (error) {
       const executionTime = Date.now() - startTime;
       logger.error(`Query failed on ${this.name}`, {
         error: (error as Error).message,
         executionTime,
-        query: JSON.stringify(query)
+        query: JSON.stringify(query),
       });
       throw error;
     }
@@ -97,17 +103,20 @@ export abstract class BaseDataSource implements IDataSource {
   /**
    * Stream data from the data source
    */
-  public async *stream(query: IQuery, context: IQueryContext): AsyncIterable<IDataRecord> {
+  public async *stream(
+    query: IQuery,
+    context: IQueryContext
+  ): AsyncIterable<IDataRecord> {
     if (!this.connected) {
       throw new Error(`Data source ${this.name} is not connected`);
     }
 
     // Validate query
     this.validateQuery(query);
-    
+
     // Apply security filters
     const secureQuery = this.applySecurityFilters(query, context);
-    
+
     // Start streaming
     yield* this.performStream(secureQuery, context);
   }
@@ -117,12 +126,12 @@ export abstract class BaseDataSource implements IDataSource {
    */
   public async healthCheck(): Promise<IHealthStatus> {
     const startTime = Date.now();
-    
+
     try {
       const status = await this.performHealthCheck();
       status.lastCheck = new Date();
       status.responseTime = Date.now() - startTime;
-      
+
       this.lastHealthCheck = status;
       return status;
     } catch (error) {
@@ -130,9 +139,9 @@ export abstract class BaseDataSource implements IDataSource {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: (error as Error).message
+        message: (error as Error).message,
       };
-      
+
       this.lastHealthCheck = status;
       return status;
     }
@@ -155,8 +164,14 @@ export abstract class BaseDataSource implements IDataSource {
   // Abstract methods to be implemented by concrete classes
   protected abstract performConnect(): Promise<void>;
   protected abstract performDisconnect(): Promise<void>;
-  protected abstract performQuery(query: IQuery, context: IQueryContext): Promise<IQueryResult>;
-  protected abstract performStream(query: IQuery, context: IQueryContext): AsyncIterable<IDataRecord>;
+  protected abstract performQuery(
+    query: IQuery,
+    context: IQueryContext
+  ): Promise<IQueryResult>;
+  protected abstract performStream(
+    query: IQuery,
+    context: IQueryContext
+  ): AsyncIterable<IDataRecord>;
   protected abstract performHealthCheck(): Promise<IHealthStatus>;
 
   /**
@@ -183,27 +198,30 @@ export abstract class BaseDataSource implements IDataSource {
   /**
    * Apply security filters based on user context
    */
-  protected applySecurityFilters(query: IQuery, context: IQueryContext): IQuery {
+  protected applySecurityFilters(
+    query: IQuery,
+    context: IQueryContext
+  ): IQuery {
     const secureQuery = { ...query };
-    
+
     // Add user-based filters
     if (!secureQuery.filters) {
       secureQuery.filters = {};
     }
-    
+
     // Apply time-based restrictions if specified
     if (context.timeRange) {
       secureQuery.filters.timestamp = {
         $gte: context.timeRange.start,
-        $lte: context.timeRange.end
+        $lte: context.timeRange.end,
       };
     }
-    
+
     // Apply permission-based filters
     if (context.filters) {
       secureQuery.filters = { ...secureQuery.filters, ...context.filters };
     }
-    
+
     return secureQuery;
   }
 
@@ -227,9 +245,9 @@ export abstract class BaseDataSource implements IDataSource {
           completeness: 1.0,
           accuracy: 1.0,
           consistency: 1.0,
-          timeliness: 1.0
-        }
-      }
+          timeliness: 1.0,
+        },
+      },
     };
   }
 

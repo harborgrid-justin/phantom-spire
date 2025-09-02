@@ -3,16 +3,15 @@
  * Additional enterprise-grade workflow templates for comprehensive CTI operations
  */
 
-import { 
-  IWorkflowDefinition, 
+import {
+  IWorkflowDefinition,
   WorkflowStatus,
-  WorkflowPriority, 
+  WorkflowPriority,
   StepType,
-  TriggerType 
+  TriggerType,
 } from '../interfaces/IWorkflowEngine.js';
 
 export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
-  
   // Vulnerability Management Workflow
   VULNERABILITY_MANAGEMENT: {
     id: 'vulnerability-management-workflow',
@@ -20,16 +19,22 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     version: '1.5',
     status: WorkflowStatus.ACTIVE,
     priority: WorkflowPriority.HIGH,
-    description: 'Comprehensive vulnerability assessment and remediation workflow',
+    description:
+      'Comprehensive vulnerability assessment and remediation workflow',
     category: 'vulnerability-management',
-    tags: ['vulnerability', 'patch-management', 'risk-assessment', 'compliance'],
-    
+    tags: [
+      'vulnerability',
+      'patch-management',
+      'risk-assessment',
+      'compliance',
+    ],
+
     metadata: {
       author: 'Vulnerability Management Team',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-02-15')
+      updatedAt: new Date('2024-02-15'),
     },
-    
+
     triggers: [
       {
         id: 'new-vulnerability-discovered',
@@ -39,11 +44,11 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         enabled: true,
         configuration: {
           eventType: 'vulnerability-discovered',
-          source: 'vulnerability-scanners'
-        }
-      }
+          source: 'vulnerability-scanners',
+        },
+      },
     ],
-    
+
     steps: [
       {
         id: 'vulnerability-assessment',
@@ -52,20 +57,24 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         description: 'Comprehensive vulnerability assessment',
         position: { x: 100, y: 100 },
         configuration: {
-          parallelSteps: ['analyze-vulnerability', 'assess-impact', 'check-exploitability']
+          parallelSteps: [
+            'analyze-vulnerability',
+            'assess-impact',
+            'check-exploitability',
+          ],
         },
         inputs: {
-          vulnerability: 'parameters.vulnerability'
+          vulnerability: 'parameters.vulnerability',
         },
         outputs: {
-          assessment: 'assessment'
+          assessment: 'assessment',
         },
         nextSteps: ['risk-prioritization'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'risk-prioritization',
         name: 'Risk Prioritization',
@@ -74,21 +83,26 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 300 },
         configuration: {
           taskType: 'risk-calculation',
-          factors: ['cvss', 'business-impact', 'exploitability', 'asset-criticality']
+          factors: [
+            'cvss',
+            'business-impact',
+            'exploitability',
+            'asset-criticality',
+          ],
         },
         inputs: {
-          assessment: 'variables.assessment'
+          assessment: 'variables.assessment',
         },
         outputs: {
           priority: 'priority',
-          riskScore: 'riskScore'
+          riskScore: 'riskScore',
         },
         nextSteps: ['remediation-planning'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'remediation-planning',
         name: 'Remediation Planning',
@@ -98,23 +112,24 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {},
         inputs: {
           priority: 'variables.priority',
-          riskScore: 'variables.riskScore'
+          riskScore: 'variables.riskScore',
         },
         outputs: {
-          remediationApproach: 'remediationApproach'
+          remediationApproach: 'remediationApproach',
         },
         nextSteps: ['emergency-patch', 'scheduled-patch', 'accept-risk'],
         conditions: [
           {
-            expression: 'variables.priority === "critical" || variables.riskScore >= 9',
-            description: 'Critical vulnerabilities require emergency patching'
-          }
+            expression:
+              'variables.priority === "critical" || variables.riskScore >= 9',
+            description: 'Critical vulnerabilities require emergency patching',
+          },
         ],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'patch-deployment',
         name: 'Patch Deployment',
@@ -122,20 +137,24 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         description: 'Deploy patches in controlled manner',
         position: { x: 100, y: 700 },
         configuration: {
-          sequentialSteps: ['test-patches', 'deploy-staging', 'deploy-production']
+          sequentialSteps: [
+            'test-patches',
+            'deploy-staging',
+            'deploy-production',
+          ],
         },
         inputs: {
-          patches: 'variables.patches'
+          patches: 'variables.patches',
         },
         outputs: {
-          deploymentResults: 'deploymentResults'
+          deploymentResults: 'deploymentResults',
         },
         nextSteps: ['verification'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'verification',
         name: 'Remediation Verification',
@@ -144,23 +163,23 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 900 },
         configuration: {
           taskType: 'vulnerability-verification',
-          methods: ['rescan', 'penetration-test', 'compliance-check']
+          methods: ['rescan', 'penetration-test', 'compliance-check'],
         },
         inputs: {
           vulnerability: 'parameters.vulnerability',
-          deploymentResults: 'variables.deploymentResults'
+          deploymentResults: 'variables.deploymentResults',
         },
         outputs: {
-          verificationResults: 'verificationResults'
+          verificationResults: 'verificationResults',
         },
         nextSteps: [],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 3
-        }
-      }
+          maxRetries: 3,
+        },
+      },
     ],
-    
+
     parameters: {
       vulnerability: {
         type: 'object',
@@ -169,42 +188,42 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         order: 1,
         description: 'Details of the discovered vulnerability',
         required: true,
-        defaultValue: {}
-      }
+        defaultValue: {},
+      },
     },
-    
+
     sla: {
       responseTime: '4h',
       resolutionTime: '72h',
-      maxExecutionTime: '168h' // 1 week
+      maxExecutionTime: '168h', // 1 week
     },
-    
+
     security: {
       classification: 'internal',
       requiredRoles: ['vulnerability-analyst', 'system-admin'],
       requiredPermissions: ['vulnerability-management', 'patch-deployment'],
       dataEncryption: true,
-      auditLevel: 'detailed'
+      auditLevel: 'detailed',
     },
-    
+
     integrations: {
       taskManagement: {
         enabled: true,
         createTasks: true,
         updateTaskStatus: true,
-        taskPriority: WorkflowPriority.HIGH
+        taskPriority: WorkflowPriority.HIGH,
       },
       messageQueue: {
         enabled: true,
         publishEvents: true,
         subscribeToEvents: true,
-        deadLetterQueue: true
+        deadLetterQueue: true,
       },
       evidence: {
         enabled: true,
         collectEvidence: true,
         preserveChainOfCustody: true,
-        evidenceRetention: '1y'
+        evidenceRetention: '1y',
       },
       issues: {
         enabled: true,
@@ -213,12 +232,12 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         escalationRules: [
           {
             condition: 'priority === "critical" && duration > 24h',
-            action: 'escalate-to-ciso'
-          }
-        ]
-      }
+            action: 'escalate-to-ciso',
+          },
+        ],
+      },
     },
-    
+
     monitoring: {
       enabled: true,
       collectMetrics: true,
@@ -230,16 +249,16 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
             metric: 'sla_breach',
             operator: '==',
             value: true,
-            action: 'alert-management'
-          }
-        ]
+            action: 'alert-management',
+          },
+        ],
       },
       logging: {
         level: 'info',
         includeStepDetails: true,
-        includeVariables: false
-      }
-    }
+        includeVariables: false,
+      },
+    },
   },
 
   // Threat Hunt Campaign Workflow
@@ -251,14 +270,19 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     priority: WorkflowPriority.HIGH,
     description: 'Systematic threat hunting campaign execution workflow',
     category: 'threat-hunting',
-    tags: ['threat-hunting', 'investigation', 'proactive-defense', 'ttp-analysis'],
-    
+    tags: [
+      'threat-hunting',
+      'investigation',
+      'proactive-defense',
+      'ttp-analysis',
+    ],
+
     metadata: {
       author: 'Threat Hunting Team',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-02-20')
+      updatedAt: new Date('2024-02-20'),
     },
-    
+
     triggers: [
       {
         id: 'scheduled-hunt',
@@ -268,8 +292,8 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         enabled: true,
         configuration: {
           schedule: '0 9 * * 1', // Every Monday at 9 AM
-          timezone: 'UTC'
-        }
+          timezone: 'UTC',
+        },
       },
       {
         id: 'intelligence-driven-hunt',
@@ -279,11 +303,11 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         enabled: true,
         configuration: {
           eventType: 'new-threat-intelligence',
-          source: 'threat-intelligence-feeds'
-        }
-      }
+          source: 'threat-intelligence-feeds',
+        },
+      },
     ],
-    
+
     steps: [
       {
         id: 'hypothesis-development',
@@ -294,15 +318,15 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {},
         inputs: {
           intelligence: 'parameters.intelligence',
-          previousHunts: 'parameters.previousHunts'
+          previousHunts: 'parameters.previousHunts',
         },
         outputs: {
           hypothesis: 'hypothesis',
-          huntScope: 'huntScope'
+          huntScope: 'huntScope',
         },
         nextSteps: ['data-collection-planning'],
         errorHandling: {
-          strategy: 'fail'
+          strategy: 'fail',
         },
         humanTask: {
           assignee: 'threat-hunt-lead',
@@ -315,7 +339,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
                 name: 'hypothesis',
                 type: 'text',
                 label: 'Hunt Hypothesis',
-                required: true
+                required: true,
               },
               {
                 id: 'scope',
@@ -327,8 +351,8 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
                   { value: 'endpoints', label: 'Endpoints' },
                   { value: 'network', label: 'Network Traffic' },
                   { value: 'cloud', label: 'Cloud Infrastructure' },
-                  { value: 'email', label: 'Email Systems' }
-                ]
+                  { value: 'email', label: 'Email Systems' },
+                ],
               },
               {
                 id: 'timeframe',
@@ -339,15 +363,15 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
                 options: [
                   { value: '24h', label: 'Last 24 Hours' },
                   { value: '7d', label: 'Last 7 Days' },
-                  { value: '30d', label: 'Last 30 Days' }
-                ]
-              }
+                  { value: '30d', label: 'Last 30 Days' },
+                ],
+              },
             ],
-            validation: {}
-          }
-        }
+            validation: {},
+          },
+        },
       },
-      
+
       {
         id: 'data-collection-planning',
         name: 'Plan Data Collection',
@@ -356,23 +380,23 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 300 },
         configuration: {
           taskType: 'data-collection-planning',
-          sources: ['siem', 'edr', 'network-monitoring', 'cloud-logs']
+          sources: ['siem', 'edr', 'network-monitoring', 'cloud-logs'],
         },
         inputs: {
           hypothesis: 'variables.hypothesis',
-          huntScope: 'variables.huntScope'
+          huntScope: 'variables.huntScope',
         },
         outputs: {
           collectionPlan: 'collectionPlan',
-          queries: 'queries'
+          queries: 'queries',
         },
         nextSteps: ['data-collection'],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 2
-        }
+          maxRetries: 2,
+        },
       },
-      
+
       {
         id: 'data-collection',
         name: 'Collect Hunt Data',
@@ -380,21 +404,25 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         description: 'Execute data collection from multiple sources',
         position: { x: 100, y: 500 },
         configuration: {
-          parallelSteps: ['collect-endpoint-data', 'collect-network-data', 'collect-cloud-data']
+          parallelSteps: [
+            'collect-endpoint-data',
+            'collect-network-data',
+            'collect-cloud-data',
+          ],
         },
         inputs: {
           collectionPlan: 'variables.collectionPlan',
-          queries: 'variables.queries'
+          queries: 'variables.queries',
         },
         outputs: {
-          collectedData: 'collectedData'
+          collectedData: 'collectedData',
         },
         nextSteps: ['data-analysis'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'data-analysis',
         name: 'Analyze Hunt Data',
@@ -403,23 +431,27 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 700 },
         configuration: {
           taskType: 'threat-data-analysis',
-          techniques: ['statistical-analysis', 'pattern-recognition', 'anomaly-detection']
+          techniques: [
+            'statistical-analysis',
+            'pattern-recognition',
+            'anomaly-detection',
+          ],
         },
         inputs: {
           collectedData: 'variables.collectedData',
-          hypothesis: 'variables.hypothesis'
+          hypothesis: 'variables.hypothesis',
         },
         outputs: {
           analysisResults: 'analysisResults',
-          findings: 'findings'
+          findings: 'findings',
         },
         nextSteps: ['findings-validation'],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 2
-        }
+          maxRetries: 2,
+        },
       },
-      
+
       {
         id: 'findings-validation',
         name: 'Validate Findings',
@@ -429,15 +461,15 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {},
         inputs: {
           analysisResults: 'variables.analysisResults',
-          findings: 'variables.findings'
+          findings: 'variables.findings',
         },
         outputs: {
           validatedFindings: 'validatedFindings',
-          falsePositives: 'falsePositives'
+          falsePositives: 'falsePositives',
         },
         nextSteps: ['threat-response-decision'],
         errorHandling: {
-          strategy: 'skip'
+          strategy: 'skip',
         },
         humanTask: {
           candidateGroups: ['threat-hunters', 'security-analysts'],
@@ -450,7 +482,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
                 name: 'findings_valid',
                 type: 'boolean',
                 label: 'Are the findings valid threats?',
-                required: true
+                required: true,
               },
               {
                 id: 'threat_level',
@@ -462,22 +494,22 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
                   { value: 'low', label: 'Low' },
                   { value: 'medium', label: 'Medium' },
                   { value: 'high', label: 'High' },
-                  { value: 'critical', label: 'Critical' }
-                ]
+                  { value: 'critical', label: 'Critical' },
+                ],
               },
               {
                 id: 'recommendations',
                 name: 'recommendations',
                 type: 'text',
                 label: 'Recommendations',
-                required: false
-              }
+                required: false,
+              },
             ],
-            validation: {}
-          }
-        }
+            validation: {},
+          },
+        },
       },
-      
+
       {
         id: 'threat-response-decision',
         name: 'Threat Response Decision',
@@ -487,23 +519,25 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {},
         inputs: {
           validatedFindings: 'variables.validatedFindings',
-          threatLevel: 'variables.threat_level'
+          threatLevel: 'variables.threat_level',
         },
         outputs: {
-          responseRequired: 'responseRequired'
+          responseRequired: 'responseRequired',
         },
         nextSteps: ['initiate-incident-response', 'document-hunt-results'],
         conditions: [
           {
-            expression: 'variables.findings_valid === true && (variables.threat_level === "high" || variables.threat_level === "critical")',
-            description: 'High or critical validated findings require incident response'
-          }
+            expression:
+              'variables.findings_valid === true && (variables.threat_level === "high" || variables.threat_level === "critical")',
+            description:
+              'High or critical validated findings require incident response',
+          },
         ],
         errorHandling: {
-          strategy: 'skip'
-        }
+          strategy: 'skip',
+        },
       },
-      
+
       {
         id: 'initiate-incident-response',
         name: 'Initiate Incident Response',
@@ -512,27 +546,27 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 50, y: 1300 },
         configuration: {
           taskType: 'workflow-trigger',
-          targetWorkflow: 'incident-response-workflow'
+          targetWorkflow: 'incident-response-workflow',
         },
         inputs: {
           validatedFindings: 'variables.validatedFindings',
-          huntContext: 'variables'
+          huntContext: 'variables',
         },
         outputs: {
-          incidentWorkflow: 'incidentWorkflow'
+          incidentWorkflow: 'incidentWorkflow',
         },
         nextSteps: ['document-hunt-results'],
         conditions: [
           {
             expression: 'variables.responseRequired === true',
-            description: 'Execute only if response is required'
-          }
+            description: 'Execute only if response is required',
+          },
         ],
         errorHandling: {
-          strategy: 'skip'
-        }
+          strategy: 'skip',
+        },
       },
-      
+
       {
         id: 'document-hunt-results',
         name: 'Document Hunt Results',
@@ -541,24 +575,24 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 1500 },
         configuration: {
           taskType: 'hunt-documentation',
-          outputs: ['hunt-report', 'lessons-learned', 'iocs']
+          outputs: ['hunt-report', 'lessons-learned', 'iocs'],
         },
         inputs: {
           hypothesis: 'variables.hypothesis',
           findings: 'variables.validatedFindings',
-          huntScope: 'variables.huntScope'
+          huntScope: 'variables.huntScope',
         },
         outputs: {
           huntReport: 'huntReport',
-          lessonsLearned: 'lessonsLearned'
+          lessonsLearned: 'lessonsLearned',
         },
         nextSteps: [],
         errorHandling: {
-          strategy: 'skip'
-        }
-      }
+          strategy: 'skip',
+        },
+      },
     ],
-    
+
     parameters: {
       intelligence: {
         type: 'object',
@@ -567,7 +601,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         order: 1,
         description: 'Intelligence data driving the hunt',
         required: false,
-        defaultValue: {}
+        defaultValue: {},
       },
       huntType: {
         type: 'string',
@@ -576,42 +610,42 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         order: 2,
         description: 'Type of threat hunt campaign',
         required: true,
-        defaultValue: 'scheduled'
-      }
+        defaultValue: 'scheduled',
+      },
     },
-    
+
     sla: {
       responseTime: '2h',
       resolutionTime: '7d',
-      maxExecutionTime: '14d'
+      maxExecutionTime: '14d',
     },
-    
+
     security: {
       classification: 'confidential',
       requiredRoles: ['threat-hunter', 'security-analyst'],
       requiredPermissions: ['threat-hunting', 'data-access'],
       dataEncryption: true,
-      auditLevel: 'comprehensive'
+      auditLevel: 'comprehensive',
     },
-    
+
     integrations: {
       taskManagement: {
         enabled: true,
         createTasks: true,
         updateTaskStatus: true,
-        taskPriority: WorkflowPriority.HIGH
+        taskPriority: WorkflowPriority.HIGH,
       },
       messageQueue: {
         enabled: true,
         publishEvents: true,
         subscribeToEvents: true,
-        deadLetterQueue: true
+        deadLetterQueue: true,
       },
       evidence: {
         enabled: true,
         collectEvidence: true,
         preserveChainOfCustody: true,
-        evidenceRetention: '2y'
+        evidenceRetention: '2y',
       },
       issues: {
         enabled: true,
@@ -620,12 +654,12 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         escalationRules: [
           {
             condition: 'threat_level === "critical"',
-            action: 'immediate-escalation'
-          }
-        ]
-      }
+            action: 'immediate-escalation',
+          },
+        ],
+      },
     },
-    
+
     monitoring: {
       enabled: true,
       collectMetrics: true,
@@ -637,16 +671,16 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
             metric: 'findings_count',
             operator: '>',
             value: 10,
-            action: 'alert-management'
-          }
-        ]
+            action: 'alert-management',
+          },
+        ],
       },
       logging: {
         level: 'info',
         includeStepDetails: true,
-        includeVariables: false
-      }
-    }
+        includeVariables: false,
+      },
+    },
   },
 
   // Compliance Audit Workflow
@@ -659,13 +693,13 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
     description: 'Automated compliance audit and reporting workflow',
     category: 'compliance',
     tags: ['compliance', 'audit', 'governance', 'reporting'],
-    
+
     metadata: {
       author: 'Compliance Team',
       createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-02-10')
+      updatedAt: new Date('2024-02-10'),
     },
-    
+
     triggers: [
       {
         id: 'scheduled-audit',
@@ -675,11 +709,11 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         enabled: true,
         configuration: {
           schedule: '0 6 1 * *', // First day of every month at 6 AM
-          timezone: 'UTC'
-        }
-      }
+          timezone: 'UTC',
+        },
+      },
     ],
-    
+
     steps: [
       {
         id: 'audit-scope-definition',
@@ -689,22 +723,22 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 100 },
         configuration: {
           taskType: 'compliance-scoping',
-          frameworks: ['nist', 'iso27001', 'sox', 'pci-dss']
+          frameworks: ['nist', 'iso27001', 'sox', 'pci-dss'],
         },
         inputs: {
           auditType: 'parameters.auditType',
-          framework: 'parameters.framework'
+          framework: 'parameters.framework',
         },
         outputs: {
           auditScope: 'auditScope',
-          requirements: 'requirements'
+          requirements: 'requirements',
         },
         nextSteps: ['evidence-collection'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'evidence-collection',
         name: 'Collect Compliance Evidence',
@@ -712,21 +746,26 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         description: 'Collect evidence for compliance requirements',
         position: { x: 100, y: 300 },
         configuration: {
-          parallelSteps: ['collect-policies', 'collect-logs', 'collect-configurations', 'collect-access-records']
+          parallelSteps: [
+            'collect-policies',
+            'collect-logs',
+            'collect-configurations',
+            'collect-access-records',
+          ],
         },
         inputs: {
           auditScope: 'variables.auditScope',
-          requirements: 'variables.requirements'
+          requirements: 'variables.requirements',
         },
         outputs: {
-          evidence: 'evidence'
+          evidence: 'evidence',
         },
         nextSteps: ['compliance-assessment'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'compliance-assessment',
         name: 'Assess Compliance Status',
@@ -735,47 +774,56 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         position: { x: 100, y: 500 },
         configuration: {
           taskType: 'compliance-assessment',
-          assessmentTools: ['automated-scanners', 'policy-checkers', 'configuration-analyzers']
+          assessmentTools: [
+            'automated-scanners',
+            'policy-checkers',
+            'configuration-analyzers',
+          ],
         },
         inputs: {
           evidence: 'variables.evidence',
-          requirements: 'variables.requirements'
+          requirements: 'variables.requirements',
         },
         outputs: {
           assessmentResults: 'assessmentResults',
-          gaps: 'gaps'
+          gaps: 'gaps',
         },
         nextSteps: ['gap-analysis'],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 2
-        }
+          maxRetries: 2,
+        },
       },
-      
+
       {
         id: 'gap-analysis',
         name: 'Analyze Compliance Gaps',
         type: StepType.TASK,
-        description: 'Analyze identified compliance gaps and prioritize remediation',
+        description:
+          'Analyze identified compliance gaps and prioritize remediation',
         position: { x: 100, y: 700 },
         configuration: {
           taskType: 'gap-analysis',
-          prioritizationCriteria: ['risk-level', 'regulatory-impact', 'remediation-effort']
+          prioritizationCriteria: [
+            'risk-level',
+            'regulatory-impact',
+            'remediation-effort',
+          ],
         },
         inputs: {
           gaps: 'variables.gaps',
-          assessmentResults: 'variables.assessmentResults'
+          assessmentResults: 'variables.assessmentResults',
         },
         outputs: {
           prioritizedGaps: 'prioritizedGaps',
-          remediationPlan: 'remediationPlan'
+          remediationPlan: 'remediationPlan',
         },
         nextSteps: ['report-generation'],
         errorHandling: {
-          strategy: 'fail'
-        }
+          strategy: 'fail',
+        },
       },
-      
+
       {
         id: 'report-generation',
         name: 'Generate Compliance Report',
@@ -785,24 +833,24 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {
           taskType: 'report-generation',
           reportFormats: ['pdf', 'html', 'excel'],
-          includeExecutiveSummary: true
+          includeExecutiveSummary: true,
         },
         inputs: {
           assessmentResults: 'variables.assessmentResults',
           prioritizedGaps: 'variables.prioritizedGaps',
-          remediationPlan: 'variables.remediationPlan'
+          remediationPlan: 'variables.remediationPlan',
         },
         outputs: {
           complianceReport: 'complianceReport',
-          executiveSummary: 'executiveSummary'
+          executiveSummary: 'executiveSummary',
         },
         nextSteps: ['report-distribution'],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 2
-        }
+          maxRetries: 2,
+        },
       },
-      
+
       {
         id: 'report-distribution',
         name: 'Distribute Compliance Report',
@@ -812,23 +860,23 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         configuration: {
           messageType: 'compliance-report',
           recipients: ['compliance-officer', 'security-manager', 'executives'],
-          distributionChannels: ['email', 'secure-portal']
+          distributionChannels: ['email', 'secure-portal'],
         },
         inputs: {
           complianceReport: 'variables.complianceReport',
-          executiveSummary: 'variables.executiveSummary'
+          executiveSummary: 'variables.executiveSummary',
         },
         outputs: {
-          distributionResults: 'distributionResults'
+          distributionResults: 'distributionResults',
         },
         nextSteps: [],
         errorHandling: {
           strategy: 'retry',
-          maxRetries: 3
-        }
-      }
+          maxRetries: 3,
+        },
+      },
     ],
-    
+
     parameters: {
       auditType: {
         type: 'string',
@@ -837,7 +885,7 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         order: 1,
         description: 'Type of compliance audit to perform',
         required: true,
-        defaultValue: 'general'
+        defaultValue: 'general',
       },
       framework: {
         type: 'string',
@@ -846,42 +894,42 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         order: 2,
         description: 'Compliance framework to audit against',
         required: true,
-        defaultValue: 'nist'
-      }
+        defaultValue: 'nist',
+      },
     },
-    
+
     sla: {
       responseTime: '1h',
       resolutionTime: '5d',
-      maxExecutionTime: '7d'
+      maxExecutionTime: '7d',
     },
-    
+
     security: {
       classification: 'confidential',
       requiredRoles: ['compliance-officer', 'auditor'],
       requiredPermissions: ['compliance-audit', 'report-generation'],
       dataEncryption: true,
-      auditLevel: 'comprehensive'
+      auditLevel: 'comprehensive',
     },
-    
+
     integrations: {
       taskManagement: {
         enabled: true,
         createTasks: true,
         updateTaskStatus: true,
-        taskPriority: WorkflowPriority.MEDIUM
+        taskPriority: WorkflowPriority.MEDIUM,
       },
       messageQueue: {
         enabled: true,
         publishEvents: true,
         subscribeToEvents: false,
-        deadLetterQueue: true
+        deadLetterQueue: true,
       },
       evidence: {
         enabled: true,
         collectEvidence: true,
         preserveChainOfCustody: true,
-        evidenceRetention: '7y'
+        evidenceRetention: '7y',
       },
       issues: {
         enabled: true,
@@ -890,12 +938,12 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
         escalationRules: [
           {
             condition: 'high_risk_gaps > 0',
-            action: 'create-remediation-issues'
-          }
-        ]
-      }
+            action: 'create-remediation-issues',
+          },
+        ],
+      },
     },
-    
+
     monitoring: {
       enabled: true,
       collectMetrics: true,
@@ -907,22 +955,22 @@ export const EXTENDED_CTI_WORKFLOWS: Record<string, IWorkflowDefinition> = {
             metric: 'compliance_score',
             operator: '<',
             value: 80,
-            action: 'alert-management'
-          }
-        ]
+            action: 'alert-management',
+          },
+        ],
       },
       logging: {
         level: 'info',
         includeStepDetails: true,
-        includeVariables: false
-      }
-    }
-  }
+        includeVariables: false,
+      },
+    },
+  },
 };
 
 // Merge with existing templates
 export const ALL_CTI_WORKFLOWS = {
-  ...EXTENDED_CTI_WORKFLOWS
+  ...EXTENDED_CTI_WORKFLOWS,
 };
 
 export default EXTENDED_CTI_WORKFLOWS;

@@ -5,13 +5,16 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { UIUXEvaluationService } from '../core/UIUXEvaluationService.js';
-import PagePerformanceMonitor, { IPageLoadMetrics, IFeatureAvailabilityReport } from '../utils/PagePerformanceMonitor.js';
+import PagePerformanceMonitor, {
+  IPageLoadMetrics,
+  IFeatureAvailabilityReport,
+} from '../utils/PagePerformanceMonitor.js';
 import {
   IPageEvaluation,
   IEvaluationIssue,
   IEvaluationMetric,
   EvaluationCategory,
-  EvaluationSeverity
+  EvaluationSeverity,
 } from '../interfaces/IUIUXEvaluation.js';
 
 export interface IPerformanceMonitoringResult {
@@ -28,29 +31,37 @@ export interface IPerformanceMonitoringResult {
 // Enhanced evaluation hook with performance monitoring
 export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
   const [evaluation, setEvaluation] = useState<IPageEvaluation | null>(null);
-  const [performanceMetrics, setPerformanceMetrics] = useState<IPageLoadMetrics | null>(null);
-  const [featureReport, setFeatureReport] = useState<IFeatureAvailabilityReport | null>(null);
-  const [performanceMonitoring, setPerformanceMonitoring] = useState<IPerformanceMonitoringResult | null>(null);
+  const [performanceMetrics, setPerformanceMetrics] =
+    useState<IPageLoadMetrics | null>(null);
+  const [featureReport, setFeatureReport] =
+    useState<IFeatureAvailabilityReport | null>(null);
+  const [performanceMonitoring, setPerformanceMonitoring] =
+    useState<IPerformanceMonitoringResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const serviceRef = useRef<UIUXEvaluationService>(new UIUXEvaluationService());
-  const performanceMonitorRef = useRef<PagePerformanceMonitor>(PagePerformanceMonitor.getInstance());
+  const performanceMonitorRef = useRef<PagePerformanceMonitor>(
+    PagePerformanceMonitor.getInstance()
+  );
   const sessionRef = useRef<string | null>(null);
   const monitoringInterval = useRef<NodeJS.Timeout | null>(null);
 
   const runPerformanceEvaluation = useCallback(async () => {
     try {
       // Measure page performance
-      const metrics = await performanceMonitorRef.current.monitorPageLoad(pageId);
+      const metrics =
+        await performanceMonitorRef.current.monitorPageLoad(pageId);
       setPerformanceMetrics(metrics);
 
-      // Check feature availability 
-      const features = await performanceMonitorRef.current.checkFeatureAvailability(pageId);
+      // Check feature availability
+      const features =
+        await performanceMonitorRef.current.checkFeatureAvailability(pageId);
       setFeatureReport(features);
 
       // Get comprehensive page report
       const pageReport = performanceMonitorRef.current.getPageReport(pageId);
-      const performanceStats = performanceMonitorRef.current.getPerformanceStats(pageId);
+      const performanceStats =
+        performanceMonitorRef.current.getPerformanceStats(pageId);
 
       const result: IPerformanceMonitoringResult = {
         loadTime: metrics.loadTime,
@@ -60,7 +71,7 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
         trend: performanceStats.trend,
         featureAvailability: features.availabilityScore,
         missingFeatures: features.missingFeatures,
-        issues: pageReport.overallHealth.issues
+        issues: pageReport.overallHealth.issues,
       };
 
       setPerformanceMonitoring(result);
@@ -69,7 +80,7 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
         loadTime: metrics.loadTime,
         fcp: metrics.firstContentfulPaint,
         featureScore: features.availabilityScore,
-        healthScore: pageReport.overallHealth.score
+        healthScore: pageReport.overallHealth.score,
       });
 
       return result;
@@ -86,7 +97,7 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
       // Run both UI/UX evaluation and performance monitoring
       const [evaluation, performanceResult] = await Promise.all([
         serviceRef.current.evaluatePage(pageId),
-        runPerformanceEvaluation()
+        runPerformanceEvaluation(),
       ]);
 
       setEvaluation(evaluation);
@@ -97,7 +108,7 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
         issues: evaluation.issues.length,
         wcag: evaluation.compliance.wcag,
         enterprise: evaluation.compliance.enterprise,
-        featureAvailability: performanceResult?.featureAvailability || 0
+        featureAvailability: performanceResult?.featureAvailability || 0,
       });
 
       return { evaluation, performance: performanceResult };
@@ -111,45 +122,52 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
     }
   }, [pageId, runPerformanceEvaluation]);
 
-  const startContinuousMonitoring = useCallback(async (intervalMs = 30000) => {
-    try {
-      // Stop existing monitoring
-      if (monitoringInterval.current) {
-        clearInterval(monitoringInterval.current);
-      }
+  const startContinuousMonitoring = useCallback(
+    async (intervalMs = 30000) => {
+      try {
+        // Stop existing monitoring
+        if (monitoringInterval.current) {
+          clearInterval(monitoringInterval.current);
+        }
 
-      // Configure the service for continuous evaluation
-      await serviceRef.current.configure({
-        autoEvaluate: true,
-        evaluationInterval: intervalMs
-      });
-      
-      const sessionId = await serviceRef.current.startContinuousEvaluation(pageId);
-      sessionRef.current = sessionId;
-      
-      // Subscribe to evaluation updates
-      await serviceRef.current.subscribe((newEvaluation) => {
-        setEvaluation(newEvaluation);
-        console.log(`🔄 Continuous evaluation update for ${pageId}:`, {
-          score: newEvaluation.overallScore,
-          issues: newEvaluation.issues.length
+        // Configure the service for continuous evaluation
+        await serviceRef.current.configure({
+          autoEvaluate: true,
+          evaluationInterval: intervalMs,
         });
-      });
 
-      // Start continuous performance monitoring
-      monitoringInterval.current = setInterval(async () => {
-        await runPerformanceEvaluation();
-      }, intervalMs);
-      
-      console.log(`🔄 Started continuous monitoring for ${pageId} (interval: ${intervalMs}ms)`);
-      return sessionId;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(errorMessage);
-      console.error('Failed to start continuous monitoring:', errorMessage);
-      return null;
-    }
-  }, [pageId, runPerformanceEvaluation]);
+        const sessionId =
+          await serviceRef.current.startContinuousEvaluation(pageId);
+        sessionRef.current = sessionId;
+
+        // Subscribe to evaluation updates
+        await serviceRef.current.subscribe(newEvaluation => {
+          setEvaluation(newEvaluation);
+          console.log(`🔄 Continuous evaluation update for ${pageId}:`, {
+            score: newEvaluation.overallScore,
+            issues: newEvaluation.issues.length,
+          });
+        });
+
+        // Start continuous performance monitoring
+        monitoringInterval.current = setInterval(async () => {
+          await runPerformanceEvaluation();
+        }, intervalMs);
+
+        console.log(
+          `🔄 Started continuous monitoring for ${pageId} (interval: ${intervalMs}ms)`
+        );
+        return sessionId;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : 'Unknown error';
+        setError(errorMessage);
+        console.error('Failed to start continuous monitoring:', errorMessage);
+        return null;
+      }
+    },
+    [pageId, runPerformanceEvaluation]
+  );
 
   const stopContinuousMonitoring = useCallback(async () => {
     if (sessionRef.current) {
@@ -169,121 +187,151 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
     }
   }, [pageId]);
 
-  const reportPerformanceIssue = useCallback(async (
-    title: string,
-    loadTime: number,
-    threshold: number = 3000
-  ) => {
-    const severity = loadTime > threshold * 2 ? EvaluationSeverity.CRITICAL :
-                    loadTime > threshold ? EvaluationSeverity.HIGH : EvaluationSeverity.MEDIUM;
-    
-    await serviceRef.current.reportIssue(pageId, {
-      category: EvaluationCategory.PERFORMANCE,
-      severity,
-      title,
-      description: `Page load time of ${loadTime}ms exceeds ${threshold}ms threshold`,
-      recommendation: 'Optimize page loading performance - reduce resource size, enable compression, use CDN',
-      metadata: { actualLoadTime: loadTime, threshold, type: 'performance-measurement' }
-    });
-    
-    await runEvaluation();
-    console.log(`🐛 Reported performance issue for ${pageId}:`, title);
-  }, [pageId, runEvaluation]);
+  const reportPerformanceIssue = useCallback(
+    async (title: string, loadTime: number, threshold: number = 3000) => {
+      const severity =
+        loadTime > threshold * 2
+          ? EvaluationSeverity.CRITICAL
+          : loadTime > threshold
+            ? EvaluationSeverity.HIGH
+            : EvaluationSeverity.MEDIUM;
 
-  const reportMissingFeature = useCallback(async (
-    featureName: string,
-    importance: 'critical' | 'high' | 'medium' | 'low' = 'medium'
-  ) => {
-    const severityMap = {
-      critical: EvaluationSeverity.CRITICAL,
-      high: EvaluationSeverity.HIGH,
-      medium: EvaluationSeverity.MEDIUM,
-      low: EvaluationSeverity.LOW
-    };
-
-    await serviceRef.current.reportIssue(pageId, {
-      category: EvaluationCategory.USABILITY,
-      severity: severityMap[importance],
-      title: `Missing Feature: ${featureName}`,
-      description: `Expected feature "${featureName}" is not available or not functioning properly`,
-      recommendation: `Implement or fix the "${featureName}" feature to improve user experience`,
-      metadata: { featureName, importance, type: 'feature-availability' }
-    });
-
-    await runEvaluation();
-    console.log(`🔧 Reported missing feature for ${pageId}:`, featureName);
-  }, [pageId, runEvaluation]);
-
-  const reportCustomIssue = useCallback(async (
-    title: string,
-    description: string,
-    category: EvaluationCategory = EvaluationCategory.USABILITY,
-    severity: EvaluationSeverity = EvaluationSeverity.MEDIUM
-  ) => {
-    try {
       await serviceRef.current.reportIssue(pageId, {
-        category,
+        category: EvaluationCategory.PERFORMANCE,
         severity,
         title,
-        description,
-        recommendation: `Review and address: ${title}`
+        description: `Page load time of ${loadTime}ms exceeds ${threshold}ms threshold`,
+        recommendation:
+          'Optimize page loading performance - reduce resource size, enable compression, use CDN',
+        metadata: {
+          actualLoadTime: loadTime,
+          threshold,
+          type: 'performance-measurement',
+        },
       });
-      
-      // Re-run evaluation to get updated results
-      await runEvaluation();
-      
-      console.log(`🐛 Reported custom issue for ${pageId}:`, title);
-    } catch (err) {
-      console.error('Failed to report custom issue:', err);
-    }
-  }, [pageId, runEvaluation]);
 
-  const collectCustomMetric = useCallback(async (
-    name: string,
-    value: number,
-    maxValue: number,
-    category: EvaluationCategory = EvaluationCategory.USABILITY,
-    unit = 'score'
-  ) => {
-    try {
-      await serviceRef.current.collectMetric(pageId, {
-        name,
-        category,
-        description: `Custom metric: ${name}`,
-        value,
-        maxValue,
-        unit,
-        threshold: {
-          excellent: maxValue * 0.9,
-          good: maxValue * 0.75,
-          acceptable: maxValue * 0.6,
-          poor: maxValue * 0.4
-        }
+      await runEvaluation();
+      console.log(`🐛 Reported performance issue for ${pageId}:`, title);
+    },
+    [pageId, runEvaluation]
+  );
+
+  const reportMissingFeature = useCallback(
+    async (
+      featureName: string,
+      importance: 'critical' | 'high' | 'medium' | 'low' = 'medium'
+    ) => {
+      const severityMap = {
+        critical: EvaluationSeverity.CRITICAL,
+        high: EvaluationSeverity.HIGH,
+        medium: EvaluationSeverity.MEDIUM,
+        low: EvaluationSeverity.LOW,
+      };
+
+      await serviceRef.current.reportIssue(pageId, {
+        category: EvaluationCategory.USABILITY,
+        severity: severityMap[importance],
+        title: `Missing Feature: ${featureName}`,
+        description: `Expected feature "${featureName}" is not available or not functioning properly`,
+        recommendation: `Implement or fix the "${featureName}" feature to improve user experience`,
+        metadata: { featureName, importance, type: 'feature-availability' },
       });
-      
-      console.log(`📈 Collected custom metric for ${pageId}:`, { name, value, maxValue });
-    } catch (err) {
-      console.error('Failed to collect custom metric:', err);
-    }
-  }, [pageId]);
+
+      await runEvaluation();
+      console.log(`🔧 Reported missing feature for ${pageId}:`, featureName);
+    },
+    [pageId, runEvaluation]
+  );
+
+  const reportCustomIssue = useCallback(
+    async (
+      title: string,
+      description: string,
+      category: EvaluationCategory = EvaluationCategory.USABILITY,
+      severity: EvaluationSeverity = EvaluationSeverity.MEDIUM
+    ) => {
+      try {
+        await serviceRef.current.reportIssue(pageId, {
+          category,
+          severity,
+          title,
+          description,
+          recommendation: `Review and address: ${title}`,
+        });
+
+        // Re-run evaluation to get updated results
+        await runEvaluation();
+
+        console.log(`🐛 Reported custom issue for ${pageId}:`, title);
+      } catch (err) {
+        console.error('Failed to report custom issue:', err);
+      }
+    },
+    [pageId, runEvaluation]
+  );
+
+  const collectCustomMetric = useCallback(
+    async (
+      name: string,
+      value: number,
+      maxValue: number,
+      category: EvaluationCategory = EvaluationCategory.USABILITY,
+      unit = 'score'
+    ) => {
+      try {
+        await serviceRef.current.collectMetric(pageId, {
+          name,
+          category,
+          description: `Custom metric: ${name}`,
+          value,
+          maxValue,
+          unit,
+          threshold: {
+            excellent: maxValue * 0.9,
+            good: maxValue * 0.75,
+            acceptable: maxValue * 0.6,
+            poor: maxValue * 0.4,
+          },
+        });
+
+        console.log(`📈 Collected custom metric for ${pageId}:`, {
+          name,
+          value,
+          maxValue,
+        });
+      } catch (err) {
+        console.error('Failed to collect custom metric:', err);
+      }
+    },
+    [pageId]
+  );
 
   const generateReport = useCallback(async () => {
     try {
       const report = await serviceRef.current.generateReport([pageId]);
-      const performanceStats = performanceMonitorRef.current.getPerformanceStats(pageId);
-      const featureReport = performanceMonitorRef.current.getLatestFeatureReport(pageId);
+      const performanceStats =
+        performanceMonitorRef.current.getPerformanceStats(pageId);
+      const featureReport =
+        performanceMonitorRef.current.getLatestFeatureReport(pageId);
 
-      console.log(`📋 Generated comprehensive evaluation report for ${pageId}:`, {
-        overallScore: report.summary.overallScore,
-        totalIssues: report.summary.criticalIssues + report.summary.highIssues + report.summary.mediumIssues + report.summary.lowIssues,
-        avgLoadTime: performanceStats.averageLoadTime,
-        featureAvailability: featureReport?.availabilityScore || 0
-      });
+      console.log(
+        `📋 Generated comprehensive evaluation report for ${pageId}:`,
+        {
+          overallScore: report.summary.overallScore,
+          totalIssues:
+            report.summary.criticalIssues +
+            report.summary.highIssues +
+            report.summary.mediumIssues +
+            report.summary.lowIssues,
+          avgLoadTime: performanceStats.averageLoadTime,
+          featureAvailability: featureReport?.availabilityScore || 0,
+        }
+      );
 
       return {
         report,
         performanceStats,
-        featureReport
+        featureReport,
       };
     } catch (err) {
       console.error('Failed to generate report:', err);
@@ -332,20 +380,27 @@ export const useUIUXEvaluation = (pageId: string, autoStart = true) => {
     // Computed values
     score: evaluation?.overallScore || 0,
     issueCount: evaluation?.issues.length || 0,
-    criticalIssues: evaluation?.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length || 0,
-    highIssues: evaluation?.issues.filter(i => i.severity === EvaluationSeverity.HIGH).length || 0,
+    criticalIssues:
+      evaluation?.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL)
+        .length || 0,
+    highIssues:
+      evaluation?.issues.filter(i => i.severity === EvaluationSeverity.HIGH)
+        .length || 0,
     wcagCompliance: evaluation?.compliance.wcag || 'Non-compliant',
     enterpriseCompliant: evaluation?.compliance.enterprise || false,
     loadTime: performanceMetrics?.loadTime || 0,
     fcp: performanceMetrics?.firstContentfulPaint || 0,
     featureAvailability: featureReport?.availabilityScore || 0,
-    isHealthy: (evaluation?.overallScore || 0) >= 75 && 
-               (evaluation?.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length || 0) === 0 &&
-               (performanceMetrics?.loadTime || 0) <= 3000 &&
-               (featureReport?.availabilityScore || 0) >= 80,
+    isHealthy:
+      (evaluation?.overallScore || 0) >= 75 &&
+      (evaluation?.issues.filter(
+        i => i.severity === EvaluationSeverity.CRITICAL
+      ).length || 0) === 0 &&
+      (performanceMetrics?.loadTime || 0) <= 3000 &&
+      (featureReport?.availabilityScore || 0) >= 80,
     performanceScore: performanceMonitoring?.score || 'unknown',
     performanceTrend: performanceMonitoring?.trend || 'stable',
-    missingFeatures: featureReport?.missingFeatures || []
+    missingFeatures: featureReport?.missingFeatures || [],
   };
 };
 
@@ -363,7 +418,7 @@ export const createEvaluationStatusElement = (
     position = 'bottom-right',
     showScore = true,
     showIssues = true,
-    minimized = false
+    minimized = false,
   } = options;
 
   // Create the status element
@@ -388,7 +443,7 @@ export const createEvaluationStatusElement = (
   `;
 
   // Initialize with loading state
-  statusElement.innerHTML = minimized 
+  statusElement.innerHTML = minimized
     ? `<div style="display: flex; align-items: center; gap: 8px;">
          📊 <span style="font-size: 12px;">Loading...</span>
        </div>`
@@ -416,9 +471,18 @@ export const createEvaluationStatusElement = (
       return;
     }
 
-    const scoreColor = evaluation.overallScore >= 75 ? '#2e7d32' : evaluation.overallScore >= 50 ? '#ed6c02' : '#d32f2f';
-    const criticalIssues = evaluation.issues.filter(i => i.severity === EvaluationSeverity.CRITICAL).length;
-    const highIssues = evaluation.issues.filter(i => i.severity === EvaluationSeverity.HIGH).length;
+    const scoreColor =
+      evaluation.overallScore >= 75
+        ? '#2e7d32'
+        : evaluation.overallScore >= 50
+          ? '#ed6c02'
+          : '#d32f2f';
+    const criticalIssues = evaluation.issues.filter(
+      i => i.severity === EvaluationSeverity.CRITICAL
+    ).length;
+    const highIssues = evaluation.issues.filter(
+      i => i.severity === EvaluationSeverity.HIGH
+    ).length;
 
     if (minimized) {
       statusElement.innerHTML = `
@@ -463,33 +527,39 @@ export const createEvaluationStatusElement = (
           </div>
         </div>
         
-        ${(criticalIssues > 0 || highIssues > 0) ? `
+        ${
+          criticalIssues > 0 || highIssues > 0
+            ? `
           <div style="background: rgba(211, 47, 47, 0.1); padding: 8px; border-radius: 4px; font-size: 12px;">
             <strong style="color: #d32f2f;">⚠️ Attention:</strong>
             ${criticalIssues > 0 ? `${criticalIssues} critical` : ''}
             ${criticalIssues > 0 && highIssues > 0 ? ', ' : ''}
             ${highIssues > 0 ? `${highIssues} high priority` : ''} 
-            issue${(criticalIssues + highIssues) > 1 ? 's' : ''} found
+            issue${criticalIssues + highIssues > 1 ? 's' : ''} found
           </div>
-        ` : `
+        `
+            : `
           <div style="background: rgba(46, 125, 50, 0.1); padding: 8px; border-radius: 4px; font-size: 12px; color: #2e7d32; text-align: center;">
             ✅ No critical issues detected
           </div>
-        `}
+        `
+        }
       `;
     }
   };
 
   // Run initial evaluation
-  evaluationService.evaluatePage(pageId)
+  evaluationService
+    .evaluatePage(pageId)
     .then(updateStatus)
     .catch(() => updateStatus(null));
 
   // Add click handler for refresh
   statusElement.addEventListener('click', () => {
     statusElement.style.opacity = '0.7';
-    evaluationService.evaluatePage(pageId)
-      .then((evaluation) => {
+    evaluationService
+      .evaluatePage(pageId)
+      .then(evaluation => {
         updateStatus(evaluation);
         statusElement.style.opacity = '1';
       })
@@ -503,7 +573,7 @@ export const createEvaluationStatusElement = (
     element: statusElement,
     refresh: () => evaluationService.evaluatePage(pageId).then(updateStatus),
     remove: () => statusElement.remove(),
-    updateStatus
+    updateStatus,
   };
 };
 
@@ -527,7 +597,7 @@ export const addUIUXEvaluation = (
     minimized = false,
     autoStart = true,
     continuous = false,
-    interval = 30000
+    interval = 30000,
   } = options || {};
 
   console.log(`🚀 Initializing UI/UX evaluation for ${pageId}`);
@@ -537,7 +607,7 @@ export const addUIUXEvaluation = (
     position,
     showScore,
     showIssues,
-    minimized
+    minimized,
   });
 
   // Initialize evaluation service
@@ -546,22 +616,26 @@ export const addUIUXEvaluation = (
 
   // Start continuous evaluation if requested
   if (continuous && autoStart) {
-    evaluationService.configure({
-      autoEvaluate: true,
-      evaluationInterval: interval
-    }).then(() => {
-      return evaluationService.startContinuousEvaluation(pageId);
-    }).then((id) => {
-      sessionId = id;
-      console.log(`🔄 Started continuous UI/UX evaluation for ${pageId}`);
-      
-      // Subscribe to updates
-      evaluationService.subscribe((evaluation) => {
-        statusWidget.updateStatus(evaluation);
+    evaluationService
+      .configure({
+        autoEvaluate: true,
+        evaluationInterval: interval,
+      })
+      .then(() => {
+        return evaluationService.startContinuousEvaluation(pageId);
+      })
+      .then(id => {
+        sessionId = id;
+        console.log(`🔄 Started continuous UI/UX evaluation for ${pageId}`);
+
+        // Subscribe to updates
+        evaluationService.subscribe(evaluation => {
+          statusWidget.updateStatus(evaluation);
+        });
+      })
+      .catch(err => {
+        console.error('Failed to start continuous evaluation:', err);
       });
-    }).catch((err) => {
-      console.error('Failed to start continuous evaluation:', err);
-    });
   }
 
   // Return control interface
@@ -575,7 +649,7 @@ export const addUIUXEvaluation = (
     },
     startContinuous: () => {
       if (!sessionId) {
-        evaluationService.startContinuousEvaluation(pageId).then((id) => {
+        evaluationService.startContinuousEvaluation(pageId).then(id => {
           sessionId = id;
         });
       }
@@ -586,6 +660,6 @@ export const addUIUXEvaluation = (
         sessionId = null;
       }
     },
-    generateReport: () => evaluationService.generateReport([pageId])
+    generateReport: () => evaluationService.generateReport([pageId]),
   };
 };

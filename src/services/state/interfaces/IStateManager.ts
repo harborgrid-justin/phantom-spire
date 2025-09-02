@@ -9,7 +9,7 @@ export enum StateScope {
   USER = 'user',
   WORKFLOW = 'workflow',
   TASK = 'task',
-  ORGANIZATION = 'organization'
+  ORGANIZATION = 'organization',
 }
 
 export enum StateAction {
@@ -17,7 +17,7 @@ export enum StateAction {
   UPDATE = 'update',
   DELETE = 'delete',
   MERGE = 'merge',
-  RESET = 'reset'
+  RESET = 'reset',
 }
 
 export interface IStateEvent {
@@ -83,52 +83,72 @@ export interface IStateMetrics {
 export interface IStateManager {
   // Core state operations
   get<T>(scope: StateScope, key: string, defaultValue?: T): Promise<T | null>;
-  set<T>(scope: StateScope, key: string, value: T, options?: IStateOptions): Promise<void>;
+  set<T>(
+    scope: StateScope,
+    key: string,
+    value: T,
+    options?: IStateOptions
+  ): Promise<void>;
   delete(scope: StateScope, key: string): Promise<boolean>;
   exists(scope: StateScope, key: string): Promise<boolean>;
-  
+
   // Bulk operations
   getMultiple<T>(scope: StateScope, keys: string[]): Promise<Map<string, T>>;
-  setMultiple<T>(scope: StateScope, entries: Map<string, T>, options?: IStateOptions): Promise<void>;
+  setMultiple<T>(
+    scope: StateScope,
+    entries: Map<string, T>,
+    options?: IStateOptions
+  ): Promise<void>;
   deleteMultiple(scope: StateScope, keys: string[]): Promise<number>;
-  
+
   // Pattern-based operations
   getByPattern<T>(scope: StateScope, pattern: string): Promise<Map<string, T>>;
   deleteByPattern(scope: StateScope, pattern: string): Promise<number>;
-  
+
   // State merging and updating
   merge<T>(scope: StateScope, key: string, value: Partial<T>): Promise<void>;
-  update<T>(scope: StateScope, key: string, updater: (current: T) => T): Promise<void>;
-  
+  update<T>(
+    scope: StateScope,
+    key: string,
+    updater: (current: T) => T
+  ): Promise<void>;
+
   // State scoping and isolation
   createScope(scope: StateScope, identifier: string): Promise<IStateScope>;
   deleteScope(scope: StateScope, identifier: string): Promise<boolean>;
   listScopes(scope: StateScope): Promise<string[]>;
-  
+
   // Event system
   subscribe(subscription: Omit<IStateSubscription, 'id'>): Promise<string>;
   unsubscribe(subscriptionId: string): Promise<boolean>;
   emit(event: Omit<IStateEvent, 'id' | 'timestamp'>): Promise<void>;
-  
+
   // State persistence and synchronization
   persist(scope?: StateScope): Promise<void>;
   restore(scope?: StateScope): Promise<void>;
   sync(): Promise<void>;
-  
+
   // State versioning
   getVersion(scope: StateScope, key: string, version?: number): Promise<any>;
-  getVersions(scope: StateScope, key: string): Promise<Array<{ version: number; timestamp: Date; value: any }>>;
+  getVersions(
+    scope: StateScope,
+    key: string
+  ): Promise<Array<{ version: number; timestamp: Date; value: any }>>;
   revert(scope: StateScope, key: string, version: number): Promise<void>;
-  
+
   // Analytics and monitoring
   getMetrics(): Promise<IStateMetrics>;
-  getStateHistory(scope: StateScope, key: string, limit?: number): Promise<IStateEvent[]>;
-  
+  getStateHistory(
+    scope: StateScope,
+    key: string,
+    limit?: number
+  ): Promise<IStateEvent[]>;
+
   // Configuration and lifecycle
   configure(config: Partial<IStateConfiguration>): Promise<void>;
   start(): Promise<void>;
   stop(): Promise<void>;
-  
+
   // Utility methods
   clear(scope?: StateScope): Promise<void>;
   validate<T>(scope: StateScope, key: string, value: T): Promise<boolean>;
@@ -157,7 +177,11 @@ export interface IStateScope {
 
 export interface IStatePersistence {
   load(scope: StateScope, identifier?: string): Promise<Map<string, any>>;
-  save(scope: StateScope, data: Map<string, any>, identifier?: string): Promise<void>;
+  save(
+    scope: StateScope,
+    data: Map<string, any>,
+    identifier?: string
+  ): Promise<void>;
   delete(scope: StateScope, identifier?: string): Promise<boolean>;
   exists(scope: StateScope, identifier?: string): Promise<boolean>;
 }

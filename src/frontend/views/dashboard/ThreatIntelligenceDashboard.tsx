@@ -69,7 +69,7 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 import { ThreatSeverity, IOCType } from '../../types/common';
 
 interface DashboardMetrics {

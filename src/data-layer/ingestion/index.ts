@@ -72,12 +72,12 @@ export const DEFAULT_INGESTION_CONFIG = {
   defaultBatchSize: 1000,
   retryAttempts: 3,
   retryBackoffMs: 5000,
-  
+
   // Performance Tuning
   memoryLimitMB: 2048,
   processingTimeoutMs: 300000, // 5 minutes
   enableParallelProcessing: true,
-  
+
   // Quality Assurance
   enableDataValidation: true,
   enableDuplicateDetection: true,
@@ -100,7 +100,7 @@ export const DEFAULT_INGESTION_CONFIG = {
       failureAction: 'reject' as const,
     },
   ],
-  
+
   // Monitoring
   enableMetrics: true,
   metricsIntervalMs: 30000,
@@ -110,7 +110,7 @@ export const DEFAULT_INGESTION_CONFIG = {
     memoryUsage: 80, // 80%
     queueDepth: 10000,
   },
-  
+
   // Security
   enableEncryption: true,
   auditLevel: 'comprehensive' as const,
@@ -139,22 +139,22 @@ export const DEFAULT_STREAM_CONFIG = {
   bufferSize: 10000,
   backpressureThreshold: 8000,
   flushIntervalMs: 5000,
-  
+
   // Processing Options
   enableBatching: true,
   batchSize: 500,
   batchTimeoutMs: 10000,
-  
+
   // Error Handling
   maxRetries: 5,
   retryBackoffMs: 1000,
   deadLetterQueueSize: 1000,
-  
+
   // Performance Tuning
   enableCompression: true,
   enableDeduplication: true,
   deduplicationWindowMs: 300000, // 5 minutes
-  
+
   // Monitoring
   enableMetrics: true,
   metricsIntervalMs: 15000,
@@ -297,11 +297,11 @@ export class IngestionFactory {
     authToken?: string
   ): STIXConnector {
     const config: any = { ...DEFAULT_STIX_CONFIG, name };
-    
+
     if (endpoint) {
       config.endpoint = endpoint;
     }
-    
+
     if (authToken) {
       config.authentication = {
         type: 'bearer',
@@ -322,11 +322,11 @@ export class IngestionFactory {
     authKey?: string
   ): MISPConnector {
     const config: any = { ...DEFAULT_MISP_CONFIG, name };
-    
+
     if (endpoint) {
       config.endpoint = endpoint;
     }
-    
+
     if (authKey) {
       config.authentication = {
         type: 'authkey',
@@ -371,7 +371,7 @@ export class IngestionIntegration {
     ingestionEngine: DataIngestionEngine
   ): void {
     // Set up event handlers for integration
-    ingestionEngine.on('jobCompleted', (job) => {
+    ingestionEngine.on('jobCompleted', job => {
       orchestrator.emit('dataIngested', {
         jobId: job.id,
         sourceId: job.sourceId,
@@ -379,11 +379,11 @@ export class IngestionIntegration {
       });
     });
 
-    ingestionEngine.on('error', (error) => {
+    ingestionEngine.on('error', error => {
       orchestrator.emit('ingestionError', error);
     });
 
-    ingestionEngine.on('alert', (alert) => {
+    ingestionEngine.on('alert', alert => {
       orchestrator.emit('ingestionAlert', alert);
     });
   }
@@ -396,11 +396,11 @@ export class IngestionIntegration {
     alertCallback: (alert: any) => void
   ): void {
     ingestionEngine.on('alert', alertCallback);
-    
+
     // Set up periodic health checks
     setInterval(() => {
       const metrics = ingestionEngine.getMetrics();
-      
+
       if (metrics.errorRate > 10) {
         alertCallback({
           type: 'high_error_rate',

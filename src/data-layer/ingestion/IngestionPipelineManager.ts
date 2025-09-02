@@ -71,7 +71,7 @@ export class IngestionPipelineManager extends EventEmitter {
     super();
     this.config = config;
     this.initializeStageRegistry();
-    
+
     logger.info('IngestionPipelineManager initialized', {
       maxConcurrentStages: config.maxConcurrentStages,
       enableCheckpointing: config.enableCheckpointing,
@@ -119,14 +119,23 @@ export class IngestionPipelineManager extends EventEmitter {
       // Validate pipeline before execution
       const validationResult = await pipeline.validate();
       if (!validationResult.isValid && this.config.validation.failFast) {
-        throw new Error(`Pipeline validation failed: ${validationResult.errors?.join(', ')}`);
+        throw new Error(
+          `Pipeline validation failed: ${validationResult.errors?.join(', ')}`
+        );
       }
 
       // Execute stages sequentially or in parallel based on dependencies
-      const stageResults = await this.executeStages(pipeline.stages, inputData, pipelineContext);
-      
+      const stageResults = await this.executeStages(
+        pipeline.stages,
+        inputData,
+        pipelineContext
+      );
+
       const totalTime = Date.now() - startTime;
-      const totalRecords = stageResults.reduce((sum, result) => sum + result.recordsProcessed, 0);
+      const totalRecords = stageResults.reduce(
+        (sum, result) => sum + result.recordsProcessed,
+        0
+      );
 
       const result: IPipelineResult = {
         success: stageResults.every(result => result.success),
@@ -152,9 +161,9 @@ export class IngestionPipelineManager extends EventEmitter {
 
       this.emit('pipelineCompleted', execution);
       return result;
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       execution.status = 'failed';
       execution.endTime = new Date();
       execution.error = errorMessage;
@@ -167,7 +176,6 @@ export class IngestionPipelineManager extends EventEmitter {
 
       this.emit('pipelineFailed', execution);
       throw error;
-
     } finally {
       this.runningPipelines.delete(executionId);
     }
@@ -176,10 +184,7 @@ export class IngestionPipelineManager extends EventEmitter {
   /**
    * Create a new pipeline with validation
    */
-  public createPipeline(
-    name: string,
-    stages: IPipelineStage[]
-  ): IDataPipeline {
+  public createPipeline(name: string, stages: IPipelineStage[]): IDataPipeline {
     return new IngestionPipeline(name, stages, this.config);
   }
 
@@ -195,13 +200,14 @@ export class IngestionPipelineManager extends EventEmitter {
     const now = Date.now();
     const executionTime = now - execution.startTime.getTime();
     const recordsProcessed = execution.stageResults.reduce(
-      (sum, result) => sum + result.recordsProcessed, 
+      (sum, result) => sum + result.recordsProcessed,
       0
     );
 
     return {
       status: execution.status === 'cancelled' ? 'paused' : execution.status,
-      progress: execution.stageResults.length / execution.pipeline.stages.length,
+      progress:
+        execution.stageResults.length / execution.pipeline.stages.length,
       startTime: execution.startTime,
       recordsProcessed,
       throughput: recordsProcessed / (executionTime / 1000) || 0,
@@ -250,7 +256,7 @@ export class IngestionPipelineManager extends EventEmitter {
 
     for (let i = 0; i < stages.length; i++) {
       const stage = stages[i];
-      
+
       // Check for parallel execution opportunity
       if (stage.parallel && i > 0) {
         // Execute this stage in parallel with compatible stages
@@ -272,7 +278,7 @@ export class IngestionPipelineManager extends EventEmitter {
         });
 
         results.push(stageResult);
-        
+
         // Update input data for next stage
         if (stageResult.success && stage.type !== 'validate') {
           currentData = (stageResult as any).outputData || currentData;
@@ -280,12 +286,19 @@ export class IngestionPipelineManager extends EventEmitter {
 
         // Create checkpoint if enabled
         if (this.config.enableCheckpointing) {
-          await this.createCheckpoint(pipelineContext, stage, stageResult, currentData);
+          await this.createCheckpoint(
+            pipelineContext,
+            stage,
+            stageResult,
+            currentData
+          );
         }
 
         // Fail fast if stage failed and validation is strict
         if (!stageResult.success && this.config.validation.failFast) {
-          throw new Error(`Stage ${stage.name} failed: ${stageResult.errors?.join(', ')}`);
+          throw new Error(
+            `Stage ${stage.name} failed: ${stageResult.errors?.join(', ')}`
+          );
         }
       }
     }
@@ -325,10 +338,10 @@ export class IngestionPipelineManager extends EventEmitter {
         recordsProcessed: this.countRecords(result),
         ...result,
       };
-
     } catch (error) {
       const executionTime = Date.now() - startTime;
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
 
       logger.error('Stage execution failed', {
         stageName: stage.name,
@@ -372,7 +385,7 @@ export class IngestionPipelineManager extends EventEmitter {
     };
 
     pipelineContext.checkpoints.push(checkpoint);
-    
+
     logger.debug('Pipeline checkpoint created', {
       pipelineId: pipelineContext.pipelineId,
       stageName: stage.name,
@@ -441,7 +454,9 @@ class IngestionPipeline implements IDataPipeline {
 
   public async execute(input: any, context?: any): Promise<IPipelineResult> {
     // This would be handled by the PipelineManager
-    throw new Error('Pipeline execution should be handled by IngestionPipelineManager');
+    throw new Error(
+      'Pipeline execution should be handled by IngestionPipelineManager'
+    );
   }
 
   public async validate(): Promise<IValidationResult> {
@@ -451,14 +466,18 @@ class IngestionPipeline implements IDataPipeline {
     // Validate stage configuration
     for (const stage of this.stages) {
       if (!stage.name || !stage.type) {
-        errors.push(`Stage missing required fields: name=${stage.name}, type=${stage.type}`);
+        errors.push(
+          `Stage missing required fields: name=${stage.name}, type=${stage.type}`
+        );
       }
 
       // Validate dependencies
       if (stage.dependencies) {
         for (const dependency of stage.dependencies) {
           if (!this.stages.find(s => s.name === dependency)) {
-            errors.push(`Stage ${stage.name} depends on non-existent stage: ${dependency}`);
+            errors.push(
+              `Stage ${stage.name} depends on non-existent stage: ${dependency}`
+            );
           }
         }
       }
@@ -489,7 +508,11 @@ class IngestionPipeline implements IDataPipeline {
  * Stage Processors
  */
 interface IStageProcessor {
-  process(stage: IPipelineStage, inputData: any, context: IStageExecutionContext): Promise<any>;
+  process(
+    stage: IPipelineStage,
+    inputData: any,
+    context: IStageExecutionContext
+  ): Promise<any>;
 }
 
 class ExtractionStageProcessor implements IStageProcessor {
@@ -521,7 +544,7 @@ class TransformationStageProcessor implements IStageProcessor {
     inputData: any,
     context: IStageExecutionContext
   ): Promise<any> {
-    const rules = stage.config.rules as ITransformationRule[] || [];
+    const rules = (stage.config.rules as ITransformationRule[]) || [];
     let transformedData = Array.isArray(inputData) ? inputData : [inputData];
 
     for (const rule of rules) {
@@ -531,7 +554,10 @@ class TransformationStageProcessor implements IStageProcessor {
     return { outputData: transformedData };
   }
 
-  private applyTransformationRule(data: any[], rule: ITransformationRule): any[] {
+  private applyTransformationRule(
+    data: any[],
+    rule: ITransformationRule
+  ): any[] {
     switch (rule.type) {
       case 'map':
         return data.map(item => this.mapFields(item, rule));
@@ -582,7 +608,10 @@ class LoadStageProcessor implements IStageProcessor {
     // Load data using the configured connector
     if (stage.connector) {
       const records = Array.isArray(inputData) ? inputData : [inputData];
-      const target = typeof stage.config.target === 'string' ? stage.config.target : 'default';
+      const target =
+        typeof stage.config.target === 'string'
+          ? stage.config.target
+          : 'default';
       const result = await stage.connector.load(records, target);
       return { loadResult: result };
     }
@@ -605,7 +634,9 @@ class ValidationStageProcessor implements IStageProcessor {
       if (this.validateRecord(record, stage.config)) {
         validRecords++;
       } else {
-        errors.push(`Validation failed for record: ${JSON.stringify(record).substring(0, 100)}`);
+        errors.push(
+          `Validation failed for record: ${JSON.stringify(record).substring(0, 100)}`
+        );
       }
     }
 
@@ -634,7 +665,7 @@ class EnrichmentStageProcessor implements IStageProcessor {
   ): Promise<any> {
     // Simple enrichment - would integrate with external services in production
     const data = Array.isArray(inputData) ? inputData : [inputData];
-    
+
     const enrichedData = data.map(record => ({
       ...record,
       enriched: true,

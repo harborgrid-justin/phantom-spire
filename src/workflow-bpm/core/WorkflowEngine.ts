@@ -9,7 +9,7 @@ import {
   IWorkflowDefinition,
   WorkflowStatus,
   WorkflowPriority,
-  IWorkflowInstance
+  IWorkflowInstance,
 } from '../interfaces/IWorkflowEngine.js';
 
 export interface IWorkflowEngineConfig {
@@ -29,7 +29,9 @@ export class WorkflowEngineCore extends EventEmitter {
     this.config = config;
   }
 
-  async registerWorkflowDefinition(definition: IWorkflowDefinition): Promise<void> {
+  async registerWorkflowDefinition(
+    definition: IWorkflowDefinition
+  ): Promise<void> {
     this.workflows.set(definition.id, definition);
     logger.info('Workflow definition registered', { id: definition.id });
   }
@@ -52,7 +54,7 @@ export class WorkflowEngineCore extends EventEmitter {
       initiatedBy,
       startedAt: new Date(),
       currentStep: 0,
-      steps: definition.steps || []
+      steps: definition.steps || [],
     };
 
     this.instances.set(instance.id, instance);
@@ -63,7 +65,9 @@ export class WorkflowEngineCore extends EventEmitter {
     return instance;
   }
 
-  async getWorkflowDefinition(workflowId: string): Promise<IWorkflowDefinition> {
+  async getWorkflowDefinition(
+    workflowId: string
+  ): Promise<IWorkflowDefinition> {
     const definition = this.workflows.get(workflowId);
     if (!definition) {
       throw new Error(`Workflow definition not found: ${workflowId}`);
@@ -125,9 +129,11 @@ export class WorkflowEngineCore extends EventEmitter {
 
   async getEngineMetrics(): Promise<any> {
     return {
-      activeInstances: Array.from(this.instances.values()).filter(i => i.status === 'running').length,
+      activeInstances: Array.from(this.instances.values()).filter(
+        i => i.status === 'running'
+      ).length,
       totalInstances: this.instances.size,
-      registeredWorkflows: this.workflows.size
+      registeredWorkflows: this.workflows.size,
     };
   }
 }

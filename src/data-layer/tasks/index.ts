@@ -7,10 +7,16 @@
 export * from './interfaces/ITaskManager.js';
 
 // Core implementation
-import { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine.js';
+import {
+  TaskManagerEngine,
+  DEFAULT_TASK_MANAGER_CONFIG,
+} from './core/TaskManagerEngine.js';
 import { TaskHandlerRegistry } from './handlers/TaskHandlers.js';
 
-export { TaskManagerEngine, DEFAULT_TASK_MANAGER_CONFIG } from './core/TaskManagerEngine.js';
+export {
+  TaskManagerEngine,
+  DEFAULT_TASK_MANAGER_CONFIG,
+} from './core/TaskManagerEngine.js';
 
 // Built-in handlers
 export {
@@ -169,21 +175,25 @@ export class TaskManagementSystemFactory {
     messageQueueManager?: any
   ): TaskManagerEngine {
     const engine = new TaskManagerEngine(config, messageQueueManager);
-    
+
     // Register built-in handlers
     const handlerRegistry = new TaskHandlerRegistry();
-    
+
     // Initialize with CTI-specific configurations
     for (const handler of handlerRegistry.getAllHandlers()) {
       engine.registerHandler(handler);
     }
-    
+
     return engine;
   }
 
   public static getTaskConfigurationForType(taskType: string): any {
-    const configKey = taskType.toUpperCase() as keyof typeof DEFAULT_CTI_TASK_CONFIGURATIONS;
-    return DEFAULT_CTI_TASK_CONFIGURATIONS[configKey] || DEFAULT_CTI_TASK_CONFIGURATIONS.DATA_INGESTION;
+    const configKey =
+      taskType.toUpperCase() as keyof typeof DEFAULT_CTI_TASK_CONFIGURATIONS;
+    return (
+      DEFAULT_CTI_TASK_CONFIGURATIONS[configKey] ||
+      DEFAULT_CTI_TASK_CONFIGURATIONS.DATA_INGESTION
+    );
   }
 }
 
@@ -414,11 +424,11 @@ export class TaskManagementUtils {
 
     // Adjust based on data volume
     if (parameters.recordCount) {
-      return baseTimeout + (parameters.recordCount * 100); // +100ms per record
+      return baseTimeout + parameters.recordCount * 100; // +100ms per record
     }
 
     if (parameters.dataSize) {
-      return baseTimeout + (parameters.dataSize * 10); // +10ms per byte
+      return baseTimeout + parameters.dataSize * 10; // +10ms per byte
     }
 
     return baseTimeout;

@@ -19,7 +19,7 @@ export type {
   ClassificationLevel,
   IChainOfCustodyEntry,
   CustodyAction,
-  EvidenceRelationshipType
+  EvidenceRelationshipType,
 } from './interfaces/IEvidence.js';
 
 export type {
@@ -28,5 +28,5 @@ export type {
   ICreateEvidenceRequest,
   IEvidenceQuery,
   IEvidenceSearchResult,
-  IEvidenceMetrics
+  IEvidenceMetrics,
 } from './interfaces/IEvidenceManager.js';

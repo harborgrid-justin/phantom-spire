@@ -9,11 +9,11 @@ import {
   EvidenceType,
   EvidenceSourceType,
   ClassificationLevel,
-  CustodyAction
+  CustodyAction,
 } from '../../data-layer/evidence/interfaces/IEvidence.js';
 import {
   IEvidenceContext,
-  ICreateEvidenceRequest
+  ICreateEvidenceRequest,
 } from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
 
 describe('Evidence Management Service', () => {
@@ -22,14 +22,14 @@ describe('Evidence Management Service', () => {
 
   beforeEach(() => {
     evidenceService = new EvidenceManagementService();
-    
+
     testContext = {
       userId: 'test-user-123',
       userRole: 'analyst',
       permissions: ['evidence:read', 'evidence:write'],
       classification: ClassificationLevel.TLP_AMBER,
       sessionId: 'test-session-456',
-      ipAddress: '192.168.1.100'
+      ipAddress: '192.168.1.100',
     };
   });
 
@@ -45,20 +45,23 @@ describe('Evidence Management Service', () => {
           type: 'ip',
           confidence: 85,
           severity: 'high',
-          tags: ['malware', 'c2']
+          tags: ['malware', 'c2'],
         },
         metadata: {
           title: 'Suspicious IP Address',
           description: 'IP address associated with malware C2',
           severity: 'high',
           confidence: 85,
-          format: 'json'
+          format: 'json',
         },
         classification: ClassificationLevel.TLP_AMBER,
-        tags: ['threat-intelligence', 'c2-server']
+        tags: ['threat-intelligence', 'c2-server'],
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
 
       expect(evidence).toBeDefined();
       expect(evidence.id).toBeDefined();
@@ -82,31 +85,37 @@ describe('Evidence Management Service', () => {
         data: {
           campaign: 'APT-TEST-001',
           ttps: ['T1055', 'T1027'],
-          attribution: 'test-actor'
+          attribution: 'test-actor',
         },
         metadata: {
           title: 'APT Campaign Analysis',
           description: 'Analysis of test APT campaign',
           severity: 'high',
           confidence: 90,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_RED
+        classification: ClassificationLevel.TLP_RED,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
-      
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
+
       // Test access with same classification level
-      const retrieved = await evidenceService.getEvidence(evidence.id, testContext);
+      const retrieved = await evidenceService.getEvidence(
+        evidence.id,
+        testContext
+      );
       expect(retrieved).toBeNull(); // Should fail due to higher classification
 
       // Test access with higher classification
       const highClassificationContext = {
         ...testContext,
-        classification: ClassificationLevel.TLP_RED
+        classification: ClassificationLevel.TLP_RED,
       };
       const retrievedWithAccess = await evidenceService.getEvidence(
-        evidence.id, 
+        evidence.id,
         highClassificationContext
       );
       expect(retrievedWithAccess).toBeDefined();
@@ -122,19 +131,22 @@ describe('Evidence Management Service', () => {
         data: {
           filename: 'suspicious.exe',
           hash: 'abc123def456',
-          size: 1024000
+          size: 1024000,
         },
         metadata: {
           title: 'Suspicious Executable',
           description: 'Potentially malicious executable file',
           severity: 'medium',
           confidence: 70,
-          format: 'binary'
+          format: 'binary',
         },
-        classification: ClassificationLevel.TLP_GREEN
+        classification: ClassificationLevel.TLP_GREEN,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
       expect(evidence.chainOfCustody).toHaveLength(1);
 
       // Update the evidence
@@ -143,9 +155,9 @@ describe('Evidence Management Service', () => {
         {
           metadata: {
             confidence: 90,
-            severity: 'high'
+            severity: 'high',
           },
-          tags: ['malware', 'trojan']
+          tags: ['malware', 'trojan'],
         },
         testContext
       );
@@ -156,7 +168,9 @@ describe('Evidence Management Service', () => {
       expect(updatedEvidence.tags).toContain('trojan');
       expect(updatedEvidence.version).toBe(2);
       expect(updatedEvidence.chainOfCustody).toHaveLength(2);
-      expect(updatedEvidence.chainOfCustody[1]?.action).toBe(CustodyAction.ANALYZED);
+      expect(updatedEvidence.chainOfCustody[1]?.action).toBe(
+        CustodyAction.ANALYZED
+      );
     });
   });
 
@@ -175,10 +189,10 @@ describe('Evidence Management Service', () => {
             description: 'Test IP 1',
             severity: 'high',
             confidence: 85,
-            format: 'json'
+            format: 'json',
           },
           classification: ClassificationLevel.TLP_AMBER,
-          tags: ['malware', 'c2']
+          tags: ['malware', 'c2'],
         },
         {
           type: EvidenceType.IOC_EVIDENCE,
@@ -191,11 +205,11 @@ describe('Evidence Management Service', () => {
             description: 'Test IP 2',
             severity: 'medium',
             confidence: 70,
-            format: 'json'
+            format: 'json',
           },
           classification: ClassificationLevel.TLP_GREEN,
-          tags: ['scan', 'recon']
-        }
+          tags: ['scan', 'recon'],
+        },
       ];
 
       for (const request of evidenceRequests) {
@@ -207,21 +221,23 @@ describe('Evidence Management Service', () => {
       const result = await evidenceService.searchEvidence(
         {
           types: [EvidenceType.IOC_EVIDENCE],
-          limit: 10
+          limit: 10,
         },
         testContext
       );
 
       expect(result.evidence).toHaveLength(2);
       expect(result.totalCount).toBe(2);
-      expect(result.evidence.every(e => e.type === EvidenceType.IOC_EVIDENCE)).toBe(true);
+      expect(
+        result.evidence.every(e => e.type === EvidenceType.IOC_EVIDENCE)
+      ).toBe(true);
     });
 
     it('should search evidence by tags', async () => {
       const result = await evidenceService.searchEvidence(
         {
           tags: ['malware'],
-          limit: 10
+          limit: 10,
         },
         testContext
       );
@@ -234,7 +250,7 @@ describe('Evidence Management Service', () => {
       const result = await evidenceService.searchEvidence(
         {
           severities: ['high'],
-          limit: 10
+          limit: 10,
         },
         testContext
       );
@@ -247,13 +263,15 @@ describe('Evidence Management Service', () => {
       const result = await evidenceService.searchEvidence(
         {
           confidenceRange: { min: 80, max: 100 },
-          limit: 10
+          limit: 10,
         },
         testContext
       );
 
       expect(result.evidence).toHaveLength(1);
-      expect(result.evidence[0]?.metadata.confidence).toBeGreaterThanOrEqual(80);
+      expect(result.evidence[0]?.metadata.confidence).toBeGreaterThanOrEqual(
+        80
+      );
     });
 
     it('should return facets with search results', async () => {
@@ -281,37 +299,43 @@ describe('Evidence Management Service', () => {
           protocol: 'HTTP',
           src_ip: '192.168.1.10',
           dst_ip: '10.0.0.1',
-          payload: 'GET /malware.exe'
+          payload: 'GET /malware.exe',
         },
         metadata: {
           title: 'Suspicious Network Traffic',
           description: 'HTTP request for malware',
           severity: 'high',
           confidence: 95,
-          format: 'pcap'
+          format: 'pcap',
         },
-        classification: ClassificationLevel.TLP_AMBER
+        classification: ClassificationLevel.TLP_AMBER,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
-      
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
+
       // Add custom custody entry
       await evidenceService.addCustodyEntry(
         evidence.id,
         {
           action: CustodyAction.ANALYZED,
           details: 'Analyzed by security team',
-          location: 'SOC-Lab-01'
+          location: 'SOC-Lab-01',
         },
         testContext
       );
 
       // Verify custody chain
-      const custodyChain = await evidenceService.getCustodyChain(evidence.id, testContext);
+      const custodyChain = await evidenceService.getCustodyChain(
+        evidence.id,
+        testContext
+      );
       expect(custodyChain).toHaveLength(2);
-      
+
       const verificationResult = await evidenceService.verifyCustodyChain(
-        evidence.id, 
+        evidence.id,
         testContext
       );
       expect(verificationResult.isValid).toBe(true);
@@ -331,31 +355,31 @@ describe('Evidence Management Service', () => {
           filename: 'malware.exe',
           md5: 'abc123def456789',
           sha256: '123456789abcdef',
-          behavior: ['file_create', 'registry_modify']
+          behavior: ['file_create', 'registry_modify'],
         },
         metadata: {
           title: 'Malware Sample Analysis',
           description: 'Analysis results from sandbox',
           severity: 'critical',
           confidence: 98,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_RED
+        classification: ClassificationLevel.TLP_RED,
       };
 
       const evidence = await evidenceService.createEvidence(request, {
         ...testContext,
-        classification: ClassificationLevel.TLP_RED
+        classification: ClassificationLevel.TLP_RED,
       });
 
       const integrityResult = await evidenceService.verifyIntegrity(
-        evidence.id, 
+        evidence.id,
         {
           ...testContext,
-          classification: ClassificationLevel.TLP_RED
+          classification: ClassificationLevel.TLP_RED,
         }
       );
-      
+
       expect(integrityResult.isValid).toBe(true);
       expect(integrityResult.algorithm).toBe('sha256');
       expect(integrityResult.currentHash).toBe(integrityResult.expectedHash);
@@ -371,23 +395,29 @@ describe('Evidence Management Service', () => {
           cve_id: 'CVE-2024-TEST',
           severity: 'high',
           description: 'Test vulnerability',
-          affected_systems: ['windows', 'linux']
+          affected_systems: ['windows', 'linux'],
         },
         metadata: {
           title: 'Critical Vulnerability Report',
           description: 'New critical vulnerability discovered',
           severity: 'critical',
           confidence: 90,
-          format: 'json'
+          format: 'json',
         },
-        classification: ClassificationLevel.TLP_WHITE
+        classification: ClassificationLevel.TLP_WHITE,
       };
 
-      const evidence = await evidenceService.createEvidence(request, testContext);
+      const evidence = await evidenceService.createEvidence(
+        request,
+        testContext
+      );
       const originalHash = evidence.integrity.hash;
-      
-      const newHash = await evidenceService.recalculateHash(evidence.id, testContext);
-      
+
+      const newHash = await evidenceService.recalculateHash(
+        evidence.id,
+        testContext
+      );
+
       expect(newHash).toBeDefined();
       expect(newHash).toBe(originalHash); // Should be same since data didn't change
     });
@@ -407,9 +437,9 @@ describe('Evidence Management Service', () => {
             description: 'Test bulk 1',
             severity: 'medium',
             confidence: 75,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_GREEN
+          classification: ClassificationLevel.TLP_GREEN,
         },
         {
           type: EvidenceType.IOC_EVIDENCE,
@@ -422,14 +452,17 @@ describe('Evidence Management Service', () => {
             description: 'Test bulk 2',
             severity: 'medium',
             confidence: 75,
-            format: 'json'
+            format: 'json',
           },
-          classification: ClassificationLevel.TLP_GREEN
-        }
+          classification: ClassificationLevel.TLP_GREEN,
+        },
       ];
 
-      const result = await evidenceService.bulkCreateEvidence(requests, testContext);
-      
+      const result = await evidenceService.bulkCreateEvidence(
+        requests,
+        testContext
+      );
+
       expect(result.successful).toBe(2);
       expect(result.failed).toBe(0);
       expect(result.errors).toHaveLength(0);
@@ -439,37 +472,43 @@ describe('Evidence Management Service', () => {
   describe('Evidence Relationships', () => {
     it('should add and manage evidence relationships', async () => {
       // Create two pieces of evidence
-      const evidence1 = await evidenceService.createEvidence({
-        type: EvidenceType.IOC_EVIDENCE,
-        sourceType: EvidenceSourceType.THREAT_FEED,
-        sourceId: 'rel-test-1',
-        sourceSystem: 'test',
-        data: { value: '1.1.1.1', type: 'ip' },
-        metadata: {
-          title: 'Related Evidence 1',
-          description: 'First piece of related evidence',
-          severity: 'high',
-          confidence: 85,
-          format: 'json'
+      const evidence1 = await evidenceService.createEvidence(
+        {
+          type: EvidenceType.IOC_EVIDENCE,
+          sourceType: EvidenceSourceType.THREAT_FEED,
+          sourceId: 'rel-test-1',
+          sourceSystem: 'test',
+          data: { value: '1.1.1.1', type: 'ip' },
+          metadata: {
+            title: 'Related Evidence 1',
+            description: 'First piece of related evidence',
+            severity: 'high',
+            confidence: 85,
+            format: 'json',
+          },
+          classification: ClassificationLevel.TLP_AMBER,
         },
-        classification: ClassificationLevel.TLP_AMBER
-      }, testContext);
+        testContext
+      );
 
-      const evidence2 = await evidenceService.createEvidence({
-        type: EvidenceType.IOC_EVIDENCE,
-        sourceType: EvidenceSourceType.THREAT_FEED,
-        sourceId: 'rel-test-2',
-        sourceSystem: 'test',
-        data: { value: 'evil.com', type: 'domain' },
-        metadata: {
-          title: 'Related Evidence 2',
-          description: 'Second piece of related evidence',
-          severity: 'high',
-          confidence: 85,
-          format: 'json'
+      const evidence2 = await evidenceService.createEvidence(
+        {
+          type: EvidenceType.IOC_EVIDENCE,
+          sourceType: EvidenceSourceType.THREAT_FEED,
+          sourceId: 'rel-test-2',
+          sourceSystem: 'test',
+          data: { value: 'evil.com', type: 'domain' },
+          metadata: {
+            title: 'Related Evidence 2',
+            description: 'Second piece of related evidence',
+            severity: 'high',
+            confidence: 85,
+            format: 'json',
+          },
+          classification: ClassificationLevel.TLP_AMBER,
         },
-        classification: ClassificationLevel.TLP_AMBER
-      }, testContext);
+        testContext
+      );
 
       // Add relationship
       await evidenceService.addRelationship(
@@ -479,7 +518,7 @@ describe('Evidence Management Service', () => {
           relationshipType: 'correlates_with',
           confidence: 85,
           description: 'Both IOCs part of same campaign',
-          evidence: ['temporal_correlation', 'same_source_campaign']
+          evidence: ['temporal_correlation', 'same_source_campaign'],
         },
         testContext
       );
@@ -489,7 +528,7 @@ describe('Evidence Management Service', () => {
         evidence1.id,
         testContext
       );
-      
+
       expect(relatedEvidence).toHaveLength(1);
       expect(relatedEvidence[0]?.id).toBe(evidence2.id);
     });
@@ -498,24 +537,27 @@ describe('Evidence Management Service', () => {
   describe('Evidence Metrics', () => {
     it('should generate comprehensive evidence metrics', async () => {
       // Create some test evidence first
-      await evidenceService.createEvidence({
-        type: EvidenceType.CAMPAIGN_EVIDENCE,
-        sourceType: EvidenceSourceType.HUMAN_ANALYSIS,
-        sourceId: 'metrics-test',
-        sourceSystem: 'test',
-        data: { campaign: 'TEST-METRICS' },
-        metadata: {
-          title: 'Metrics Test Evidence',
-          description: 'Evidence for metrics testing',
-          severity: 'high',
-          confidence: 90,
-          format: 'json'
+      await evidenceService.createEvidence(
+        {
+          type: EvidenceType.CAMPAIGN_EVIDENCE,
+          sourceType: EvidenceSourceType.HUMAN_ANALYSIS,
+          sourceId: 'metrics-test',
+          sourceSystem: 'test',
+          data: { campaign: 'TEST-METRICS' },
+          metadata: {
+            title: 'Metrics Test Evidence',
+            description: 'Evidence for metrics testing',
+            severity: 'high',
+            confidence: 90,
+            format: 'json',
+          },
+          classification: ClassificationLevel.TLP_AMBER,
         },
-        classification: ClassificationLevel.TLP_AMBER
-      }, testContext);
+        testContext
+      );
 
       const metrics = await evidenceService.getEvidenceMetrics();
-      
+
       expect(metrics).toBeDefined();
       expect(metrics.totalEvidence).toBeGreaterThan(0);
       expect(metrics.evidenceByType).toBeDefined();
@@ -535,35 +577,38 @@ describe('Evidence Analytics Engine', () => {
   beforeEach(() => {
     evidenceService = new EvidenceManagementService();
     analyticsEngine = new EvidenceAnalyticsEngine(evidenceService);
-    
+
     testContext = {
       userId: 'test-analyst',
       userRole: 'senior-analyst',
       permissions: ['evidence:read', 'evidence:write', 'evidence:analyze'],
       classification: ClassificationLevel.TLP_AMBER,
       sessionId: 'analytics-session',
-      ipAddress: '192.168.1.50'
+      ipAddress: '192.168.1.50',
     };
   });
 
   describe('Single Evidence Analysis', () => {
     it('should analyze single evidence for quality issues', async () => {
       // Create evidence with low confidence
-      const evidence = await evidenceService.createEvidence({
-        type: EvidenceType.IOC_EVIDENCE,
-        sourceType: EvidenceSourceType.OSINT,
-        sourceId: 'low-confidence-test',
-        sourceSystem: 'test',
-        data: { value: 'suspicious.domain.com', type: 'domain' },
-        metadata: {
-          title: 'Low Confidence IOC',
-          description: 'IOC with low confidence rating',
-          severity: 'medium',
-          confidence: 35, // Low confidence
-          format: 'json'
+      const evidence = await evidenceService.createEvidence(
+        {
+          type: EvidenceType.IOC_EVIDENCE,
+          sourceType: EvidenceSourceType.OSINT,
+          sourceId: 'low-confidence-test',
+          sourceSystem: 'test',
+          data: { value: 'suspicious.domain.com', type: 'domain' },
+          metadata: {
+            title: 'Low Confidence IOC',
+            description: 'IOC with low confidence rating',
+            severity: 'medium',
+            confidence: 35, // Low confidence
+            format: 'json',
+          },
+          classification: ClassificationLevel.TLP_GREEN,
         },
-        classification: ClassificationLevel.TLP_GREEN
-      }, testContext);
+        testContext
+      );
 
       const findings = await analyticsEngine.analyzeSingleEvidence(
         evidence.id,
@@ -572,8 +617,10 @@ describe('Evidence Analytics Engine', () => {
 
       expect(findings).toBeDefined();
       expect(findings.length).toBeGreaterThan(0);
-      
-      const lowConfidenceFinding = findings.find(f => f.title === 'Low Confidence Evidence');
+
+      const lowConfidenceFinding = findings.find(
+        f => f.title === 'Low Confidence Evidence'
+      );
       expect(lowConfidenceFinding).toBeDefined();
       expect(lowConfidenceFinding!.type).toBe('quality_issue');
       expect(lowConfidenceFinding!.severity).toBe('medium');
@@ -584,29 +631,32 @@ describe('Evidence Analytics Engine', () => {
     it('should perform comprehensive analysis on multiple evidence items', async () => {
       // Create multiple related evidence items
       const evidenceIds = [];
-      
+
       for (let i = 0; i < 3; i++) {
-        const evidence = await evidenceService.createEvidence({
-          type: EvidenceType.IOC_EVIDENCE,
-          sourceType: EvidenceSourceType.THREAT_FEED,
-          sourceId: `comprehensive-test-${i}`,
-          sourceSystem: 'test-comprehensive',
-          data: { 
-            value: `192.168.1.${100 + i}`, 
-            type: 'ip',
-            campaign: 'TEST-CAMPAIGN-001'
+        const evidence = await evidenceService.createEvidence(
+          {
+            type: EvidenceType.IOC_EVIDENCE,
+            sourceType: EvidenceSourceType.THREAT_FEED,
+            sourceId: `comprehensive-test-${i}`,
+            sourceSystem: 'test-comprehensive',
+            data: {
+              value: `192.168.1.${100 + i}`,
+              type: 'ip',
+              campaign: 'TEST-CAMPAIGN-001',
+            },
+            metadata: {
+              title: `Comprehensive Test Evidence ${i + 1}`,
+              description: `Evidence ${i + 1} for comprehensive analysis`,
+              severity: 'high',
+              confidence: 85 + i * 5,
+              format: 'json',
+            },
+            classification: ClassificationLevel.TLP_AMBER,
+            tags: ['test-campaign', 'comprehensive-analysis'],
           },
-          metadata: {
-            title: `Comprehensive Test Evidence ${i + 1}`,
-            description: `Evidence ${i + 1} for comprehensive analysis`,
-            severity: 'high',
-            confidence: 85 + i * 5,
-            format: 'json'
-          },
-          classification: ClassificationLevel.TLP_AMBER,
-          tags: ['test-campaign', 'comprehensive-analysis']
-        }, testContext);
-        
+          testContext
+        );
+
         evidenceIds.push(evidence.id);
       }
 
@@ -618,7 +668,7 @@ describe('Evidence Analytics Engine', () => {
           include_patterns: true,
           include_risk_assessment: true,
           include_recommendations: true,
-          analysis_depth: 'comprehensive'
+          analysis_depth: 'comprehensive',
         }
       );
 
@@ -642,25 +692,28 @@ describe('Evidence Analytics Engine', () => {
       const evidenceIds = [];
 
       for (let i = 0; i < 2; i++) {
-        const evidence = await evidenceService.createEvidence({
-          type: EvidenceType.ATTACK_PATTERN,
-          sourceType: EvidenceSourceType.SENSOR_DATA,
-          sourceId: `temporal-test-${i}`,
-          sourceSystem: 'test-temporal',
-          data: { 
-            technique: `T10${i}${i}`,
-            timestamp: new Date(baseTime.getTime() + i * 30000) // 30 seconds apart
+        const evidence = await evidenceService.createEvidence(
+          {
+            type: EvidenceType.ATTACK_PATTERN,
+            sourceType: EvidenceSourceType.SENSOR_DATA,
+            sourceId: `temporal-test-${i}`,
+            sourceSystem: 'test-temporal',
+            data: {
+              technique: `T10${i}${i}`,
+              timestamp: new Date(baseTime.getTime() + i * 30000), // 30 seconds apart
+            },
+            metadata: {
+              title: `Temporal Test Evidence ${i + 1}`,
+              description: `Evidence for temporal correlation testing`,
+              severity: 'high',
+              confidence: 90,
+              format: 'json',
+            },
+            classification: ClassificationLevel.TLP_AMBER,
           },
-          metadata: {
-            title: `Temporal Test Evidence ${i + 1}`,
-            description: `Evidence for temporal correlation testing`,
-            severity: 'high',
-            confidence: 90,
-            format: 'json'
-          },
-          classification: ClassificationLevel.TLP_AMBER
-        }, testContext);
-        
+          testContext
+        );
+
         evidenceIds.push(evidence.id);
       }
 
@@ -672,7 +725,7 @@ describe('Evidence Analytics Engine', () => {
 
       expect(correlations).toBeDefined();
       expect(correlations.length).toBeGreaterThan(0);
-      
+
       const correlation = correlations[0];
       expect(correlation?.correlation_type).toBe('temporal');
       expect(correlation?.strength).toBeGreaterThan(50);

@@ -9,28 +9,28 @@ export interface IEvidence {
   sourceType: EvidenceSourceType;
   sourceId: string;
   sourceSystem: string;
-  
+
   // Evidence content and metadata
   data: Record<string, any>;
   metadata: IEvidenceMetadata;
-  
+
   // Chain of custody
   chainOfCustody: IChainOfCustodyEntry[];
   provenance: IEvidenceProvenance;
-  
+
   // Classification and handling
   classification: ClassificationLevel;
   handling: HandlingInstruction[];
   retentionPolicy: IRetentionPolicy;
-  
+
   // Integrity and validation
   integrity: IIntegrityCheck;
   validation: IEvidenceValidation;
-  
+
   // Relationships
   relationships: IEvidenceRelationship[];
   tags: string[];
-  
+
   // Audit trail
   createdAt: Date;
   updatedAt: Date;
@@ -49,7 +49,7 @@ export enum EvidenceType {
   VULNERABILITY = 'vulnerability',
   CAMPAIGN_EVIDENCE = 'campaign_evidence',
   ATTRIBUTION_EVIDENCE = 'attribution_evidence',
-  CORRELATION_EVIDENCE = 'correlation_evidence'
+  CORRELATION_EVIDENCE = 'correlation_evidence',
 }
 
 export enum EvidenceSourceType {
@@ -62,7 +62,7 @@ export enum EvidenceSourceType {
   EXTERNAL_REPORT = 'external_report',
   HONEYPOT = 'honeypot',
   SANDBOX = 'sandbox',
-  OSINT = 'osint'
+  OSINT = 'osint',
 }
 
 export enum ClassificationLevel {
@@ -73,7 +73,7 @@ export enum ClassificationLevel {
   TLP_WHITE = 'tlp_white',
   TLP_GREEN = 'tlp_green',
   TLP_AMBER = 'tlp_amber',
-  TLP_RED = 'tlp_red'
+  TLP_RED = 'tlp_red',
 }
 
 export interface IEvidenceMetadata {
@@ -114,7 +114,7 @@ export enum CustodyAction {
   ARCHIVED = 'archived',
   EXPORTED = 'exported',
   DELETED = 'deleted',
-  RESTORED = 'restored'
+  RESTORED = 'restored',
 }
 
 export interface IEvidenceProvenance {
@@ -141,7 +141,11 @@ export interface IProcessingStep {
 export interface IDataLineage {
   sourceId: string;
   sourceType: string;
-  relationship: 'derived_from' | 'aggregated_from' | 'enriched_by' | 'validated_by';
+  relationship:
+    | 'derived_from'
+    | 'aggregated_from'
+    | 'enriched_by'
+    | 'validated_by';
   timestamp: Date;
 }
 
@@ -207,7 +211,7 @@ export enum EvidenceRelationshipType {
   PRECEDES = 'precedes',
   FOLLOWS = 'follows',
   ATTRIBUTED_TO = 'attributed_to',
-  VALIDATES = 'validates'
+  VALIDATES = 'validates',
 }
 
 export interface IDataQuality {

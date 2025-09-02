@@ -79,8 +79,11 @@ describe('Fortune 100-Grade Task Management System', () => {
 
       // Get task status
       const status = await taskManager.getTaskStatus(task.id);
-      expect([TaskStatus.QUEUED, TaskStatus.RUNNING, TaskStatus.COMPLETED]).toContain(status);
-
+      expect([
+        TaskStatus.QUEUED,
+        TaskStatus.RUNNING,
+        TaskStatus.COMPLETED,
+      ]).toContain(status);
     }, 15000);
 
     it('should create and execute a threat analysis task', async () => {
@@ -109,7 +112,6 @@ describe('Fortune 100-Grade Task Management System', () => {
 
       const execution = await taskManager.executeTask(task.id);
       expect(execution).toBeDefined();
-
     }, 10000);
 
     it('should handle task cancellation', async () => {
@@ -136,7 +138,6 @@ describe('Fortune 100-Grade Task Management System', () => {
 
       const finalStatus = await taskManager.getTaskStatus(task.id);
       expect(finalStatus).toBe(TaskStatus.CANCELLED);
-
     }, 10000);
 
     it('should query tasks with filters', async () => {
@@ -170,7 +171,9 @@ describe('Fortune 100-Grade Task Management System', () => {
       });
 
       expect(alertTasks.tasks.length).toBeGreaterThanOrEqual(3);
-      expect(alertTasks.tasks.every(t => t.type === TaskType.ALERTING)).toBe(true);
+      expect(alertTasks.tasks.every(t => t.type === TaskType.ALERTING)).toBe(
+        true
+      );
 
       // Query with tag filter
       const taggedTasks = await taskManager.queryTasks({
@@ -180,7 +183,6 @@ describe('Fortune 100-Grade Task Management System', () => {
 
       expect(taggedTasks.tasks.length).toBeGreaterThanOrEqual(3);
       expect(taggedTasks.tasks.every(t => t.tags.includes('test'))).toBe(true);
-
     }, 15000);
 
     it('should search tasks by text', async () => {
@@ -211,14 +213,13 @@ describe('Fortune 100-Grade Task Management System', () => {
       expect(searchResults.tasks.length).toBeGreaterThanOrEqual(1);
       const foundTask = searchResults.tasks.find(t => t.id === task.id);
       expect(foundTask).toBeDefined();
-
     }, 10000);
   });
 
   describe('Task Handlers', () => {
     it('should have all built-in CTI handlers registered', () => {
       const allHandlers = handlerRegistry.getAllHandlers();
-      
+
       expect(allHandlers.length).toBeGreaterThanOrEqual(8);
 
       // Check for specific CTI handlers
@@ -234,26 +235,37 @@ describe('Fortune 100-Grade Task Management System', () => {
     });
 
     it('should get handlers for specific task types', () => {
-      const iocHandlers = handlerRegistry.getHandlersForType(TaskType.IOC_PROCESSING);
+      const iocHandlers = handlerRegistry.getHandlersForType(
+        TaskType.IOC_PROCESSING
+      );
       expect(iocHandlers.length).toBeGreaterThanOrEqual(1);
       expect(iocHandlers[0].supportedTypes).toContain(TaskType.IOC_PROCESSING);
 
-      const threatHandlers = handlerRegistry.getHandlersForType(TaskType.THREAT_ANALYSIS);
+      const threatHandlers = handlerRegistry.getHandlersForType(
+        TaskType.THREAT_ANALYSIS
+      );
       expect(threatHandlers.length).toBeGreaterThanOrEqual(1);
-      expect(threatHandlers[0].supportedTypes).toContain(TaskType.THREAT_ANALYSIS);
+      expect(threatHandlers[0].supportedTypes).toContain(
+        TaskType.THREAT_ANALYSIS
+      );
     });
   });
 
   describe('Task Templates and Utilities', () => {
     it('should create tasks from all available templates', () => {
-      const templates = Object.keys(CTI_TASK_TEMPLATES) as (keyof typeof CTI_TASK_TEMPLATES)[];
-      
+      const templates = Object.keys(
+        CTI_TASK_TEMPLATES
+      ) as (keyof typeof CTI_TASK_TEMPLATES)[];
+
       expect(templates.length).toBeGreaterThanOrEqual(6);
 
       for (const templateName of templates) {
-        const taskDef = TaskManagementUtils.createTaskFromTemplate(templateName, {
-          createdBy: 'test-user',
-        });
+        const taskDef = TaskManagementUtils.createTaskFromTemplate(
+          templateName,
+          {
+            createdBy: 'test-user',
+          }
+        );
 
         expect(taskDef).toBeDefined();
         expect(taskDef.name).toBeDefined();
@@ -266,30 +278,39 @@ describe('Fortune 100-Grade Task Management System', () => {
     });
 
     it('should calculate task priorities correctly', () => {
-      expect(TaskManagementUtils.calculateTaskPriority({
-        severity: 'critical',
-        urgency: 'immediate'
-      })).toBe('critical');
+      expect(
+        TaskManagementUtils.calculateTaskPriority({
+          severity: 'critical',
+          urgency: 'immediate',
+        })
+      ).toBe('critical');
 
-      expect(TaskManagementUtils.calculateTaskPriority({
-        severity: 'high',
-        urgency: 'urgent'
-      })).toBe('high');
+      expect(
+        TaskManagementUtils.calculateTaskPriority({
+          severity: 'high',
+          urgency: 'urgent',
+        })
+      ).toBe('high');
 
-      expect(TaskManagementUtils.calculateTaskPriority({
-        severity: 'medium'
-      })).toBe('normal');
+      expect(
+        TaskManagementUtils.calculateTaskPriority({
+          severity: 'medium',
+        })
+      ).toBe('normal');
 
       expect(TaskManagementUtils.calculateTaskPriority({})).toBe('low');
     });
 
     it('should generate workflow dependencies', () => {
-      const incidentDeps = TaskManagementUtils.generateTaskDependencies('incident-response');
+      const incidentDeps =
+        TaskManagementUtils.generateTaskDependencies('incident-response');
       expect(incidentDeps).toContain('evidence-collection');
       expect(incidentDeps).toContain('threat-analysis');
       expect(incidentDeps).toContain('report-generation');
 
-      const threatIntelDeps = TaskManagementUtils.generateTaskDependencies('threat-intelligence');
+      const threatIntelDeps = TaskManagementUtils.generateTaskDependencies(
+        'threat-intelligence'
+      );
       expect(threatIntelDeps).toContain('data-ingestion');
       expect(threatIntelDeps).toContain('correlation-analysis');
     });
@@ -335,7 +356,7 @@ describe('Fortune 100-Grade Task Management System', () => {
       // Try to create task with missing required fields
       await expect(
         taskManager.createTask({
-          name: 'Invalid Task'
+          name: 'Invalid Task',
           // Missing type and definition
         } as any)
       ).rejects.toThrow();

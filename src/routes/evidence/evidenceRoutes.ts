@@ -5,16 +5,19 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { authMiddleware as authenticateToken, requireRole as authorizeRole } from '../../middleware/auth.js';
+import {
+  authMiddleware as authenticateToken,
+  requireRole as authorizeRole,
+} from '../../middleware/auth.js';
 import { DataLayerOrchestrator } from '../../data-layer/DataLayerOrchestrator.js';
-import { 
-  EvidenceType, 
-  EvidenceSourceType, 
-  ClassificationLevel 
+import {
+  EvidenceType,
+  EvidenceSourceType,
+  ClassificationLevel,
 } from '../../data-layer/evidence/interfaces/IEvidence.js';
-import { 
-  IEvidenceContext, 
-  ICreateEvidenceRequest 
+import {
+  IEvidenceContext,
+  ICreateEvidenceRequest,
 } from '../../data-layer/evidence/interfaces/IEvidenceManager.js';
 import { logger } from '../../utils/logger.js';
 
@@ -29,7 +32,7 @@ const createEvidenceContext = (req: any): IEvidenceContext => {
     classification: req.user?.classification || ClassificationLevel.TLP_WHITE,
     sessionId: req.sessionID || 'unknown',
     ipAddress: req.ip || req.connection.remoteAddress || 'unknown',
-    userAgent: req.get('User-Agent')
+    userAgent: req.get('User-Agent'),
   };
 };
 
@@ -106,7 +109,8 @@ const createEvidenceContext = (req: any): IEvidenceContext => {
  *       403:
  *         description: Insufficient permissions
  */
-router.post('/',
+router.post(
+  '/',
   authenticateToken,
   authorizeRole(['analyst', 'admin']),
   [
@@ -120,7 +124,7 @@ router.post('/',
     body('metadata.severity').isIn(['low', 'medium', 'high', 'critical']),
     body('metadata.confidence').isInt({ min: 0, max: 100 }),
     body('metadata.format').notEmpty(),
-    body('classification').optional().isIn(Object.values(ClassificationLevel))
+    body('classification').optional().isIn(Object.values(ClassificationLevel)),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -129,13 +133,15 @@ router.post('/',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
-      
+
       const request: ICreateEvidenceRequest = {
         type: req.body.type,
         sourceType: req.body.sourceType,
@@ -143,10 +149,11 @@ router.post('/',
         sourceSystem: req.body.sourceSystem,
         data: req.body.data,
         metadata: req.body.metadata,
-        classification: req.body.classification || ClassificationLevel.TLP_WHITE,
+        classification:
+          req.body.classification || ClassificationLevel.TLP_WHITE,
         tags: req.body.tags || [],
         handling: req.body.handling,
-        retentionPolicy: req.body.retentionPolicy
+        retentionPolicy: req.body.retentionPolicy,
       };
 
       const evidence = await orchestrator.createEvidence(request, context);
@@ -155,24 +162,24 @@ router.post('/',
         evidenceId: evidence.id,
         userId: context.userId,
         type: evidence.type,
-        classification: evidence.classification
+        classification: evidence.classification,
       });
 
       res.status(201).json({
         success: true,
         data: evidence,
-        message: 'Evidence created successfully'
+        message: 'Evidence created successfully',
       });
     } catch (error) {
       logger.error('Failed to create evidence via API', {
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to create evidence',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -289,13 +296,14 @@ router.post('/',
  *       401:
  *         description: Unauthorized
  */
-router.get('/',
+router.get(
+  '/',
   authenticateToken,
   [
     query('minConfidence').optional().isInt({ min: 0, max: 100 }),
     query('maxConfidence').optional().isInt({ min: 0, max: 100 }),
     query('limit').optional().isInt({ min: 1, max: 1000 }),
-    query('offset').optional().isInt({ min: 0 })
+    query('offset').optional().isInt({ min: 0 }),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -304,32 +312,70 @@ router.get('/',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
-      
+
       const query: any = {
-        types: req.query.types ? (Array.isArray(req.query.types) ? (req.query.types as string[]).map(t => t as EvidenceType) : [req.query.types as EvidenceType]) : undefined,
-        sourceTypes: req.query.sourceTypes ? (Array.isArray(req.query.sourceTypes) ? (req.query.sourceTypes as string[]).map(t => t as EvidenceSourceType) : [req.query.sourceTypes as EvidenceSourceType]) : undefined,
-        classifications: req.query.classifications ? (Array.isArray(req.query.classifications) ? (req.query.classifications as string[]).map(c => c as ClassificationLevel) : [req.query.classifications as ClassificationLevel]) : undefined,
-        tags: req.query.tags ? (Array.isArray(req.query.tags) ? req.query.tags as string[] : [req.query.tags as string]) : undefined,
+        types: req.query.types
+          ? Array.isArray(req.query.types)
+            ? (req.query.types as string[]).map(t => t as EvidenceType)
+            : [req.query.types as EvidenceType]
+          : undefined,
+        sourceTypes: req.query.sourceTypes
+          ? Array.isArray(req.query.sourceTypes)
+            ? (req.query.sourceTypes as string[]).map(
+                t => t as EvidenceSourceType
+              )
+            : [req.query.sourceTypes as EvidenceSourceType]
+          : undefined,
+        classifications: req.query.classifications
+          ? Array.isArray(req.query.classifications)
+            ? (req.query.classifications as string[]).map(
+                c => c as ClassificationLevel
+              )
+            : [req.query.classifications as ClassificationLevel]
+          : undefined,
+        tags: req.query.tags
+          ? Array.isArray(req.query.tags)
+            ? (req.query.tags as string[])
+            : [req.query.tags as string]
+          : undefined,
         text: req.query.text as string,
-        severities: req.query.severities ? (Array.isArray(req.query.severities) ? req.query.severities as Array<'low' | 'medium' | 'high' | 'critical'> : [req.query.severities as 'low' | 'medium' | 'high' | 'critical']) : undefined,
-        confidenceRange: (req.query.minConfidence || req.query.maxConfidence) ? {
-          min: parseInt(req.query.minConfidence as string) || 0,
-          max: parseInt(req.query.maxConfidence as string) || 100
-        } : undefined,
-        dateRange: (req.query.startDate || req.query.endDate) ? {
-          start: req.query.startDate ? new Date(req.query.startDate as string) : new Date(0),
-          end: req.query.endDate ? new Date(req.query.endDate as string) : new Date()
-        } : undefined,
+        severities: req.query.severities
+          ? Array.isArray(req.query.severities)
+            ? (req.query.severities as Array<
+                'low' | 'medium' | 'high' | 'critical'
+              >)
+            : [req.query.severities as 'low' | 'medium' | 'high' | 'critical']
+          : undefined,
+        confidenceRange:
+          req.query.minConfidence || req.query.maxConfidence
+            ? {
+                min: parseInt(req.query.minConfidence as string) || 0,
+                max: parseInt(req.query.maxConfidence as string) || 100,
+              }
+            : undefined,
+        dateRange:
+          req.query.startDate || req.query.endDate
+            ? {
+                start: req.query.startDate
+                  ? new Date(req.query.startDate as string)
+                  : new Date(0),
+                end: req.query.endDate
+                  ? new Date(req.query.endDate as string)
+                  : new Date(),
+              }
+            : undefined,
         sortBy: req.query.sortBy as string,
         sortDirection: req.query.sortDirection as 'asc' | 'desc',
         limit: parseInt(req.query.limit as string) || 50,
-        offset: parseInt(req.query.offset as string) || 0
+        offset: parseInt(req.query.offset as string) || 0,
       };
 
       const result = await orchestrator.searchEvidence(query, context);
@@ -337,18 +383,18 @@ router.get('/',
       res.json({
         success: true,
         data: result,
-        message: 'Search completed successfully'
+        message: 'Search completed successfully',
       });
     } catch (error) {
       logger.error('Failed to search evidence via API', {
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to search evidence',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -377,11 +423,10 @@ router.get('/',
  *       401:
  *         description: Unauthorized
  */
-router.get('/:evidenceId',
+router.get(
+  '/:evidenceId',
   authenticateToken,
-  [
-    param('evidenceId').notEmpty()
-  ],
+  [param('evidenceId').notEmpty()],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
@@ -389,39 +434,44 @@ router.get('/:evidenceId',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
       const evidenceManager = orchestrator.getEvidenceManager();
-      
-      const evidence = await evidenceManager.getEvidence(req.params.evidenceId, context);
-      
+
+      const evidence = await evidenceManager.getEvidence(
+        req.params.evidenceId,
+        context
+      );
+
       if (!evidence) {
         return res.status(404).json({
           success: false,
-          message: 'Evidence not found or access denied'
+          message: 'Evidence not found or access denied',
         });
       }
 
       res.json({
         success: true,
         data: evidence,
-        message: 'Evidence retrieved successfully'
+        message: 'Evidence retrieved successfully',
       });
     } catch (error) {
       logger.error('Failed to retrieve evidence via API', {
         evidenceId: req.params.evidenceId,
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve evidence',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -452,12 +502,11 @@ router.get('/:evidenceId',
  *       403:
  *         description: Insufficient permissions
  */
-router.post('/:evidenceId/analyze',
+router.post(
+  '/:evidenceId/analyze',
   authenticateToken,
   authorizeRole(['analyst', 'admin']),
-  [
-    param('evidenceId').notEmpty()
-  ],
+  [param('evidenceId').notEmpty()],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
@@ -465,14 +514,16 @@ router.post('/:evidenceId/analyze',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
       const analyticsEngine = orchestrator.getEvidenceAnalyticsEngine();
-      
+
       const findings = await analyticsEngine.analyzeSingleEvidence(
         req.params.evidenceId,
         context
@@ -483,21 +534,21 @@ router.post('/:evidenceId/analyze',
         data: {
           evidenceId: req.params.evidenceId,
           findings,
-          analyzedAt: new Date()
+          analyzedAt: new Date(),
         },
-        message: 'Evidence analysis completed successfully'
+        message: 'Evidence analysis completed successfully',
       });
     } catch (error) {
       logger.error('Failed to analyze evidence via API', {
         evidenceId: req.params.evidenceId,
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to analyze evidence',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -526,11 +577,10 @@ router.post('/:evidenceId/analyze',
  *       401:
  *         description: Unauthorized
  */
-router.get('/:evidenceId/custody',
+router.get(
+  '/:evidenceId/custody',
   authenticateToken,
-  [
-    param('evidenceId').notEmpty()
-  ],
+  [param('evidenceId').notEmpty()],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
@@ -538,37 +588,45 @@ router.get('/:evidenceId/custody',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
       const evidenceManager = orchestrator.getEvidenceManager();
-      
-      const custodyChain = await evidenceManager.getCustodyChain(req.params.evidenceId, context);
-      const verification = await evidenceManager.verifyCustodyChain(req.params.evidenceId, context);
+
+      const custodyChain = await evidenceManager.getCustodyChain(
+        req.params.evidenceId,
+        context
+      );
+      const verification = await evidenceManager.verifyCustodyChain(
+        req.params.evidenceId,
+        context
+      );
 
       res.json({
         success: true,
         data: {
           evidenceId: req.params.evidenceId,
           custodyChain,
-          verification
+          verification,
         },
-        message: 'Custody chain retrieved successfully'
+        message: 'Custody chain retrieved successfully',
       });
     } catch (error) {
       logger.error('Failed to retrieve custody chain via API', {
         evidenceId: req.params.evidenceId,
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve custody chain',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -599,12 +657,11 @@ router.get('/:evidenceId/custody',
  *       403:
  *         description: Insufficient permissions
  */
-router.post('/:evidenceId/integrity',
+router.post(
+  '/:evidenceId/integrity',
   authenticateToken,
   authorizeRole(['analyst', 'admin']),
-  [
-    param('evidenceId').notEmpty()
-  ],
+  [param('evidenceId').notEmpty()],
   async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
@@ -612,31 +669,36 @@ router.post('/:evidenceId/integrity',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
-      
-      const result = await orchestrator.verifyEvidenceIntegrity(req.params.evidenceId, context);
+
+      const result = await orchestrator.verifyEvidenceIntegrity(
+        req.params.evidenceId,
+        context
+      );
 
       res.json({
         success: true,
         data: result,
-        message: 'Integrity verification completed successfully'
+        message: 'Integrity verification completed successfully',
       });
     } catch (error) {
       logger.error('Failed to verify evidence integrity via API', {
         evidenceId: req.params.evidenceId,
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to verify evidence integrity',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -692,13 +754,16 @@ router.post('/:evidenceId/integrity',
  *       403:
  *         description: Insufficient permissions
  */
-router.post('/analyze',
+router.post(
+  '/analyze',
   authenticateToken,
   authorizeRole(['analyst', 'admin']),
   [
     body('evidenceIds').isArray({ min: 1 }),
     body('evidenceIds.*').notEmpty(),
-    body('options.analysis_depth').optional().isIn(['basic', 'standard', 'comprehensive'])
+    body('options.analysis_depth')
+      .optional()
+      .isIn(['basic', 'standard', 'comprehensive']),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -707,13 +772,15 @@ router.post('/analyze',
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
-          errors: errors.array()
+          errors: errors.array(),
         });
       }
 
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
       const context = createEvidenceContext(req);
-      
+
       const result = await orchestrator.analyzeEvidence(
         req.body.evidenceIds,
         context,
@@ -723,19 +790,22 @@ router.post('/analyze',
       res.json({
         success: true,
         data: result,
-        message: 'Comprehensive analysis completed successfully'
+        message: 'Comprehensive analysis completed successfully',
       });
     } catch (error) {
-      logger.error('Failed to perform comprehensive evidence analysis via API', {
-        evidenceIds: req.body.evidenceIds,
-        userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      logger.error(
+        'Failed to perform comprehensive evidence analysis via API',
+        {
+          evidenceIds: req.body.evidenceIds,
+          userId: (req as any).user?.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }
+      );
 
       res.status(500).json({
         success: false,
         message: 'Failed to perform evidence analysis',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }
@@ -770,35 +840,45 @@ router.post('/analyze',
  *       403:
  *         description: Insufficient permissions
  */
-router.get('/metrics',
+router.get(
+  '/metrics',
   authenticateToken,
   authorizeRole(['analyst', 'admin']),
   async (req: Request, res: Response) => {
     try {
-      const orchestrator: DataLayerOrchestrator = req.app.get('dataLayerOrchestrator');
-      
-      const timeRange = (req.query.startDate || req.query.endDate) ? {
-        start: req.query.startDate ? new Date(req.query.startDate as string) : new Date(0),
-        end: req.query.endDate ? new Date(req.query.endDate as string) : new Date()
-      } : undefined;
+      const orchestrator: DataLayerOrchestrator = req.app.get(
+        'dataLayerOrchestrator'
+      );
+
+      const timeRange =
+        req.query.startDate || req.query.endDate
+          ? {
+              start: req.query.startDate
+                ? new Date(req.query.startDate as string)
+                : new Date(0),
+              end: req.query.endDate
+                ? new Date(req.query.endDate as string)
+                : new Date(),
+            }
+          : undefined;
 
       const metrics = await orchestrator.getEvidenceMetrics(timeRange);
 
       res.json({
         success: true,
         data: metrics,
-        message: 'Evidence metrics retrieved successfully'
+        message: 'Evidence metrics retrieved successfully',
       });
     } catch (error) {
       logger.error('Failed to retrieve evidence metrics via API', {
         userId: (req as any).user?.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
 
       res.status(500).json({
         success: false,
         message: 'Failed to retrieve evidence metrics',
-        error: error instanceof Error ? error.message : 'Internal server error'
+        error: error instanceof Error ? error.message : 'Internal server error',
       });
     }
   }

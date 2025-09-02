@@ -5,7 +5,10 @@
 
 import { IMessage } from './IMessageQueue.js';
 import { IIOC } from '../../models/IOC.js';
-import { IDataRecord, IQueryContext } from '../../data-layer/interfaces/IDataSource.js';
+import {
+  IDataRecord,
+  IQueryContext,
+} from '../../data-layer/interfaces/IDataSource.js';
 import { IAnalyticsResult } from '../../data-layer/analytics/AdvancedAnalyticsEngine.js';
 
 // IOC-related Messages
@@ -73,7 +76,11 @@ export interface IRelationshipData {
 export interface IThreatAnalysisRequest {
   readonly analysisId: string;
   readonly iocs: IIOC[];
-  readonly analysisType: 'campaign' | 'attribution' | 'behavioral' | 'infrastructure';
+  readonly analysisType:
+    | 'campaign'
+    | 'attribution'
+    | 'behavioral'
+    | 'infrastructure';
   readonly options: {
     readonly includePredictions: boolean;
     readonly includeAnomalies: boolean;
@@ -258,29 +265,29 @@ export const MessageTypes = {
   IOC_ENRICHMENT_RESULT: 'ioc.enrichment.result',
   IOC_VALIDATION_REQUEST: 'ioc.validation.request',
   IOC_VALIDATION_RESULT: 'ioc.validation.result',
-  
+
   // Threat Analysis Messages
   THREAT_ANALYSIS_REQUEST: 'threat.analysis.request',
   THREAT_ANALYSIS_RESULT: 'threat.analysis.result',
   CAMPAIGN_DISCOVERY: 'threat.campaign.discovery',
   ATTRIBUTION_ANALYSIS: 'threat.attribution.analysis',
-  
+
   // Data Integration Messages
   DATA_INGESTION_REQUEST: 'data.ingestion.request',
   DATA_INGESTION_RESULT: 'data.ingestion.result',
   DATA_VALIDATION_REQUEST: 'data.validation.request',
   DATA_VALIDATION_RESULT: 'data.validation.result',
-  
+
   // Alert Messages
   THREAT_ALERT_NOTIFICATION: 'alert.threat.notification',
   ALERT_ESCALATION: 'alert.escalation',
   ALERT_ACKNOWLEDGMENT: 'alert.acknowledgment',
-  
+
   // Analytics Pipeline Messages
   ANALYTICS_PIPELINE_REQUEST: 'analytics.pipeline.request',
   ANALYTICS_PIPELINE_RESULT: 'analytics.pipeline.result',
   ANALYTICS_STEP_COMPLETE: 'analytics.step.complete',
-  
+
   // System Messages
   SYSTEM_HEALTH_CHECK: 'system.health.check',
   SYSTEM_METRICS_UPDATE: 'system.metrics.update',
@@ -306,5 +313,6 @@ export type ThreatAnalysisResultMessage = IMessage<IThreatAnalysisResult>;
 export type DataIngestionRequestMessage = IMessage<IDataIngestionRequest>;
 export type DataIngestionResultMessage = IMessage<IDataIngestionResult>;
 export type ThreatAlertNotificationMessage = IMessage<IThreatAlertNotification>;
-export type AnalyticsPipelineRequestMessage = IMessage<IAnalyticsPipelineRequest>;
+export type AnalyticsPipelineRequestMessage =
+  IMessage<IAnalyticsPipelineRequest>;
 export type AnalyticsPipelineResultMessage = IMessage<IAnalyticsPipelineResult>;

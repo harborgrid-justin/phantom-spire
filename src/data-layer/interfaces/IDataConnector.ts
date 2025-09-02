@@ -10,13 +10,16 @@ export interface IDataConnector {
   readonly type: string;
   readonly version: string;
   readonly supportedFormats: string[];
-  
+
   initialize(config: IConnectorConfig): Promise<void>;
   validate(config: IConnectorConfig): Promise<IValidationResult>;
   connect(): Promise<void>;
   disconnect(): Promise<void>;
   extract(request: IExtractionRequest): Promise<IExtractionResult>;
-  transform(data: any[], transformationRules: ITransformationRule[]): Promise<IDataRecord[]>;
+  transform(
+    data: any[],
+    transformationRules: ITransformationRule[]
+  ): Promise<IDataRecord[]>;
   load(records: IDataRecord[], target: string): Promise<ILoadResult>;
   healthCheck(): Promise<IHealthStatus>;
 }
@@ -42,7 +45,14 @@ export interface IConnectionConfig {
 }
 
 export interface IAuthConfig {
-  type: 'none' | 'basic' | 'bearer' | 'apikey' | 'oauth2' | 'certificate' | 'authkey';
+  type:
+    | 'none'
+    | 'basic'
+    | 'bearer'
+    | 'apikey'
+    | 'oauth2'
+    | 'certificate'
+    | 'authkey';
   credentials: Record<string, string>;
 }
 
@@ -104,7 +114,7 @@ export interface ILoadResult {
 export interface IDataPipeline {
   readonly name: string;
   readonly stages: IPipelineStage[];
-  
+
   execute(input: any, context?: any): Promise<IPipelineResult>;
   validate(): Promise<IValidationResult>;
   monitor(): Promise<IPipelineMetrics>;

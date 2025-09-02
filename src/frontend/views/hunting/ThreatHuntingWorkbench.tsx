@@ -76,7 +76,7 @@ import {
   StorageOutlined
 } from '@mui/icons-material';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 interface HuntingQuery {
   id: string;

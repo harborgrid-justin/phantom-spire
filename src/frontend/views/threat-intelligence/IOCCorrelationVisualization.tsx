@@ -56,21 +56,16 @@ import {
   FormControlLabel,
   Tabs,
   Tab,
-  TabPanel,
   Drawer,
   AppBar,
   Toolbar,
-  Menu,
   ListItemButton,
   Collapse,
-  TreeView,
-  TreeItem
 } from '@mui/material';
 
 import {
   Hub,
   AccountTree,
-  Scatter,
   BubbleChart,
   Timeline,
   NetworkCheck,
@@ -128,10 +123,11 @@ import {
   Pause,
   Stop,
   FastForward,
-  FastRewind
+  FastRewind,
+  Menu
 } from '@mui/icons-material';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced interfaces for IOC correlation
 interface IOCNode {
@@ -866,9 +862,8 @@ const IOCCorrelationVisualization: React.FC = () => {
       </Typography>
       <List dense>
         {clusters.map(cluster => (
-          <ListItem
+          <ListItemButton
             key={cluster.id}
-            button
             selected={selectedCluster === cluster.id}
             onClick={() => setSelectedCluster(cluster.id)}
           >
@@ -895,7 +890,7 @@ const IOCCorrelationVisualization: React.FC = () => {
                 ));
               }}
             />
-          </ListItem>
+          </ListItemButton>
         ))}
       </List>
     </Paper>
@@ -1059,7 +1054,6 @@ const IOCCorrelationVisualization: React.FC = () => {
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
             variant="fullWidth"
-            size="small"
           >
             <Tab label="Stats" />
             <Tab label="Clusters" />

@@ -59,13 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   AppBar,
   Toolbar,
   Drawer,
@@ -77,8 +70,6 @@ import {
   MenuItem as MenuItemComponent,
   ListItemButton,
   Collapse,
-  TreeView,
-  TreeItem,
   Breadcrumbs,
   Link,
   RadioGroup,
@@ -91,7 +82,7 @@ import {
 } from '@mui/material';
 
 import {
-  Rss,
+  RssFeed as Rss,
   Stream,
   CloudDownload,
   Storage,
@@ -132,7 +123,7 @@ import {
   Delete,
   Add,
   Remove,
-  Copy,
+  ContentCopy as Copy,
   Save,
   SaveAs,
   FolderOpen,
@@ -175,11 +166,9 @@ import {
   Api,
   Code,
   Extension,
-  Integration,
   Cable,
   Webhook,
   QrCode,
-  RssFeed,
   Notifications,
   NotificationsActive,
   NotificationsOff,
@@ -192,7 +181,8 @@ import {
   Tablet,
   PhonelinkSetup,
   Cast,
-  CastConnected
+  CastConnected,
+  History
 } from '@mui/icons-material';
 
 import {
@@ -225,7 +215,6 @@ import {
   LabelList
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
 
 // Feed processing interfaces
 interface ThreatFeed {
@@ -447,17 +436,6 @@ const AutomatedThreatFeedProcessor: React.FC = () => {
   const [healthFilter, setHealthFilter] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d' | '30d'>('24h');
 
-  // Initialize UI/UX Evaluation
-  useEffect(() => {
-    const evaluationController = addUIUXEvaluation('automated-threat-feed-processor', {
-      continuous: true,
-      position: 'bottom-right',
-      minimized: true,
-      interval: 120000
-    });
-
-    return () => evaluationController.remove();
-  }, []);
 
   // Initialize WebSocket for real-time updates
   useEffect(() => {

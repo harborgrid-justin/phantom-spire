@@ -59,12 +59,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   Breadcrumbs,
   Link,
   Menu,
@@ -75,8 +69,19 @@ import {
   ClickAwayListener,
   Backdrop,
   Fade,
-  Modal
+  Modal,
+  ListItemButton,
+  FormGroup
 } from '@mui/material';
+
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot
+} from '@mui/lab';
 
 import {
   Map,
@@ -189,10 +194,9 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Treemap,
-  Sankey
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Geographic threat data interfaces
 interface ThreatLocation {
@@ -859,9 +863,8 @@ const InteractiveThreatLandscapeMaps: React.FC = () => {
           .sort((a, b) => b.threatCount - a.threatCount)
           .slice(0, 10)
           .map((location, index) => (
-            <ListItem
+            <ListItemButton
               key={location.id}
-              button
               onClick={() => {
                 setSelectedLocation(location);
                 setDetailsOpen(true);
@@ -894,7 +897,7 @@ const InteractiveThreatLandscapeMaps: React.FC = () => {
                   </Box>
                 }
               />
-            </ListItem>
+            </ListItemButton>
           ))}
       </List>
     </Paper>

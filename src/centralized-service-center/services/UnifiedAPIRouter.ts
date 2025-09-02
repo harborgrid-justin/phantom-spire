@@ -5,7 +5,10 @@
 
 import express from 'express';
 import { centralizedServiceCenter } from '../core/CentralizedSystemServiceCenter.js';
-import { IServiceOperationRequest, IUnifiedRequestContext } from '../interfaces/ICentralizedServiceCenter.js';
+import {
+  IServiceOperationRequest,
+  IUnifiedRequestContext,
+} from '../interfaces/ICentralizedServiceCenter.js';
 import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
@@ -21,16 +24,16 @@ router.get('/services', async (req, res) => {
       data: services,
       metadata: {
         count: services.length,
-        timestamp: new Date()
-      }
+        timestamp: new Date(),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'SERVICE_LIST_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -42,28 +45,28 @@ router.get('/services/:serviceId', async (req, res) => {
   try {
     const { serviceId } = req.params;
     const service = await centralizedServiceCenter.getService(serviceId);
-    
+
     if (!service) {
       return res.status(404).json({
         success: false,
         error: {
           code: 'SERVICE_NOT_FOUND',
-          message: `Service ${serviceId} not found`
-        }
+          message: `Service ${serviceId} not found`,
+        },
       });
     }
 
     res.json({
       success: true,
-      data: service
+      data: service,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'SERVICE_GET_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -81,8 +84,8 @@ router.post('/services/:serviceId/execute', async (req, res) => {
         success: false,
         error: {
           code: 'MISSING_OPERATION',
-          message: 'Operation is required'
-        }
+          message: 'Operation is required',
+        },
       });
     }
 
@@ -92,12 +95,12 @@ router.post('/services/:serviceId/execute', async (req, res) => {
       userId: req.headers['x-user-id'] as string,
       organizationId: req.headers['x-organization-id'] as string,
       sessionId: req.headers['x-session-id'] as string,
-      correlationId: req.headers['x-correlation-id'] as string || uuidv4(),
-      traceId: req.headers['x-trace-id'] as string || uuidv4(),
+      correlationId: (req.headers['x-correlation-id'] as string) || uuidv4(),
+      traceId: (req.headers['x-trace-id'] as string) || uuidv4(),
       timestamp: new Date(),
       source: 'centralized-api',
       priority: (options?.priority || 'normal') as any,
-      metadata: req.headers
+      metadata: req.headers,
     };
 
     const request: IServiceOperationRequest = {
@@ -105,20 +108,19 @@ router.post('/services/:serviceId/execute', async (req, res) => {
       operation,
       parameters: parameters || {},
       context,
-      options
+      options,
     };
 
     const result = await centralizedServiceCenter.executeOperation(request);
-    
+
     res.status(result.success ? 200 : 500).json(result);
-    
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'EXECUTION_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -131,15 +133,15 @@ router.get('/platform/status', async (req, res) => {
     const status = await centralizedServiceCenter.getPlatformStatus();
     res.json({
       success: true,
-      data: status
+      data: status,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'STATUS_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -152,15 +154,15 @@ router.get('/platform/metrics', async (req, res) => {
     const metrics = await centralizedServiceCenter.getPlatformMetrics();
     res.json({
       success: true,
-      data: metrics
+      data: metrics,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'METRICS_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -173,15 +175,15 @@ router.get('/platform/config', async (req, res) => {
     const config = await centralizedServiceCenter.getConfiguration();
     res.json({
       success: true,
-      data: config
+      data: config,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'CONFIG_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -195,15 +197,15 @@ router.put('/platform/config', async (req, res) => {
     await centralizedServiceCenter.updateConfiguration(config);
     res.json({
       success: true,
-      message: 'Configuration updated successfully'
+      message: 'Configuration updated successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'CONFIG_UPDATE_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -214,22 +216,23 @@ router.put('/platform/config', async (req, res) => {
 router.get('/services/capability/:capability', async (req, res) => {
   try {
     const { capability } = req.params;
-    const services = await centralizedServiceCenter.findServicesByCapability(capability);
+    const services =
+      await centralizedServiceCenter.findServicesByCapability(capability);
     res.json({
       success: true,
       data: services,
       metadata: {
         capability,
-        count: services.length
-      }
+        count: services.length,
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'CAPABILITY_SEARCH_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -240,18 +243,19 @@ router.get('/services/capability/:capability', async (req, res) => {
 router.get('/services/:serviceId/dependencies', async (req, res) => {
   try {
     const { serviceId } = req.params;
-    const dependencies = await centralizedServiceCenter.getServiceDependencies(serviceId);
+    const dependencies =
+      await centralizedServiceCenter.getServiceDependencies(serviceId);
     res.json({
       success: true,
-      data: dependencies
+      data: dependencies,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
         code: 'DEPENDENCIES_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });
@@ -268,8 +272,8 @@ router.get('/docs', async (req, res) => {
       success: false,
       error: {
         code: 'DOCS_ERROR',
-        message: error.message
-      }
+        message: error.message,
+      },
     });
   }
 });

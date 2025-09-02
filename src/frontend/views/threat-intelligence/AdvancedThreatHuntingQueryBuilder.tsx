@@ -68,12 +68,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -111,8 +105,8 @@ import {
   Delete,
   Add,
   Remove,
-  Copy,
-  Paste,
+  ContentCopy,
+  ContentPaste,
   Undo,
   Redo,
   FormatIndentIncrease,
@@ -204,7 +198,7 @@ import {
   ResponsiveContainer as RCContainer
 } from 'recharts';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Query builder interfaces
 interface QueryField {
@@ -343,7 +337,7 @@ interface HuntingSession {
 
 const AdvancedThreatHuntingQueryBuilder: React.FC = () => {
   const theme = useTheme();
-  const editorRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   
   // Core states
   const [currentQuery, setCurrentQuery] = useState('');
@@ -995,9 +989,8 @@ level: medium`;
         </Typography>
         <List>
           {executions.slice(0, 10).map(execution => (
-            <ListItem
+            <ListItemButton
               key={execution.id}
-              button
               onClick={() => {
                 setCurrentExecution(execution);
                 setResultsOpen(true);
@@ -1051,15 +1044,15 @@ level: medium`;
               />
               <Box sx={{ display: 'flex', gap: 0.5 }}>
                 <IconButton size="small">
-                  <Copy fontSize="small" />
+                  <ContentCopy fontSize="small" />
                 </IconButton>
                 <IconButton size="small">
                   <Download fontSize="small" />
                 </IconButton>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
+                      </Box>
+                    </ListItemButton>
+                  ))}
+              </List>
       </CardContent>
     </Card>
   );
@@ -1224,15 +1217,11 @@ level: medium`;
                     field.description.toLowerCase().includes(searchTerm.toLowerCase())
                   )
                   .map(field => (
-                    <ListItem
+                    <ListItemButton
                       key={field.name}
-                      button
                       onClick={() => {
-                        // Insert field into query
-                        const currentPos = editorRef.current?.selectionStart || 0;
-                        const newQuery = currentQuery.substring(0, currentPos) + 
-                                        field.name + 
-                                        currentQuery.substring(currentPos);
+                        // Insert field into query at the end
+                        const newQuery = currentQuery + (currentQuery ? ' ' : '') + field.name;
                         setCurrentQuery(newQuery);
                       }}
                     >
@@ -1258,7 +1247,7 @@ level: medium`;
                           sx={{ width: 40 }}
                         />
                       </Box>
-                    </ListItem>
+                    </ListItemButton>
                   ))}
               </List>
             </Box>
@@ -1282,9 +1271,8 @@ level: medium`;
               
               <List dense>
                 {queryTemplates.slice(0, 10).map(template => (
-                  <ListItem
+                  <ListItemButton
                     key={template.id}
-                    button
                     onClick={() => {
                       setCurrentQuery(template.query);
                       setQueryLanguage(template.language);
@@ -1320,7 +1308,7 @@ level: medium`;
                         </Box>
                       }
                     />
-                  </ListItem>
+                  </ListItemButton>
                 ))}
               </List>
             </Box>

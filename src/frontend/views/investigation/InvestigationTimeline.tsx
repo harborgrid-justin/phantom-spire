@@ -8,19 +8,21 @@ import {
   Box,
   Typography,
   Paper,
+  Card,
+  CardContent,
+  Chip
+} from '@mui/material';
+import {
   Timeline,
   TimelineItem,
   TimelineContent,
   TimelineConnector,
   TimelineSeparator,
   TimelineDot,
-  TimelineOppositeContent,
-  Card,
-  CardContent,
-  Chip
-} from '@mui/material';
+  TimelineOppositeContent
+} from '@mui/lab';
 import { Timeline as TimelineIcon, Security, BugReport, Analytics } from '@mui/icons-material';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 export const InvestigationTimeline: React.FC = () => {
   useEffect(() => {

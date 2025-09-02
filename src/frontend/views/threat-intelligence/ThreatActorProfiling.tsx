@@ -51,13 +51,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
   Stepper,
   Step,
   StepLabel,
@@ -108,7 +101,7 @@ import {
   Shield
 } from '@mui/icons-material';
 
-import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced interfaces for threat actor data
 interface ThreatActor {

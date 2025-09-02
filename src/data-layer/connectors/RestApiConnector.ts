@@ -12,7 +12,7 @@ import {
   IValidationResult,
   IExtractionRequest,
   IExtractionResult,
-  ILoadResult
+  ILoadResult,
 } from '../interfaces/IDataConnector.js';
 import { IDataRecord, IHealthStatus } from '../interfaces/IDataSource.js';
 import { logger } from '../../utils/logger.js';
@@ -58,18 +58,20 @@ export class RestApiConnector extends BaseDataConnector {
     windowStart: number;
   };
 
-  protected async performInitialization(config: IConnectorConfig): Promise<void> {
+  protected async performInitialization(
+    config: IConnectorConfig
+  ): Promise<void> {
     const restConfig = config as IRestApiConfig;
-    
+
     // Create HTTP client
     this.httpClient = axios.create({
       baseURL: restConfig.connection.baseUrl,
       timeout: restConfig.connection.timeout || 30000,
       headers: {
         'User-Agent': `PhantomSpire-DataConnector/${this.version}`,
-        'Accept': 'application/json',
-        ...restConfig.connection.headers
-      }
+        Accept: 'application/json',
+        ...restConfig.connection.headers,
+      },
     });
 
     // Setup authentication
@@ -94,7 +96,7 @@ export class RestApiConnector extends BaseDataConnector {
     // Test connection with health endpoint or basic request
     const config = this.config as IRestApiConfig;
     const healthEndpoint = config.endpoints?.health || '/health';
-    
+
     try {
       await this.httpClient.get(healthEndpoint);
     } catch (error) {
@@ -110,21 +112,23 @@ export class RestApiConnector extends BaseDataConnector {
     this.httpClient = undefined;
   }
 
-  protected async performExtraction(request: IExtractionRequest): Promise<IExtractionResult> {
+  protected async performExtraction(
+    request: IExtractionRequest
+  ): Promise<IExtractionResult> {
     if (!this.httpClient) {
       throw new Error('HTTP client not connected');
     }
 
     const config = this.config as IRestApiConfig;
     const endpoint = config.endpoints?.data || '/data';
-    
+
     const requestConfig: AxiosRequestConfig = {
       method: 'GET',
       url: endpoint,
       params: {
         ...config.connection.queryParams,
-        ...this.buildQueryParams(request)
-      }
+        ...this.buildQueryParams(request),
+      },
     };
 
     // Apply rate limiting
@@ -132,10 +136,10 @@ export class RestApiConnector extends BaseDataConnector {
 
     const startTime = Date.now();
     const response = await this.httpClient.request(requestConfig);
-    
+
     const data = response.data;
     let extractedRecords: any[];
-    
+
     // Handle different response structures
     if (Array.isArray(data)) {
       extractedRecords = data;
@@ -150,9 +154,13 @@ export class RestApiConnector extends BaseDataConnector {
     }
 
     // Handle pagination
-    const hasMore = this.determineHasMore(data, extractedRecords.length, request.batchSize);
+    const hasMore = this.determineHasMore(
+      data,
+      extractedRecords.length,
+      request.batchSize
+    );
     const nextToken = this.extractNextToken(data);
-    
+
     return {
       data: extractedRecords,
       metadata: {
@@ -160,13 +168,16 @@ export class RestApiConnector extends BaseDataConnector {
         extracted: extractedRecords.length,
         hasMore,
         ...(nextToken && { nextToken }),
-        executionTime: Date.now() - startTime
+        executionTime: Date.now() - startTime,
       },
-      errors: []
+      errors: [],
     };
   }
 
-  protected async performLoad(records: IDataRecord[], target: string): Promise<ILoadResult> {
+  protected async performLoad(
+    records: IDataRecord[],
+    target: string
+  ): Promise<ILoadResult> {
     if (!this.httpClient) {
       throw new Error('HTTP client not connected');
     }
@@ -179,14 +190,14 @@ export class RestApiConnector extends BaseDataConnector {
     const batchSize = 10;
     for (let i = 0; i < records.length; i += batchSize) {
       const batch = records.slice(i, i + batchSize);
-      
+
       try {
         await this.enforceRateLimit();
-        
+
         const response = await this.httpClient.post(target, {
-          records: batch.map(r => r.data)
+          records: batch.map(r => r.data),
         });
-        
+
         if (response.status >= 200 && response.status < 300) {
           loaded += batch.length;
         } else {
@@ -204,7 +215,7 @@ export class RestApiConnector extends BaseDataConnector {
       loaded,
       failed,
       errors,
-      executionTime: 0 // Will be set by base class
+      executionTime: 0, // Will be set by base class
     };
   }
 
@@ -214,38 +225,42 @@ export class RestApiConnector extends BaseDataConnector {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: 0,
-        message: 'HTTP client not initialized'
+        message: 'HTTP client not initialized',
       };
     }
 
     const config = this.config as IRestApiConfig;
     const healthEndpoint = config.endpoints?.health || '/health';
-    
+
     try {
       const startTime = Date.now();
-      const response = await this.httpClient.get(healthEndpoint, { timeout: 5000 });
+      const response = await this.httpClient.get(healthEndpoint, {
+        timeout: 5000,
+      });
       const responseTime = Date.now() - startTime;
-      
+
       return {
         status: response.status < 400 ? 'healthy' : 'degraded',
         lastCheck: new Date(),
         responseTime,
         metrics: {
           statusCode: response.status,
-          responseSize: JSON.stringify(response.data).length
-        }
+          responseSize: JSON.stringify(response.data).length,
+        },
       };
     } catch (error) {
       return {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: 0,
-        message: (error as Error).message
+        message: (error as Error).message,
       };
     }
   }
 
-  protected override async validateConnection(connection: any): Promise<IValidationResult> {
+  protected override async validateConnection(
+    connection: any
+  ): Promise<IValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -259,14 +274,19 @@ export class RestApiConnector extends BaseDataConnector {
       }
     }
 
-    if (connection.timeout && (connection.timeout < 1000 || connection.timeout > 300000)) {
+    if (
+      connection.timeout &&
+      (connection.timeout < 1000 || connection.timeout > 300000)
+    ) {
       warnings.push('Timeout should be between 1000ms and 300000ms');
     }
 
     return { isValid: errors.length === 0, errors, warnings };
   }
 
-  protected override async validateAuthentication(auth: any): Promise<IValidationResult> {
+  protected override async validateAuthentication(
+    auth: any
+  ): Promise<IValidationResult> {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -302,27 +322,27 @@ export class RestApiConnector extends BaseDataConnector {
 
     switch (auth.type) {
       case 'bearer':
-        this.httpClient.defaults.headers.common['Authorization'] = 
+        this.httpClient.defaults.headers.common['Authorization'] =
           `Bearer ${auth.credentials.token}`;
         break;
-      
+
       case 'apikey':
         if (auth.credentials.header) {
-          this.httpClient.defaults.headers.common[auth.credentials.header] = 
+          this.httpClient.defaults.headers.common[auth.credentials.header] =
             auth.credentials.key;
         }
         if (auth.credentials.param) {
           this.httpClient.defaults.params = {
             ...this.httpClient.defaults.params,
-            [auth.credentials.param]: auth.credentials.key
+            [auth.credentials.param]: auth.credentials.key,
           };
         }
         break;
-      
+
       case 'basic':
         this.httpClient.defaults.auth = {
           username: auth.credentials.username,
-          password: auth.credentials.password
+          password: auth.credentials.password,
         };
         break;
     }
@@ -331,11 +351,13 @@ export class RestApiConnector extends BaseDataConnector {
   /**
    * Setup rate limiting
    */
-  private setupRateLimit(_rateLimit: NonNullable<IRestApiConfig['rateLimit']>): void {
+  private setupRateLimit(
+    _rateLimit: NonNullable<IRestApiConfig['rateLimit']>
+  ): void {
     this.rateLimiter = {
       lastRequest: 0,
       requestCount: 0,
-      windowStart: Date.now()
+      windowStart: Date.now(),
     };
   }
 
@@ -351,7 +373,7 @@ export class RestApiConnector extends BaseDataConnector {
         logger.debug(`Making HTTP request`, {
           method: config.method?.toUpperCase(),
           url: config.url,
-          params: config.params
+          params: config.params,
         });
         return config;
       },
@@ -367,7 +389,7 @@ export class RestApiConnector extends BaseDataConnector {
         logger.debug(`HTTP response received`, {
           status: response.status,
           statusText: response.statusText,
-          dataSize: JSON.stringify(response.data).length
+          dataSize: JSON.stringify(response.data).length,
         });
         return response;
       },
@@ -375,7 +397,7 @@ export class RestApiConnector extends BaseDataConnector {
         logger.error(`HTTP response error`, {
           status: error.response?.status,
           statusText: error.response?.statusText,
-          data: error.response?.data
+          data: error.response?.data,
         });
         return Promise.reject(error);
       }
@@ -402,16 +424,18 @@ export class RestApiConnector extends BaseDataConnector {
 
     // Add pagination parameters
     if (config.pagination) {
-      const batchSize = request.batchSize || config.pagination.maxPageSize || 100;
-      
+      const batchSize =
+        request.batchSize || config.pagination.maxPageSize || 100;
+
       switch (config.pagination.type) {
         case 'offset':
           params[config.pagination.limitParam || 'limit'] = batchSize;
           if (request.query?.offset) {
-            params[config.pagination.offsetParam || 'offset'] = request.query.offset;
+            params[config.pagination.offsetParam || 'offset'] =
+              request.query.offset;
           }
           break;
-        
+
         case 'page':
           params[config.pagination.limitParam || 'page_size'] = batchSize;
           if (request.query?.offset) {
@@ -419,7 +443,7 @@ export class RestApiConnector extends BaseDataConnector {
             params[config.pagination.pageParam || 'page'] = page;
           }
           break;
-        
+
         case 'cursor':
           params[config.pagination.limitParam || 'limit'] = batchSize;
           // Cursor would be handled separately in pagination logic
@@ -463,7 +487,10 @@ export class RestApiConnector extends BaseDataConnector {
     if (rateLimit.requestsPerMinute) {
       const windowRequests = this.rateLimiter.requestCount;
       if (windowRequests >= rateLimit.requestsPerMinute) {
-        delay = Math.max(delay, windowDuration - (now - this.rateLimiter.windowStart));
+        delay = Math.max(
+          delay,
+          windowDuration - (now - this.rateLimiter.windowStart)
+        );
       }
     }
 
@@ -488,11 +515,11 @@ export class RestApiConnector extends BaseDataConnector {
     if (responseData.hasMore !== undefined) {
       return responseData.hasMore;
     }
-    
+
     if (responseData.has_more !== undefined) {
       return responseData.has_more;
     }
-    
+
     if (responseData.pagination?.hasMore !== undefined) {
       return responseData.pagination.hasMore;
     }
@@ -514,9 +541,11 @@ export class RestApiConnector extends BaseDataConnector {
    * Extract next token for cursor-based pagination
    */
   private extractNextToken(responseData: any): string | undefined {
-    return responseData.nextToken || 
-           responseData.next_token || 
-           responseData.pagination?.nextToken ||
-           responseData.pagination?.next_cursor;
+    return (
+      responseData.nextToken ||
+      responseData.next_token ||
+      responseData.pagination?.nextToken ||
+      responseData.pagination?.next_cursor
+    );
   }
 }

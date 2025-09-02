@@ -9,7 +9,7 @@ export enum EvaluationCategory {
   USABILITY = 'usability',
   VISUAL_DESIGN = 'visual_design',
   ENTERPRISE_STANDARDS = 'enterprise_standards',
-  USER_JOURNEY = 'user_journey'
+  USER_JOURNEY = 'user_journey',
 }
 
 export enum EvaluationSeverity {
@@ -17,7 +17,7 @@ export enum EvaluationSeverity {
   HIGH = 'high',
   MEDIUM = 'medium',
   LOW = 'low',
-  INFO = 'info'
+  INFO = 'info',
 }
 
 export interface IEvaluationMetric {
@@ -131,21 +131,39 @@ export interface IUIUXEvaluationService {
 
   // Page evaluation
   evaluatePage(pageId: string, element?: HTMLElement): Promise<IPageEvaluation>;
-  startContinuousEvaluation(pageId: string, element?: HTMLElement): Promise<string>;
+  startContinuousEvaluation(
+    pageId: string,
+    element?: HTMLElement
+  ): Promise<string>;
   stopContinuousEvaluation(sessionId: string): Promise<void>;
 
   // Metrics collection
-  collectMetric(pageId: string, metric: Omit<IEvaluationMetric, 'id' | 'timestamp'>): Promise<void>;
-  getMetrics(pageId: string, category?: EvaluationCategory): Promise<IEvaluationMetric[]>;
+  collectMetric(
+    pageId: string,
+    metric: Omit<IEvaluationMetric, 'id' | 'timestamp'>
+  ): Promise<void>;
+  getMetrics(
+    pageId: string,
+    category?: EvaluationCategory
+  ): Promise<IEvaluationMetric[]>;
 
   // Issue management
-  reportIssue(pageId: string, issue: Omit<IEvaluationIssue, 'id' | 'timestamp' | 'resolved'>): Promise<void>;
-  getIssues(pageId: string, severity?: EvaluationSeverity): Promise<IEvaluationIssue[]>;
+  reportIssue(
+    pageId: string,
+    issue: Omit<IEvaluationIssue, 'id' | 'timestamp' | 'resolved'>
+  ): Promise<void>;
+  getIssues(
+    pageId: string,
+    severity?: EvaluationSeverity
+  ): Promise<IEvaluationIssue[]>;
   resolveIssue(issueId: string): Promise<void>;
 
   // Reporting
   generateReport(pageIds?: string[]): Promise<IEvaluationReport>;
-  exportReport(reportId: string, format: 'pdf' | 'json' | 'csv' | 'xlsx'): Promise<Buffer | string>;
+  exportReport(
+    reportId: string,
+    format: 'pdf' | 'json' | 'csv' | 'xlsx'
+  ): Promise<Buffer | string>;
   getReports(): Promise<IEvaluationReport[]>;
 
   // Real-time monitoring
@@ -153,7 +171,10 @@ export interface IUIUXEvaluationService {
   unsubscribe(subscriptionId: string): Promise<void>;
 
   // Utilities
-  calculateScore(metrics: IEvaluationMetric[], issues: IEvaluationIssue[]): number;
+  calculateScore(
+    metrics: IEvaluationMetric[],
+    issues: IEvaluationIssue[]
+  ): number;
   validateWCAGCompliance(element: HTMLElement): Promise<IEvaluationIssue[]>;
   measurePerformance(action: () => Promise<void>): Promise<number>;
 }

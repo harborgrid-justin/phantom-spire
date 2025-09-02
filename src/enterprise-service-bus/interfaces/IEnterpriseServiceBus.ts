@@ -122,13 +122,17 @@ export interface IEnterpriseServiceBus {
   unregisterService(serviceId: string): Promise<void>;
   getService(serviceId: string): Promise<IServiceDefinition | null>;
   listServices(): Promise<IServiceDefinition[]>;
-  
+
   /**
    * Message Processing
    */
   processRequest(request: IServiceRequest): Promise<IServiceResponse>;
-  processAsyncMessage(serviceId: string, message: unknown, context: IRequestContext): Promise<void>;
-  
+  processAsyncMessage(
+    serviceId: string,
+    message: unknown,
+    context: IRequestContext
+  ): Promise<void>;
+
   /**
    * Routing and Transformation
    */
@@ -136,13 +140,13 @@ export interface IEnterpriseServiceBus {
   removeRoutingRule(ruleId: string): Promise<void>;
   addTransformation(transformation: IMessageTransformation): Promise<void>;
   removeTransformation(transformationId: string): Promise<void>;
-  
+
   /**
    * Monitoring and Metrics
    */
   getMetrics(): Promise<IServiceBusMetrics>;
   getServiceHealth(serviceId: string): Promise<IServiceHealth>;
-  
+
   /**
    * Lifecycle Management
    */

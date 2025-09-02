@@ -59,12 +59,6 @@ import {
   Step,
   StepLabel,
   StepContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
   AppBar,
   Toolbar,
   Drawer,
@@ -95,7 +89,6 @@ import {
 
 import {
   Api,
-  Integration,
   Hub,
   DeviceHub,
   Cloud,
@@ -103,7 +96,7 @@ import {
   CloudDone,
   CloudOff,
   Storage,
-  Database,
+  Dataset,
   NetworkCheck,
   Router,
   Security,
@@ -113,10 +106,8 @@ import {
   Lock,
   LockOpen,
   Http,
-  HttpsIcon,
+  Https,
   Code,
-  Json,
-  Xml,
   DataObject,
   Functions,
   Transform,
@@ -130,7 +121,6 @@ import {
   Schedule,
   Timer,
   Speed,
-  SpeedIcon,
   Timeline as TimelineIcon,
   TrendingUp,
   TrendingDown,
@@ -208,8 +198,8 @@ import {
   SupervisorAccount
 } from '@mui/icons-material';
 
-import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, TreeMap, ComposedChart, Pie } from 'recharts';
-import { addUIUXEvaluation } from '../../services/ui-ux-evaluation/core/UIUXEvaluationService';
+import { LineChart, Line, AreaChart, Area, BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, PieChart as RechartsPieChart, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap, ComposedChart, Pie } from 'recharts';
+import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 
 // Enhanced Interfaces for API Management and External Service Integration
 interface ApiEndpoint {
