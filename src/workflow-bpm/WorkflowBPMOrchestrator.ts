@@ -60,7 +60,7 @@ export class WorkflowBPMOrchestrator extends EventEmitter {
     this.initialize();
   }
 
-  private async initialize(): Promise<void> {
+  public async initialize(): Promise<void> {
     try {
       // Initialize repository
       this.repository = new MongoWorkflowRepository(logger);

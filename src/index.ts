@@ -3,11 +3,14 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { config } from './config/config.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { connectDatabase } from './config/database.js';
 import routes from './routes/index.js';
+import setupRoutes from './routes/setup.js';
 import swaggerSpec from './config/swagger.js';
 import swaggerUi from 'swagger-ui-express';
 import { WorkflowBPMOrchestrator } from './workflow-bpm/index.js';
@@ -19,6 +22,9 @@ import {
 import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
 import { centralizedServiceCenter } from './centralized-service-center/index.js';
 import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -47,6 +53,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // API Documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Serve static files from setup directory
+app.use('/setup/static', express.static(path.join(__dirname, 'setup/static')));
+
+// Setup page route
+app.get('/setup', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'setup/static/index.html'));
+});
+
+// Dashboard page route
+app.get('/dashboard', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'setup/static/dashboard.html'));
+});
+
 // Health check endpoint
 app.get('/health', (_req, res) => {
   res.status(200).json({
@@ -67,16 +86,23 @@ app.get('/', (_req, res) => {
     timestamp: new Date().toISOString(),
     endpoints: {
       health: '/health',
+      setup: '/setup',
+      dashboard: '/dashboard',
       apiDocs: '/api-docs',
       api: '/api/v1',
       workflow: '/api/v1/workflow',
       platform: '/api/v1/platform',
+    },
+    ui: {
+      setup: 'http://localhost:3000/setup',
+      dashboard: 'http://localhost:3000/dashboard',
     },
   });
 });
 
 // API routes
 app.use('/api/v1', routes);
+app.use('/api/setup', setupRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

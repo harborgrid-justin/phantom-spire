@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Spire CTI Platform - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Material-UI CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #667eea;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .card-content {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 1rem;
+        }
+
+        .status-badge.operational {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .api-endpoints {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .endpoint-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .endpoint-item h4 {
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .endpoint-item p {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #667eea;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .endpoint-item a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>🚀 Phantom Spire CTI Platform</h1>
+            <p>Enterprise-grade Cyber Threat Intelligence Platform - Dashboard</p>
+            <div class="status-badge operational">
+                ✅ System Operational
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">System Status</div>
+                </div>
+                <div class="card-content">
+                    <p>All core systems are operational and ready to process threat intelligence data.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/health" class="btn btn-secondary">Health Check</a>
+                        <a href="/api-docs" class="btn btn-secondary">API Docs</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">🔗</div>
+                    <div class="card-title">Database Management</div>
+                </div>
+                <div class="card-content">
+                    <p>Access database administration tools for MongoDB, PostgreSQL, MySQL, and Redis.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="http://localhost:8081" target="_blank" class="btn btn-secondary">MongoDB</a>
+                        <a href="http://localhost:8080" target="_blank" class="btn btn-secondary">SQL Admin</a>
+                        <a href="http://localhost:8082" target="_blank" class="btn btn-secondary">Redis</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">🛡️</div>
+                    <div class="card-title">Threat Intelligence</div>
+                </div>
+                <div class="card-content">
+                    <p>Access IOC analysis, MITRE ATT&CK framework integration, and threat hunting capabilities.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/api/v1/iocs" class="btn">IOC Analysis</a>
+                        <a href="/api/v1/mitre" class="btn">MITRE Data</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Workflow Management</div>
+                </div>
+                <div class="card-content">
+                    <p>Automated workflows for threat analysis, incident response, and compliance management.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/api/v1/workflow" class="btn">Workflows</a>
+                        <a href="/api/v1/tasks" class="btn">Tasks</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">🏢</div>
+                    <div class="card-title">Organization Management</div>
+                </div>
+                <div class="card-content">
+                    <p>Multi-tenant organization structure with departments, teams, and role-based access control.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/api/v1/organizations" class="btn">Organizations</a>
+                        <a href="/api/v1/auth" class="btn">Authentication</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">📁</div>
+                    <div class="card-title">Evidence & Issues</div>
+                </div>
+                <div class="card-content">
+                    <p>Digital evidence management and issue tracking for security incidents.</p>
+                    <div style="margin-top: 1rem;">
+                        <a href="/api/v1/evidence" class="btn">Evidence</a>
+                        <a href="/api/v1/issues" class="btn">Issues</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="api-endpoints">
+            <h2>Available API Endpoints</h2>
+            <div class="endpoints-grid" id="endpointsGrid">
+                <!-- Endpoints will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PhantomSpireDashboard {
+            constructor() {
+                this.loadEndpoints();
+            }
+
+            async loadEndpoints() {
+                try {
+                    const response = await fetch('/');
+                    const data = await response.json();
+                    
+                    if (data.endpoints) {
+                        this.renderEndpoints(data.endpoints, data.ui);
+                    }
+                } catch (error) {
+                    console.error('Failed to load endpoints:', error);
+                    document.getElementById('endpointsGrid').innerHTML = `
+                        <div style="text-align: center; color: #666;">
+                            Failed to load API endpoints. Please check the server status.
+                        </div>
+                    `;
+                }
+            }
+
+            renderEndpoints(endpoints, ui) {
+                const grid = document.getElementById('endpointsGrid');
+                let html = '';
+
+                // Add UI endpoints first
+                if (ui) {
+                    Object.entries(ui).forEach(([name, url]) => {
+                        html += `
+                            <div class="endpoint-item">
+                                <h4>${name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h4>
+                                <p>${url}</p>
+                                <a href="${url}" target="_blank">Open →</a>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Add API endpoints
+                Object.entries(endpoints).forEach(([name, endpoint]) => {
+                    if (name !== 'ui') {
+                        html += `
+                            <div class="endpoint-item">
+                                <h4>${name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</h4>
+                                <p>${endpoint}</p>
+                                <a href="${endpoint}" target="_blank">Test →</a>
+                            </div>
+                        `;
+                    }
+                });
+
+                grid.innerHTML = html;
+            }
+        }
+
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PhantomSpireDashboard();
+        });
+    </script>
+</body>
+</html>
