@@ -79,9 +79,24 @@ log_header() {
 
 # Error handling
 handle_error() {
-    log_error "Error in $1. Check $LOG_FILE for details."
-    log_error "To retry: $0"
-    exit 1
+    local exit_code=$?
+    local line_number=$1
+    local function_name=$2
+    
+    log_error "Error occurred in $function_name at line $line_number (exit code: $exit_code)"
+    log_error "Check $LOG_FILE for detailed error information"
+    log_error "To retry installation, run: $0"
+    
+    # Clean up temporary files
+    rm -f /tmp/nodesource_setup.sh
+    rm -f /tmp/phantom-spire*
+    
+    exit $exit_code
+}
+
+# Set up error trapping
+set_error_trap() {
+    trap 'handle_error ${LINENO} ${FUNCNAME[1]:-"main"}' ERR
 }
 
 # Check if running as root
@@ -219,14 +234,52 @@ install_nodejs() {
     
     log_info "Installing Node.js $NODEJS_VERSION..."
     
-    # Install NodeSource repository
-    curl -fsSL https://deb.nodesource.com/setup_${NODEJS_VERSION}.x | bash -
+    # Secure NodeSource repository installation - download and verify first
+    local temp_script="/tmp/nodesource_setup.sh"
     
     case $OS in
         ubuntu|debian)
+            log_info "Downloading NodeSource repository setup script..."
+            curl -fsSL "https://deb.nodesource.com/setup_${NODEJS_VERSION}.x" -o "$temp_script"
+            
+            # Verify the script was downloaded successfully
+            if [[ ! -f "$temp_script" ]] || [[ ! -s "$temp_script" ]]; then
+                log_error "Failed to download NodeSource setup script"
+                exit 1
+            fi
+            
+            # Verify it's a shell script
+            if ! head -n1 "$temp_script" | grep -q "#!/bin/bash\|#!/bin/sh"; then
+                log_error "Downloaded script is not a valid shell script"
+                rm -f "$temp_script"
+                exit 1
+            fi
+            
+            log_info "Executing NodeSource repository setup..."
+            bash "$temp_script"
+            rm -f "$temp_script"
             apt-get install -y nodejs
             ;;
         centos|fedora)
+            log_info "Downloading NodeSource repository setup script..."
+            curl -fsSL "https://rpm.nodesource.com/setup_${NODEJS_VERSION}.x" -o "$temp_script"
+            
+            # Verify the script was downloaded successfully
+            if [[ ! -f "$temp_script" ]] || [[ ! -s "$temp_script" ]]; then
+                log_error "Failed to download NodeSource setup script"
+                exit 1
+            fi
+            
+            # Verify it's a shell script
+            if ! head -n1 "$temp_script" | grep -q "#!/bin/bash\|#!/bin/sh"; then
+                log_error "Downloaded script is not a valid shell script"
+                rm -f "$temp_script"
+                exit 1
+            fi
+            
+            log_info "Executing NodeSource repository setup..."
+            bash "$temp_script"
+            rm -f "$temp_script"
             yum install -y nodejs npm
             ;;
     esac
@@ -513,6 +566,9 @@ verify_installation() {
         if curl -f http://localhost:3000/health &>/dev/null; then
             log_success "✅ Phantom Spire is responding on http://localhost:3000"
             break
+        elif curl -fk https://localhost:3443/health &>/dev/null 2>&1; then
+            log_success "✅ Phantom Spire is responding on https://localhost:3443"
+            break
         fi
         
         if [[ $attempt -eq $max_attempts ]]; then
@@ -560,23 +616,101 @@ verify_installation() {
     return $db_status
 }
 
+# Configure enterprise-grade SSL/TLS (optional for production)
+setup_enterprise_ssl() {
+    log_header "ENTERPRISE SSL/TLS CONFIGURATION"
+    
+    read -p "Do you want to configure SSL/TLS for production deployment? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_info "Skipping SSL/TLS configuration. You can set this up later."
+        return 0
+    fi
+    
+    local ssl_dir="$INSTALL_DIR/ssl"
+    mkdir -p "$ssl_dir"
+    chown "$SERVICE_USER:$SERVICE_USER" "$ssl_dir"
+    
+    # Generate self-signed certificate for development/testing
+    log_info "Generating self-signed SSL certificate for development..."
+    
+    openssl req -x509 -newkey rsa:4096 -keyout "$ssl_dir/phantom-spire.key" \
+        -out "$ssl_dir/phantom-spire.crt" -days 365 -nodes \
+        -subj "/C=US/ST=State/L=City/O=Organization/OU=IT/CN=localhost"
+    
+    # Set proper permissions
+    chmod 600 "$ssl_dir/phantom-spire.key"
+    chmod 644 "$ssl_dir/phantom-spire.crt"
+    chown "$SERVICE_USER:$SERVICE_USER" "$ssl_dir"/*
+    
+    log_success "Self-signed SSL certificate generated"
+    log_warning "⚠️  For production, replace with a valid certificate from a trusted CA"
+    
+    # Update environment configuration for HTTPS
+    local env_file="$INSTALL_DIR/.env"
+    if [[ -f "$env_file" ]]; then
+        # Add HTTPS configuration
+        if ! grep -q "HTTPS_ENABLED" "$env_file"; then
+            cat >> "$env_file" << EOF
+
+# HTTPS Configuration (Enterprise)
+HTTPS_ENABLED=true
+HTTPS_PORT=3443
+SSL_KEY_PATH=$ssl_dir/phantom-spire.key
+SSL_CERT_PATH=$ssl_dir/phantom-spire.crt
+
+# Force HTTPS redirect
+FORCE_HTTPS=true
+
+# Additional security headers
+SECURITY_HEADERS_ENABLED=true
+HSTS_ENABLED=true
+EOF
+            log_success "HTTPS configuration added to environment file"
+        fi
+    fi
+    
+    log_info "📋 HTTPS Setup Complete:"
+    log_info "   • Self-signed certificate created at: $ssl_dir/"
+    log_info "   • HTTPS will be available on port 3443"
+    log_info "   • Environment configured for secure deployment"
+    log_warning "   ⚠️  Remember to open port 3443 in your firewall"
+}
+
 # Display post-installation information
 display_post_install() {
     log_header "INSTALLATION COMPLETED SUCCESSFULLY!"
     
     echo -e "${GREEN}🎉 Phantom Spire CTI Platform has been installed successfully!${NC}\n"
     
+    # Check if HTTPS is configured
+    local https_enabled=false
+    local env_file="$INSTALL_DIR/.env"
+    if [[ -f "$env_file" ]] && grep -q "HTTPS_ENABLED=true" "$env_file"; then
+        https_enabled=true
+    fi
+    
     echo -e "${WHITE}📍 ACCESS INFORMATION:${NC}"
-    echo -e "${CYAN}   Web Interface:${NC}     http://localhost:3000"
-    echo -e "${CYAN}   Setup Wizard:${NC}      http://localhost:3000/setup"
-    echo -e "${CYAN}   API Documentation:${NC} http://localhost:3000/api/docs"
-    echo -e "${CYAN}   Health Check:${NC}      http://localhost:3000/health"
+    if [[ "$https_enabled" == true ]]; then
+        echo -e "${CYAN}   Web Interface (HTTPS):${NC} https://localhost:3443"
+        echo -e "${CYAN}   Web Interface (HTTP):${NC}  http://localhost:3000 (redirects to HTTPS)"
+        echo -e "${CYAN}   Setup Wizard:${NC}          https://localhost:3443/setup"
+        echo -e "${CYAN}   API Documentation:${NC}     https://localhost:3443/api/docs"
+        echo -e "${CYAN}   Health Check:${NC}          https://localhost:3443/health"
+    else
+        echo -e "${CYAN}   Web Interface:${NC}     http://localhost:3000"
+        echo -e "${CYAN}   Setup Wizard:${NC}      http://localhost:3000/setup"
+        echo -e "${CYAN}   API Documentation:${NC} http://localhost:3000/api/docs"
+        echo -e "${CYAN}   Health Check:${NC}      http://localhost:3000/health"
+        echo -e "${YELLOW}   💡 Consider enabling HTTPS for production deployment${NC}"
+    fi
     echo ""
     
     echo -e "${WHITE}🗄️  DATABASE ADMINISTRATION:${NC}"
     echo -e "${CYAN}   Adminer (All DBs):${NC}   http://localhost:8080"
     echo -e "${CYAN}   MongoDB Admin:${NC}       http://localhost:8081"
     echo -e "${CYAN}   Redis Commander:${NC}     http://localhost:8082"
+    echo -e "${YELLOW}   ⚠️  Secure these endpoints with authentication in production${NC}"
     echo ""
     
     echo -e "${WHITE}🔧 SYSTEM MANAGEMENT:${NC}"
@@ -617,6 +751,9 @@ main() {
     echo -e "${PURPLE}Version: $SETUP_VERSION${NC}"
     echo -e "${PURPLE}Enhanced Multi-Database Setup${NC}\n"
     
+    # Set up error handling
+    set_error_trap
+    
     # Initialize log file
     echo "Phantom Spire Installation Log - $(date)" > "$LOG_FILE"
     
@@ -627,18 +764,21 @@ main() {
     check_root
     
     # Installation steps
-    check_system_requirements || handle_error "System requirements check"
-    install_system_deps || handle_error "System dependencies installation"
-    install_docker || handle_error "Docker installation"
-    install_nodejs || handle_error "Node.js installation"
-    setup_service_user || handle_error "Service user creation"
-    setup_phantom_spire || handle_error "Phantom Spire setup"
-    setup_databases || handle_error "Database setup"
-    build_application || handle_error "Application build"
-    create_systemd_service || handle_error "Service creation"
-    configure_firewall || handle_error "Firewall configuration"
-    start_services || handle_error "Service startup"
-    verify_installation || handle_error "Installation verification"
+    check_system_requirements
+    install_system_deps
+    install_docker
+    install_nodejs
+    setup_service_user
+    setup_phantom_spire
+    setup_databases
+    build_application
+    create_systemd_service
+    configure_firewall
+    start_services
+    verify_installation
+    
+    # Optional enterprise SSL/TLS setup
+    setup_enterprise_ssl
     
     # Cleanup
     cleanup
