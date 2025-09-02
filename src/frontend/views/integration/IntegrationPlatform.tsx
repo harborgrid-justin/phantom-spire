@@ -3,7 +3,7 @@
  * External system integrations and API connectors
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -19,7 +19,8 @@ import {
   ListItemIcon,
   Switch,
   LinearProgress,
-  Alert
+  Alert,
+  Snackbar
 } from '@mui/material';
 import { 
   Extension, 
@@ -33,8 +34,21 @@ import {
   Webhook
 } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 export const IntegrationPlatform: React.FC = () => {
+  // Enhanced business logic integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('integration');
+
   useEffect(() => {
     const evaluationController = addUIUXEvaluation('integration-platform', {
       continuous: true,
@@ -46,7 +60,8 @@ export const IntegrationPlatform: React.FC = () => {
     return () => evaluationController.remove();
   }, []);
 
-  const integrations = [
+  // State for integrations
+  const [integrations, setIntegrations] = useState([
     { 
       id: 'splunk', 
       name: 'Splunk SIEM', 
@@ -72,14 +87,68 @@ export const IntegrationPlatform: React.FC = () => {
       description: 'File and URL analysis service'
     },
     { 
-      id: 'slack', 
-      name: 'Slack Notifications', 
-      type: 'Communication', 
+      id: 'elastic', 
+      name: 'Elastic Security', 
+      type: 'SIEM', 
       status: 'error', 
       lastSync: '1 hour ago',
-      description: 'Team communication and alerting'
+      description: 'Elasticsearch security analytics'
+    },
+    { 
+      id: 'crowdstrike', 
+      name: 'CrowdStrike Falcon', 
+      type: 'Endpoint Protection', 
+      status: 'connected', 
+      lastSync: '3 minutes ago',
+      description: 'Advanced endpoint protection'
     }
-  ];
+  ]);
+
+  // Business logic operations
+  const handleTestConnection = async (integrationId: string) => {
+    try {
+      await businessLogic.execute('test-integration', { integrationId });
+      addNotification('success', 'Integration connection test successful');
+      setIntegrations(prev => prev.map(i => 
+        i.id === integrationId ? { ...i, status: 'connected', lastSync: 'Just now' } : i
+      ));
+    } catch (error) {
+      addNotification('error', 'Integration connection test failed');
+    }
+  };
+
+  const handleSyncIntegration = async (integrationId: string) => {
+    try {
+      await businessLogic.execute('sync-integration', { integrationId }, 'medium');
+      addNotification('info', 'Integration sync initiated');
+      setIntegrations(prev => prev.map(i => 
+        i.id === integrationId ? { ...i, lastSync: 'Syncing...' } : i
+      ));
+    } catch (error) {
+      addNotification('error', 'Failed to sync integration');
+    }
+  };
+
+  const handleToggleIntegration = async (integrationId: string, enabled: boolean) => {
+    try {
+      await businessLogic.execute('toggle-integration', { integrationId, enabled });
+      addNotification('success', `Integration ${enabled ? 'enabled' : 'disabled'}`);
+      setIntegrations(prev => prev.map(i => 
+        i.id === integrationId ? { ...i, status: enabled ? 'connected' : 'disabled' } : i
+      ));
+    } catch (error) {
+      addNotification('error', 'Failed to toggle integration');
+    }
+  };
+
+  const handleRefreshIntegrations = async () => {
+    try {
+      await refresh();
+      addNotification('success', 'Integration status refreshed');
+    } catch (error) {
+      addNotification('error', 'Failed to refresh integrations');
+    }
+  };
 
   const apiConnectors = [
     { name: 'REST API', endpoints: 45, status: 'healthy' },
@@ -218,6 +287,24 @@ export const IntegrationPlatform: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Notifications */}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          autoHideDuration={6000}
+          onClose={() => removeNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert
+            severity={notification.type}
+            onClose={() => removeNotification(notification.id)}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
