@@ -6,7 +6,7 @@ services:
     environment:
       - NODE_ENV=development
       - MONGODB_URI=mongodb://mongo:27017/phantom-spire
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://:phantom_redis_pass@redis:6379
       - POSTGRESQL_URI=postgresql://postgres:phantom_secure_pass@postgres:5432/phantom_spire
       - MYSQL_URI=mysql://phantom_user:phantom_secure_pass@mysql:3306/phantom_spire
       - SETUP_MODE=true

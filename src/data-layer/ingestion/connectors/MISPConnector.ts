@@ -13,7 +13,9 @@ import {
   ILoadResult,
 } from '../../interfaces/IDataConnector.js';
 import { IHealthStatus, IDataRecord } from '../../interfaces/IDataSource.js';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+// Local type for Axios to avoid import issues
+type AxiosInstance = any;
 
 export interface IMISPConnectorConfig extends IConnectorConfig {
   // MISP-specific configuration
@@ -22,7 +24,7 @@ export interface IMISPConnectorConfig extends IConnectorConfig {
   extractAttributes: boolean;
   extractObjects: boolean;
   extractGalaxy: boolean;
-  
+
   // Data source configuration
   endpoint?: string;
   authentication?: {
@@ -32,12 +34,12 @@ export interface IMISPConnectorConfig extends IConnectorConfig {
     username?: string;
     password?: string;
   };
-  
+
   // Processing options
   batchSize: number;
   timeout: number;
   retryAttempts: number;
-  
+
   // Filtering options
   published?: boolean;
   eventTypes?: string[];
@@ -211,7 +213,7 @@ export class MISPConnector implements IDataConnector {
     'relationships',
     'attributes',
     'objects',
-    'galaxy'
+    'galaxy',
   ];
 
   private config: IMISPConnectorConfig;
@@ -221,7 +223,7 @@ export class MISPConnector implements IDataConnector {
   constructor(name: string, config: IMISPConnectorConfig) {
     this.name = name;
     this.config = config;
-    
+
     if (config.endpoint) {
       this.setupHttpClient();
     }
@@ -240,11 +242,11 @@ export class MISPConnector implements IDataConnector {
    */
   public async initialize(config: IConnectorConfig): Promise<void> {
     this.config = { ...this.config, ...config } as IMISPConnectorConfig;
-    
+
     if (this.config.endpoint) {
       this.setupHttpClient();
     }
-    
+
     logger.info('MISPConnector initialized', {
       name: this.name,
       endpoint: this.config.endpoint,
@@ -254,7 +256,10 @@ export class MISPConnector implements IDataConnector {
   /**
    * Transform data using transformation rules
    */
-  public async transform(data: any[], transformationRules: any[]): Promise<any[]> {
+  public async transform(
+    data: any[],
+    _transformationRules: any[]
+  ): Promise<any[]> {
     // Basic transformation for MISP data
     return data.map(item => ({
       id: item.uuid || item.id,
@@ -274,10 +279,9 @@ export class MISPConnector implements IDataConnector {
         // Test connection with MISP version endpoint
         await this.httpClient.get('/servers/getVersion');
       }
-      
+
       this.isConnected = true;
       logger.info('MISPConnector connected successfully', { name: this.name });
-      
     } catch (error) {
       this.isConnected = false;
       const errorMessage = `Failed to connect MISPConnector ${this.name}: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -303,9 +307,11 @@ export class MISPConnector implements IDataConnector {
 
     try {
       if (this.config.endpoint && this.httpClient) {
-        const response = await this.httpClient.get('/servers/getVersion', { timeout: 5000 });
-        const version = response.data.version;
-        
+        await this.httpClient.get('/servers/getVersion', {
+          timeout: 5000,
+        });
+        // Version info available in response but not currently used
+
         const responseTime = Date.now() - startTime;
 
         return {
@@ -322,15 +328,17 @@ export class MISPConnector implements IDataConnector {
         responseTime: Date.now() - startTime,
         message: 'MISP authentication is valid',
       };
-
     } catch (error) {
-      issues.push(error instanceof Error ? error.message : 'Unknown health check error');
-      
+      issues.push(
+        error instanceof Error ? error.message : 'Unknown health check error'
+      );
+
       return {
         status: 'unhealthy',
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: error instanceof Error ? error.message : 'Unknown health check error',
+        message:
+          error instanceof Error ? error.message : 'Unknown health check error',
         metrics: {
           connectorType: this.type === 'misp' ? 1 : 0,
           errorOccurred: 1,
@@ -342,9 +350,11 @@ export class MISPConnector implements IDataConnector {
   /**
    * Extract MISP data from source
    */
-  public async extract(request: IExtractionRequest): Promise<IExtractionResult> {
+  public async extract(
+    request: IExtractionRequest
+  ): Promise<IExtractionResult> {
     const startTime = Date.now();
-    
+
     try {
       logger.info('Starting MISP data extraction', {
         connector: this.name,
@@ -389,11 +399,10 @@ export class MISPConnector implements IDataConnector {
           executionTime,
         },
       };
-
     } catch (error) {
       const executionTime = Date.now() - startTime;
       const errorMessage = `MISP extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      
+
       logger.error(errorMessage, {
         connector: this.name,
         executionTime,
@@ -440,11 +449,10 @@ export class MISPConnector implements IDataConnector {
         errors,
         warnings,
       };
-
     } catch (error) {
       const errorMessage = `MISP validation error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
-      
+
       return {
         isValid: false,
         errors: [errorMessage],
@@ -456,10 +464,13 @@ export class MISPConnector implements IDataConnector {
   /**
    * Load processed MISP data to destination
    */
-  public async load(records: IDataRecord[], target: string): Promise<ILoadResult> {
+  public async load(
+    records: IDataRecord[],
+    target: string
+  ): Promise<ILoadResult> {
     const startTime = Date.now();
     const items = records.map(record => record.data);
-    
+
     try {
       logger.info('Starting MISP data load', {
         connector: this.name,
@@ -474,14 +485,14 @@ export class MISPConnector implements IDataConnector {
       for (const item of items) {
         try {
           // Transform MISP item to internal format
-          const transformedItem = this.transformMISPItem(item);
-          
+          this.transformMISPItem(item); // transformation applied but result not currently stored
+
           // In a real implementation, this would save to database or send to another system
           logger.debug('MISP item loaded', {
             id: item.id || item.uuid,
             type: item.type || 'event',
           });
-          
+
           loaded++;
         } catch (error) {
           failed++;
@@ -506,11 +517,9 @@ export class MISPConnector implements IDataConnector {
         errors,
         executionTime,
       };
-
     } catch (error) {
-      const executionTime = Date.now() - startTime;
       const errorMessage = `MISP load failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      
+
       logger.error(errorMessage, error);
       throw new Error(errorMessage);
     }
@@ -526,18 +535,19 @@ export class MISPConnector implements IDataConnector {
       timeout: this.config.timeout || 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
     // Setup authentication
     if (this.config.authentication) {
       const auth = this.config.authentication;
-      
+
       switch (auth.type) {
         case 'authkey':
           if (auth.authkey) {
-            this.httpClient.defaults.headers.common['Authorization'] = auth.authkey;
+            this.httpClient.defaults.headers.common['Authorization'] =
+              auth.authkey;
           }
           break;
         case 'basic':
@@ -553,7 +563,7 @@ export class MISPConnector implements IDataConnector {
 
     // Add request/response interceptors for logging
     this.httpClient.interceptors.request.use(
-      (config) => {
+      config => {
         logger.debug('MISP HTTP request', {
           method: config.method,
           url: config.url,
@@ -561,14 +571,14 @@ export class MISPConnector implements IDataConnector {
         });
         return config;
       },
-      (error) => {
+      error => {
         logger.error('MISP HTTP request error', error);
         return Promise.reject(error);
       }
     );
 
     this.httpClient.interceptors.response.use(
-      (response) => {
+      response => {
         logger.debug('MISP HTTP response', {
           status: response.status,
           dataLength: JSON.stringify(response.data).length,
@@ -576,7 +586,7 @@ export class MISPConnector implements IDataConnector {
         });
         return response;
       },
-      (error) => {
+      error => {
         logger.error('MISP HTTP response error', {
           status: error.response?.status,
           message: error.message,
@@ -587,7 +597,9 @@ export class MISPConnector implements IDataConnector {
     );
   }
 
-  private async extractFromEndpoint(request: IExtractionRequest): Promise<IMISPEvent[]> {
+  private async extractFromEndpoint(
+    request: IExtractionRequest
+  ): Promise<IMISPEvent[]> {
     if (!this.httpClient) {
       throw new Error('HTTP client not configured');
     }
@@ -608,8 +620,11 @@ export class MISPConnector implements IDataConnector {
       searchParams.threat_level_id = this.config.threatLevelFilter;
     }
 
-    const response = await this.httpClient.post('/events/restSearch', searchParams);
-    
+    const response = await this.httpClient.post(
+      '/events/restSearch',
+      searchParams
+    );
+
     if (response.data.response) {
       return response.data.response.map((item: any) => item.Event);
     }
@@ -622,7 +637,9 @@ export class MISPConnector implements IDataConnector {
       const data = JSON.parse(jsonString);
       return this.normalizeToEvents(data);
     } catch (error) {
-      throw new Error(`Failed to parse MISP JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to parse MISP JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -655,26 +672,34 @@ export class MISPConnector implements IDataConnector {
 
     // Filter by published status
     if (this.config.published !== undefined) {
-      filteredEvents = filteredEvents.filter(event => event.published === this.config.published);
+      filteredEvents = filteredEvents.filter(
+        event => event.published === this.config.published
+      );
     }
 
     // Filter by threat level
-    if (this.config.threatLevelFilter && this.config.threatLevelFilter.length > 0) {
-      filteredEvents = filteredEvents.filter(event => 
+    if (
+      this.config.threatLevelFilter &&
+      this.config.threatLevelFilter.length > 0
+    ) {
+      filteredEvents = filteredEvents.filter(event =>
         this.config.threatLevelFilter!.includes(parseInt(event.threat_level_id))
       );
     }
 
     // Filter by analysis level
     if (this.config.analysisFilter && this.config.analysisFilter.length > 0) {
-      filteredEvents = filteredEvents.filter(event => 
+      filteredEvents = filteredEvents.filter(event =>
         this.config.analysisFilter!.includes(parseInt(event.analysis))
       );
     }
 
     // Filter by distribution level
-    if (this.config.distributionFilter && this.config.distributionFilter.length > 0) {
-      filteredEvents = filteredEvents.filter(event => 
+    if (
+      this.config.distributionFilter &&
+      this.config.distributionFilter.length > 0
+    ) {
+      filteredEvents = filteredEvents.filter(event =>
         this.config.distributionFilter!.includes(parseInt(event.distribution))
       );
     }
@@ -772,15 +797,21 @@ export class MISPConnector implements IDataConnector {
     }
 
     if (!attribute.type) {
-      errors.push(`MISP attribute ${attribute.uuid} missing required "type" field`);
+      errors.push(
+        `MISP attribute ${attribute.uuid} missing required "type" field`
+      );
     }
 
     if (!attribute.value) {
-      errors.push(`MISP attribute ${attribute.uuid} missing required "value" field`);
+      errors.push(
+        `MISP attribute ${attribute.uuid} missing required "value" field`
+      );
     }
 
     if (!attribute.category) {
-      errors.push(`MISP attribute ${attribute.uuid} missing required "category" field`);
+      errors.push(
+        `MISP attribute ${attribute.uuid} missing required "category" field`
+      );
     }
 
     return errors;
@@ -790,9 +821,13 @@ export class MISPConnector implements IDataConnector {
     const warnings: string[] = [];
 
     // Check for events without attributes
-    const eventsWithoutAttributes = events.filter(event => !event.Attribute || event.Attribute.length === 0);
+    const eventsWithoutAttributes = events.filter(
+      event => !event.Attribute || event.Attribute.length === 0
+    );
     if (eventsWithoutAttributes.length > 0) {
-      warnings.push(`${eventsWithoutAttributes.length} events have no attributes`);
+      warnings.push(
+        `${eventsWithoutAttributes.length} events have no attributes`
+      );
     }
 
     // Check for unpublished events

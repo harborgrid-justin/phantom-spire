@@ -13,7 +13,9 @@ import {
   ILoadResult,
 } from '../../interfaces/IDataConnector.js';
 import { IHealthStatus, IDataRecord } from '../../interfaces/IDataSource.js';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
+// Local type for Axios to avoid import issues
+type AxiosInstance = any;
 
 export interface ISTIXConnectorConfig extends IConnectorConfig {
   // STIX-specific configuration
@@ -21,7 +23,7 @@ export interface ISTIXConnectorConfig extends IConnectorConfig {
   validateSchema: boolean;
   extractRelationships: boolean;
   supportedTypes: string[];
-  
+
   // Data source configuration
   endpoint?: string;
   authentication?: {
@@ -33,7 +35,7 @@ export interface ISTIXConnectorConfig extends IConnectorConfig {
     apiKey?: string;
     apiKeyHeader?: string;
   };
-  
+
   // Processing options
   batchSize: number;
   timeout: number;
@@ -97,7 +99,7 @@ export class STIXConnector implements IDataConnector {
     'extract',
     'validate',
     'transform',
-    'relationships'
+    'relationships',
   ];
 
   private config: ISTIXConnectorConfig;
@@ -107,7 +109,7 @@ export class STIXConnector implements IDataConnector {
   constructor(name: string, config: ISTIXConnectorConfig) {
     this.name = name;
     this.config = config;
-    
+
     if (config.endpoint) {
       this.setupHttpClient();
     }
@@ -125,11 +127,11 @@ export class STIXConnector implements IDataConnector {
    */
   public async initialize(config: IConnectorConfig): Promise<void> {
     this.config = { ...this.config, ...config } as ISTIXConnectorConfig;
-    
+
     if (this.config.endpoint) {
       this.setupHttpClient();
     }
-    
+
     logger.info('STIXConnector initialized', {
       name: this.name,
       endpoint: this.config.endpoint,
@@ -137,9 +139,12 @@ export class STIXConnector implements IDataConnector {
   }
 
   /**
-   * Transform data using transformation rules  
+   * Transform data using transformation rules
    */
-  public async transform(data: any[], transformationRules: any[]): Promise<any[]> {
+  public async transform(
+    data: any[],
+    _transformationRules: any[]
+  ): Promise<any[]> {
     // Basic transformation for STIX data
     return data.map(item => ({
       id: item.id,
@@ -159,10 +164,9 @@ export class STIXConnector implements IDataConnector {
         // Test connection with a simple request
         await this.httpClient.get('/health', { timeout: 5000 });
       }
-      
+
       this.isConnected = true;
       logger.info('STIXConnector connected successfully', { name: this.name });
-      
     } catch (error) {
       this.isConnected = false;
       const errorMessage = `Failed to connect STIXConnector ${this.name}: ${error instanceof Error ? error.message : 'Unknown error'}`;
@@ -204,15 +208,17 @@ export class STIXConnector implements IDataConnector {
           endpointReachable: 1,
         },
       };
-
     } catch (error) {
-      issues.push(error instanceof Error ? error.message : 'Unknown health check error');
-      
+      issues.push(
+        error instanceof Error ? error.message : 'Unknown health check error'
+      );
+
       return {
         status: 'unhealthy' as const,
         lastCheck: new Date(),
         responseTime: Date.now() - startTime,
-        message: error instanceof Error ? error.message : 'Unknown health check error',
+        message:
+          error instanceof Error ? error.message : 'Unknown health check error',
         metrics: {
           connectorType: 0,
           errorOccurred: 1,
@@ -224,9 +230,11 @@ export class STIXConnector implements IDataConnector {
   /**
    * Extract STIX data from source
    */
-  public async extract(request: IExtractionRequest): Promise<IExtractionResult> {
+  public async extract(
+    request: IExtractionRequest
+  ): Promise<IExtractionResult> {
     const startTime = Date.now();
-    
+
     try {
       logger.info('Starting STIX data extraction', {
         connector: this.name,
@@ -247,12 +255,13 @@ export class STIXConnector implements IDataConnector {
       }
 
       // Filter by supported types
-      const filteredData = this.config.supportedTypes.length > 0
-        ? data.filter(obj => this.config.supportedTypes.includes(obj.type))
-        : data;
+      const filteredData =
+        this.config.supportedTypes.length > 0
+          ? data.filter(obj => this.config.supportedTypes.includes(obj.type))
+          : data;
 
       // Extract relationships if configured
-      const relationships = this.config.extractRelationships 
+      const relationships = this.config.extractRelationships
         ? this.extractRelationships(filteredData)
         : [];
 
@@ -275,11 +284,10 @@ export class STIXConnector implements IDataConnector {
           executionTime,
         },
       };
-
     } catch (error) {
       const executionTime = Date.now() - startTime;
       const errorMessage = `STIX extraction failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      
+
       logger.error(errorMessage, {
         connector: this.name,
         executionTime,
@@ -312,9 +320,13 @@ export class STIXConnector implements IDataConnector {
       }
 
       // Check STIX version consistency
-      const versions = new Set(objects.map(obj => obj.spec_version).filter(Boolean));
+      const versions = new Set(
+        objects.map(obj => obj.spec_version).filter(Boolean)
+      );
       if (versions.size > 1) {
-        warnings.push(`Mixed STIX versions detected: ${Array.from(versions).join(', ')}`);
+        warnings.push(
+          `Mixed STIX versions detected: ${Array.from(versions).join(', ')}`
+        );
       }
 
       logger.debug('STIX validation completed', {
@@ -329,11 +341,10 @@ export class STIXConnector implements IDataConnector {
         errors: errors.length > 0 ? errors : [],
         warnings: warnings.length > 0 ? warnings : [],
       };
-
     } catch (error) {
       const errorMessage = `STIX validation error: ${error instanceof Error ? error.message : 'Unknown error'}`;
       logger.error(errorMessage, error);
-      
+
       return {
         isValid: false,
         errors: [errorMessage],
@@ -345,10 +356,13 @@ export class STIXConnector implements IDataConnector {
   /**
    * Load processed STIX data to destination
    */
-  public async load(records: IDataRecord[], target: string): Promise<ILoadResult> {
+  public async load(
+    records: IDataRecord[],
+    target: string
+  ): Promise<ILoadResult> {
     const startTime = Date.now();
     const objects = records.map(record => record.data);
-    
+
     try {
       logger.info('Starting STIX data load', {
         connector: this.name,
@@ -363,15 +377,15 @@ export class STIXConnector implements IDataConnector {
       for (const obj of objects) {
         try {
           // Transform STIX object to internal format
-          const transformedObj = this.transformSTIXObject(obj as ISTIXObject);
-          
+          this.transformSTIXObject(obj as ISTIXObject); // transformation applied but result not currently stored
+
           // In a real implementation, this would save to database or send to another system
           // For now, we'll just log the successful transformation
           logger.debug('STIX object loaded', {
             id: obj.id,
             type: obj.type,
           });
-          
+
           loaded++;
         } catch (error) {
           failed++;
@@ -396,11 +410,9 @@ export class STIXConnector implements IDataConnector {
         errors,
         executionTime,
       };
-
     } catch (error) {
-      const executionTime = Date.now() - startTime;
       const errorMessage = `STIX load failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      
+
       logger.error(errorMessage, error);
       throw new Error(errorMessage);
     }
@@ -416,18 +428,19 @@ export class STIXConnector implements IDataConnector {
       timeout: this.config.timeout || 30000,
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
     // Setup authentication
     if (this.config.authentication) {
       const auth = this.config.authentication;
-      
+
       switch (auth.type) {
         case 'bearer':
           if (auth.token) {
-            this.httpClient.defaults.headers.common['Authorization'] = `Bearer ${auth.token}`;
+            this.httpClient.defaults.headers.common['Authorization'] =
+              `Bearer ${auth.token}`;
           }
           break;
         case 'basic':
@@ -440,7 +453,8 @@ export class STIXConnector implements IDataConnector {
           break;
         case 'apikey':
           if (auth.apiKey && auth.apiKeyHeader) {
-            this.httpClient.defaults.headers.common[auth.apiKeyHeader] = auth.apiKey;
+            this.httpClient.defaults.headers.common[auth.apiKeyHeader] =
+              auth.apiKey;
           }
           break;
       }
@@ -448,7 +462,7 @@ export class STIXConnector implements IDataConnector {
 
     // Add request/response interceptors for logging
     this.httpClient.interceptors.request.use(
-      (config) => {
+      config => {
         logger.debug('STIX HTTP request', {
           method: config.method,
           url: config.url,
@@ -456,14 +470,14 @@ export class STIXConnector implements IDataConnector {
         });
         return config;
       },
-      (error) => {
+      error => {
         logger.error('STIX HTTP request error', error);
         return Promise.reject(error);
       }
     );
 
     this.httpClient.interceptors.response.use(
-      (response) => {
+      response => {
         logger.debug('STIX HTTP response', {
           status: response.status,
           dataLength: JSON.stringify(response.data).length,
@@ -471,7 +485,7 @@ export class STIXConnector implements IDataConnector {
         });
         return response;
       },
-      (error) => {
+      error => {
         logger.error('STIX HTTP response error', {
           status: error.response?.status,
           message: error.message,
@@ -482,7 +496,9 @@ export class STIXConnector implements IDataConnector {
     );
   }
 
-  private async extractFromEndpoint(request: IExtractionRequest): Promise<ISTIXObject[]> {
+  private async extractFromEndpoint(
+    request: IExtractionRequest
+  ): Promise<ISTIXObject[]> {
     if (!this.httpClient) {
       throw new Error('HTTP client not configured');
     }
@@ -503,7 +519,9 @@ export class STIXConnector implements IDataConnector {
       const data = JSON.parse(jsonString);
       return this.normalizeToObjects(data);
     } catch (error) {
-      throw new Error(`Failed to parse STIX JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to parse STIX JSON: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -606,31 +624,34 @@ export class STIXConnector implements IDataConnector {
 
   private isValidSTIXIdentifier(id: string): boolean {
     // STIX identifier format: type--uuid
-    const stixIdPattern = /^[a-z][a-z-]+[a-z]--[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+    const stixIdPattern =
+      /^[a-z][a-z-]+[a-z]--[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
     return stixIdPattern.test(id);
   }
 
   private extractRelationships(objects: ISTIXObject[]): ISTIXRelationship[] {
-    return objects.filter(obj => obj.type === 'relationship') as ISTIXRelationship[];
+    return objects.filter(
+      obj => obj.type === 'relationship'
+    ) as ISTIXRelationship[];
   }
 
   private detectSTIXVersion(objects: ISTIXObject[]): string {
-    const versions = objects
-      .map(obj => obj.spec_version)
-      .filter(Boolean);
-    
+    const versions = objects.map(obj => obj.spec_version).filter(Boolean);
+
     if (versions.length === 0) {
       return this.config.version;
     }
-    
+
     // Return most common version
-    const versionCounts = versions.reduce((acc, version) => {
-      acc[version] = (acc[version] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    return Object.entries(versionCounts)
-      .sort(([, a], [, b]) => b - a)[0][0];
+    const versionCounts = versions.reduce(
+      (acc, version) => {
+        acc[version] = (acc[version] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    return Object.entries(versionCounts).sort(([, a], [, b]) => b - a)[0][0];
   }
 
   private transformSTIXObject(obj: ISTIXObject): any {
@@ -648,7 +669,7 @@ export class STIXConnector implements IDataConnector {
 
     // Add type-specific transformations
     switch (obj.type) {
-      case 'indicator':
+      case 'indicator': {
         const indicator = obj as ISTIXIndicator;
         return {
           ...base,
@@ -658,8 +679,9 @@ export class STIXConnector implements IDataConnector {
           valid_until: indicator.valid_until,
           confidence: this.extractConfidence(indicator),
         };
+      }
 
-      case 'malware':
+      case 'malware': {
         const malware = obj as ISTIXMalware;
         return {
           ...base,
@@ -667,8 +689,9 @@ export class STIXConnector implements IDataConnector {
           labels: malware.labels,
           is_family: malware.is_family,
         };
+      }
 
-      case 'threat-actor':
+      case 'threat-actor': {
         const actor = obj as ISTIXThreatActor;
         return {
           ...base,
@@ -676,6 +699,7 @@ export class STIXConnector implements IDataConnector {
           labels: actor.labels,
           aliases: actor.aliases,
         };
+      }
 
       default:
         return { ...base, data: obj };
@@ -687,13 +711,13 @@ export class STIXConnector implements IDataConnector {
     if (obj.confidence !== undefined) {
       return obj.confidence;
     }
-    
+
     // Derive confidence from labels or other fields
     const labels = obj.labels || [];
     if (labels.includes('high-confidence')) return 85;
     if (labels.includes('medium-confidence')) return 65;
     if (labels.includes('low-confidence')) return 35;
-    
+
     return 50; // Default medium confidence
   }
 }

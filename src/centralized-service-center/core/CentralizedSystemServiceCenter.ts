@@ -91,7 +91,7 @@ export class CentralizedSystemServiceCenter extends EventEmitter implements ICen
     // Initialize message queue manager first as it's used by other components
     this.messageQueueManager = new MessageQueueManager({
       redis: {
-        url: `redis://${process.env.REDIS_HOST || 'localhost'}:${process.env.REDIS_PORT || '6379'}`,
+        url: process.env.REDIS_URL || 'redis://localhost:6379',
         keyPrefix: 'phantom-spire:',
         maxConnections: 10,
         commandTimeout: 5000
@@ -238,6 +238,11 @@ export class CentralizedSystemServiceCenter extends EventEmitter implements ICen
       this.workflowOrchestrator.once('orchestrator-ready', () => {
         console.log('✅ Workflow BPM Orchestrator ready');
         resolve();
+      });
+      // Initialize the orchestrator after setting up the event listener
+      this.workflowOrchestrator.initialize().catch((error) => {
+        console.error('Failed to initialize workflow orchestrator:', error);
+        resolve(); // Still resolve to not hang the startup
       });
     });
 

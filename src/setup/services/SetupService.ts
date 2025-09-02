@@ -7,6 +7,26 @@ import { SystemRequirementsService } from './SystemRequirementsService.js';
 import axios from 'axios';
 import mongoose from 'mongoose';
 
+// API Response types
+interface MISPVersionResponse {
+  version: string;
+}
+
+interface OTXUserResponse {
+  username: string;
+  member_since: string;
+}
+
+interface VirusTotalUserResponse {
+  data: {
+    id: string;
+    type: string;
+    attributes: {
+      quotas: any;
+    };
+  };
+}
+
 export interface SetupStatus {
   isSetupRequired: boolean;
   isFirstRun: boolean;
@@ -212,11 +232,13 @@ export class SetupService {
         timeout: 10000
       });
 
+      const responseData = response.data as MISPVersionResponse;
+
       return {
         success: true,
         message: 'MISP connection successful',
         details: {
-          version: response.data.version || 'Unknown',
+          version: responseData.version || 'Unknown',
           url: config.url,
           status: response.status
         },
@@ -301,12 +323,14 @@ export class SetupService {
         timeout: 10000
       });
 
+      const responseData = response.data as OTXUserResponse;
+
       return {
         success: true,
         message: 'AlienVault OTX connection successful',
         details: {
-          username: response.data.username,
-          member_since: response.data.member_since,
+          username: responseData.username,
+          member_since: responseData.member_since,
           status: response.status
         },
         responseTime: Date.now() - startTime
@@ -337,13 +361,15 @@ export class SetupService {
         timeout: 10000
       });
 
+      const responseData = response.data as VirusTotalUserResponse;
+
       return {
         success: true,
         message: 'VirusTotal connection successful',
         details: {
-          id: response.data.data.id,
-          type: response.data.data.type,
-          quotas: response.data.data.attributes.quotas,
+          id: responseData.data.id,
+          type: responseData.data.type,
+          quotas: responseData.data.attributes.quotas,
           status: response.status
         },
         responseTime: Date.now() - startTime
