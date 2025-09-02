@@ -56,10 +56,14 @@ export function initializeServicePage(serviceId: string, options?: {
   console.log(`🚀 Initializing business logic for ${serviceId}`);
   
   // Ensure business logic services are initialized
-  ensureInitialized().then(() => {
-    console.log(`✅ Business logic ready for ${serviceId}`);
+  import('./core/ServiceInitializer').then(({ ensureInitialized }) => {
+    return ensureInitialized().then(() => {
+      console.log(`✅ Business logic ready for ${serviceId}`);
+    }).catch(error => {
+      console.error(`❌ Failed to initialize business logic for ${serviceId}:`, error);
+    });
   }).catch(error => {
-    console.error(`❌ Failed to initialize business logic for ${serviceId}:`, error);
+    console.error(`❌ Failed to load service initializer for ${serviceId}:`, error);
   });
   
   return {
@@ -86,7 +90,8 @@ export const BusinessLogicUtils = {
     const validServices = [
       'analytics', 'operations', 'admin', 'ioc-management', 
       'threat-intelligence', 'incident', 'hunting', 'feeds',
-      'integration', 'repository', 'dashboard', 'analytics-automation'
+      'integration', 'repository', 'dashboard', 'analytics-automation',
+      'investigation', 'mitre', 'evidence'
     ];
     return validServices.includes(serviceId);
   }

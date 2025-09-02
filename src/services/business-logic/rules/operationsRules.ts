@@ -268,7 +268,7 @@ export const systemHealthCheckRule: BusinessRule = {
     // Simulate health check processing
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const healthMetrics = {
+    const healthMetrics: any = {
       overall: 'healthy',
       timestamp: new Date(),
       services: {
@@ -288,7 +288,7 @@ export const systemHealthCheckRule: BusinessRule = {
     };
 
     // Determine overall health status
-    const serviceStatuses = Object.values(healthMetrics.services).map(s => s.status);
+    const serviceStatuses = Object.values(healthMetrics.services).map((s: any) => s.status);
     if (serviceStatuses.includes('critical')) {
       healthMetrics.overall = 'critical';
     } else if (serviceStatuses.includes('warning')) {

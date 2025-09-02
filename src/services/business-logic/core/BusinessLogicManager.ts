@@ -253,6 +253,86 @@ export class BusinessLogicManager extends EventEmitter {
         realTimeUpdates: true,
         validationRules: [],
         cacheConfig: { enabled: true, ttl: 240000, maxSize: 150 }
+      },
+      {
+        id: 'incident',
+        name: 'Incident Response',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 120000, maxSize: 200 }
+      },
+      {
+        id: 'hunting',
+        name: 'Threat Hunting',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 180000, maxSize: 100 }
+      },
+      {
+        id: 'feeds',
+        name: 'Feed Management',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 300000, maxSize: 150 }
+      },
+      {
+        id: 'integration',
+        name: 'Integration Platform',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 50 }
+      },
+      {
+        id: 'repository',
+        name: 'Threat Intelligence Repository',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 900000, maxSize: 200 }
+      },
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 60000, maxSize: 100 }
+      },
+      {
+        id: 'analytics-automation',
+        name: 'Analytics Automation',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 240000, maxSize: 100 }
+      },
+      {
+        id: 'investigation',
+        name: 'Investigation',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 180000, maxSize: 150 }
+      },
+      {
+        id: 'mitre',
+        name: 'MITRE ATT&CK',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 100 }
+      },
+      {
+        id: 'evidence',
+        name: 'Evidence Management',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 200 }
       }
     ];
 

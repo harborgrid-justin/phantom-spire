@@ -3,10 +3,10 @@
  * Registers business rules and initializes services for all service pages
  */
 
-import { businessLogicManager } from './core/BusinessLogicManager';
-import { realTimeDataService } from './core/RealTimeDataService';
-import { analyticsBusinessRules } from './rules/analyticsRules';
-import { operationsBusinessRules } from './rules/operationsRules';
+import { businessLogicManager } from './BusinessLogicManager';
+import { realTimeDataService } from './RealTimeDataService';
+import { analyticsBusinessRules } from '../rules/analyticsRules';
+import { operationsBusinessRules } from '../rules/operationsRules';
 
 export interface ServiceInitializationOptions {
   enableRealTimeData?: boolean;

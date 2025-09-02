@@ -169,7 +169,7 @@ export function useRealTimeData(options: UseRealTimeDataOptions) {
 
   // Handle subscription
   useEffect(() => {
-    if (!options.enabled || options.enabled === false) {
+    if (!options.enabled) {
       return;
     }
 
