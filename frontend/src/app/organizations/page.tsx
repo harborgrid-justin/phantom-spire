@@ -17,8 +17,8 @@ export default function OrganizationsPage() {
     try {
       setLoading(true);
       const response = await apiClient.getOrganizations();
-      if (response.data && Array.isArray(response.data)) {
-        setOrganizations(response.data);
+      if (response.data && typeof response.data === 'object' && response.data !== null && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        setOrganizations((response.data as any).data);
       } else if (response.error) {
         setError(response.error);
       }
