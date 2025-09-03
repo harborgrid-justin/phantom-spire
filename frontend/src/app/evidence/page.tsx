@@ -2,9 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../lib/api';
+import { useServicePage } from '../../lib/business-logic';
 import { Evidence } from '../../types/api';
 
 export default function EvidencePage() {
+  // Business Logic Integration
+  const {
+    loading: businessLoading,
+    data: businessData,
+    error: businessError,
+    stats,
+    connected,
+    notifications,
+    execute,
+    refresh,
+    addNotification,
+    removeNotification
+  } = useServicePage('evidence');
+
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,14 +34,28 @@ export default function EvidencePage() {
   const fetchEvidence = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.getEvidence();
-      if (response.data && Array.isArray(response.data)) {
-        setEvidence(response.data);
-      } else if (response.error) {
-        setError(response.error);
+      
+      // Use business logic first
+      const businessResponse = await execute('getEvidence', {});
+      
+      if (businessResponse.success && businessResponse.data) {
+        setEvidence(businessResponse.data);
+        addNotification('success', 'Evidence loaded successfully via business logic');
+      } else {
+        // Fallback to direct API
+        const response = await apiClient.getEvidence();
+        if (response.data && Array.isArray(response.data)) {
+          setEvidence(response.data);
+          addNotification('info', 'Evidence loaded via direct API (business logic unavailable)');
+        } else if (response.error) {
+          setError(response.error);
+          addNotification('error', `Failed to load evidence: ${response.error}`);
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch evidence');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to fetch evidence';
+      setError(errorMsg);
+      addNotification('error', errorMsg);
     } finally {
       setLoading(false);
     }
@@ -42,22 +71,59 @@ export default function EvidencePage() {
     e.preventDefault();
     if (!uploadFile) return;
 
-    // Mock upload functionality
-    const newEvidence: Evidence = {
-      id: String(evidence.length + 1),
-      type: uploadFile.type || 'file',
-      description: uploadDescription || uploadFile.name,
-      filePath: `/uploads/${uploadFile.name}`,
-      metadata: {
+    try {
+      // Use business logic for upload
+      const uploadResponse = await execute('uploadEvidence', {
         fileName: uploadFile.name,
-        fileSize: uploadFile.size,
         fileType: uploadFile.type,
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+        fileSize: uploadFile.size,
+        description: uploadDescription || uploadFile.name
+      });
 
-    setEvidence([...evidence, newEvidence]);
+      if (uploadResponse.success) {
+        addNotification('success', `Evidence "${uploadFile.name}" uploaded successfully`);
+        
+        // Add to local state
+        const newEvidence: Evidence = {
+          id: uploadResponse.data?.id || String(evidence.length + 1),
+          type: uploadFile.type || 'file',
+          description: uploadDescription || uploadFile.name,
+          filePath: uploadResponse.data?.filePath || `/uploads/${uploadFile.name}`,
+          metadata: {
+            fileName: uploadFile.name,
+            fileSize: uploadFile.size,
+            fileType: uploadFile.type,
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        setEvidence([...evidence, newEvidence]);
+      } else {
+        addNotification('error', `Upload failed: ${uploadResponse.error}`);
+        
+        // Fallback to mock functionality
+        const newEvidence: Evidence = {
+          id: String(evidence.length + 1),
+          type: uploadFile.type || 'file',
+          description: uploadDescription || uploadFile.name,
+          filePath: `/uploads/${uploadFile.name}`,
+          metadata: {
+            fileName: uploadFile.name,
+            fileSize: uploadFile.size,
+            fileType: uploadFile.type,
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        setEvidence([...evidence, newEvidence]);
+        addNotification('info', 'Evidence added locally (business logic unavailable)');
+      }
+    } catch (error) {
+      addNotification('error', 'Upload operation failed');
+    }
+
     setShowUploadForm(false);
     setUploadFile(null);
     setUploadDescription('');
@@ -92,6 +158,59 @@ export default function EvidencePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Business Logic Status */}
+      <div className="mb-4">
+        <div className="flex items-center space-x-4 text-sm">
+          <div className={`flex items-center ${connected ? 'text-green-600' : 'text-gray-500'}`}>
+            <div className={`w-2 h-2 rounded-full mr-2 ${connected ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+            {connected ? 'Business Logic Connected' : 'Business Logic Offline'}
+          </div>
+          {stats && (
+            <div className="text-gray-600">
+              Service Stats: {stats.totalRequests || 0} requests
+            </div>
+          )}
+          <button
+            onClick={refresh}
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      {/* Business Logic Notifications */}
+      {notifications.length > 0 && (
+        <div className="mb-6">
+          <div className="space-y-2">
+            {notifications.slice(0, 3).map((notification) => (
+              <div
+                key={notification.id}
+                className={`p-3 rounded-md flex justify-between items-center ${
+                  notification.type === 'error' ? 'bg-red-100 border border-red-200 text-red-800' :
+                  notification.type === 'warning' ? 'bg-yellow-100 border border-yellow-200 text-yellow-800' :
+                  notification.type === 'success' ? 'bg-green-100 border border-green-200 text-green-800' :
+                  'bg-blue-100 border border-blue-200 text-blue-800'
+                }`}
+              >
+                <div className="text-sm">
+                  {notification.message}
+                  <span className="text-xs opacity-75 ml-2">
+                    {new Date(notification.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+                <button
+                  onClick={() => removeNotification(notification.id)}
+                  className="ml-4 text-xs opacity-50 hover:opacity-100"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">

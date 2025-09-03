@@ -2,11 +2,26 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '../../lib/api';
+import { useServicePage } from '../../lib/business-logic';
 import { MITRETechnique, MITRETactic, MITREGroup } from '../../types/api';
 
 type TabType = 'techniques' | 'tactics' | 'groups';
 
 export default function MITREPage() {
+  // Business Logic Integration
+  const {
+    loading: businessLoading,
+    data: businessData,
+    error: businessError,
+    stats,
+    connected,
+    notifications,
+    execute,
+    refresh,
+    addNotification,
+    removeNotification
+  } = useServicePage('mitre');
+
   const [activeTab, setActiveTab] = useState<TabType>('techniques');
   const [techniques, setTechniques] = useState<MITRETechnique[]>([]);
   const [tactics, setTactics] = useState<MITRETactic[]>([]);
@@ -21,31 +36,67 @@ export default function MITREPage() {
   const fetchMITREData = async () => {
     try {
       setLoading(true);
-      const [techniquesResponse, tacticsResponse, groupsResponse] = await Promise.allSettled([
-        apiClient.getMITRETechniques(),
-        apiClient.getMITRETactics(),
-        apiClient.getMITREGroups(),
+      
+      // Try business logic first
+      const [techniquesRes, tacticsRes, groupsRes] = await Promise.allSettled([
+        execute('getTechniques', {}),
+        execute('getTactics', {}),
+        execute('getGroups', {})
       ]);
 
-      if (techniquesResponse.status === 'fulfilled' && Array.isArray(techniquesResponse.value.data)) {
-        setTechniques(techniquesResponse.value.data);
+      // Process business logic results
+      let hasBusinessData = false;
+      
+      if (techniquesRes.status === 'fulfilled' && techniquesRes.value.success) {
+        setTechniques(techniquesRes.value.data || []);
+        hasBusinessData = true;
       }
-      if (tacticsResponse.status === 'fulfilled' && Array.isArray(tacticsResponse.value.data)) {
-        setTactics(tacticsResponse.value.data);
+      
+      if (tacticsRes.status === 'fulfilled' && tacticsRes.value.success) {
+        setTactics(tacticsRes.value.data || []);
+        hasBusinessData = true;
       }
-      if (groupsResponse.status === 'fulfilled' && Array.isArray(groupsResponse.value.data)) {
-        setGroups(groupsResponse.value.data);
+      
+      if (groupsRes.status === 'fulfilled' && groupsRes.value.success) {
+        setGroups(groupsRes.value.data || []);
+        hasBusinessData = true;
       }
 
-      // Check if any requests failed
-      const failedRequests = [techniquesResponse, tacticsResponse, groupsResponse]
-        .filter(response => response.status === 'rejected');
-      
-      if (failedRequests.length > 0) {
-        setError('Some MITRE data could not be loaded. Make sure the backend server is running.');
+      if (hasBusinessData) {
+        addNotification('success', 'MITRE data loaded via business logic');
+      } else {
+        // Fallback to direct API
+        const [techniquesResponse, tacticsResponse, groupsResponse] = await Promise.allSettled([
+          apiClient.getMITRETechniques(),
+          apiClient.getMITRETactics(),
+          apiClient.getMITREGroups(),
+        ]);
+
+        if (techniquesResponse.status === 'fulfilled' && Array.isArray(techniquesResponse.value.data)) {
+          setTechniques(techniquesResponse.value.data);
+        }
+        if (tacticsResponse.status === 'fulfilled' && Array.isArray(tacticsResponse.value.data)) {
+          setTactics(tacticsResponse.value.data);
+        }
+        if (groupsResponse.status === 'fulfilled' && Array.isArray(groupsResponse.value.data)) {
+          setGroups(groupsResponse.value.data);
+        }
+
+        // Check if any requests failed
+        const failedRequests = [techniquesResponse, tacticsResponse, groupsResponse]
+          .filter(response => response.status === 'rejected');
+        
+        if (failedRequests.length > 0) {
+          setError('Some MITRE data could not be loaded. Make sure the backend server is running.');
+          addNotification('warning', 'Some MITRE data could not be loaded');
+        } else {
+          addNotification('info', 'MITRE data loaded via direct API (business logic unavailable)');
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch MITRE data');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to fetch MITRE data';
+      setError(errorMsg);
+      addNotification('error', errorMsg);
     } finally {
       setLoading(false);
     }

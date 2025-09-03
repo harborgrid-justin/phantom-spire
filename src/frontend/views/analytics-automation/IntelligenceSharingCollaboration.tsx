@@ -209,6 +209,9 @@ import {
   TimelineOppositeContent,
 } from '@mui/lab';
 
+// Business Logic Integration
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
+
 // Collaboration interfaces
 interface Organization {
   id: string;
@@ -431,6 +434,19 @@ interface CollaborationWorkspace {
 
 const IntelligenceSharingCollaboration: React.FC = () => {
   const theme = useTheme();
+  
+  // Business Logic Integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications: businessNotifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('analytics-automation');
+  
   const wsRef = useRef<WebSocket | null>(null);
   
   // Core data states

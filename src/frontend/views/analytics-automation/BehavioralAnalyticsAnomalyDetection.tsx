@@ -201,6 +201,8 @@ import {
   Treemap
 } from 'recharts';
 
+// Business Logic Integration
+import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
 // Behavioral analytics interfaces
 interface BehaviorProfile {
@@ -421,6 +423,19 @@ interface BehaviorAnalytics {
 
 const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
   const theme = useTheme();
+  
+  // Business Logic Integration
+  const {
+    businessLogic,
+    realTimeData,
+    notifications: businessNotifications,
+    addNotification,
+    removeNotification,
+    isFullyLoaded,
+    hasErrors,
+    refresh
+  } = useServicePage('analytics-automation');
+  
   const chartRef = useRef<HTMLDivElement>(null);
   
   // Core data states
