@@ -41,12 +41,12 @@ export default function Dashboard() {
         ]);
 
         setStats({
-          totalIOCs: iocsResponse.status === 'fulfilled' && Array.isArray(iocsResponse.value.data) 
-            ? iocsResponse.value.data.length : 0,
-          totalIssues: issuesResponse.status === 'fulfilled' && Array.isArray(issuesResponse.value.data)
-            ? issuesResponse.value.data.length : 0,
-          totalOrganizations: orgsResponse.status === 'fulfilled' && Array.isArray(orgsResponse.value.data)
-            ? orgsResponse.value.data.length : 0,
+          totalIOCs: iocsResponse.status === 'fulfilled' && iocsResponse.value.data?.data && Array.isArray(iocsResponse.value.data.data) 
+            ? iocsResponse.value.data.data.length : 0,
+          totalIssues: issuesResponse.status === 'fulfilled' && issuesResponse.value.data?.data && Array.isArray(issuesResponse.value.data.data)
+            ? issuesResponse.value.data.data.length : 0,
+          totalOrganizations: orgsResponse.status === 'fulfilled' && orgsResponse.value.data?.data && Array.isArray(orgsResponse.value.data.data)
+            ? orgsResponse.value.data.data.length : 0,
           systemStatus: apiResponse.data ? 'Online' : 'Offline',
         });
 
