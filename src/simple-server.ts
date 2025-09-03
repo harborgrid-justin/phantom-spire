@@ -74,6 +74,153 @@ app.get('/health', (_req, res) => {
   });
 });
 
+// In-memory data stores for demo purposes
+let iocs: any[] = [
+  { id: '1', type: 'ip', value: '192.168.1.100', severity: 'high', description: 'Suspicious IP address' },
+  { id: '2', type: 'domain', value: 'malicious.example.com', severity: 'critical', description: 'Known malware C&C domain' },
+];
+
+let issues: any[] = [
+  { id: '1', title: 'Security breach detected', severity: 'high', status: 'open', description: 'Potential data exfiltration attempt' },
+  { id: '2', title: 'Malware alert', severity: 'medium', status: 'investigating', description: 'Suspicious file detected on endpoint' },
+];
+
+let organizations: any[] = [
+  { id: '1', name: 'ACME Corp', code: 'ACME', domain: 'acme.com', industry: 'technology' },
+  { id: '2', name: 'Beta Industries', code: 'BETA', domain: 'beta.com', industry: 'manufacturing' },
+];
+
+const mitreData = {
+  techniques: [
+    { id: 'T1003', name: 'OS Credential Dumping', description: 'Adversaries may attempt to dump credentials' },
+    { id: 'T1071', name: 'Application Layer Protocol', description: 'Adversaries may communicate using application layer protocols' },
+  ],
+  tactics: [
+    { id: 'TA0006', name: 'Credential Access', description: 'The adversary is trying to steal account names and passwords' },
+    { id: 'TA0011', name: 'Command and Control', description: 'The adversary is trying to communicate with compromised systems' },
+  ],
+  groups: [
+    { id: 'G0016', name: 'APT29', description: 'APT29 is threat group that has been attributed to Russias Foreign Intelligence Service' },
+    { id: 'G0007', name: 'APT1', description: 'APT1 is a Chinese threat group that has been attributed to the 2nd Bureau of the PLAs General Staff Department 3rd Department' },
+  ]
+};
+
+// API v1 Routes
+app.get('/api/v1/', (_req, res) => {
+  res.status(200).json({
+    name: 'Phantom Spire CTI Platform API',
+    version: '1.0.0',
+    description: 'Enterprise-grade Cyber Threat Intelligence Platform API',
+    status: 'operational',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      iocs: '/api/v1/iocs',
+      issues: '/api/v1/issues',
+      organizations: '/api/v1/organizations',
+      mitre: '/api/v1/mitre',
+    },
+    features: {
+      crud_operations: true,
+      real_time_updates: true,
+      mitre_integration: true,
+      threat_intelligence: true,
+    },
+  });
+});
+
+// IOC endpoints
+app.get('/api/v1/iocs', (_req, res) => {
+  res.json({ data: iocs });
+});
+
+app.get('/api/v1/iocs/:id', (req, res) => {
+  const ioc = iocs.find(i => i.id === req.params.id);
+  if (!ioc) {
+    return res.status(404).json({ error: 'IOC not found' });
+  }
+  res.json({ data: ioc });
+});
+
+app.post('/api/v1/iocs', (req, res) => {
+  const newIOC = {
+    id: String(Date.now()),
+    ...req.body,
+    createdAt: new Date().toISOString(),
+  };
+  iocs.push(newIOC);
+  res.status(201).json({ data: newIOC, message: 'IOC created successfully' });
+});
+
+app.delete('/api/v1/iocs/:id', (req, res) => {
+  const index = iocs.findIndex(i => i.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ error: 'IOC not found' });
+  }
+  iocs.splice(index, 1);
+  res.json({ message: 'IOC deleted successfully' });
+});
+
+// Issues endpoints
+app.get('/api/v1/issues', (_req, res) => {
+  res.json({ data: issues });
+});
+
+app.get('/api/v1/issues/:id', (req, res) => {
+  const issue = issues.find(i => i.id === req.params.id);
+  if (!issue) {
+    return res.status(404).json({ error: 'Issue not found' });
+  }
+  res.json({ data: issue });
+});
+
+app.post('/api/v1/issues', (req, res) => {
+  const newIssue = {
+    id: String(Date.now()),
+    ...req.body,
+    createdAt: new Date().toISOString(),
+    status: req.body.status || 'open',
+  };
+  issues.push(newIssue);
+  res.status(201).json({ data: newIssue, message: 'Issue created successfully' });
+});
+
+// Organizations endpoints
+app.get('/api/v1/organizations', (_req, res) => {
+  res.json({ data: organizations });
+});
+
+app.get('/api/v1/organizations/:id', (req, res) => {
+  const org = organizations.find(o => o.id === req.params.id);
+  if (!org) {
+    return res.status(404).json({ error: 'Organization not found' });
+  }
+  res.json({ data: org });
+});
+
+// MITRE endpoints
+app.get('/api/v1/mitre/techniques', (_req, res) => {
+  res.json({ data: mitreData.techniques });
+});
+
+app.get('/api/v1/mitre/tactics', (_req, res) => {
+  res.json({ data: mitreData.tactics });
+});
+
+app.get('/api/v1/mitre/groups', (_req, res) => {
+  res.json({ data: mitreData.groups });
+});
+
+// Evidence endpoints
+app.get('/api/v1/evidence', (_req, res) => {
+  res.json({ data: [] });
+});
+
+// Tasks endpoints
+app.get('/api/v1/tasks', (_req, res) => {
+  res.json({ data: [] });
+});
+
 // Root endpoint - main entry point
 app.get('/', (_req, res) => {
   res.status(200).json({
@@ -86,10 +233,17 @@ app.get('/', (_req, res) => {
       health: '/health',
       setup: '/setup',
       dashboard: '/dashboard',
+      api: '/api/v1',
     },
     ui: {
       setup: 'http://localhost:3000/setup',
       dashboard: 'http://localhost:3000/dashboard',
+    },
+    features: {
+      crud_operations: true,
+      real_time_updates: true,
+      mitre_integration: true,
+      threat_intelligence: true,
     },
   });
 });
