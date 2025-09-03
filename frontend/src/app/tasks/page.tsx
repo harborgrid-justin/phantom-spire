@@ -23,8 +23,8 @@ export default function TasksPage() {
     try {
       setLoading(true);
       const response = await apiClient.getTasks();
-      if (response.data && Array.isArray(response.data)) {
-        setTasks(response.data);
+      if (response.data && typeof response.data === 'object' && response.data !== null && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        setTasks((response.data as any).data);
       } else if (response.error) {
         setError(response.error);
       }

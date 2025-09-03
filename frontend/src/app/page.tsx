@@ -41,12 +41,12 @@ export default function Dashboard() {
         ]);
 
         setStats({
-          totalIOCs: iocsResponse.status === 'fulfilled' && iocsResponse.value.data?.data && Array.isArray(iocsResponse.value.data.data) 
-            ? iocsResponse.value.data.data.length : 0,
-          totalIssues: issuesResponse.status === 'fulfilled' && issuesResponse.value.data?.data && Array.isArray(issuesResponse.value.data.data)
-            ? issuesResponse.value.data.data.length : 0,
-          totalOrganizations: orgsResponse.status === 'fulfilled' && orgsResponse.value.data?.data && Array.isArray(orgsResponse.value.data.data)
-            ? orgsResponse.value.data.data.length : 0,
+          totalIOCs: iocsResponse.status === 'fulfilled' && iocsResponse.value.data && typeof iocsResponse.value.data === 'object' && iocsResponse.value.data !== null && 'data' in iocsResponse.value.data && Array.isArray((iocsResponse.value.data as any).data)
+            ? (iocsResponse.value.data as any).data.length : 0,
+          totalIssues: issuesResponse.status === 'fulfilled' && issuesResponse.value.data && typeof issuesResponse.value.data === 'object' && issuesResponse.value.data !== null && 'data' in issuesResponse.value.data && Array.isArray((issuesResponse.value.data as any).data)
+            ? (issuesResponse.value.data as any).data.length : 0,
+          totalOrganizations: orgsResponse.status === 'fulfilled' && orgsResponse.value.data && typeof orgsResponse.value.data === 'object' && orgsResponse.value.data !== null && 'data' in orgsResponse.value.data && Array.isArray((orgsResponse.value.data as any).data)
+            ? (orgsResponse.value.data as any).data.length : 0,
           systemStatus: apiResponse.data ? 'Online' : 'Offline',
         });
 

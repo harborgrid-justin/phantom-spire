@@ -72,14 +72,14 @@ export default function MITREPage() {
           apiClient.getMITREGroups(),
         ]);
 
-        if (techniquesResponse.status === 'fulfilled' && Array.isArray(techniquesResponse.value.data)) {
-          setTechniques(techniquesResponse.value.data);
+        if (techniquesResponse.status === 'fulfilled' && techniquesResponse.value.data && typeof techniquesResponse.value.data === 'object' && techniquesResponse.value.data !== null && 'data' in techniquesResponse.value.data && Array.isArray((techniquesResponse.value.data as any).data)) {
+          setTechniques((techniquesResponse.value.data as any).data);
         }
-        if (tacticsResponse.status === 'fulfilled' && Array.isArray(tacticsResponse.value.data)) {
-          setTactics(tacticsResponse.value.data);
+        if (tacticsResponse.status === 'fulfilled' && tacticsResponse.value.data && typeof tacticsResponse.value.data === 'object' && tacticsResponse.value.data !== null && 'data' in tacticsResponse.value.data && Array.isArray((tacticsResponse.value.data as any).data)) {
+          setTactics((tacticsResponse.value.data as any).data);
         }
-        if (groupsResponse.status === 'fulfilled' && Array.isArray(groupsResponse.value.data)) {
-          setGroups(groupsResponse.value.data);
+        if (groupsResponse.status === 'fulfilled' && groupsResponse.value.data && typeof groupsResponse.value.data === 'object' && groupsResponse.value.data !== null && 'data' in groupsResponse.value.data && Array.isArray((groupsResponse.value.data as any).data)) {
+          setGroups((groupsResponse.value.data as any).data);
         }
 
         // Check if any requests failed

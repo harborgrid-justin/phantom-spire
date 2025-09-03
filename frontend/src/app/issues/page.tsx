@@ -25,8 +25,8 @@ export default function IssuesPage() {
     try {
       setLoading(true);
       const response = await apiClient.getIssues();
-      if (response.data && Array.isArray(response.data)) {
-        setIssues(response.data);
+      if (response.data && typeof response.data === 'object' && response.data !== null && 'data' in response.data && Array.isArray((response.data as any).data)) {
+        setIssues((response.data as any).data);
       } else if (response.error) {
         setError(response.error);
       }

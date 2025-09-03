@@ -44,8 +44,8 @@ export default function EvidencePage() {
       } else {
         // Fallback to direct API
         const response = await apiClient.getEvidence();
-        if (response.data && Array.isArray(response.data)) {
-          setEvidence(response.data);
+        if (response.data && typeof response.data === 'object' && response.data !== null && 'data' in response.data && Array.isArray((response.data as any).data)) {
+          setEvidence((response.data as any).data);
           addNotification('info', 'Evidence loaded via direct API (business logic unavailable)');
         } else if (response.error) {
           setError(response.error);
@@ -339,7 +339,7 @@ export default function EvidencePage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 text-sm">
-                        {item.metadata?.fileName || 'Unknown File'}
+                        {(item.metadata?.fileName as string) || 'Unknown File'}
                       </h3>
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                         {item.type}
@@ -353,9 +353,12 @@ export default function EvidencePage() {
                 </p>
                 
                 <div className="space-y-1 text-xs text-gray-500">
-                  {item.metadata?.fileSize && (
-                    <div>Size: {formatFileSize(Number(item.metadata.fileSize))}</div>
-                  )}
+                  {(() => {
+                    if (item.metadata?.fileSize && typeof item.metadata.fileSize === 'number') {
+                      return <div>Size: {formatFileSize(Number(item.metadata.fileSize))}</div>;
+                    }
+                    return null;
+                  })()}
                   <div>Created: {new Date(item.createdAt).toLocaleDateString()}</div>
                   {item.filePath && (
                     <div className="truncate">Path: {item.filePath}</div>
