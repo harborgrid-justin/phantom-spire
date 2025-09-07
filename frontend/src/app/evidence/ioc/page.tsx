@@ -18,7 +18,6 @@ export default function IOCEvidencePage() {
   // Business Logic Integration
   const {
     loading: businessLoading,
-    data: businessData,
     error: businessError,
     stats,
     connected,

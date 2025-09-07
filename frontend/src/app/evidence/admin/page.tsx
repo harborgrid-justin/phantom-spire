@@ -64,7 +64,6 @@ export default function EvidenceConfigurationPage() {
   // Business Logic Integration
   const {
     loading: businessLoading,
-    data: businessData,
     error: businessError,
     stats,
     connected,

@@ -36,7 +36,6 @@ export default function ChainOfCustodyTrackingPage() {
   // Business Logic Integration
   const {
     loading: businessLoading,
-    data: businessData,
     error: businessError,
     stats,
     connected,

@@ -28,7 +28,6 @@ export default function EvidenceMetricsDashboard() {
   // Business Logic Integration
   const {
     loading: businessLoading,
-    data: businessData,
     error: businessError,
     stats,
     connected,

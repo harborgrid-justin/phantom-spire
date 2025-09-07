@@ -6,6 +6,9 @@ import evidenceRoutes from './evidence/evidenceRoutes.js';
 import issueRoutes from './issue/issueRoutesSimplified.js';
 import { organizationRoutes } from './organization.js';
 import { createTaskRoutes } from './tasks/taskRoutes.js';
+import { createTaskTemplateRoutes } from './tasks/taskTemplateRoutes.js';
+import { createTaskWorkflowRoutes } from './tasks/taskWorkflowRoutes.js';
+import { createInvestigationRoutes } from './investigation/investigationRoutes.js';
 import attackVectorRoutes from './attackVectors.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
@@ -26,7 +29,12 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   if (orchestrator) {
     const taskManager = orchestrator.getTaskManager();
     router.use('/tasks', createTaskRoutes(taskManager));
+    router.use('/tasks', createTaskTemplateRoutes());
+    router.use('/tasks', createTaskWorkflowRoutes());
   }
+
+  // Investigation routes
+  router.use('/investigation', createInvestigationRoutes());
 
   // API info endpoint
   router.get('/', (_req, res) => {
