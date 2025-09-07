@@ -6,6 +6,7 @@ import evidenceRoutes from './evidence/evidenceRoutes.js';
 import issueRoutes from './issue/issueRoutesSimplified.js';
 import { organizationRoutes } from './organization.js';
 import { createTaskRoutes } from './tasks/taskRoutes.js';
+import attackVectorRoutes from './attackVectors.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -19,6 +20,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/evidence', evidenceRoutes);
   router.use('/issues', issueRoutes);
   router.use('/organizations', organizationRoutes);
+  router.use('/attack-vectors', attackVectorRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -39,6 +41,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         evidence: '/api/v1/evidence',
         issues: '/api/v1/issues',
         organizations: '/api/v1/organizations',
+        attackVectors: '/api/v1/attack-vectors',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
@@ -51,6 +54,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         evidenceManagement: true,
         threatIntelligence: true,
         issueTracking: true,
+        attackVectorAnalysis: true,
       },
     });
   });
