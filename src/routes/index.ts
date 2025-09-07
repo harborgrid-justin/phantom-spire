@@ -11,6 +11,7 @@ import { createTaskWorkflowRoutes } from './tasks/taskWorkflowRoutes.js';
 import { createInvestigationRoutes } from './investigation/investigationRoutes.js';
 import attackVectorRoutes from './attackVectors.js';
 import cveRoutes from './cve.js';
+import cveAdvancedRoutes from './cveAdvanced.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -26,6 +27,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/organizations', organizationRoutes);
   router.use('/attack-vectors', attackVectorRoutes);
   router.use('/cve', cveRoutes);
+  router.use('/cve-advanced', cveAdvancedRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -53,6 +55,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         organizations: '/api/v1/organizations',
         attackVectors: '/api/v1/attack-vectors',
         cve: '/api/v1/cve',
+        cveAdvanced: '/api/v1/cve-advanced',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
