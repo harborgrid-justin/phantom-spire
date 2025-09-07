@@ -197,7 +197,7 @@ export default function CVEMainPage() {
               <p className="text-sm text-gray-600">Management dashboards</p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Filters and Controls */}

@@ -34,11 +34,11 @@ export default function CVEDashboardPage() {
       
       // Load CVE statistics
       const statsResponse = await apiClient.get('/cve/stats');
-      setStats(statsResponse.data);
+      setStats(statsResponse.data as CVEStats);
 
       // Load recent CVEs
       const cveResponse = await apiClient.get('/cve?limit=10&sort={"field":"publishedDate","order":"desc"}');
-      setRecentCVEs(cveResponse.data.cves);
+      setRecentCVEs(cveResponse.data.cves as CVE[]);
 
       // Execute business logic
       await execute('dashboard-load', { 

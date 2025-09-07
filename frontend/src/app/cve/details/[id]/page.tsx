@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CVE } from '../../../types/cve';
-import { apiClient } from '../../../lib/api';
-import { useServicePage } from '../../../lib/business-logic';
+import { CVE } from '../../../../types/cve';
+import { apiClient } from '../../../../lib/api';
+import { useServicePage } from '../../../../lib/business-logic';
 
 interface CVEDetailsPageProps {
   params: { id: string };
