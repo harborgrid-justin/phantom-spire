@@ -49,7 +49,6 @@ export default function PatternDetectionPage() {
   // Business Logic Integration
   const {
     loading: businessLoading,
-    data: businessData,
     error: businessError,
     stats,
     connected,
