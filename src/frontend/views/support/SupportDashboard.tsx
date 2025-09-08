@@ -110,7 +110,7 @@ const SupportDashboard: React.FC = () => {
 
   const handleLaunchPage = (page: SupportNavigationItem) => {
     // In a real implementation, this would navigate to the page
-    addNotification('info', \`Launching \${page.title}\`);
+    addNotification('info', `Launching ${page.title}`);
     console.log('Navigate to:', page.path);
   };
 
@@ -393,7 +393,7 @@ const SupportDashboard: React.FC = () => {
             <Chip
               key={key}
               icon={<category.icon />}
-              label={\`\${category.title} (\${getSupportPagesByCategory(key).length})\`}
+              label={`${category.title} (${getSupportPagesByCategory(key).length})`}
               onClick={() => setSelectedCategory(key)}
               variant={selectedCategory === key ? 'filled' : 'outlined'}
               sx={{ 
