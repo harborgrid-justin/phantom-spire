@@ -43,7 +43,8 @@ import {
   ChevronRight,
   Notifications,
   Warning,
-  CheckCircle
+  CheckCircle,
+  Router
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { User } from '../../types/common';
@@ -275,6 +276,51 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       path: '/integrations',
       icon: <Extension />,
       requiredPermissions: ['admin']
+    },
+    {
+      id: 'network-management',
+      label: 'Network Management',
+      path: '/network-management',
+      icon: <Router />,
+      color: theme.palette.primary.main,
+      children: [
+        {
+          id: 'network-infrastructure',
+          label: 'Infrastructure',
+          path: '/network-management/infrastructure',
+          icon: <Router />
+        },
+        {
+          id: 'network-monitoring',
+          label: 'Monitoring',
+          path: '/network-management/monitoring',
+          icon: <Visibility />
+        },
+        {
+          id: 'network-security',
+          label: 'Security',
+          path: '/network-management/security',
+          icon: <Security />
+        },
+        {
+          id: 'network-configuration',
+          label: 'Configuration',
+          path: '/network-management/configuration',
+          icon: <Settings />
+        },
+        {
+          id: 'network-optimization',
+          label: 'Optimization',
+          path: '/network-management/optimization',
+          icon: <Analytics />
+        },
+        {
+          id: 'network-compliance',
+          label: 'Compliance',
+          path: '/network-management/compliance',
+          icon: <AdminPanelSettings />
+        }
+      ]
     },
     {
       id: 'admin',

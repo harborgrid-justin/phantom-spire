@@ -21,6 +21,7 @@ import projectExecutionRoutes from './projectExecution.js';
 import { workflowManagementRoutes } from './workflow-management/index.js';
 import { userManagementRoutes } from './user-management/userManagementRoutes.js';
 import xdrRoutes from './xdr.js';
+import { createNetworkManagementRoutes } from './networkManagementRoutes.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -46,6 +47,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/workflow-management', workflowManagementRoutes);
   router.use('/user-management', userManagementRoutes);
   router.use('/xdr', xdrRoutes);
+  router.use('/network-management', createNetworkManagementRoutes());
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -83,6 +85,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         workflowManagement: '/api/v1/workflow-management',
         userManagement: '/api/v1/user-management',
         xdr: '/api/v1/xdr',
+        networkManagement: '/api/v1/network-management',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
@@ -104,6 +107,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         workflowManagement: true,
         userManagement: true,
         xdrPlatform: true,
+        networkManagement: true,
       },
     });
   });
