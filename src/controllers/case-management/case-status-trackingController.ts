@@ -117,7 +117,7 @@ export class CaseStatusTrackingController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Status Tracking Entry ${id}`,
       description: 'Real-time case status monitoring and updates',
       status: 'active',
       createdAt: new Date().toISOString(),

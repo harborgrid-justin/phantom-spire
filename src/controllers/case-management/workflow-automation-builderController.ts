@@ -117,7 +117,7 @@ export class WorkflowAutomationBuilderController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Workflow Automation Builder Entry ${id}`,
       description: 'Custom workflow automation and triggers',
       status: 'active',
       createdAt: new Date().toISOString(),

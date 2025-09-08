@@ -117,7 +117,7 @@ export class CaseClosureWorkflowController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Closure Workflow Entry ${id}`,
       description: 'Comprehensive case closure and sign-off process',
       status: 'active',
       createdAt: new Date().toISOString(),

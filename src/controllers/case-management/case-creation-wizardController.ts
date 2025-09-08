@@ -117,7 +117,7 @@ export class CaseCreationWizardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Creation Wizard Entry ${id}`,
       description: 'Guided case creation with templates and validation',
       status: 'active',
       createdAt: new Date().toISOString(),

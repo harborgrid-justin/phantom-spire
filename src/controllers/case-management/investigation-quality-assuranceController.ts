@@ -117,7 +117,7 @@ export class InvestigationQualityAssuranceController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Investigation Quality Assurance Entry ${id}`,
       description: 'Quality control and review processes',
       status: 'active',
       createdAt: new Date().toISOString(),

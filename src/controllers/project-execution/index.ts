@@ -1,0 +1,52 @@
+/**
+ * Project Execution Controllers
+ */
+
+export { ProjectCharterBuilderController } from './project-charter-builderController.js';
+export { ProjectScopeManagementController } from './project-scope-managementController.js';
+export { StakeholderAnalysisMatrixController } from './stakeholder-analysis-matrixController.js';
+export { ProjectRequirementsTrackerController } from './project-requirements-trackerController.js';
+export { WorkBreakdownStructureController } from './work-breakdown-structureController.js';
+export { ProjectEstimationEngineController } from './project-estimation-engineController.js';
+export { ProjectFeasibilityAnalyzerController } from './project-feasibility-analyzerController.js';
+export { ProjectInitiationDashboardController } from './project-initiation-dashboardController.js';
+export { ResourceCapacityPlannerController } from './resource-capacity-plannerController.js';
+export { TeamCompositionOptimizerController } from './team-composition-optimizerController.js';
+export { ResourceConflictResolverController } from './resource-conflict-resolverController.js';
+export { SkillGapAnalyzerController } from './skill-gap-analyzerController.js';
+export { VendorResourceManagerController } from './vendor-resource-managerController.js';
+export { ResourceUtilizationTrackerController } from './resource-utilization-trackerController.js';
+export { CrossProjectResourceBoardController } from './cross-project-resource-boardController.js';
+export { ResourcePerformanceAnalyticsController } from './resource-performance-analyticsController.js';
+export { CriticalPathAnalyzerController } from './critical-path-analyzerController.js';
+export { MilestoneTrackingCenterController } from './milestone-tracking-centerController.js';
+export { ScheduleOptimizationEngineController } from './schedule-optimization-engineController.js';
+export { DependencyManagementBoardController } from './dependency-management-boardController.js';
+export { TimelineVisualizationStudioController } from './timeline-visualization-studioController.js';
+export { ScheduleVarianceMonitorController } from './schedule-variance-monitorController.js';
+export { AgileSprintPlannerController } from './agile-sprint-plannerController.js';
+export { BaselineScheduleManagerController } from './baseline-schedule-managerController.js';
+export { ProjectRiskRegisterController } from './project-risk-registerController.js';
+export { QualityAssuranceFrameworkController } from './quality-assurance-frameworkController.js';
+export { IssueEscalationMatrixController } from './issue-escalation-matrixController.js';
+export { ChangeRequestWorkflowController } from './change-request-workflowController.js';
+export { QualityMetricsDashboardController } from './quality-metrics-dashboardController.js';
+export { RiskHeatMapAnalyzerController } from './risk-heat-map-analyzerController.js';
+export { ComplianceChecklistManagerController } from './compliance-checklist-managerController.js';
+export { LessonsLearnedRepositoryController } from './lessons-learned-repositoryController.js';
+export { ProjectBudgetPlannerController } from './project-budget-plannerController.js';
+export { CostTrackingDashboardController } from './cost-tracking-dashboardController.js';
+export { EarnedValueAnalyzerController } from './earned-value-analyzerController.js';
+export { ProcurementManagementCenterController } from './procurement-management-centerController.js';
+export { CostBenefitCalculatorController } from './cost-benefit-calculatorController.js';
+export { BudgetForecastingEngineController } from './budget-forecasting-engineController.js';
+export { ExpenseApprovalWorkflowController } from './expense-approval-workflowController.js';
+export { FinancialReportingSuiteController } from './financial-reporting-suiteController.js';
+export { StakeholderCommunicationHubController } from './stakeholder-communication-hubController.js';
+export { ProjectStatusBroadcasterController } from './project-status-broadcasterController.js';
+export { MeetingManagementCenterController } from './meeting-management-centerController.js';
+export { DocumentCollaborationWorkspaceController } from './document-collaboration-workspaceController.js';
+export { TeamCommunicationPortalController } from './team-communication-portalController.js';
+export { ExecutiveBriefingGeneratorController } from './executive-briefing-generatorController.js';
+export { ProjectWikiManagerController } from './project-wiki-managerController.js';
+export { NotificationCenterController } from './notification-centerController.js';

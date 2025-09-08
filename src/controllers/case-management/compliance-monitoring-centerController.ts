@@ -117,7 +117,7 @@ export class ComplianceMonitoringCenterController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Compliance Monitoring Center Entry ${id}`,
       description: 'Regulatory compliance tracking and monitoring',
       status: 'active',
       createdAt: new Date().toISOString(),

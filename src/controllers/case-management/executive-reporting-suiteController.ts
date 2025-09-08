@@ -117,7 +117,7 @@ export class ExecutiveReportingSuiteController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Executive Reporting Suite Entry ${id}`,
       description: 'Executive-level reporting and dashboards',
       status: 'active',
       createdAt: new Date().toISOString(),

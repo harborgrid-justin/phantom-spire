@@ -117,7 +117,7 @@ export class CertificationManagementPortalController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Certification Management Portal Entry ${id}`,
       description: 'Security certification tracking and renewal management',
       status: 'active',
       createdAt: new Date().toISOString(),

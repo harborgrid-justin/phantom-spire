@@ -117,7 +117,7 @@ export class CaseAssignmentDashboardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Assignment Dashboard Entry ${id}`,
       description: 'Intelligent case assignment and workload management',
       status: 'active',
       createdAt: new Date().toISOString(),

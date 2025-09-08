@@ -117,7 +117,7 @@ export class MilestoneManagementController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Milestone Management Entry ${id}`,
       description: 'Investigation milestone tracking and reporting',
       status: 'active',
       createdAt: new Date().toISOString(),

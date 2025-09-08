@@ -117,7 +117,7 @@ export class EvidenceStorageManagerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Evidence Storage Manager Entry ${id}`,
       description: 'Secure evidence storage and access control',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class AuditTrailViewerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Audit Trail Viewer Entry ${id}`,
       description: 'Comprehensive audit trail visualization and search',
       status: 'active',
       createdAt: new Date().toISOString(),

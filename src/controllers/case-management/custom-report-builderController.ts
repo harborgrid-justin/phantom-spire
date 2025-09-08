@@ -117,7 +117,7 @@ export class CustomReportBuilderController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Custom Report Builder Entry ${id}`,
       description: 'Drag-and-drop custom report creation',
       status: 'active',
       createdAt: new Date().toISOString(),
