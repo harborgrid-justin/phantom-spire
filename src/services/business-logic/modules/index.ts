@@ -18,6 +18,9 @@ export * from './enterprise-integration';
 // Workflow Management (49 modules) - comprehensive BPM system
 export * from './workflow-management';
 
+// User Management (49 modules) - comprehensive user management system
+export * from './user-management';
+
 // Import all rules for registration
 import { allThreatAnalysisRules } from './threat-analysis';
 import { allSecurityOperationsRules } from './security-operations';
