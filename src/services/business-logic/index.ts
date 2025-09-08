@@ -47,6 +47,15 @@ export {
 export { analyticsBusinessRules } from './rules/analyticsRules';
 export { operationsBusinessRules } from './rules/operationsRules';
 
+// New Business Logic Modules (32 additional modules)
+export * from './modules';
+export { 
+  allBusinessLogicModules, 
+  newBusinessLogicServiceIds, 
+  moduleCategories,
+  moduleMetadata 
+} from './modules';
+
 // Utility function to initialize business logic for a service page
 export function initializeServicePage(serviceId: string, options?: {
   realTimeEnabled?: boolean;
@@ -88,10 +97,31 @@ export const BusinessLogicUtils = {
   
   isValidServiceId: (serviceId: string) => {
     const validServices = [
+      // Original services
       'analytics', 'operations', 'admin', 'ioc-management', 
       'threat-intelligence', 'incident', 'hunting', 'feeds',
       'integration', 'repository', 'dashboard', 'analytics-automation',
-      'investigation', 'mitre', 'evidence'
+      'investigation', 'mitre', 'evidence',
+      // New Threat Analysis & Intelligence Services
+      'advanced-threat-detection', 'threat-intelligence-correlation', 
+      'attribution-analysis', 'threat-campaign-tracking',
+      'malware-analysis-automation', 'vulnerability-impact-assessment',
+      'threat-landscape-monitoring', 'intelligence-quality-scoring',
+      // New Security Operations & Response Services
+      'incident-response-automation', 'security-orchestration',
+      'alert-triage-prioritization', 'forensic-analysis-workflow',
+      'containment-strategy', 'recovery-operations',
+      'threat-hunting-automation', 'security-metrics-dashboard',
+      // New Risk Management & Compliance Services
+      'risk-assessment', 'compliance-monitoring',
+      'policy-enforcement', 'audit-trail-management',
+      'control-effectiveness', 'regulatory-reporting',
+      'business-impact-analysis', 'third-party-risk-management',
+      // New Enterprise Integration & Automation Services
+      'workflow-process-engine', 'data-integration-pipeline',
+      'api-gateway-management', 'service-health-monitoring',
+      'configuration-management', 'deployment-automation',
+      'performance-optimization', 'resource-allocation-engine'
     ];
     return validServices.includes(serviceId);
   }
