@@ -49,16 +49,29 @@ class BusinessLogicClient {
 
   async executeBusinessLogic(request: BusinessLogicRequest): Promise<BusinessLogicResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/${request.serviceId}/execute`, {
-        method: 'POST',
+      let endpoint: string;
+      
+      // Handle vulnerability management services differently
+      if (request.serviceId.includes('assets-') || 
+          request.serviceId.includes('threat-intelligence-') ||
+          request.serviceId.includes('compliance-') ||
+          request.serviceId.includes('remediation-') ||
+          request.serviceId.includes('analytics-')) {
+        
+        // Map service ID to vulnerability management endpoint
+        const [category, page] = request.serviceId.split('-');
+        endpoint = `/api/v1/vulnerability-management/${category}/${page}`;
+      } else {
+        // Use the original platform services pattern
+        endpoint = `${this.baseUrl}/${request.serviceId}/execute`;
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'GET', // For now, we'll use GET for data fetching
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          operation: request.operation,
-          parameters: request.parameters,
-          options: request.options
-        })
+          'Authorization': 'Bearer ' + localStorage.getItem('authToken') || ''
+        }
       });
 
       if (!response.ok) {
@@ -66,7 +79,17 @@ class BusinessLogicClient {
       }
 
       const data = await response.json();
-      return data;
+      return {
+        success: true,
+        data,
+        metadata: {
+          requestId: `req-${Date.now()}`,
+          timestamp: new Date(),
+          processingTime: response.headers.get('X-Response-Time') ? 
+            parseInt(response.headers.get('X-Response-Time')!) : 0,
+          serviceVersion: '1.0.0'
+        }
+      };
     } catch (error) {
       return {
         success: false,

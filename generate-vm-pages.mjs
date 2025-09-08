@@ -16,6 +16,14 @@ const pages = [
   // Asset Management (8 pages)
   {
     category: 'assets',
+    name: 'inventory',
+    title: '📋 Asset Inventory',
+    description: 'Comprehensive asset inventory and management',
+    endpoint: '/inventory',
+    icon: '📋'
+  },
+  {
+    category: 'assets',
     name: 'assessment',
     title: '🔍 Asset Vulnerability Assessment',
     description: 'Detailed vulnerability assessment for individual assets',
@@ -280,10 +288,14 @@ function generatePageTemplate(page) {
   const apiEndpoint = `/api/v1/vulnerability-management/${page.category}${page.endpoint}`;
   const serviceKey = `${page.category}-${page.name}`;
 
+  // Calculate correct relative path to lib directory
+  // From /vulnerability-management/category/page/ to /lib/
+  const relativePath = '../../../../lib/business-logic';
+
   return `'use client';
 
 import { useState, useEffect } from 'react';
-import { useServicePage } from '../../../../../lib/business-logic';
+import { useServicePage } from '${relativePath}';
 
 export default function ${componentName}() {
   const { 
@@ -292,10 +304,10 @@ export default function ${componentName}() {
     error, 
     connected, 
     execute, 
-    businessStats,
+    stats,
     notifications,
     removeNotification 
-  } = useServicePage('${serviceKey}', '${apiEndpoint}');
+  } = useServicePage('${serviceKey}');
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -306,7 +318,7 @@ export default function ${componentName}() {
   const loadData = async () => {
     try {
       setRefreshing(true);
-      await execute('load-data', {});
+      await execute('get-data', { endpoint: '${apiEndpoint}' });
     } catch (err) {
       console.error('Failed to load data:', err);
     } finally {
@@ -333,9 +345,9 @@ export default function ${componentName}() {
             <div className={\`w-2 h-2 rounded-full mr-2 \${connected ? 'bg-green-500' : 'bg-gray-400'}\`}></div>
             {connected ? '${page.title.replace(/🎯|📡|👥|🎭|🕵️|🚨|📊|🗺️|✔️|📝|📋|📜|📅|🧪|🚀|↩️|🚑|🕒|📈|📉|⚡|👔|🌡️|🔮|🔍|📋|⚠️|✅|🔧|🛡️|🔄/g, '').trim()} System Online' : '${page.title.replace(/🎯|📡|👥|🎭|🕵️|🚨|📊|🗺️|✔️|📝|📋|📜|📅|🧪|🚀|↩️|🚑|🕒|📈|📉|⚡|👔|🌡️|🔮|🔍|📋|⚠️|✅|🔧|🛡️|🔄/g, '').trim()} System Offline'}
           </div>
-          {businessStats && (
+          {stats && (
             <div className="text-gray-600">
-              Total Requests: {businessStats.totalRequests || 0}
+              Total Requests: {stats?.totalRequests || 0}
             </div>
           )}
         </div>
@@ -499,7 +511,7 @@ export default function ${componentName}() {
 }
 
 // Create directories and generate pages
-const basePath = path.join(__dirname, '../frontend/src/app/vulnerability-management');
+const basePath = path.join(__dirname, 'frontend/src/app/vulnerability-management');
 
 console.log('🚀 Generating 32 Vulnerability Management Pages...\n');
 
@@ -509,12 +521,16 @@ for (const page of pages) {
   const categoryPath = path.join(basePath, page.category);
   const pagePath = path.join(categoryPath, page.name);
   
+  console.log(`Creating: ${page.category}/${page.name}`);
+  
   // Create directories
   if (!fs.existsSync(categoryPath)) {
     fs.mkdirSync(categoryPath, { recursive: true });
+    console.log(`  Created category directory: ${categoryPath}`);
   }
   if (!fs.existsSync(pagePath)) {
     fs.mkdirSync(pagePath, { recursive: true });
+    console.log(`  Created page directory: ${pagePath}`);
   }
 
   // Generate page
