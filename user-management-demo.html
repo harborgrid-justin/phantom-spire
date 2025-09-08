@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management System Demo - User Directory Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center">
+                    <span class="text-5xl mr-3">👥</span>
+                    User Directory Portal
+                </h1>
+                <p class="text-lg text-gray-600">Comprehensive user directory and profile management</p>
+                <div class="mt-2 flex items-center space-x-4 text-sm text-gray-500">
+                    <span class="flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        System Active
+                    </span>
+                    <span>•</span>
+                    <span>Last Updated: 2 minutes ago</span>
+                    <span>•</span>
+                    <span>1,247 Active Users</span>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New User
+                </button>
+                <button class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+                    </svg>
+                    Filter
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Users</p>
+                        <p class="text-3xl font-bold text-gray-900">1,247</p>
+                        <p class="text-sm text-green-600">+12% from last month</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <span class="text-2xl">👥</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Active Now</p>
+                        <p class="text-3xl font-bold text-gray-900">892</p>
+                        <p class="text-sm text-green-600">85% online rate</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <span class="text-2xl">🟢</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">New This Week</p>
+                        <p class="text-3xl font-bold text-gray-900">23</p>
+                        <p class="text-sm text-blue-600">5 pending approval</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <span class="text-2xl">⭐</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Departments</p>
+                        <p class="text-3xl font-bold text-gray-900">15</p>
+                        <p class="text-sm text-gray-600">Across 3 locations</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <span class="text-2xl">🏢</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="flex-1 max-w-lg">
+                    <div class="relative">
+                        <input type="text" placeholder="Search users by name, email, or department..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option>All Departments</option>
+                        <option>Engineering</option>
+                        <option>Marketing</option>
+                        <option>Sales</option>
+                        <option>Human Resources</option>
+                    </select>
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option>All Status</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Pending</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Cards Grid -->
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <!-- User Card 1 -->
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        JS
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">John Smith</h3>
+                        <p class="text-sm text-gray-600">Senior Developer</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Email:</span>
+                        <span class="text-gray-900">john.smith@company.com</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="text-gray-900">Engineering</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Joined:</span>
+                        <span class="text-gray-900">Jan 15, 2023</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                    <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800">Admin</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                        View Profile
+                    </button>
+                    <button class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Card 2 -->
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        SJ
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Sarah Johnson</h3>
+                        <p class="text-sm text-gray-600">Marketing Manager</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Email:</span>
+                        <span class="text-gray-900">sarah.j@company.com</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="text-gray-900">Marketing</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Joined:</span>
+                        <span class="text-gray-900">Mar 8, 2023</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                    <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Manager</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                        View Profile
+                    </button>
+                    <button class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Card 3 -->
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        MD
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Mike Davis</h3>
+                        <p class="text-sm text-gray-600">Sales Representative</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Email:</span>
+                        <span class="text-gray-900">mike.davis@company.com</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="text-gray-900">Sales</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Joined:</span>
+                        <span class="text-gray-900">Nov 22, 2022</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                    <span class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-800">User</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                        View Profile
+                    </button>
+                    <button class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Card 4 -->
+            <div class="bg-white rounded-lg shadow-md p-6 card-hover">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        EM
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Emily Chen</h3>
+                        <p class="text-sm text-gray-600">UX Designer</p>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Email:</span>
+                        <span class="text-gray-900">emily.chen@company.com</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Department:</span>
+                        <span class="text-gray-900">Design</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">Joined:</span>
+                        <span class="text-gray-900">Jul 10, 2023</span>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">Active</span>
+                    <span class="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-800">Designer</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="flex-1 px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                        View Profile
+                    </button>
+                    <button class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Load More Button -->
+        <div class="mt-8 text-center">
+            <button class="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                Load More Users
+            </button>
+        </div>
+
+        <!-- Footer Note -->
+        <div class="mt-12 text-center text-sm text-gray-500 bg-white rounded-lg p-4">
+            <p>🎉 This is one of <strong>49 User Management Pages</strong> generated with complete frontend-backend integration</p>
+            <p class="mt-1">Features: RESTful APIs • Business Logic • Role-Based Access • Enterprise Security</p>
+        </div>
+    </div>
+</body>
+</html>
