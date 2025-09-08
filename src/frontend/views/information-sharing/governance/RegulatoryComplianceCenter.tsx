@@ -228,7 +228,7 @@ export const RegulatoryComplianceCenter: React.FC = () => {
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom">Active Frameworks</Typography>
+              <Typography variant="h6" gutterBottom>Active Frameworks</Typography>
               <Typography variant="h3" color="primary">3</Typography>
               <Typography variant="body2" color="textSecondary">Monitored</Typography>
             </CardContent>
@@ -237,7 +237,7 @@ export const RegulatoryComplianceCenter: React.FC = () => {
         <Grid item xs={12} md={4}>
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom">Next Audit</Typography>
+              <Typography variant="h6" gutterBottom>Next Audit</Typography>
               <Typography variant="h3" color="warning.main">45</Typography>
               <Typography variant="body2" color="textSecondary">Days</Typography>
             </CardContent>

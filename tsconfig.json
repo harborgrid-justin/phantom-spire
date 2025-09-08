@@ -27,7 +27,6 @@
     "downlevelIteration": true,
     "jsx": "react-jsx",
     "allowImportingTsExtensions": false,
-    "types": ["node"],
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
