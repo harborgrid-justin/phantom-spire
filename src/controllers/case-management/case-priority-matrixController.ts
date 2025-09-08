@@ -117,7 +117,7 @@ export class CasePriorityMatrixController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Priority Matrix Entry ${id}`,
       description: 'Dynamic case prioritization and resource allocation',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class ComplianceReportingDashboardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Compliance Reporting Dashboard Entry ${id}`,
       description: 'Regulatory reporting and submission tracking',
       status: 'active',
       createdAt: new Date().toISOString(),

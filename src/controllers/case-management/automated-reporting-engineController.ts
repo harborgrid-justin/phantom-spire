@@ -117,7 +117,7 @@ export class AutomatedReportingEngineController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Automated Reporting Engine Entry ${id}`,
       description: 'Scheduled and triggered report generation',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class EvidenceSharingPortalController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Evidence Sharing Portal Entry ${id}`,
       description: 'Secure evidence sharing with external parties',
       status: 'active',
       createdAt: new Date().toISOString(),

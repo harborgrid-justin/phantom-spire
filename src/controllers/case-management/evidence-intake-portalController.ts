@@ -117,7 +117,7 @@ export class EvidenceIntakePortalController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Evidence Intake Portal Entry ${id}`,
       description: 'Streamlined evidence submission and validation',
       status: 'active',
       createdAt: new Date().toISOString(),

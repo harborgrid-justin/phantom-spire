@@ -117,7 +117,7 @@ export class PerformanceMetricsCenterController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Performance Metrics Center Entry ${id}`,
       description: 'Team and individual performance analytics',
       status: 'active',
       createdAt: new Date().toISOString(),

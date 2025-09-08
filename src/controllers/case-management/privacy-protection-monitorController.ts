@@ -117,7 +117,7 @@ export class PrivacyProtectionMonitorController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Privacy Protection Monitor Entry ${id}`,
       description: 'Data privacy compliance and protection monitoring',
       status: 'active',
       createdAt: new Date().toISOString(),

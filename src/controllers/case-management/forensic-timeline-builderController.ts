@@ -117,7 +117,7 @@ export class ForensicTimelineBuilderController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Forensic Timeline Builder Entry ${id}`,
       description: 'Interactive forensic timeline creation and visualization',
       status: 'active',
       createdAt: new Date().toISOString(),

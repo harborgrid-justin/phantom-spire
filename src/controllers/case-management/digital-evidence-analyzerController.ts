@@ -117,7 +117,7 @@ export class DigitalEvidenceAnalyzerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Digital Evidence Analyzer Entry ${id}`,
       description: 'Automated digital evidence analysis and correlation',
       status: 'active',
       createdAt: new Date().toISOString(),

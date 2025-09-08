@@ -117,7 +117,7 @@ export class ChainOfCustodyTrackerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Chain of Custody Tracker Entry ${id}`,
       description: 'Complete evidence custody tracking and auditing',
       status: 'active',
       createdAt: new Date().toISOString(),

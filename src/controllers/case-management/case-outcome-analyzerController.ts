@@ -117,7 +117,7 @@ export class CaseOutcomeAnalyzerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Case Outcome Analyzer Entry ${id}`,
       description: 'Case outcome analysis and success metrics',
       status: 'active',
       createdAt: new Date().toISOString(),

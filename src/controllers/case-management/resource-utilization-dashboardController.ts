@@ -117,7 +117,7 @@ export class ResourceUtilizationDashboardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Resource Utilization Dashboard Entry ${id}`,
       description: 'Resource usage optimization analytics',
       status: 'active',
       createdAt: new Date().toISOString(),

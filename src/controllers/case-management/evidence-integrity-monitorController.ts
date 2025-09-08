@@ -117,7 +117,7 @@ export class EvidenceIntegrityMonitorController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Evidence Integrity Monitor Entry ${id}`,
       description: 'Continuous evidence integrity verification',
       status: 'active',
       createdAt: new Date().toISOString(),

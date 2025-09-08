@@ -117,7 +117,7 @@ export class InvestigationPlanningDashboardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Investigation Planning Dashboard Entry ${id}`,
       description: 'Strategic investigation planning and resource allocation',
       status: 'active',
       createdAt: new Date().toISOString(),

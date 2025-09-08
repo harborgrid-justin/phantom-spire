@@ -117,7 +117,7 @@ export class LegalHoldManagerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Legal Hold Manager Entry ${id}`,
       description: 'Legal hold management and notification system',
       status: 'active',
       createdAt: new Date().toISOString(),

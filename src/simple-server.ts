@@ -858,6 +858,99 @@ app.use('/api/v1/case-management', async (req, res, next) => {
   }
 });
 
+// Project Execution API Integration
+app.use('/api/v1/project-execution', async (req, res, next) => {
+  // Simple project execution routes for demonstration
+  const path = req.path;
+  const method = req.method;
+
+  // Mock project execution data
+  const mockProjectData = {
+    id: Date.now().toString(),
+    title: 'Sample Project Execution Entry',
+    description: 'Demonstration project execution functionality',
+    status: 'active',
+    priority: 'medium',
+    category: req.path.split('/')[1] || 'general',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    metadata: {
+      module: req.path.split('/')[2] || 'unknown',
+      type: 'project-execution',
+      version: '1.0.0'
+    },
+    summary: {
+      total: 25,
+      active: 18,
+      completed: 7,
+      pending: 5,
+      health: 92
+    },
+    metrics: {
+      efficiency: 88,
+      quality: 94,
+      timeline: 86,
+      budget: 91
+    },
+    recentActivity: [
+      {
+        id: '1',
+        event: 'Project execution process initiated',
+        details: 'New project workflow started',
+        timestamp: new Date(),
+        status: 'completed'
+      }
+    ]
+  };
+
+  // Handle root endpoint
+  if (path === '/' || path === '') {
+    const categories = {
+      planning: ['project-charter-builder', 'project-scope-management', 'stakeholder-analysis-matrix', 'project-requirements-tracker', 'work-breakdown-structure', 'project-estimation-engine', 'project-feasibility-analyzer', 'project-initiation-dashboard'],
+      resources: ['resource-capacity-planner', 'team-composition-optimizer', 'resource-conflict-resolver', 'skill-gap-analyzer', 'vendor-resource-manager', 'resource-utilization-tracker', 'cross-project-resource-board', 'resource-performance-analytics'],
+      scheduling: ['critical-path-analyzer', 'milestone-tracking-center', 'schedule-optimization-engine', 'dependency-management-board', 'timeline-visualization-studio', 'schedule-variance-monitor', 'agile-sprint-planner', 'baseline-schedule-manager'],
+      'risk-quality': ['project-risk-register', 'quality-assurance-framework', 'issue-escalation-matrix', 'change-request-workflow', 'quality-metrics-dashboard', 'risk-heat-map-analyzer', 'compliance-checklist-manager', 'lessons-learned-repository'],
+      budget: ['project-budget-planner', 'cost-tracking-dashboard', 'earned-value-analyzer', 'procurement-management-center', 'cost-benefit-calculator', 'budget-forecasting-engine', 'expense-approval-workflow', 'financial-reporting-suite'],
+      communication: ['stakeholder-communication-hub', 'project-status-broadcaster', 'meeting-management-center', 'document-collaboration-workspace', 'team-communication-portal', 'executive-briefing-generator', 'project-wiki-manager', 'notification-center']
+    };
+
+    return res.json({
+      success: true,
+      message: 'Project Execution API - 48 modules for comprehensive project management',
+      totalModules: 48,
+      categories,
+      endpoints: {
+        health: '/api/v1/project-execution/health',
+        modules: Object.keys(categories).map(category => ({
+          category,
+          baseUrl: `/api/v1/project-execution/${category}`,
+          modules: categories[category].length
+        }))
+      },
+      timestamp: new Date()
+    });
+  }
+
+  // Handle health endpoint
+  if (path === '/health') {
+    return res.json({
+      success: true,
+      message: 'Project Execution module is operational',
+      modules: 48,
+      categories: ['planning', 'resources', 'scheduling', 'risk-quality', 'budget', 'communication'],
+      timestamp: new Date()
+    });
+  }
+
+  // Handle all other endpoints
+  res.json({
+    success: true,
+    message: `Project execution operation completed: ${method} ${path}`,
+    data: mockProjectData,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Root endpoint - main entry point
 app.get('/', (_req, res) => {
   res.status(200).json({
@@ -873,6 +966,7 @@ app.get('/', (_req, res) => {
       api: '/api/v1',
       vulnerabilityManagement: '/api/v1/vulnerability-management',
       caseManagement: '/api/v1/case-management',
+      projectExecution: '/api/v1/project-execution',
     },
     ui: {
       setup: 'http://localhost:3000/setup',
@@ -884,6 +978,7 @@ app.get('/', (_req, res) => {
       mitre_integration: true,
       threat_intelligence: true,
       case_management: true,
+      project_execution: true,
       advanced_analytics: true,
       business_logic_engine: true,
     },
@@ -895,6 +990,18 @@ app.get('/', (_req, res) => {
         workflows: 8,
         analytics: 8,
         compliance: 8
+      },
+      status: 'operational'
+    },
+    projectExecution: {
+      totalModules: 48,
+      categories: {
+        planning: 8,
+        resources: 8,
+        scheduling: 8,
+        'risk-quality': 8,
+        budget: 8,
+        communication: 8
       },
       status: 'operational'
     },
@@ -918,6 +1025,7 @@ const server = app.listen(PORT, () => {
   console.log(`⚙️ Setup Interface: http://localhost:${PORT}/setup`);
   console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
   console.log(`📋 Case Management API: http://localhost:${PORT}/api/v1/case-management`);
+  console.log(`🚀 Project Execution API: http://localhost:${PORT}/api/v1/project-execution`);
   console.log(`📁 Case Management UI: http://localhost:${PORT}/frontend (Navigate to Case Management)`);
 });
 

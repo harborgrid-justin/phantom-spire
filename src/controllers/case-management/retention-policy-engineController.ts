@@ -117,7 +117,7 @@ export class RetentionPolicyEngineController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Retention Policy Engine Entry ${id}`,
       description: 'Automated data retention and disposal policies',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class EvidenceSearchEngineController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Evidence Search Engine Entry ${id}`,
       description: 'Advanced evidence search and filtering capabilities',
       status: 'active',
       createdAt: new Date().toISOString(),

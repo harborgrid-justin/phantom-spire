@@ -117,7 +117,7 @@ export class TaskAssignmentBoardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Task Assignment Board Entry ${id}`,
       description: 'Kanban-style task management for investigations',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class RegulatoryChangeTrackerController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Regulatory Change Tracker Entry ${id}`,
       description: 'Regulatory requirement change tracking and impact analysis',
       status: 'active',
       createdAt: new Date().toISOString(),

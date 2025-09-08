@@ -117,7 +117,7 @@ export class CollaborationWorkspaceController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Collaboration Workspace Entry ${id}`,
       description: 'Team collaboration tools for investigation teams',
       status: 'active',
       createdAt: new Date().toISOString(),

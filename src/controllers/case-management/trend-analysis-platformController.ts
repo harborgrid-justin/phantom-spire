@@ -117,7 +117,7 @@ export class TrendAnalysisPlatformController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Trend Analysis Platform Entry ${id}`,
       description: 'Case trend analysis and predictive insights',
       status: 'active',
       createdAt: new Date().toISOString(),

@@ -117,7 +117,7 @@ export class ProgressTrackingDashboardController {
     // Mock data retrieval - replace with actual database query
     const mockEntry = {
       id,
-      title: `${page.title} Entry ${id}`,
+      title: `Progress Tracking Dashboard Entry ${id}`,
       description: 'Real-time investigation progress monitoring',
       status: 'active',
       createdAt: new Date().toISOString(),
