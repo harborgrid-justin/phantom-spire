@@ -78,6 +78,13 @@ After installation, visit **http://localhost:3000/setup** for the guided setup w
 - **Data Encryption**: At-rest and in-transit encryption
 - **Secure API Access**: JWT-based authentication with refresh tokens
 
+### 📋 Advanced Case Management (40 Modules)
+- **Lifecycle Management**: Complete case lifecycle from creation to closure
+- **Evidence Management**: Chain of custody, digital analysis, and secure storage
+- **Investigation Workflows**: Planning, collaboration, and quality assurance
+- **Reporting & Analytics**: Performance metrics, trend analysis, and executive reporting
+- **Compliance & Audit**: Regulatory compliance, audit trails, and legal holds
+
 ## 📋 Production Prerequisites
 
 ### System Requirements
