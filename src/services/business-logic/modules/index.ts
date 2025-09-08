@@ -15,11 +15,15 @@ export * from './risk-management';
 // Enterprise Integration & Automation (9 modules) - includes new AI/ML engine
 export * from './enterprise-integration';
 
+// Workflow Management (49 modules) - comprehensive BPM system
+export * from './workflow-management';
+
 // Import all rules for registration
 import { allThreatAnalysisRules } from './threat-analysis';
 import { allSecurityOperationsRules } from './security-operations';
 import { allRiskManagementRules } from './risk-management';
 import { allEnterpriseIntegrationRules } from './enterprise-integration';
+import { allWorkflowManagementBusinessLogic } from './workflow-management';
 
 // Import SOA enhancements metadata
 import { 
