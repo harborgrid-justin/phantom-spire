@@ -11,6 +11,7 @@ import { configurationManagementRules } from './ConfigurationManagement';
 import { deploymentAutomationRules } from './DeploymentAutomation';
 import { performanceOptimizationRules } from './PerformanceOptimization';
 import { resourceAllocationEngineRules } from './ResourceAllocationEngine';
+import { advancedAIMLIntegrationEngineRules } from './AdvancedAIMLIntegrationEngine';
 
 // Export individual rule sets
 export {
@@ -21,10 +22,11 @@ export {
   configurationManagementRules,
   deploymentAutomationRules,
   performanceOptimizationRules,
-  resourceAllocationEngineRules
+  resourceAllocationEngineRules,
+  advancedAIMLIntegrationEngineRules
 };
 
-// Aggregate all enterprise integration rules
+// Aggregate all enterprise integration rules (now 9 modules total)
 export const allEnterpriseIntegrationRules = [
   ...workflowProcessEngineRules,
   ...dataIntegrationPipelineRules,
@@ -33,5 +35,6 @@ export const allEnterpriseIntegrationRules = [
   ...configurationManagementRules,
   ...deploymentAutomationRules,
   ...performanceOptimizationRules,
-  ...resourceAllocationEngineRules
+  ...resourceAllocationEngineRules,
+  ...advancedAIMLIntegrationEngineRules
 ];

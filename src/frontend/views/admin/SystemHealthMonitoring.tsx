@@ -244,10 +244,16 @@ export const SystemHealthMonitoring: React.FC = () => {
   // Get status color and icon
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'healthy': return { color: 'success', icon: <CheckCircle />, text: 'HEALTHY' };
-      case 'warning': return { color: 'warning', icon: <Warning />, text: 'WARNING' };
-      case 'critical': return { color: 'error', icon: <ErrorOutline />, text: 'CRITICAL' };
-      default: return { color: 'default', icon: <BugReport />, text: 'UNKNOWN' };
+      case 'healthy': 
+      case 'success': 
+        return { color: 'success' as const, icon: <CheckCircle />, text: 'HEALTHY' };
+      case 'warning': 
+        return { color: 'warning' as const, icon: <Warning />, text: 'WARNING' };
+      case 'critical': 
+      case 'error': 
+        return { color: 'error' as const, icon: <ErrorOutline />, text: 'CRITICAL' };
+      default: 
+        return { color: 'default' as const, icon: <BugReport />, text: 'UNKNOWN' };
     }
   };
 

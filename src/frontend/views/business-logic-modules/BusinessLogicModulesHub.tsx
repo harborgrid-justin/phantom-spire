@@ -1,6 +1,6 @@
 /**
  * Business Logic Modules Hub
- * Central hub for accessing all 32 business logic modules
+ * Central hub for accessing all 40 business logic modules
  */
 
 import React, { useState, useEffect } from 'react';
@@ -37,7 +37,8 @@ import {
   Share,
   BugReport,
   Gavel,
-  Timeline
+  Timeline,
+  Psychology
 } from '@mui/icons-material';
 import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 import { moduleCategories, moduleMetadata } from '../../../services/business-logic/modules';
@@ -350,6 +351,15 @@ export const BusinessLogicModulesHub: React.FC = () => {
         description: 'Intelligent resource allocation and capacity management',
         category: 'enterprise-integration',
         icon: <Analytics />,
+        status: 'active',
+        lastUpdate: new Date()
+      },
+      {
+        id: 'advanced-aiml-integration-engine',
+        name: 'Advanced AI/ML Integration Engine',
+        description: 'Intelligent automation and machine learning integration platform',
+        category: 'enterprise-integration',
+        icon: <Psychology />,
         status: 'active',
         lastUpdate: new Date()
       }

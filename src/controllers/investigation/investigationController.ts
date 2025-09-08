@@ -280,7 +280,7 @@ export class InvestigationController {
       id: `note-${Date.now()}`,
       type,
       content,
-      author: req.user?.username || 'Unknown',
+      author: req.user?.username || req.user?.email || 'Unknown',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
