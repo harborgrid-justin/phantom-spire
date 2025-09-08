@@ -14,6 +14,7 @@ export interface BusinessLogicRequest {
   userId?: string;
   timestamp: Date;
   priority: 'low' | 'medium' | 'high' | 'critical';
+  context?: Record<string, any>;
 }
 
 export interface BusinessLogicResponse {

@@ -21,12 +21,16 @@ export * from './workflow-management';
 // User Management (49 modules) - comprehensive user management system
 export * from './user-management';
 
+// XDR (Extended Detection and Response) (49 modules) - comprehensive XDR platform
+export * from './xdr';
+
 // Import all rules for registration
 import { allThreatAnalysisRules } from './threat-analysis';
 import { allSecurityOperationsRules } from './security-operations';
 import { allRiskManagementRules } from './risk-management';
 import { allEnterpriseIntegrationRules } from './enterprise-integration';
 import { allWorkflowManagementBusinessLogic } from './workflow-management';
+import { allXDRBusinessLogicRules } from './xdr';
 
 // Import SOA enhancements metadata
 import { 
@@ -35,19 +39,20 @@ import {
   allSOAEnhancementIds
 } from '../../soa-enhancements/index.js';
 
-// Aggregate all 40 business logic modules (33 business rules + 7 generic modules)
+// Aggregate all business logic modules with XDR
 export const allBusinessLogicModules = [
   ...allThreatAnalysisRules,        // 8 modules
   ...allSecurityOperationsRules,    // 8 modules
   ...allRiskManagementRules,        // 8 modules
-  ...allEnterpriseIntegrationRules  // 9 modules (8 original + 1 new AI/ML)
-]; // Total: 33 business logic modules
+  ...allEnterpriseIntegrationRules, // 9 modules (8 original + 1 new AI/ML)
+  ...allXDRBusinessLogicRules       // 49 XDR modules
+]; // Total: 82 business logic modules
 
 // Combined with SOA enhancements for total platform services
 export const allPlatformServices = [
-  ...allBusinessLogicModules,       // 33 business logic modules
+  ...allBusinessLogicModules,       // 82 business logic modules (including 49 XDR)
   ...soaEnhancementServices         // 32 SOA enhancement services
-]; // Total: 65 platform services
+]; // Total: 114 platform services
 
 // Service IDs for all new modules
 export const newBusinessLogicServiceIds = [
