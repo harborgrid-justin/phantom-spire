@@ -53,11 +53,10 @@ export const AuditTrail: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'AuditTrail',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'audit-trail']
+    addUIUXEvaluation('governance-audit-trail', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

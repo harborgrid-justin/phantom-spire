@@ -53,11 +53,10 @@ export const PolicyManagement: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PolicyManagement',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'policy-management']
+    addUIUXEvaluation('governance-policy-management', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

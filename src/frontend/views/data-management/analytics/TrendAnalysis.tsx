@@ -53,11 +53,10 @@ export const TrendAnalysis: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'TrendAnalysis',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'trend-analysis']
+    addUIUXEvaluation('analytics-trend-analysis', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

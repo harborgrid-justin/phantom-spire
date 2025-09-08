@@ -9,41 +9,41 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { DataManagementHub } from './DataManagementHub';
 
 // Data Ingestion & Processing Components (8 pages)
-import { DataSourceConfiguration } from './ingestion/DataSourceConfiguration';
-import { RealTimeDataStreams } from './ingestion/RealTimeDataStreams';
-import { BatchProcessingManagement } from './ingestion/BatchProcessingManagement';
-import { DataTransformationHub } from './ingestion/DataTransformationHub';
-import { QualityValidationCenter } from './ingestion/QualityValidationCenter';
-import { ProcessingPipelineMonitor } from './ingestion/ProcessingPipelineMonitor';
-import { FormatConversionTools } from './ingestion/FormatConversionTools';
-import { DataSchemaRegistry } from './ingestion/DataSchemaRegistry';
+import { Sources } from './ingestion/Sources';
+import { Streams } from './ingestion/Streams';
+import { BatchProcessing } from './ingestion/BatchProcessing';
+import { Transformation } from './ingestion/Transformation';
+import { QualityValidation } from './ingestion/QualityValidation';
+import { PipelineMonitor } from './ingestion/PipelineMonitor';
+import { FormatConversion } from './ingestion/FormatConversion';
+import { SchemaRegistry } from './ingestion/SchemaRegistry';
 
 // Data Governance & Compliance Components (8 pages)
-import { DataGovernanceDashboard } from './governance/DataGovernanceDashboard';
-import { PolicyManagementCenter } from './governance/PolicyManagementCenter';
+import { Dashboard as GovernanceDashboard } from './governance/Dashboard';
+import { PolicyManagement } from './governance/PolicyManagement';
 import { ComplianceMonitoring } from './governance/ComplianceMonitoring';
-import { DataLineageTracking } from './governance/DataLineageTracking';
-import { PrivacyControlsHub } from './governance/PrivacyControlsHub';
-import { AuditTrailManagement } from './governance/AuditTrailManagement';
+import { LineageTracking } from './governance/LineageTracking';
+import { PrivacyControls } from './governance/PrivacyControls';
+import { AuditTrail } from './governance/AuditTrail';
 import { RetentionPolicies } from './governance/RetentionPolicies';
-import { DataClassificationManagement } from './governance/DataClassificationManagement';
+import { Classification } from './governance/Classification';
 
 // Data Analytics & Insights Components (8 pages)
-import { AnalyticsWorkbench } from './analytics/AnalyticsWorkbench';
-import { ReportGenerationCenter } from './analytics/ReportGenerationCenter';
+import { Workbench } from './analytics/Workbench';
+import { ReportGeneration } from './analytics/ReportGeneration';
 import { DashboardBuilder } from './analytics/DashboardBuilder';
-import { MetricsKPIPortal } from './analytics/MetricsKPIPortal';
-import { TrendAnalysisHub } from './analytics/TrendAnalysisHub';
+import { MetricsKpi } from './analytics/MetricsKpi';
+import { TrendAnalysis } from './analytics/TrendAnalysis';
 import { PerformanceAnalytics } from './analytics/PerformanceAnalytics';
-import { DataMiningTools } from './analytics/DataMiningTools';
+import { DataMining } from './analytics/DataMining';
 import { PredictiveAnalytics } from './analytics/PredictiveAnalytics';
 
 // Data Operations & Monitoring Components (8 pages)
-import { DataHealthMonitor } from './operations/DataHealthMonitor';
+import { HealthMonitor } from './operations/HealthMonitor';
 import { StorageManagement } from './operations/StorageManagement';
-import { BackupRecoveryCenter } from './operations/BackupRecoveryCenter';
-import { AccessControlHub } from './operations/AccessControlHub';
-import { IntegrationStatusCenter } from './operations/IntegrationStatusCenter';
+import { BackupRecovery } from './operations/BackupRecovery';
+import { AccessControl } from './operations/AccessControl';
+import { IntegrationStatus } from './operations/IntegrationStatus';
 import { PerformanceOptimizer } from './operations/PerformanceOptimizer';
 import { ErrorManagement } from './operations/ErrorManagement';
 import { CapacityPlanning } from './operations/CapacityPlanning';
@@ -57,43 +57,6 @@ const PlaceholderComponent: React.FC<{ title: string; description: string }> = (
   </div>
 );
 
-// Component shortcuts for placeholders
-const DataSourceConfigurationPlaceholder = () => <PlaceholderComponent title="📊 Data Source Configuration" description="Configure and manage data source connections and settings" />;
-const RealTimeDataStreamsPlaceholder = () => <PlaceholderComponent title="🌊 Real-time Data Streams" description="Monitor and manage real-time data streaming services" />;
-const BatchProcessingManagementPlaceholder = () => <PlaceholderComponent title="⚙️ Batch Processing Management" description="Manage batch processing jobs and schedules" />;
-const DataTransformationHubPlaceholder = () => <PlaceholderComponent title="🔄 Data Transformation Hub" description="Transform and map data between different formats and schemas" />;
-const QualityValidationCenterPlaceholder = () => <PlaceholderComponent title="✅ Quality Validation Center" description="Validate data quality and enforce business rules" />;
-const ProcessingPipelineMonitorPlaceholder = () => <PlaceholderComponent title="📊 Processing Pipeline Monitor" description="Monitor data processing pipelines and their performance" />;
-const FormatConversionToolsPlaceholder = () => <PlaceholderComponent title="🔄 Format Conversion Tools" description="Convert data between different formats and standards" />;
-const DataSchemaRegistryPlaceholder = () => <PlaceholderComponent title="📋 Data Schema Registry" description="Manage and version data schemas and structures" />;
-
-const DataGovernanceDashboardPlaceholder = () => <PlaceholderComponent title="🛡️ Data Governance Dashboard" description="Overview of data governance policies and compliance status" />;
-const PolicyManagementCenterPlaceholder = () => <PlaceholderComponent title="📜 Policy Management Center" description="Create and manage data governance policies" />;
-const ComplianceMonitoringPlaceholder = () => <PlaceholderComponent title="📊 Compliance Monitoring" description="Monitor compliance with regulatory requirements" />;
-const DataLineageTrackingPlaceholder = () => <PlaceholderComponent title="🔍 Data Lineage Tracking" description="Track data flow and dependencies across systems" />;
-const PrivacyControlsHubPlaceholder = () => <PlaceholderComponent title="🔒 Privacy Controls Hub" description="Manage privacy controls and data subject rights" />;
-const AuditTrailManagementPlaceholder = () => <PlaceholderComponent title="📝 Audit Trail Management" description="Review and manage data access audit trails" />;
-const RetentionPoliciesPlaceholder = () => <PlaceholderComponent title="⏰ Retention Policies" description="Manage data retention and archival policies" />;
-const DataClassificationManagementPlaceholder = () => <PlaceholderComponent title="🏷️ Data Classification Management" description="Classify and tag data based on sensitivity levels" />;
-
-const AnalyticsWorkbenchPlaceholder = () => <PlaceholderComponent title="🔬 Analytics Workbench" description="Interactive analytics workspace for data exploration" />;
-const ReportGenerationCenterPlaceholder = () => <PlaceholderComponent title="📊 Report Generation Center" description="Generate and schedule automated reports" />;
-const DashboardBuilderPlaceholder = () => <PlaceholderComponent title="📈 Dashboard Builder" description="Create and customize interactive dashboards" />;
-const MetricsKPIPortalPlaceholder = () => <PlaceholderComponent title="📊 Metrics & KPI Portal" description="Monitor key performance indicators and business metrics" />;
-const TrendAnalysisHubPlaceholder = () => <PlaceholderComponent title="📈 Trend Analysis Hub" description="Analyze trends and patterns in your data" />;
-const PerformanceAnalyticsPlaceholder = () => <PlaceholderComponent title="⚡ Performance Analytics" description="Analyze system and data processing performance" />;
-const DataMiningToolsPlaceholder = () => <PlaceholderComponent title="⛏️ Data Mining Tools" description="Extract insights and patterns from large datasets" />;
-const PredictiveAnalyticsPlaceholder = () => <PlaceholderComponent title="🔮 Predictive Analytics" description="Build and deploy predictive models" />;
-
-const DataHealthMonitorPlaceholder = () => <PlaceholderComponent title="💚 Data Health Monitor" description="Monitor the health and status of all data systems" />;
-const StorageManagementPlaceholder = () => <PlaceholderComponent title="💾 Storage Management" description="Manage data storage across different tiers and systems" />;
-const BackupRecoveryCenterPlaceholder = () => <PlaceholderComponent title="💾 Backup & Recovery Center" description="Manage data backups and disaster recovery" />;
-const AccessControlHubPlaceholder = () => <PlaceholderComponent title="🔐 Access Control Hub" description="Manage user access and permissions for data resources" />;
-const IntegrationStatusCenterPlaceholder = () => <PlaceholderComponent title="🔗 Integration Status Center" description="Monitor status of data integrations and connectors" />;
-const PerformanceOptimizerPlaceholder = () => <PlaceholderComponent title="🚀 Performance Optimizer" description="Optimize data processing and query performance" />;
-const ErrorManagementPlaceholder = () => <PlaceholderComponent title="🚨 Error Management" description="Monitor and resolve data processing errors" />;
-const CapacityPlanningPlaceholder = () => <PlaceholderComponent title="📊 Capacity Planning" description="Plan and forecast data infrastructure capacity needs" />;
-
 export const DataManagementRouter: React.FC = () => {
   return (
     <Routes>
@@ -102,44 +65,44 @@ export const DataManagementRouter: React.FC = () => {
       <Route path="hub" element={<DataManagementHub />} />
       
       {/* Data Ingestion & Processing (8 routes) */}
-      <Route path="ingestion/sources" element={<DataSourceConfigurationPlaceholder />} />
-      <Route path="ingestion/streams" element={<RealTimeDataStreamsPlaceholder />} />
-      <Route path="ingestion/batch-processing" element={<BatchProcessingManagementPlaceholder />} />
-      <Route path="ingestion/transformation" element={<DataTransformationHubPlaceholder />} />
-      <Route path="ingestion/quality-validation" element={<QualityValidationCenterPlaceholder />} />
-      <Route path="ingestion/pipeline-monitor" element={<ProcessingPipelineMonitorPlaceholder />} />
-      <Route path="ingestion/format-conversion" element={<FormatConversionToolsPlaceholder />} />
-      <Route path="ingestion/schema-registry" element={<DataSchemaRegistryPlaceholder />} />
+      <Route path="ingestion/sources" element={<Sources />} />
+      <Route path="ingestion/streams" element={<Streams />} />
+      <Route path="ingestion/batch-processing" element={<BatchProcessing />} />
+      <Route path="ingestion/transformation" element={<Transformation />} />
+      <Route path="ingestion/quality-validation" element={<QualityValidation />} />
+      <Route path="ingestion/pipeline-monitor" element={<PipelineMonitor />} />
+      <Route path="ingestion/format-conversion" element={<FormatConversion />} />
+      <Route path="ingestion/schema-registry" element={<SchemaRegistry />} />
       
       {/* Data Governance & Compliance (8 routes) */}
-      <Route path="governance/dashboard" element={<DataGovernanceDashboardPlaceholder />} />
-      <Route path="governance/policy-management" element={<PolicyManagementCenterPlaceholder />} />
-      <Route path="governance/compliance-monitoring" element={<ComplianceMonitoringPlaceholder />} />
-      <Route path="governance/lineage-tracking" element={<DataLineageTrackingPlaceholder />} />
-      <Route path="governance/privacy-controls" element={<PrivacyControlsHubPlaceholder />} />
-      <Route path="governance/audit-trail" element={<AuditTrailManagementPlaceholder />} />
-      <Route path="governance/retention-policies" element={<RetentionPoliciesPlaceholder />} />
-      <Route path="governance/classification" element={<DataClassificationManagementPlaceholder />} />
+      <Route path="governance/dashboard" element={<GovernanceDashboard />} />
+      <Route path="governance/policy-management" element={<PolicyManagement />} />
+      <Route path="governance/compliance-monitoring" element={<ComplianceMonitoring />} />
+      <Route path="governance/lineage-tracking" element={<LineageTracking />} />
+      <Route path="governance/privacy-controls" element={<PrivacyControls />} />
+      <Route path="governance/audit-trail" element={<AuditTrail />} />
+      <Route path="governance/retention-policies" element={<RetentionPolicies />} />
+      <Route path="governance/classification" element={<Classification />} />
       
       {/* Data Analytics & Insights (8 routes) */}
-      <Route path="analytics/workbench" element={<AnalyticsWorkbenchPlaceholder />} />
-      <Route path="analytics/report-generation" element={<ReportGenerationCenterPlaceholder />} />
-      <Route path="analytics/dashboard-builder" element={<DashboardBuilderPlaceholder />} />
-      <Route path="analytics/metrics-kpi" element={<MetricsKPIPortalPlaceholder />} />
-      <Route path="analytics/trend-analysis" element={<TrendAnalysisHubPlaceholder />} />
-      <Route path="analytics/performance-analytics" element={<PerformanceAnalyticsPlaceholder />} />
-      <Route path="analytics/data-mining" element={<DataMiningToolsPlaceholder />} />
-      <Route path="analytics/predictive-analytics" element={<PredictiveAnalyticsPlaceholder />} />
+      <Route path="analytics/workbench" element={<Workbench />} />
+      <Route path="analytics/report-generation" element={<ReportGeneration />} />
+      <Route path="analytics/dashboard-builder" element={<DashboardBuilder />} />
+      <Route path="analytics/metrics-kpi" element={<MetricsKpi />} />
+      <Route path="analytics/trend-analysis" element={<TrendAnalysis />} />
+      <Route path="analytics/performance-analytics" element={<PerformanceAnalytics />} />
+      <Route path="analytics/data-mining" element={<DataMining />} />
+      <Route path="analytics/predictive-analytics" element={<PredictiveAnalytics />} />
       
       {/* Data Operations & Monitoring (8 routes) */}
-      <Route path="operations/health-monitor" element={<DataHealthMonitorPlaceholder />} />
-      <Route path="operations/storage-management" element={<StorageManagementPlaceholder />} />
-      <Route path="operations/backup-recovery" element={<BackupRecoveryCenterPlaceholder />} />
-      <Route path="operations/access-control" element={<AccessControlHubPlaceholder />} />
-      <Route path="operations/integration-status" element={<IntegrationStatusCenterPlaceholder />} />
-      <Route path="operations/performance-optimizer" element={<PerformanceOptimizerPlaceholder />} />
-      <Route path="operations/error-management" element={<ErrorManagementPlaceholder />} />
-      <Route path="operations/capacity-planning" element={<CapacityPlanningPlaceholder />} />
+      <Route path="operations/health-monitor" element={<HealthMonitor />} />
+      <Route path="operations/storage-management" element={<StorageManagement />} />
+      <Route path="operations/backup-recovery" element={<BackupRecovery />} />
+      <Route path="operations/access-control" element={<AccessControl />} />
+      <Route path="operations/integration-status" element={<IntegrationStatus />} />
+      <Route path="operations/performance-optimizer" element={<PerformanceOptimizer />} />
+      <Route path="operations/error-management" element={<ErrorManagement />} />
+      <Route path="operations/capacity-planning" element={<CapacityPlanning />} />
       
       {/* Fallback route */}
       <Route path="*" element={<Navigate to="hub" replace />} />

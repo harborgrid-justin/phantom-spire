@@ -53,11 +53,10 @@ export const ReportGeneration: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'ReportGeneration',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'report-generation']
+    addUIUXEvaluation('analytics-report-generation', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

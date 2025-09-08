@@ -53,11 +53,10 @@ export const MetricsKpi: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'MetricsKpi',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'metrics-kpi']
+    addUIUXEvaluation('analytics-metrics-kpi', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

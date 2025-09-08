@@ -53,11 +53,10 @@ export const Transformation: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'Transformation',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'ingestion', 'transformation']
+    addUIUXEvaluation('ingestion-transformation', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

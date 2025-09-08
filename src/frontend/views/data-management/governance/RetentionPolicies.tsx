@@ -53,11 +53,10 @@ export const RetentionPolicies: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'RetentionPolicies',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'retention-policies']
+    addUIUXEvaluation('governance-retention-policies', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

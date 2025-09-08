@@ -53,11 +53,10 @@ export const Workbench: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'Workbench',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'workbench']
+    addUIUXEvaluation('analytics-workbench', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

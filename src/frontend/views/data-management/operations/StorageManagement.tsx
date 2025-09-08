@@ -53,11 +53,10 @@ export const StorageManagement: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'StorageManagement',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'storage-management']
+    addUIUXEvaluation('operations-storage-management', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

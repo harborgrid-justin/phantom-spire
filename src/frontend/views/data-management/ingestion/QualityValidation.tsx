@@ -53,11 +53,10 @@ export const QualityValidation: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'QualityValidation',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'ingestion', 'quality-validation']
+    addUIUXEvaluation('ingestion-quality-validation', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

@@ -53,11 +53,10 @@ export const HealthMonitor: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'HealthMonitor',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'health-monitor']
+    addUIUXEvaluation('operations-health-monitor', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

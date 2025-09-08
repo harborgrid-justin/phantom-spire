@@ -53,11 +53,10 @@ export const PrivacyControls: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PrivacyControls',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'privacy-controls']
+    addUIUXEvaluation('governance-privacy-controls', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

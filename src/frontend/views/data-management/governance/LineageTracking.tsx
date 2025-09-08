@@ -53,11 +53,10 @@ export const LineageTracking: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'LineageTracking',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'lineage-tracking']
+    addUIUXEvaluation('governance-lineage-tracking', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

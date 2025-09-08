@@ -53,11 +53,10 @@ export const CapacityPlanning: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'CapacityPlanning',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'capacity-planning']
+    addUIUXEvaluation('operations-capacity-planning', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

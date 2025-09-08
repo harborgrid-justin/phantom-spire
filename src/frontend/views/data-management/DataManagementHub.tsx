@@ -60,11 +60,10 @@ export const DataManagementHub: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'DataManagementHub',
-      component: 'MainDashboard',
-      loadTime: performance.now(),
-      interactionPath: ['dashboard', 'data-management', 'hub']
+    addUIUXEvaluation('main-datamanagementhub', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 
@@ -192,7 +191,7 @@ export const DataManagementHub: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'success' | 'warning' | 'error' | 'default' => {
     switch (status) {
       case 'healthy': return 'success';
       case 'warning': return 'warning';

@@ -53,11 +53,10 @@ export const Streams: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'Streams',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'ingestion', 'streams']
+    addUIUXEvaluation('ingestion-streams', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

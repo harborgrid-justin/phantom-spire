@@ -53,11 +53,10 @@ export const IntegrationStatus: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'IntegrationStatus',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'integration-status']
+    addUIUXEvaluation('operations-integration-status', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

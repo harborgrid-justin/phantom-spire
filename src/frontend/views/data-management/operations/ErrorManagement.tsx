@@ -53,11 +53,10 @@ export const ErrorManagement: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'ErrorManagement',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'error-management']
+    addUIUXEvaluation('operations-error-management', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

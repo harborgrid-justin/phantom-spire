@@ -53,11 +53,10 @@ export const ComplianceMonitoring: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'ComplianceMonitoring',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'governance', 'compliance-monitoring']
+    addUIUXEvaluation('governance-compliance-monitoring', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

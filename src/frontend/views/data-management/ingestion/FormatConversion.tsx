@@ -53,11 +53,10 @@ export const FormatConversion: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'FormatConversion',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'ingestion', 'format-conversion']
+    addUIUXEvaluation('ingestion-format-conversion', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

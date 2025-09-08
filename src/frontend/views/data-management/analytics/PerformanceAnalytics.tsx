@@ -53,11 +53,10 @@ export const PerformanceAnalytics: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PerformanceAnalytics',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'performance-analytics']
+    addUIUXEvaluation('analytics-performance-analytics', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

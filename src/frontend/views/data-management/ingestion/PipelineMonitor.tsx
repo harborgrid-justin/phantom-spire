@@ -53,11 +53,10 @@ export const PipelineMonitor: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PipelineMonitor',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'ingestion', 'pipeline-monitor']
+    addUIUXEvaluation('ingestion-pipeline-monitor', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

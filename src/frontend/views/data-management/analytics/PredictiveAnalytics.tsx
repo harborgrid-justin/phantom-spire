@@ -53,11 +53,10 @@ export const PredictiveAnalytics: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PredictiveAnalytics',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'predictive-analytics']
+    addUIUXEvaluation('analytics-predictive-analytics', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

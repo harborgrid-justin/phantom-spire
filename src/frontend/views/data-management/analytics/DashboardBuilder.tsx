@@ -53,11 +53,10 @@ export const DashboardBuilder: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'DashboardBuilder',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'analytics', 'dashboard-builder']
+    addUIUXEvaluation('analytics-dashboard-builder', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

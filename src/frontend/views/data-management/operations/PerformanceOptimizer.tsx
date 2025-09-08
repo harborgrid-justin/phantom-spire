@@ -53,11 +53,10 @@ export const PerformanceOptimizer: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: 'PerformanceOptimizer',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', 'operations', 'performance-optimizer']
+    addUIUXEvaluation('operations-performance-optimizer', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 

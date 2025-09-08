@@ -347,11 +347,10 @@ export const ${componentName}: React.FC = () => {
 
   // UI/UX evaluation integration
   useEffect(() => {
-    addUIUXEvaluation({
-      page: '${componentName}',
-      component: 'MainContent',
-      loadTime: performance.now(),
-      interactionPath: ['data-management', '${page.category}', '${page.name}']
+    addUIUXEvaluation('${page.category}-${page.name}', {
+      position: 'bottom-right',
+      autoStart: true,
+      showScore: true
     });
   }, []);
 
