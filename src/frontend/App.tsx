@@ -41,6 +41,7 @@ import { RealTimeOperationsCenter } from './views/operations/RealTimeOperationsC
 import { ThreatIntelRepository } from './views/repository/ThreatIntelRepository';
 import { IntegrationPlatform } from './views/integration/IntegrationPlatform';
 import { NetworkManagementDashboard } from './views/network-management/NetworkManagementDashboard';
+import { ETLRouter } from './views/etl/ETLRouter';
 
 // Authentication & Security
 import { AuthenticationProvider } from './context/AuthenticationContext';
@@ -405,6 +406,7 @@ const PhantomSpireApp: React.FC = () => {
                           <Route path="/repository/*" element={<ThreatIntelRepository />} />
                           <Route path="/integrations/*" element={<IntegrationPlatform />} />
                           <Route path="/network-management/*" element={<NetworkManagementDashboard />} />
+                          <Route path="/etl/*" element={<ETLRouter />} />
                         </Routes>
                       </Box>
                     </Box>

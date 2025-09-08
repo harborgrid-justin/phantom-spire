@@ -323,6 +323,52 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
       ]
     },
     {
+      id: 'etl',
+      label: 'ETL Management',
+      path: '/etl',
+      icon: <Storage />,
+      color: theme.palette.secondary.main,
+      children: [
+        {
+          id: 'etl-extraction',
+          label: 'Data Extraction',
+          path: '/etl/extraction',
+          icon: <Storage />
+        },
+        {
+          id: 'etl-transformation',
+          label: 'Transformation',
+          path: '/etl/transformation',
+          icon: <Settings />
+        },
+        {
+          id: 'etl-loading',
+          label: 'Data Loading',
+          path: '/etl/loading',
+          icon: <Storage />
+        },
+        {
+          id: 'etl-pipeline',
+          label: 'Pipeline Management',
+          path: '/etl/pipeline',
+          icon: <Timeline />
+        },
+        {
+          id: 'etl-monitoring',
+          label: 'Monitoring',
+          path: '/etl/monitoring',
+          icon: <Analytics />
+        },
+        {
+          id: 'etl-governance',
+          label: 'Governance',
+          path: '/etl/governance',
+          icon: <AdminPanelSettings />
+        }
+      ],
+      requiredPermissions: ['read']
+    },
+    {
       id: 'admin',
       label: 'Administration',
       path: '/admin',
