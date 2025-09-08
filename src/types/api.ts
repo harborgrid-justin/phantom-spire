@@ -102,3 +102,23 @@ export interface AlertQuery extends PaginationQuery {
   assignedTo?: string;
   search?: string;
 }
+
+// User authentication and session types
+export interface User {
+  id: string;
+  email: string;
+  role: string;
+  organizationId?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+// Extend Express Request type with user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}
