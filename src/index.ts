@@ -12,6 +12,7 @@ import { connectDatabase } from './config/database.js';
 import routes from './routes/index.js';
 import setupRoutes from './routes/setup.js';
 import comprehensiveSetupRoutes from './setup/routes/setupRoutes.js';
+import vulnerabilityManagementRoutes from './routes/vulnerabilityManagement.js';
 import swaggerSpec from './config/swagger.js';
 import swaggerUi from 'swagger-ui-express';
 import { WorkflowBPMOrchestrator } from './workflow-bpm/index.js';
@@ -127,6 +128,7 @@ app.get('/', (_req, res) => {
       api: '/api/v1',
       workflow: '/api/v1/workflow',
       platform: '/api/v1/platform',
+      vulnerabilityManagement: '/api/v1/vulnerability-management',
     },
     ui: {
       setup: 'http://localhost:3000/setup',
@@ -137,6 +139,7 @@ app.get('/', (_req, res) => {
 
 // API routes
 app.use('/api/v1', routes);
+app.use('/api/v1/vulnerability-management', vulnerabilityManagementRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/setup', comprehensiveSetupRoutes);
 
