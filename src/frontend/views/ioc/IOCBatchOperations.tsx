@@ -36,7 +36,7 @@ import {
   StepLabel,
   StepContent
 } from '@mui/material';
-import { BatchPrediction, Upload, CheckCircle, Error, Warning } from '@mui/icons-material';
+import { BatchPrediction, Upload, CheckCircle,  Error as ErrorIcon, Warning } from '@mui/icons-material';
 
 export const IOCBatchOperations: React.FC = () => {
   const [operationType, setOperationType] = useState('create');
@@ -125,7 +125,7 @@ export const IOCBatchOperations: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'success': return <CheckCircle color="success" />;
-      case 'error': return <Error color="error" />;
+      case 'error': return <ErrorIcon color="error" />;
       case 'warning': return <Warning color="warning" />;
       default: return null;
     }

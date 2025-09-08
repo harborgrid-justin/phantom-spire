@@ -86,8 +86,7 @@ import {
 
 import {
   Security,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   CheckCircle,
   Info,
   Assignment,

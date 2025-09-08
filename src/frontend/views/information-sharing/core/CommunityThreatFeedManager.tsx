@@ -44,8 +44,7 @@ import {
   Star,
   TrendingUp,
   CheckCircle,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   Info,
   Refresh,
   FilterList,
@@ -227,7 +226,7 @@ export const CommunityThreatFeedManager: React.FC = () => {
     switch (status) {
       case 'active': return <CheckCircle />;
       case 'inactive': return <Info />;
-      case 'error': return <Error />;
+      case 'error': return <ErrorIcon />;
       case 'pending': return <Warning />;
       default: return <Info />;
     }

@@ -103,8 +103,7 @@ import {
   Timeline as TimelineIcon,
   TrendingUp,
   TrendingDown,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   CheckCircle,
   Info,
   Visibility,
@@ -1310,7 +1309,7 @@ const AutomatedThreatFeedProcessor: React.FC = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Avatar sx={{ bgcolor: liveMetrics.errorRate > 5 ? theme.palette.error.main : theme.palette.success.main }}>
-                    <Error />
+                    <ErrorIcon />
                   </Avatar>
                   <Box>
                     <Typography variant="h5">

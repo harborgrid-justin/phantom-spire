@@ -96,8 +96,7 @@ import {
   Science,
   BugReport,
   Security,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   CheckCircle,
   Info,
   Timeline as TimelineIcon,
@@ -885,7 +884,7 @@ const MLThreatScoringDashboard: React.FC = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Avatar sx={{ bgcolor: theme.palette.error.main }}>
-                    <Error />
+                    <ErrorIcon />
                   </Avatar>
                   <Box>
                     <Typography variant="h5">

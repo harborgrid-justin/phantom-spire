@@ -29,8 +29,7 @@ import {
   PlayArrow,
   Pause,
   Stop,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Schedule,
   Build,
   Security,
@@ -111,7 +110,7 @@ export const SecurityOrchestrationCenter: React.FC = () => {
     switch (step.status) {
       case 'completed': return <CheckCircle color="success" />;
       case 'running': return <CircularProgress size={20} />;
-      case 'failed': return <Error color="error" />;
+      case 'failed': return <ErrorIcon color="error" />;
       default: return <Schedule />;
     }
   };
@@ -281,7 +280,7 @@ export const SecurityOrchestrationCenter: React.FC = () => {
                         {workflow.workflow_status === 'completed' ? 
                           <CheckCircle color="success" /> : 
                           workflow.workflow_status === 'failed' ? 
-                          <Error color="error" /> : 
+                          <ErrorIcon color="error" /> : 
                           <CircularProgress size={20} />
                         }
                       </ListItemIcon>

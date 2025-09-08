@@ -28,8 +28,7 @@ import {
 import { 
   Security,
   Warning,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Speed,
   Analytics,
   BugReport,
@@ -110,7 +109,7 @@ export const AdvancedThreatDetectionDashboard: React.FC = () => {
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <Error color="error" />;
+      case 'critical': return <ErrorIcon color="error" />;
       case 'high': return <Warning color="warning" />;
       case 'medium': return <Security color="info" />;
       case 'low': return <CheckCircle color="success" />;

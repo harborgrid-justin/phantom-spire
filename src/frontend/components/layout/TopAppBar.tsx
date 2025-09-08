@@ -38,8 +38,7 @@ import {
   Security,
   Speed,
   Warning,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Info,
   Refresh,
   FullscreenExit,
@@ -92,7 +91,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
     operational: { color: theme.palette.success.main, icon: <CheckCircle />, label: 'Operational' },
     degraded: { color: theme.palette.warning.main, icon: <Warning />, label: 'Degraded Performance' },
     maintenance: { color: theme.palette.info.main, icon: <Info />, label: 'Maintenance Mode' },
-    error: { color: theme.palette.error.main, icon: <Error />, label: 'System Error' },
+    error: { color: theme.palette.error.main, icon: <ErrorIcon />, label: 'System Error' },
     initializing: { color: theme.palette.grey[500], icon: <Refresh />, label: 'Initializing' }
   };
 
@@ -442,7 +441,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           recentNotifications.map((notification) => (
             <MenuItem key={notification.id}>
               <ListItemIcon>
-                {notification.level === 'error' ? <Error color="error" /> :
+                {notification.level === 'error' ? <ErrorIcon color="error" /> :
                  notification.level === 'warning' ? <Warning color="warning" /> :
                  notification.level === 'success' ? <CheckCircle color="success" /> :
                  <Info color="info" />}

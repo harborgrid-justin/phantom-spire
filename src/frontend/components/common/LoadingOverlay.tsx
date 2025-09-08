@@ -17,8 +17,7 @@ import {
 import {
   Security,
   CheckCircle,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   Refresh
 } from '@mui/icons-material';
 import { SystemStatus } from '../../types/common';
@@ -65,7 +64,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
     },
     error: {
       color: theme.palette.error.main,
-      icon: <Error />,
+      icon: <ErrorIcon />,
       label: 'System Error'
     }
   };

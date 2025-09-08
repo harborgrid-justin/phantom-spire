@@ -114,8 +114,7 @@ import {
   CompareArrows,
   Sync,
   SyncProblem,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Warning,
   Info,
   Schedule,
@@ -934,7 +933,7 @@ const ApiManagementExternalService: React.FC = () => {
     const icons = {
       active: <CheckCircle sx={{ fontSize: 16 }} />,
       inactive: <Pause sx={{ fontSize: 16 }} />,
-      deprecated: <Error sx={{ fontSize: 16 }} />,
+      deprecated: <ErrorIcon sx={{ fontSize: 16 }} />,
       maintenance: <Settings sx={{ fontSize: 16 }} />,
       testing: <Schedule sx={{ fontSize: 16 }} />
     };

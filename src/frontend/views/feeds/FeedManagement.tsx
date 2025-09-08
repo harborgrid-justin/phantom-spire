@@ -22,7 +22,7 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { RssFeed, CheckCircle, Error, Schedule } from '@mui/icons-material';
+import { RssFeed, CheckCircle,  Error as ErrorIcon, Schedule } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
 
@@ -125,7 +125,7 @@ export const FeedManagement: React.FC = () => {
                     {feed.status === 'active' ? (
                       <CheckCircle color="success" />
                     ) : feed.status === 'error' ? (
-                      <Error color="error" />
+                      <ErrorIcon color="error" />
                     ) : (
                       <Schedule color="warning" />
                     )}

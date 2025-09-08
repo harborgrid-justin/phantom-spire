@@ -222,7 +222,7 @@ const ThreatActorReportGenerator: React.FC = () => {
     switch (status) {
       case 'completed': return <CheckCircle />;
       case 'generating': return <CircularProgress size={20} />;
-      case 'failed': return <Error />;
+      case 'failed': return <ErrorIcon />;
       case 'scheduled': return <Pending />;
       default: return <Description />;
     }

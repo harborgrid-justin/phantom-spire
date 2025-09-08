@@ -60,8 +60,7 @@ import {
   Search,
   Refresh,
   OpenInNew,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Link,
   Storage,
   Package,
@@ -397,7 +396,7 @@ const SupplyChainCompromiseVectors: React.FC = () => {
       {[
         { label: 'Total Vectors', value: metrics?.total_vectors || 0, icon: <AccountTree />, color: theme.palette.primary.main },
         { label: 'High Risk Dependencies', value: metrics?.high_risk_dependencies || 0, icon: <Warning />, color: theme.palette.error.main },
-        { label: 'Recent Incidents', value: metrics?.recent_incidents || 0, icon: <Error />, color: theme.palette.warning.main },
+        { label: 'Recent Incidents', value: metrics?.recent_incidents || 0, icon: <ErrorIcon />, color: theme.palette.warning.main },
         { label: 'Supply Chain Maturity', value: `${metrics?.supply_chain_maturity || 0}%`, icon: <Shield />, color: theme.palette.success.main }
       ].map((metric, index) => (
         <Grid item xs={12} sm={6} lg={3} key={index}>

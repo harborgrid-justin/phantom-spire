@@ -26,8 +26,7 @@ import {
   Extension, 
   Api, 
   CloudSync, 
-  CheckCircle, 
-  Error, 
+  CheckCircle,  Error as ErrorIcon, 
   Settings,
   Security,
   Storage,
@@ -215,7 +214,7 @@ export const IntegrationPlatform: React.FC = () => {
                     {integration.status === 'connected' ? (
                       <CheckCircle color="success" />
                     ) : (
-                      <Error color="error" />
+                      <ErrorIcon color="error" />
                     )}
                     <Chip
                       size="small"

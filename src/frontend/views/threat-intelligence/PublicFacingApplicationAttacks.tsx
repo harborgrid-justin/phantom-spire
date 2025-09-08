@@ -61,8 +61,7 @@ import {
   Search,
   Refresh,
   OpenInNew,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Code,
   Storage,
   API,
@@ -355,7 +354,7 @@ const PublicFacingApplicationAttacks: React.FC = () => {
     <Grid container spacing={3} sx={{ mb: 3 }}>
       {[
         { label: 'Total Vectors', value: metrics?.total_vectors || 0, icon: <Web />, color: theme.palette.primary.main },
-        { label: 'Critical Vulns', value: metrics?.critical_vulnerabilities || 0, icon: <Error />, color: theme.palette.error.main },
+        { label: 'Critical Vulns', value: metrics?.critical_vulnerabilities || 0, icon: <ErrorIcon />, color: theme.palette.error.main },
         { label: 'Active Campaigns', value: metrics?.active_campaigns || 0, icon: <TrendingUp />, color: theme.palette.warning.main },
         { label: 'Prevention Rate', value: `${metrics?.prevention_rate || 0}%`, icon: <Shield />, color: theme.palette.success.main }
       ].map((metric, index) => (

@@ -85,8 +85,7 @@ import {
   VisibilityOff,
   BugReport,
   Security,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   CheckCircle,
   Info,
   FilterList,
@@ -1028,7 +1027,7 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
                     height: 32
                   }}
                 >
-                  {anomaly.severity === 'critical' ? <Error fontSize="small" /> :
+                  {anomaly.severity === 'critical' ? <ErrorIcon fontSize="small" /> :
                    anomaly.severity === 'high' ? <Warning fontSize="small" /> :
                    <Info fontSize="small" />}
                 </Avatar>
@@ -1177,7 +1176,7 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
                     >
                       {model.status === 'active' ? <CheckCircle fontSize="small" /> :
                        model.status === 'training' ? <Psychology fontSize="small" /> :
-                       model.status === 'error' ? <Error fontSize="small" /> :
+                       model.status === 'error' ? <ErrorIcon fontSize="small" /> :
                        <Pause fontSize="small" />}
                     </Avatar>
                   </ListItemIcon>
@@ -1262,7 +1261,7 @@ const BehavioralAnalyticsAnomalyDetection: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Avatar sx={{ bgcolor: theme.palette.warning.main }}>
-                  <Error />
+                  <ErrorIcon />
                 </Avatar>
                 <Box>
                   <Typography variant="h5">

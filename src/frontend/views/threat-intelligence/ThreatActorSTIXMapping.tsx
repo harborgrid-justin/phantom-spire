@@ -41,8 +41,7 @@ import {
   Schema,
   DataObject,
   Sync,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Warning,
   Search,
   Download,
@@ -423,7 +422,7 @@ const ThreatActorSTIXMapping: React.FC = () => {
                                 color={getStatusColor(selectedObject.mapping_status)}
                                 icon={
                                   selectedObject.mapping_status === 'mapped' ? <CheckCircle /> :
-                                  selectedObject.mapping_status === 'error' ? <Error /> :
+                                  selectedObject.mapping_status === 'error' ? <ErrorIcon /> :
                                   <Warning />
                                 }
                               />

@@ -26,7 +26,7 @@ import {
   Refresh,
   Settings,
   TrendingUp,
-  Error,
+  Error as ErrorIcon,
   CheckCircle,
   Warning,
   Info
@@ -75,16 +75,10 @@ export const DataMining: React.FC = () => {
         const result = await response.json();
         setData(result.data);
         
-        addNotification({
-          type: 'success',
-          message: 'Data loaded successfully'
-        });
+        addNotification('success', 'Data loaded successfully');
       } catch (error) {
         console.error('Failed to load data:', error);
-        addNotification({
-          type: 'error',
-          message: 'Failed to load data'
-        });
+        addNotification('error', 'Failed to load data');
       } finally {
         setLoading(false);
       }

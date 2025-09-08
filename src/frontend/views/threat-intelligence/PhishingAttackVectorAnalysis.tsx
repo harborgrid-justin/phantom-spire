@@ -66,8 +66,7 @@ import {
   OpenInNew,
   ExpandMore,
   ChevronRight,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Info,
 } from '@mui/icons-material';
 
