@@ -345,7 +345,7 @@ export default function ${componentName}() {
             <div className={\`w-2 h-2 rounded-full mr-2 \${connected ? 'bg-green-500' : 'bg-gray-400'}\`}></div>
             {connected ? '${page.title.replace(/🎯|📡|👥|🎭|🕵️|🚨|📊|🗺️|✔️|📝|📋|📜|📅|🧪|🚀|↩️|🚑|🕒|📈|📉|⚡|👔|🌡️|🔮|🔍|📋|⚠️|✅|🔧|🛡️|🔄/g, '').trim()} System Online' : '${page.title.replace(/🎯|📡|👥|🎭|🕵️|🚨|📊|🗺️|✔️|📝|📋|📜|📅|🧪|🚀|↩️|🚑|🕒|📈|📉|⚡|👔|🌡️|🔮|🔍|📋|⚠️|✅|🔧|🛡️|🔄/g, '').trim()} System Offline'}
           </div>
-          {businessStats && (
+          {stats && (
             <div className="text-gray-600">
               Total Requests: {stats?.totalRequests || 0}
             </div>
