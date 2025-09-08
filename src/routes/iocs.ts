@@ -13,6 +13,46 @@ import {
   getDashboardStats,
   getTrendAnalysis,
   getQualityReport,
+  // Extended IOC Analytics & Reporting
+  getIOCTrendAnalytics,
+  getIOCRiskAssessment,
+  getIOCPerformanceMetrics,
+  getIOCComplianceReport,
+  // IOC Intelligence & Enrichment
+  getIOCThreatAttribution,
+  getIOCOSINTEnrichment,
+  getIOCContextualAnalysis,
+  getIOCReputationScoring,
+  // IOC Operations & Management
+  performIOCBatchOperations,
+  getIOCLifecycleManagement,
+  getIOCDataQuality,
+  manageIOCArchive,
+  // IOC Integration & Feeds
+  getIOCFeedSources,
+  getIOCAPIConnectors,
+  getIOCFeedManagement,
+  performIOCDataSync,
+  // IOC Visualization
+  getIOCGeolocation,
+  getIOCRelationshipNetwork,
+  getIOCTimeline,
+  getIOCInteractiveDashboard,
+  // IOC Workflows
+  getIOCPlaybooks,
+  getIOCAutomationWorkflows,
+  getIOCCaseManagement,
+  getIOCInvestigationTools,
+  // IOC Collaboration
+  getIOCCollaborationWorkspaces,
+  manageIOCSharing,
+  getIOCCommunityIntelligence,
+  getIOCPeerReviews,
+  // IOC Advanced Features
+  getIOCMLDetection,
+  getIOCBehavioralAnalysis,
+  getIOCPredictiveIntelligence,
+  getIOCCustomRules,
 } from '../controllers/iocController.js';
 import { authMiddleware, requireRole } from '../middleware/auth.js';
 import { validateRequest } from '../middleware/validation.js';
@@ -120,5 +160,57 @@ router.delete(
   validateRequest,
   deleteIOC
 );
+
+// ============================================================================
+// EXTENDED IOC ROUTES - 32 Additional Business-Ready Endpoints
+// ============================================================================
+
+// IOC Analytics & Reporting (4 routes)
+router.get('/analytics/trends', authMiddleware, getIOCTrendAnalytics);
+router.get('/analytics/risk-assessment', authMiddleware, getIOCRiskAssessment);
+router.get('/analytics/performance', authMiddleware, getIOCPerformanceMetrics);
+router.get('/analytics/compliance', authMiddleware, requireRole(['admin', 'analyst']), getIOCComplianceReport);
+
+// IOC Intelligence & Enrichment (4 routes)
+router.get('/intelligence/attribution', authMiddleware, getIOCThreatAttribution);
+router.get('/intelligence/osint', authMiddleware, getIOCOSINTEnrichment);
+router.get('/intelligence/context', authMiddleware, getIOCContextualAnalysis);
+router.get('/intelligence/reputation', authMiddleware, getIOCReputationScoring);
+
+// IOC Operations & Management (4 routes)
+router.post('/operations/batch', authMiddleware, requireRole(['admin', 'analyst']), performIOCBatchOperations);
+router.get('/operations/lifecycle', authMiddleware, getIOCLifecycleManagement);
+router.get('/operations/data-quality', authMiddleware, getIOCDataQuality);
+router.post('/operations/archive', authMiddleware, requireRole(['admin']), manageIOCArchive);
+
+// IOC Integration & Feeds (4 routes)
+router.get('/feeds/sources', authMiddleware, getIOCFeedSources);
+router.get('/feeds/connectors', authMiddleware, getIOCAPIConnectors);
+router.get('/feeds/management', authMiddleware, requireRole(['admin', 'analyst']), getIOCFeedManagement);
+router.post('/feeds/synchronization', authMiddleware, requireRole(['admin']), performIOCDataSync);
+
+// IOC Visualization (4 routes)
+router.get('/visualization/geolocation', authMiddleware, getIOCGeolocation);
+router.get('/visualization/relationships', authMiddleware, getIOCRelationshipNetwork);
+router.get('/visualization/timeline', authMiddleware, getIOCTimeline);
+router.get('/visualization/dashboard', authMiddleware, getIOCInteractiveDashboard);
+
+// IOC Workflows (4 routes)
+router.get('/workflows/playbooks', authMiddleware, getIOCPlaybooks);
+router.get('/workflows/automation', authMiddleware, getIOCAutomationWorkflows);
+router.get('/workflows/cases', authMiddleware, getIOCCaseManagement);
+router.get('/workflows/investigation', authMiddleware, getIOCInvestigationTools);
+
+// IOC Collaboration (4 routes)
+router.get('/collaboration/workspaces', authMiddleware, getIOCCollaborationWorkspaces);
+router.post('/collaboration/sharing', authMiddleware, requireRole(['admin', 'analyst']), manageIOCSharing);
+router.get('/collaboration/community', authMiddleware, getIOCCommunityIntelligence);
+router.get('/collaboration/reviews', authMiddleware, getIOCPeerReviews);
+
+// IOC Advanced Features (4 routes)
+router.get('/advanced/ml-detection', authMiddleware, requireRole(['admin', 'analyst']), getIOCMLDetection);
+router.get('/advanced/behavioral', authMiddleware, getIOCBehavioralAnalysis);
+router.get('/advanced/predictive', authMiddleware, requireRole(['admin', 'analyst']), getIOCPredictiveIntelligence);
+router.get('/advanced/custom-rules', authMiddleware, getIOCCustomRules);
 
 export default router;

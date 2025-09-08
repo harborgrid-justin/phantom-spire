@@ -700,3 +700,830 @@ export const getQualityReport = asyncHandler(
     } as ApiResponse);
   }
 );
+
+// ============================================================================
+// EXTENDED IOC ENDPOINTS - 32 Additional Business-Ready Pages
+// ============================================================================
+
+/**
+ * IOC Analytics & Reporting (4 endpoints)
+ */
+
+/**
+ * @swagger
+ * /iocs/analytics/trends:
+ *   get:
+ *     summary: Advanced IOC trend analysis with predictive insights
+ *     tags: [IOC Analytics]
+ *     security:
+ *       - BearerAuth: []
+ */
+export const getIOCTrendAnalytics = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { timeframe = '30d', categories, predictive = false } = req.query;
+    
+    const analytics = await IOCStatisticsService.generateAdvancedTrends({
+      timeframe: timeframe as string,
+      categories: categories ? (categories as string).split(',') : undefined,
+      includePredictive: predictive === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: analytics,
+      message: 'IOC trend analytics generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/analytics/risk-assessment:
+ *   get:
+ *     summary: Comprehensive IOC risk assessment dashboard
+ *     tags: [IOC Analytics]
+ */
+export const getIOCRiskAssessment = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { severity, confidence_threshold } = req.query;
+    
+    const riskData = await IOCAnalysisService.generateRiskAssessmentReport({
+      severityFilter: severity as string,
+      confidenceThreshold: confidence_threshold ? parseInt(confidence_threshold as string) : 70
+    });
+
+    res.json({
+      success: true,
+      data: riskData,
+      message: 'IOC risk assessment completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/analytics/performance:
+ *   get:
+ *     summary: IOC detection performance metrics
+ *     tags: [IOC Analytics]
+ */
+export const getIOCPerformanceMetrics = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { start_date, end_date, granularity = 'daily' } = req.query;
+    
+    const metrics = await IOCStatisticsService.generatePerformanceMetrics({
+      startDate: start_date ? new Date(start_date as string) : undefined,
+      endDate: end_date ? new Date(end_date as string) : undefined,
+      granularity: granularity as 'hourly' | 'daily' | 'weekly'
+    });
+
+    res.json({
+      success: true,
+      data: metrics,
+      message: 'Performance metrics generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/analytics/compliance:
+ *   get:
+ *     summary: IOC compliance and regulatory reporting
+ *     tags: [IOC Analytics]
+ */
+export const getIOCComplianceReport = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { framework = 'all', export_format = 'json' } = req.query;
+    
+    const complianceData = await IOCStatisticsService.generateComplianceReport({
+      framework: framework as string,
+      exportFormat: export_format as 'json' | 'pdf' | 'csv'
+    });
+
+    res.json({
+      success: true,
+      data: complianceData,
+      message: 'Compliance report generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * IOC Intelligence & Enrichment (4 endpoints)
+ */
+
+/**
+ * @swagger
+ * /iocs/intelligence/attribution:
+ *   get:
+ *     summary: Threat actor attribution analysis for IOCs
+ *     tags: [IOC Intelligence]
+ */
+export const getIOCThreatAttribution = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_id, confidence_min = 50 } = req.query;
+    
+    const attribution = await IOCAnalysisService.generateThreatAttribution({
+      iocId: ioc_id as string,
+      minConfidence: parseInt(confidence_min as string)
+    });
+
+    res.json({
+      success: true,
+      data: attribution,
+      message: 'Threat attribution analysis completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/intelligence/osint:
+ *   get:
+ *     summary: OSINT enrichment for IOCs from multiple sources
+ *     tags: [IOC Intelligence]
+ */
+export const getIOCOSINTEnrichment = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_value, sources = 'all', real_time = false } = req.query;
+    
+    const osintData = await IOCEnrichmentService.performOSINTEnrichment({
+      iocValue: ioc_value as string,
+      sources: sources === 'all' ? [] : (sources as string).split(','),
+      realTime: real_time === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: osintData,
+      message: 'OSINT enrichment completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/intelligence/context:
+ *   get:
+ *     summary: Contextual analysis for IOCs with campaign mapping
+ *     tags: [IOC Intelligence]
+ */
+export const getIOCContextualAnalysis = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_id, include_campaigns = true, include_ttps = true } = req.query;
+    
+    const context = await IOCAnalysisService.generateContextualAnalysis({
+      iocId: ioc_id as string,
+      includeCampaigns: include_campaigns === 'true',
+      includeTTPs: include_ttps === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: context,
+      message: 'Contextual analysis completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/intelligence/reputation:
+ *   get:
+ *     summary: Multi-source reputation scoring for IOCs
+ *     tags: [IOC Intelligence]
+ */
+export const getIOCReputationScoring = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_value, algorithm = 'weighted', include_history = false } = req.query;
+    
+    const reputation = await IOCEnrichmentService.calculateReputationScore({
+      iocValue: ioc_value as string,
+      algorithm: algorithm as 'weighted' | 'bayesian' | 'consensus',
+      includeHistory: include_history === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: reputation,
+      message: 'Reputation scoring completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * IOC Operations & Management (4 endpoints)
+ */
+
+/**
+ * @swagger
+ * /iocs/operations/batch:
+ *   post:
+ *     summary: Batch IOC operations (create, update, delete)
+ *     tags: [IOC Operations]
+ */
+export const performIOCBatchOperations = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { operations, dry_run = false } = req.body;
+    
+    const results = await IOCValidationService.performBatchOperations({
+      operations,
+      dryRun: dry_run,
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: results,
+      message: `Batch operations ${dry_run ? 'validated' : 'completed'}`,
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/operations/lifecycle:
+ *   get:
+ *     summary: IOC lifecycle management and automation rules
+ *     tags: [IOC Operations]
+ */
+export const getIOCLifecycleManagement = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { status, age_threshold, include_rules = true } = req.query;
+    
+    const lifecycle = await IOCAnalysisService.generateLifecycleReport({
+      statusFilter: status as string,
+      ageThreshold: age_threshold ? parseInt(age_threshold as string) : 90,
+      includeAutomationRules: include_rules === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: lifecycle,
+      message: 'Lifecycle management data generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/operations/data-quality:
+ *   get:
+ *     summary: Advanced IOC data quality assessment
+ *     tags: [IOC Operations]
+ */
+export const getIOCDataQuality = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { include_recommendations = true, severity_filter } = req.query;
+    
+    const quality = await IOCValidationService.generateQualityAssessment({
+      includeRecommendations: include_recommendations === 'true',
+      severityFilter: severity_filter as string
+    });
+
+    res.json({
+      success: true,
+      data: quality,
+      message: 'Data quality assessment completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/operations/archive:
+ *   post:
+ *     summary: IOC archival and retention management
+ *     tags: [IOC Operations]
+ */
+export const manageIOCArchive = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { action, criteria, retention_policy } = req.body;
+    
+    const archiveResult = await IOCStatisticsService.manageArchival({
+      action: action as 'archive' | 'restore' | 'purge',
+      criteria,
+      retentionPolicy: retention_policy,
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: archiveResult,
+      message: `Archive ${action} completed`,
+    } as ApiResponse);
+  }
+);
+
+/**
+ * IOC Integration & Feeds (4 endpoints)
+ */
+
+/**
+ * @swagger
+ * /iocs/feeds/sources:
+ *   get:
+ *     summary: External IOC feed source management
+ *     tags: [IOC Feeds]
+ */
+export const getIOCFeedSources = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { status, type, include_stats = true } = req.query;
+    
+    const sources = await IOCEnrichmentService.getFeedSources({
+      statusFilter: status as string,
+      typeFilter: type as string,
+      includeStatistics: include_stats === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: sources,
+      message: 'Feed sources retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/feeds/connectors:
+ *   get:
+ *     summary: API connector management for IOC feeds
+ *     tags: [IOC Feeds]
+ */
+export const getIOCAPIConnectors = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { provider, health_check = false } = req.query;
+    
+    const connectors = await IOCEnrichmentService.getAPIConnectors({
+      providerFilter: provider as string,
+      performHealthCheck: health_check === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: connectors,
+      message: 'API connectors retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/feeds/management:
+ *   get:
+ *     summary: Comprehensive feed management dashboard
+ *     tags: [IOC Feeds]
+ */
+export const getIOCFeedManagement = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { include_schedules = true, include_errors = true } = req.query;
+    
+    const management = await IOCStatisticsService.getFeedManagement({
+      includeSchedules: include_schedules === 'true',
+      includeErrors: include_errors === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: management,
+      message: 'Feed management data retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/feeds/synchronization:
+ *   post:
+ *     summary: IOC data synchronization across systems
+ *     tags: [IOC Feeds]
+ */
+export const performIOCDataSync = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { target_systems, sync_type = 'incremental', dry_run = false } = req.body;
+    
+    const syncResult = await IOCEnrichmentService.performDataSync({
+      targetSystems: target_systems,
+      syncType: sync_type as 'full' | 'incremental' | 'delta',
+      dryRun: dry_run,
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: syncResult,
+      message: `Data synchronization ${dry_run ? 'validated' : 'completed'}`,
+    } as ApiResponse);
+  }
+);
+
+/**
+ * Additional Advanced IOC Endpoints (16 more specialized endpoints)
+ */
+
+/**
+ * @swagger
+ * /iocs/visualization/geolocation:
+ *   get:
+ *     summary: Geolocation mapping for IP-based IOCs
+ *     tags: [IOC Visualization]
+ */
+export const getIOCGeolocation = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { time_range, clustering = true, heat_map = false } = req.query;
+    
+    const geoData = await IOCAnalysisService.generateGeolocationData({
+      timeRange: time_range as string,
+      enableClustering: clustering === 'true',
+      generateHeatMap: heat_map === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: geoData,
+      message: 'Geolocation data generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/visualization/relationships:
+ *   get:
+ *     summary: IOC relationship network visualization
+ *     tags: [IOC Visualization]
+ */
+export const getIOCRelationshipNetwork = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { center_ioc, depth = 2, relationship_types } = req.query;
+    
+    const network = await IOCAnalysisService.generateRelationshipNetwork({
+      centerIOC: center_ioc as string,
+      depth: parseInt(depth as string),
+      relationshipTypes: relationship_types ? (relationship_types as string).split(',') : undefined
+    });
+
+    res.json({
+      success: true,
+      data: network,
+      message: 'Relationship network generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/visualization/timeline:
+ *   get:
+ *     summary: IOC activity timeline visualization
+ *     tags: [IOC Visualization]
+ */
+export const getIOCTimeline = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_id, granularity = 'daily', include_context = true } = req.query;
+    
+    const timeline = await IOCAnalysisService.generateActivityTimeline({
+      iocId: ioc_id as string,
+      granularity: granularity as 'hourly' | 'daily' | 'weekly',
+      includeContext: include_context === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: timeline,
+      message: 'Activity timeline generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/visualization/dashboard:
+ *   get:
+ *     summary: Interactive IOC dashboard with real-time updates
+ *     tags: [IOC Visualization]
+ */
+export const getIOCInteractiveDashboard = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { widgets, refresh_interval = 30 } = req.query;
+    
+    const dashboard = await IOCStatisticsService.generateInteractiveDashboard({
+      selectedWidgets: widgets ? (widgets as string).split(',') : undefined,
+      refreshInterval: parseInt(refresh_interval as string)
+    });
+
+    res.json({
+      success: true,
+      data: dashboard,
+      message: 'Interactive dashboard generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/workflows/playbooks:
+ *   get:
+ *     summary: IOC-triggered security playbook management
+ *     tags: [IOC Workflows]
+ */
+export const getIOCPlaybooks = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_type, severity, status } = req.query;
+    
+    const playbooks = await IOCAnalysisService.getSecurityPlaybooks({
+      iocType: ioc_type as string,
+      severityFilter: severity as string,
+      statusFilter: status as string
+    });
+
+    res.json({
+      success: true,
+      data: playbooks,
+      message: 'Security playbooks retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/workflows/automation:
+ *   get:
+ *     summary: Automated IOC response and mitigation workflows
+ *     tags: [IOC Workflows]
+ */
+export const getIOCAutomationWorkflows = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { trigger_type, execution_status, include_metrics = true } = req.query;
+    
+    const workflows = await IOCAnalysisService.getAutomationWorkflows({
+      triggerType: trigger_type as string,
+      executionStatus: execution_status as string,
+      includeMetrics: include_metrics === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: workflows,
+      message: 'Automation workflows retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/workflows/cases:
+ *   get:
+ *     summary: IOC-related case management and tracking
+ *     tags: [IOC Workflows]
+ */
+export const getIOCCaseManagement = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { status, assignee, priority, include_timeline = true } = req.query;
+    
+    const cases = await IOCAnalysisService.getCaseManagement({
+      statusFilter: status as string,
+      assigneeFilter: assignee as string,
+      priorityFilter: priority as string,
+      includeTimeline: include_timeline === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: cases,
+      message: 'Case management data retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/workflows/investigation:
+ *   get:
+ *     summary: Digital forensic investigation tools for IOCs
+ *     tags: [IOC Workflows]
+ */
+export const getIOCInvestigationTools = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_id, investigation_type, include_artifacts = true } = req.query;
+    
+    const investigation = await IOCAnalysisService.getInvestigationTools({
+      iocId: ioc_id as string,
+      investigationType: investigation_type as string,
+      includeArtifacts: include_artifacts === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: investigation,
+      message: 'Investigation tools data retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/collaboration/workspaces:
+ *   get:
+ *     summary: Team collaboration workspaces for IOC analysis
+ *     tags: [IOC Collaboration]
+ */
+export const getIOCCollaborationWorkspaces = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { team_id, project_status, include_activity = true } = req.query;
+    
+    const workspaces = await IOCAnalysisService.getCollaborationWorkspaces({
+      teamId: team_id as string,
+      projectStatus: project_status as string,
+      includeActivity: include_activity === 'true',
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: workspaces,
+      message: 'Collaboration workspaces retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/collaboration/sharing:
+ *   post:
+ *     summary: External IOC sharing and community intelligence
+ *     tags: [IOC Collaboration]
+ */
+export const manageIOCSharing = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { ioc_ids, sharing_level, target_organizations, include_metadata = true } = req.body;
+    
+    const sharingResult = await IOCEnrichmentService.manageExternalSharing({
+      iocIds: ioc_ids,
+      sharingLevel: sharing_level as 'public' | 'community' | 'trusted',
+      targetOrganizations: target_organizations,
+      includeMetadata: include_metadata,
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: sharingResult,
+      message: 'IOC sharing configured',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/collaboration/community:
+ *   get:
+ *     summary: Community intelligence and crowd-sourced IOC validation
+ *     tags: [IOC Collaboration]
+ */
+export const getIOCCommunityIntelligence = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { source_filter, confidence_min = 50, include_votes = true } = req.query;
+    
+    const community = await IOCEnrichmentService.getCommunityIntelligence({
+      sourceFilter: source_filter as string,
+      minConfidence: parseInt(confidence_min as string),
+      includeVotes: include_votes === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: community,
+      message: 'Community intelligence retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/collaboration/reviews:
+ *   get:
+ *     summary: Peer review system for IOC validation
+ *     tags: [IOC Collaboration]
+ */
+export const getIOCPeerReviews = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { review_status, reviewer_id, include_metrics = true } = req.query;
+    
+    const reviews = await IOCValidationService.getPeerReviews({
+      reviewStatus: review_status as string,
+      reviewerId: reviewer_id as string,
+      includeMetrics: include_metrics === 'true',
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: reviews,
+      message: 'Peer reviews retrieved',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/advanced/ml-detection:
+ *   get:
+ *     summary: Machine learning-powered IOC detection and classification
+ *     tags: [IOC Advanced]
+ */
+export const getIOCMLDetection = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { model_type = 'ensemble', confidence_threshold = 0.8, include_explanations = true } = req.query;
+    
+    const mlResults = await IOCAnalysisService.performMLDetection({
+      modelType: model_type as string,
+      confidenceThreshold: parseFloat(confidence_threshold as string),
+      includeExplanations: include_explanations === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: mlResults,
+      message: 'ML detection analysis completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/advanced/behavioral:
+ *   get:
+ *     summary: Behavioral analysis and anomaly detection for IOCs
+ *     tags: [IOC Advanced]
+ */
+export const getIOCBehavioralAnalysis = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { analysis_window = '7d', anomaly_sensitivity = 'medium', include_patterns = true } = req.query;
+    
+    const behavioral = await IOCAnalysisService.performBehavioralAnalysis({
+      analysisWindow: analysis_window as string,
+      anomalySensitivity: anomaly_sensitivity as 'low' | 'medium' | 'high',
+      includePatterns: include_patterns === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: behavioral,
+      message: 'Behavioral analysis completed',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/advanced/predictive:
+ *   get:
+ *     summary: Predictive intelligence and threat forecasting
+ *     tags: [IOC Advanced]
+ */
+export const getIOCPredictiveIntelligence = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { forecast_horizon = '30d', prediction_type = 'emergence', include_confidence = true } = req.query;
+    
+    const predictive = await IOCAnalysisService.generatePredictiveIntelligence({
+      forecastHorizon: forecast_horizon as string,
+      predictionType: prediction_type as string,
+      includeConfidence: include_confidence === 'true'
+    });
+
+    res.json({
+      success: true,
+      data: predictive,
+      message: 'Predictive intelligence generated',
+    } as ApiResponse);
+  }
+);
+
+/**
+ * @swagger
+ * /iocs/advanced/custom-rules:
+ *   get:
+ *     summary: Custom rule engine for IOC detection and alerts
+ *     tags: [IOC Advanced]
+ */
+export const getIOCCustomRules = asyncHandler(
+  async (req: AuthRequest, res: Response) => {
+    const { rule_type, status, include_performance = true } = req.query;
+    
+    const rules = await IOCValidationService.getCustomRules({
+      ruleType: rule_type as string,
+      statusFilter: status as string,
+      includePerformance: include_performance === 'true',
+      userId: req.user?.id
+    });
+
+    res.json({
+      success: true,
+      data: rules,
+      message: 'Custom rules retrieved',
+    } as ApiResponse);
+  }
+);

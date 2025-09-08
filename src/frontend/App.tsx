@@ -30,7 +30,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Main Dashboard Views
 import { ThreatIntelligenceDashboard } from './views/dashboard/ThreatIntelligenceDashboard';
-import { IOCManagementConsole } from './views/ioc/IOCManagementConsole';
+import { IOCRouter } from './views/ioc/IOCRouter';
 import { IncidentResponseCenter } from './views/incident/IncidentResponseCenter';
 import { ThreatHuntingWorkbench } from './views/hunting/ThreatHuntingWorkbench';
 import { AnalyticsReporting } from './views/analytics/AnalyticsReporting';
@@ -393,7 +393,7 @@ const PhantomSpireApp: React.FC = () => {
                         <Routes>
                           <Route path="/" element={<Navigate to="/dashboard" replace />} />
                           <Route path="/dashboard" element={<ThreatIntelligenceDashboard />} />
-                          <Route path="/ioc/*" element={<IOCManagementConsole />} />
+                          <Route path="/ioc/*" element={<IOCRouter />} />
                           <Route path="/incidents/*" element={<IncidentResponseCenter />} />
                           <Route path="/hunting/*" element={<ThreatHuntingWorkbench />} />
                           <Route path="/analytics/*" element={<AnalyticsReporting />} />
