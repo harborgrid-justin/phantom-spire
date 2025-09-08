@@ -40,6 +40,7 @@ import { UserSystemManagement } from './views/admin/UserSystemManagement';
 import { RealTimeOperationsCenter } from './views/operations/RealTimeOperationsCenter';
 import { ThreatIntelRepository } from './views/repository/ThreatIntelRepository';
 import { IntegrationPlatform } from './views/integration/IntegrationPlatform';
+import { NetworkManagementDashboard } from './views/network-management/NetworkManagementDashboard';
 
 // Authentication & Security
 import { AuthenticationProvider } from './context/AuthenticationContext';
@@ -403,6 +404,7 @@ const PhantomSpireApp: React.FC = () => {
                           <Route path="/operations" element={<RealTimeOperationsCenter />} />
                           <Route path="/repository/*" element={<ThreatIntelRepository />} />
                           <Route path="/integrations/*" element={<IntegrationPlatform />} />
+                          <Route path="/network-management/*" element={<NetworkManagementDashboard />} />
                         </Routes>
                       </Box>
                     </Box>
