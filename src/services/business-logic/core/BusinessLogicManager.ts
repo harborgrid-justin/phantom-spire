@@ -72,6 +72,7 @@ export class BusinessLogicManager extends EventEmitter {
   private constructor() {
     super();
     this.initializeDefaultServices();
+    this.initializeBusinessRules();
     this.setupRequestProcessing();
   }
 
@@ -333,10 +334,294 @@ export class BusinessLogicManager extends EventEmitter {
         realTimeUpdates: false,
         validationRules: [],
         cacheConfig: { enabled: true, ttl: 1800000, maxSize: 200 }
+      },
+      // New Threat Analysis & Intelligence Services (8 modules)
+      {
+        id: 'advanced-threat-detection',
+        name: 'Advanced Threat Detection Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 300000, maxSize: 150 }
+      },
+      {
+        id: 'threat-intelligence-correlation',
+        name: 'Threat Intelligence Correlation Service',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 200 }
+      },
+      {
+        id: 'attribution-analysis',
+        name: 'Attribution Analysis Engine',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 100 }
+      },
+      {
+        id: 'threat-campaign-tracking',
+        name: 'Threat Campaign Tracking',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 900000, maxSize: 150 }
+      },
+      {
+        id: 'malware-analysis-automation',
+        name: 'Malware Analysis Automation',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1200000, maxSize: 100 }
+      },
+      {
+        id: 'vulnerability-impact-assessment',
+        name: 'Vulnerability Impact Assessment',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 200 }
+      },
+      {
+        id: 'threat-landscape-monitoring',
+        name: 'Threat Landscape Monitoring',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 7200000, maxSize: 100 }
+      },
+      {
+        id: 'intelligence-quality-scoring',
+        name: 'Intelligence Quality Scoring',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 150 }
+      },
+      // New Security Operations & Response Services (8 modules)
+      {
+        id: 'incident-response-automation',
+        name: 'Incident Response Automation',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 120000, maxSize: 100 }
+      },
+      {
+        id: 'security-orchestration',
+        name: 'Security Orchestration Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 180000, maxSize: 150 }
+      },
+      {
+        id: 'alert-triage-prioritization',
+        name: 'Alert Triage & Prioritization',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 60000, maxSize: 200 }
+      },
+      {
+        id: 'forensic-analysis-workflow',
+        name: 'Forensic Analysis Workflow',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 100 }
+      },
+      {
+        id: 'containment-strategy',
+        name: 'Containment Strategy Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 300000, maxSize: 100 }
+      },
+      {
+        id: 'recovery-operations',
+        name: 'Recovery Operations Manager',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 150 }
+      },
+      {
+        id: 'threat-hunting-automation',
+        name: 'Threat Hunting Automation',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 200 }
+      },
+      {
+        id: 'security-metrics-dashboard',
+        name: 'Security Metrics Dashboard',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 300000, maxSize: 150 }
+      },
+      // New Risk Management & Compliance Services (8 modules)
+      {
+        id: 'risk-assessment',
+        name: 'Risk Assessment Engine',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 7200000, maxSize: 100 }
+      },
+      {
+        id: 'compliance-monitoring',
+        name: 'Compliance Monitoring Service',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 200 }
+      },
+      {
+        id: 'policy-enforcement',
+        name: 'Policy Enforcement Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 150 }
+      },
+      {
+        id: 'audit-trail-management',
+        name: 'Audit Trail Management',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 86400000, maxSize: 500 }
+      },
+      {
+        id: 'control-effectiveness',
+        name: 'Control Effectiveness Measurement',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 7200000, maxSize: 150 }
+      },
+      {
+        id: 'regulatory-reporting',
+        name: 'Regulatory Reporting Automation',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 86400000, maxSize: 100 }
+      },
+      {
+        id: 'business-impact-analysis',
+        name: 'Business Impact Analysis',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 7200000, maxSize: 100 }
+      },
+      {
+        id: 'third-party-risk-management',
+        name: 'Third-Party Risk Management',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 7200000, maxSize: 200 }
+      },
+      // New Enterprise Integration & Automation Services (8 modules)
+      {
+        id: 'workflow-process-engine',
+        name: 'Workflow Process Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 600000, maxSize: 200 }
+      },
+      {
+        id: 'data-integration-pipeline',
+        name: 'Data Integration Pipeline',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 300 }
+      },
+      {
+        id: 'api-gateway-management',
+        name: 'API Gateway Management',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 300000, maxSize: 150 }
+      },
+      {
+        id: 'service-health-monitoring',
+        name: 'Service Health Monitoring',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 60000, maxSize: 200 }
+      },
+      {
+        id: 'configuration-management',
+        name: 'Configuration Management',
+        enabled: true,
+        realTimeUpdates: false,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 150 }
+      },
+      {
+        id: 'deployment-automation',
+        name: 'Deployment Automation',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 100 }
+      },
+      {
+        id: 'performance-optimization',
+        name: 'Performance Optimization',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 3600000, maxSize: 150 }
+      },
+      {
+        id: 'resource-allocation-engine',
+        name: 'Resource Allocation Engine',
+        enabled: true,
+        realTimeUpdates: true,
+        validationRules: [],
+        cacheConfig: { enabled: true, ttl: 1800000, maxSize: 200 }
       }
     ];
 
     defaultServices.forEach(service => this.registerService(service));
+  }
+
+  /**
+   * Initialize all business rules for the 32 new modules
+   */
+  private async initializeBusinessRules(): Promise<void> {
+    try {
+      // Import all business logic modules
+      const { allBusinessLogicModules } = await import('../modules');
+      
+      // Register all business rules
+      allBusinessLogicModules.forEach(rule => {
+        this.addBusinessRule(rule.serviceId, rule);
+      });
+      
+      console.log(`🚀 Business Logic Manager: Initialized ${allBusinessLogicModules.length} business rules for 32 modules`);
+      this.emit('rules:initialized', { 
+        totalRules: allBusinessLogicModules.length, 
+        modules: 32 
+      });
+    } catch (error) {
+      console.error('❌ Failed to initialize business rules:', error);
+      // Continue without the new rules to prevent system failure
+    }
   }
 
   private setupRequestProcessing(): void {
