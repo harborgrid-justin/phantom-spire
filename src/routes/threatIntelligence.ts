@@ -48,4 +48,24 @@ router.get('/intel-operations/source-management', ComprehensiveThreatIntelContro
 router.get('/intel-operations/api-management', ComprehensiveThreatIntelController.getThreatIntelligenceAPIs);
 router.get('/intel-operations/training-center', ComprehensiveThreatIntelController.getIntelligenceTrainingCenter);
 
+// Cyber Threat Hunting & Response Routes (8 endpoints)
+router.get('/threat-hunting/proactive-hunting', ComprehensiveThreatIntelController.getProactiveThreatHunting);
+router.get('/threat-hunting/behavioral-analytics', ComprehensiveThreatIntelController.getBehavioralAnalyticsEngine);
+router.get('/threat-hunting/hunting-playbooks', ComprehensiveThreatIntelController.getThreatHuntingPlaybooks);
+router.get('/threat-hunting/incident-response', ComprehensiveThreatIntelController.getRapidIncidentResponse);
+router.get('/threat-hunting/forensic-analysis', ComprehensiveThreatIntelController.getDigitalForensicsAnalysis);
+router.get('/threat-hunting/threat-simulation', ComprehensiveThreatIntelController.getThreatSimulationEngine);
+router.get('/threat-hunting/compromise-assessment', ComprehensiveThreatIntelController.getCompromiseAssessment);
+router.get('/threat-hunting/response-automation', ComprehensiveThreatIntelController.getResponseAutomationHub);
+
+// Advanced Threat Detection & Prevention Routes (8 endpoints)
+router.get('/threat-detection/ml-detection', ComprehensiveThreatIntelController.getMLPoweredDetection);
+router.get('/threat-detection/zero-day-protection', ComprehensiveThreatIntelController.getZeroDayProtection);
+router.get('/threat-detection/sandbox-analysis', ComprehensiveThreatIntelController.getSandboxAnalysisCenter);
+router.get('/threat-detection/network-monitoring', ComprehensiveThreatIntelController.getNetworkThreatMonitoring);
+router.get('/threat-detection/endpoint-protection', ComprehensiveThreatIntelController.getEndpointProtectionCenter);
+router.get('/threat-detection/threat-prevention', ComprehensiveThreatIntelController.getThreatPreventionEngine);
+router.get('/threat-detection/signature-engine', ComprehensiveThreatIntelController.getSignatureDetectionEngine);
+router.get('/threat-detection/threat-scoring', ComprehensiveThreatIntelController.getThreatScoringMatrix);
+
 export default router;

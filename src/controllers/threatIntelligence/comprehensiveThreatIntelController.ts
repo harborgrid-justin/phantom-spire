@@ -1,6 +1,6 @@
 /**
  * Comprehensive Threat Intelligence Controller
- * Handles all 32 threat intelligence endpoints with business-ready functionality
+ * Handles all 48 threat intelligence endpoints with business-ready functionality
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -1301,6 +1301,725 @@ export class ComprehensiveThreatIntelController {
           { action: 'Training module completed', timestamp: '2024-01-15T10:02:00Z' }
         ],
         lastUpdated: '2024-01-15T10:30:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Cyber Threat Hunting & Response Controllers (8 endpoints)
+
+  static async getProactiveThreatHunting(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 2456,
+          active: 342,
+          pending: 89,
+          critical: 23
+        },
+        items: [
+          {
+            id: 'PTH-001',
+            name: 'Advanced Persistence Hunt',
+            description: 'Proactive hunting for advanced persistent threats',
+            confidence: 92,
+            status: 'active',
+            tags: ['APT', 'Hunting', 'Proactive'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T11:30:00Z'
+          },
+          {
+            id: 'PTH-002',
+            name: 'Lateral Movement Detection',
+            description: 'Hunt for lateral movement patterns in network',
+            confidence: 85,
+            status: 'monitoring',
+            tags: ['Lateral Movement', 'Network', 'Detection'],
+            severity: 'medium',
+            lastUpdated: '2024-01-15T11:15:00Z'
+          }
+        ],
+        hunting: {
+          activeCampaigns: 342,
+          successRate: 87.3,
+          averageTimeToDetection: 4.2
+        },
+        stats: {
+          totalRecords: 2456,
+          active: 342,
+          critical: 23,
+          successRate: '87.3%'
+        },
+        recentActivity: [
+          { action: 'New hunt campaign initiated', timestamp: '2024-01-15T11:00:00Z' },
+          { action: 'Threat detected', timestamp: '2024-01-15T10:45:00Z' }
+        ],
+        lastUpdated: '2024-01-15T11:30:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getBehavioralAnalyticsEngine(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 5678,
+          active: 1234,
+          pending: 456,
+          critical: 67
+        },
+        items: [
+          {
+            id: 'BAE-001',
+            name: 'User Behavior Anomaly',
+            description: 'ML-driven user behavior anomaly detection',
+            confidence: 94,
+            status: 'active',
+            tags: ['Behavioral', 'ML', 'Anomaly'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T11:45:00Z'
+          }
+        ],
+        analytics: {
+          modelsDeployed: 15,
+          anomaliesDetected: 1234,
+          falsePositiveRate: 2.3
+        },
+        stats: {
+          totalRecords: 5678,
+          active: 1234,
+          critical: 67,
+          successRate: '94.2%'
+        },
+        recentActivity: [
+          { action: 'Behavior model updated', timestamp: '2024-01-15T11:30:00Z' }
+        ],
+        lastUpdated: '2024-01-15T11:45:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getThreatHuntingPlaybooks(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 189,
+          active: 45,
+          pending: 12,
+          critical: 8
+        },
+        items: [
+          {
+            id: 'THP-001',
+            name: 'APT29 Hunt Playbook',
+            description: 'Structured hunting methodology for APT29 campaigns',
+            confidence: 98,
+            status: 'active',
+            tags: ['APT29', 'Playbook', 'Structured'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T12:00:00Z'
+          }
+        ],
+        playbooks: {
+          totalPlaybooks: 189,
+          activePlaybooks: 45,
+          executionSuccess: 91.7
+        },
+        stats: {
+          totalRecords: 189,
+          active: 45,
+          critical: 8,
+          successRate: '91.7%'
+        },
+        recentActivity: [
+          { action: 'Playbook executed', timestamp: '2024-01-15T11:45:00Z' }
+        ],
+        lastUpdated: '2024-01-15T12:00:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getRapidIncidentResponse(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 1567,
+          active: 89,
+          pending: 23,
+          critical: 15
+        },
+        items: [
+          {
+            id: 'RIR-001',
+            name: 'Critical Infrastructure Breach',
+            description: 'Rapid response to critical infrastructure compromise',
+            confidence: 96,
+            status: 'active',
+            tags: ['Critical', 'Infrastructure', 'Breach'],
+            severity: 'critical',
+            lastUpdated: '2024-01-15T12:15:00Z'
+          }
+        ],
+        response: {
+          averageResponseTime: 12.5,
+          containmentSuccess: 94.2,
+          recoveryTime: 45.3
+        },
+        stats: {
+          totalRecords: 1567,
+          active: 89,
+          critical: 15,
+          successRate: '94.2%'
+        },
+        recentActivity: [
+          { action: 'Incident contained', timestamp: '2024-01-15T12:00:00Z' }
+        ],
+        lastUpdated: '2024-01-15T12:15:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getDigitalForensicsAnalysis(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 3456,
+          active: 234,
+          pending: 67,
+          critical: 34
+        },
+        items: [
+          {
+            id: 'DFA-001',
+            name: 'Memory Forensics Analysis',
+            description: 'Advanced memory dump analysis for malware detection',
+            confidence: 93,
+            status: 'active',
+            tags: ['Forensics', 'Memory', 'Malware'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T12:30:00Z'
+          }
+        ],
+        forensics: {
+          evidenceProcessed: 234,
+          artifactsFound: 1567,
+          analysisAccuracy: 95.8
+        },
+        stats: {
+          totalRecords: 3456,
+          active: 234,
+          critical: 34,
+          successRate: '95.8%'
+        },
+        recentActivity: [
+          { action: 'Evidence analyzed', timestamp: '2024-01-15T12:15:00Z' }
+        ],
+        lastUpdated: '2024-01-15T12:30:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getThreatSimulationEngine(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 892,
+          active: 45,
+          pending: 12,
+          critical: 7
+        },
+        items: [
+          {
+            id: 'TSE-001',
+            name: 'APT Simulation Campaign',
+            description: 'Red team simulation of advanced persistent threat',
+            confidence: 98,
+            status: 'active',
+            tags: ['Simulation', 'Red Team', 'APT'],
+            severity: 'medium',
+            lastUpdated: '2024-01-15T12:45:00Z'
+          }
+        ],
+        simulation: {
+          activeSimulations: 45,
+          successfulAttacks: 32,
+          detectionRate: 71.1
+        },
+        stats: {
+          totalRecords: 892,
+          active: 45,
+          critical: 7,
+          successRate: '71.1%'
+        },
+        recentActivity: [
+          { action: 'Simulation completed', timestamp: '2024-01-15T12:30:00Z' }
+        ],
+        lastUpdated: '2024-01-15T12:45:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getCompromiseAssessment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 1234,
+          active: 156,
+          pending: 45,
+          critical: 23
+        },
+        items: [
+          {
+            id: 'CA-001',
+            name: 'Network Compromise Assessment',
+            description: 'Comprehensive assessment of network compromise indicators',
+            confidence: 91,
+            status: 'active',
+            tags: ['Assessment', 'Network', 'Compromise'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T13:00:00Z'
+          }
+        ],
+        assessment: {
+          assessmentsCompleted: 156,
+          compromiseDetected: 34,
+          falsePositives: 8
+        },
+        stats: {
+          totalRecords: 1234,
+          active: 156,
+          critical: 23,
+          successRate: '91.3%'
+        },
+        recentActivity: [
+          { action: 'Assessment completed', timestamp: '2024-01-15T12:45:00Z' }
+        ],
+        lastUpdated: '2024-01-15T13:00:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getResponseAutomationHub(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 2789,
+          active: 389,
+          pending: 67,
+          critical: 45
+        },
+        items: [
+          {
+            id: 'RAH-001',
+            name: 'Automated Containment Response',
+            description: 'Automated threat containment and isolation workflows',
+            confidence: 97,
+            status: 'active',
+            tags: ['Automation', 'Containment', 'Response'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T13:15:00Z'
+          }
+        ],
+        automation: {
+          automatedResponses: 389,
+          successfulContainments: 356,
+          averageResponseTime: 8.7
+        },
+        stats: {
+          totalRecords: 2789,
+          active: 389,
+          critical: 45,
+          successRate: '91.5%'
+        },
+        recentActivity: [
+          { action: 'Automated response executed', timestamp: '2024-01-15T13:00:00Z' }
+        ],
+        lastUpdated: '2024-01-15T13:15:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Advanced Threat Detection & Prevention Controllers (8 endpoints)
+
+  static async getMLPoweredDetection(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 7890,
+          active: 1456,
+          pending: 234,
+          critical: 89
+        },
+        items: [
+          {
+            id: 'MLD-001',
+            name: 'Deep Learning Malware Detection',
+            description: 'Advanced neural network malware classification',
+            confidence: 96,
+            status: 'active',
+            tags: ['ML', 'Deep Learning', 'Malware'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T13:30:00Z'
+          }
+        ],
+        ml: {
+          modelsDeployed: 24,
+          detectionAccuracy: 96.7,
+          falsePositiveRate: 1.8
+        },
+        stats: {
+          totalRecords: 7890,
+          active: 1456,
+          critical: 89,
+          successRate: '96.7%'
+        },
+        recentActivity: [
+          { action: 'ML model updated', timestamp: '2024-01-15T13:15:00Z' }
+        ],
+        lastUpdated: '2024-01-15T13:30:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getZeroDayProtection(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 567,
+          active: 89,
+          pending: 23,
+          critical: 12
+        },
+        items: [
+          {
+            id: 'ZDP-001',
+            name: 'Zero-Day Exploit Protection',
+            description: 'Advanced protection against unknown zero-day exploits',
+            confidence: 94,
+            status: 'active',
+            tags: ['Zero-Day', 'Exploit', 'Protection'],
+            severity: 'critical',
+            lastUpdated: '2024-01-15T13:45:00Z'
+          }
+        ],
+        protection: {
+          protectedAssets: 89,
+          threatsBlocked: 45,
+          detectionRate: 92.4
+        },
+        stats: {
+          totalRecords: 567,
+          active: 89,
+          critical: 12,
+          successRate: '92.4%'
+        },
+        recentActivity: [
+          { action: 'Zero-day detected and blocked', timestamp: '2024-01-15T13:30:00Z' }
+        ],
+        lastUpdated: '2024-01-15T13:45:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getSandboxAnalysisCenter(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 4567,
+          active: 678,
+          pending: 123,
+          critical: 56
+        },
+        items: [
+          {
+            id: 'SAC-001',
+            name: 'Dynamic Malware Analysis',
+            description: 'Automated dynamic analysis in secure sandbox environment',
+            confidence: 95,
+            status: 'active',
+            tags: ['Sandbox', 'Dynamic', 'Malware'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T14:00:00Z'
+          }
+        ],
+        sandbox: {
+          samplesAnalyzed: 678,
+          maliciousDetected: 234,
+          analysisTime: 15.3
+        },
+        stats: {
+          totalRecords: 4567,
+          active: 678,
+          critical: 56,
+          successRate: '95.2%'
+        },
+        recentActivity: [
+          { action: 'Sample analyzed', timestamp: '2024-01-15T13:45:00Z' }
+        ],
+        lastUpdated: '2024-01-15T14:00:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getNetworkThreatMonitoring(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 9876,
+          active: 2345,
+          pending: 456,
+          critical: 123
+        },
+        items: [
+          {
+            id: 'NTM-001',
+            name: 'Network Traffic Anomaly',
+            description: 'Real-time network traffic analysis and anomaly detection',
+            confidence: 93,
+            status: 'active',
+            tags: ['Network', 'Traffic', 'Anomaly'],
+            severity: 'medium',
+            lastUpdated: '2024-01-15T14:15:00Z'
+          }
+        ],
+        monitoring: {
+          trafficAnalyzed: 2345,
+          threatsDetected: 89,
+          networkCoverage: 98.7
+        },
+        stats: {
+          totalRecords: 9876,
+          active: 2345,
+          critical: 123,
+          successRate: '93.8%'
+        },
+        recentActivity: [
+          { action: 'Network threat detected', timestamp: '2024-01-15T14:00:00Z' }
+        ],
+        lastUpdated: '2024-01-15T14:15:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getEndpointProtectionCenter(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 6789,
+          active: 1234,
+          pending: 234,
+          critical: 67
+        },
+        items: [
+          {
+            id: 'EPC-001',
+            name: 'Endpoint Behavioral Analysis',
+            description: 'Advanced endpoint detection and response capabilities',
+            confidence: 97,
+            status: 'active',
+            tags: ['Endpoint', 'EDR', 'Behavioral'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T14:30:00Z'
+          }
+        ],
+        protection: {
+          endpointsProtected: 1234,
+          threatsBlocked: 456,
+          responseTime: 3.2
+        },
+        stats: {
+          totalRecords: 6789,
+          active: 1234,
+          critical: 67,
+          successRate: '97.1%'
+        },
+        recentActivity: [
+          { action: 'Endpoint threat blocked', timestamp: '2024-01-15T14:15:00Z' }
+        ],
+        lastUpdated: '2024-01-15T14:30:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getThreatPreventionEngine(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 3456,
+          active: 567,
+          pending: 89,
+          critical: 34
+        },
+        items: [
+          {
+            id: 'TPE-001',
+            name: 'Proactive Threat Prevention',
+            description: 'AI-driven proactive threat prevention and blocking',
+            confidence: 98,
+            status: 'active',
+            tags: ['Prevention', 'Proactive', 'AI'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T14:45:00Z'
+          }
+        ],
+        prevention: {
+          threatsBlocked: 567,
+          preventionRate: 98.2,
+          falsePositives: 12
+        },
+        stats: {
+          totalRecords: 3456,
+          active: 567,
+          critical: 34,
+          successRate: '98.2%'
+        },
+        recentActivity: [
+          { action: 'Threat prevented', timestamp: '2024-01-15T14:30:00Z' }
+        ],
+        lastUpdated: '2024-01-15T14:45:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getSignatureDetectionEngine(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 8901,
+          active: 1567,
+          pending: 234,
+          critical: 78
+        },
+        items: [
+          {
+            id: 'SDE-001',
+            name: 'Advanced Signature Matching',
+            description: 'High-performance signature-based threat detection',
+            confidence: 99,
+            status: 'active',
+            tags: ['Signature', 'Pattern', 'Detection'],
+            severity: 'medium',
+            lastUpdated: '2024-01-15T15:00:00Z'
+          }
+        ],
+        signatures: {
+          totalSignatures: 1567,
+          matchesFound: 234,
+          updateFrequency: 24
+        },
+        stats: {
+          totalRecords: 8901,
+          active: 1567,
+          critical: 78,
+          successRate: '99.1%'
+        },
+        recentActivity: [
+          { action: 'Signature updated', timestamp: '2024-01-15T14:45:00Z' }
+        ],
+        lastUpdated: '2024-01-15T15:00:00Z'
+      };
+
+      res.json(mockData);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getThreatScoringMatrix(req: Request, res: Response, next: NextFunction) {
+    try {
+      const mockData = {
+        summary: {
+          total: 5432,
+          active: 987,
+          pending: 156,
+          critical: 89
+        },
+        items: [
+          {
+            id: 'TSM-001',
+            name: 'Dynamic Threat Scoring',
+            description: 'Intelligent threat scoring and risk assessment framework',
+            confidence: 96,
+            status: 'active',
+            tags: ['Scoring', 'Risk', 'Assessment'],
+            severity: 'high',
+            lastUpdated: '2024-01-15T15:15:00Z'
+          }
+        ],
+        scoring: {
+          threatsScored: 987,
+          averageScore: 6.7,
+          criticalThreats: 89
+        },
+        stats: {
+          totalRecords: 5432,
+          active: 987,
+          critical: 89,
+          successRate: '96.4%'
+        },
+        recentActivity: [
+          { action: 'Threat scored', timestamp: '2024-01-15T15:00:00Z' }
+        ],
+        lastUpdated: '2024-01-15T15:15:00Z'
       };
 
       res.json(mockData);
