@@ -1,6 +1,6 @@
 /**
  * Business Logic Modules - Main Index
- * Central export for all 40 business logic modules
+ * Central export for all 40 business logic modules + 32 SOA enhancements
  */
 
 // Threat Analysis & Intelligence (8 modules)
@@ -21,6 +21,13 @@ import { allSecurityOperationsRules } from './security-operations';
 import { allRiskManagementRules } from './risk-management';
 import { allEnterpriseIntegrationRules } from './enterprise-integration';
 
+// Import SOA enhancements metadata
+import { 
+  soaEnhancementServices,
+  allSOAEnhancements,
+  allSOAEnhancementIds
+} from '../../soa-enhancements/index.js';
+
 // Aggregate all 40 business logic modules (33 business rules + 7 generic modules)
 export const allBusinessLogicModules = [
   ...allThreatAnalysisRules,        // 8 modules
@@ -28,6 +35,12 @@ export const allBusinessLogicModules = [
   ...allRiskManagementRules,        // 8 modules
   ...allEnterpriseIntegrationRules  // 9 modules (8 original + 1 new AI/ML)
 ]; // Total: 33 business logic modules
+
+// Combined with SOA enhancements for total platform services
+export const allPlatformServices = [
+  ...allBusinessLogicModules,       // 33 business logic modules
+  ...soaEnhancementServices         // 32 SOA enhancement services
+]; // Total: 65 platform services
 
 // Service IDs for all new modules
 export const newBusinessLogicServiceIds = [
@@ -72,6 +85,12 @@ export const newBusinessLogicServiceIds = [
   'resource-allocation-engine',
   'advanced-aiml-integration-engine'
 ];
+
+// Complete service ID list including SOA enhancements
+export const allServiceIds = [
+  ...newBusinessLogicServiceIds,    // 33 business logic services
+  ...allSOAEnhancementIds          // 32 SOA enhancement services
+]; // Total: 65 service IDs
 
 // Module categories for organization
 export const moduleCategories = {
@@ -125,5 +144,5 @@ export const moduleMetadata = {
   categories: 4,
   modulesPerCategory: [8, 8, 8, 9], // Updated to reflect 9 in enterprise-integration
   version: '2.0.0',
-  description: '40 precision-engineered modules with complete frontend-backend integration'
+  description: '72 precision-engineered modules (40 business logic + 32 SOA enhancements) with complete frontend-backend integration'
 };
