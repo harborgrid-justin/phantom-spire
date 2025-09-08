@@ -23,6 +23,7 @@ import { userManagementRoutes } from './user-management/userManagementRoutes.js'
 import xdrRoutes from './xdr.js';
 import { createNetworkManagementRoutes } from './networkManagementRoutes.js';
 import etlRoutes from './etl/index.js';
+import modernizationRoutes from './modernization/index.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -49,6 +50,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/user-management', userManagementRoutes);
   router.use('/xdr', xdrRoutes);
   router.use('/network-management', createNetworkManagementRoutes());
+  router.use('/modernization', modernizationRoutes);
   router.use('/etl', etlRoutes);
 
   // Task management routes (only if orchestrator is provided)
@@ -88,6 +90,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         userManagement: '/api/v1/user-management',
         xdr: '/api/v1/xdr',
         networkManagement: '/api/v1/network-management',
+        modernization: '/api/v1/modernization',
         etl: '/api/v1/etl',
         tasks: orchestrator
           ? '/api/v1/tasks'
@@ -111,6 +114,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         userManagement: true,
         xdrPlatform: true,
         networkManagement: true,
+        modernizationPlatform: true,
         etlPlatform: true,
       },
     });
