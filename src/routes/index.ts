@@ -16,6 +16,7 @@ import vulnerabilityManagementRoutes from './vulnerabilityManagement.js';
 import threatIntelligenceRoutes from './threatIntelligence.js';
 import dataManagementRoutes from './dataManagement.js';
 import vendorRiskRoutes from './vendorRisk.js';
+import forensicsRoutes from './forensics.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -36,6 +37,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/threat-intelligence', threatIntelligenceRoutes);
   router.use('/data-management', dataManagementRoutes);
   router.use('/vendor-risk', vendorRiskRoutes);
+  router.use('/forensics', forensicsRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -68,6 +70,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         threatIntelligence: '/api/v1/threat-intelligence',
         dataManagement: '/api/v1/data-management',
         vendorRisk: '/api/v1/vendor-risk',
+        forensics: '/api/v1/forensics',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
@@ -84,6 +87,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         vulnerabilityManagement: true,
         dataManagement: true,
         vendorRiskManagement: true,
+        digitalForensics: true,
       },
     });
   });
