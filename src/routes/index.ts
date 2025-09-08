@@ -18,6 +18,7 @@ import dataManagementRoutes from './dataManagement.js';
 import vendorRiskRoutes from './vendorRisk.js';
 import forensicsRoutes from './forensics.js';
 import projectExecutionRoutes from './projectExecution.js';
+import { workflowManagementRoutes } from './workflow-management/index.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -40,6 +41,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/vendor-risk', vendorRiskRoutes);
   router.use('/forensics', forensicsRoutes);
   router.use('/project-execution', projectExecutionRoutes);
+  router.use('/workflow-management', workflowManagementRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -74,6 +76,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         vendorRisk: '/api/v1/vendor-risk',
         forensics: '/api/v1/forensics',
         projectExecution: '/api/v1/project-execution',
+        workflowManagement: '/api/v1/workflow-management',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
@@ -92,6 +95,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         vendorRiskManagement: true,
         digitalForensics: true,
         projectExecution: true,
+        workflowManagement: true,
       },
     });
   });
