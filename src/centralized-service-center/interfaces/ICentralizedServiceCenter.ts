@@ -212,6 +212,25 @@ export interface IPlatformMetrics {
   complianceStatus?: string;
   securityLevel?: string;
   scalabilityTier?: string;
+  // Enhanced 40-module specific metrics
+  moduleMetrics?: {
+    totalModules: number;
+    businessLogicModules: number;
+    genericModules: number;
+    precisionLevel: string;
+    integrationHealth: string;
+    crossModuleEfficiency: number;
+    aiMlIntegrationScore: number;
+    performanceOptimizationLevel: string;
+  };
+  advancedCapabilities?: {
+    threatDetectionAccuracy: number;
+    incidentResponseAutomation: number;
+    mlModelDeploymentSuccess: number;
+    predictiveAnalyticsEnabled: boolean;
+    realTimeOrchestration: boolean;
+    intelligentFailover: boolean;
+  };
 }
 
 /**
