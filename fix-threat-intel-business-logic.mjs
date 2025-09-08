@@ -1,9 +1,20 @@
+#!/usr/bin/env node
+
 /**
- * Advanced Threat Analytics Business Logic Service
- * Advanced analytics and machine learning for threat detection
+ * Fix Threat Intelligence Business Logic Services
+ * Fixes template issues in the generated business logic services
  */
 
-export interface IThreatAnalyticsData {
+import fs from 'fs/promises';
+import path from 'path';
+
+// Fixed business logic template
+const fixedBusinessLogicTemplate = (page) => `/**
+ * ${page.title} Business Logic Service
+ * ${page.description}
+ */
+
+export interface I${toPascalCase(page.name)}Data {
   id: string;
   title: string;
   description: string;
@@ -17,7 +28,7 @@ export interface IThreatAnalyticsData {
   createdBy: string;
 }
 
-export interface IThreatAnalyticsAnalytics {
+export interface I${toPascalCase(page.name)}Analytics {
   totalItems: number;
   activeItems: number;
   criticalItems: number;
@@ -30,7 +41,7 @@ export interface IThreatAnalyticsAnalytics {
   }>;
 }
 
-export interface IThreatAnalyticsConfig {
+export interface I${toPascalCase(page.name)}Config {
   enableRealTimeProcessing: boolean;
   confidenceThreshold: number;
   alertingEnabled: boolean;
@@ -39,16 +50,16 @@ export interface IThreatAnalyticsConfig {
   processingBatchSize: number;
 }
 
-export class ThreatAnalyticsBusinessLogic {
-  private config: IThreatAnalyticsConfig;
+export class ${toPascalCase(page.name)}BusinessLogic {
+  private config: I${toPascalCase(page.name)}Config;
   private readonly pageInfo = {
-    category: 'advanced-analytics',
-    name: 'threat-analytics',
-    title: 'Advanced Threat Analytics',
-    description: 'Advanced analytics and machine learning for threat detection'
+    category: '${page.category}',
+    name: '${page.name}',
+    title: '${page.title}',
+    description: '${page.description}'
   };
 
-  constructor(config?: Partial<IThreatAnalyticsConfig>) {
+  constructor(config?: Partial<I${toPascalCase(page.name)}Config>) {
     this.config = {
       enableRealTimeProcessing: true,
       confidenceThreshold: 80,
@@ -61,7 +72,7 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Get all advanced threat analytics entries with filtering and pagination
+   * Get all ${page.title.toLowerCase()} entries with filtering and pagination
    */
   async getAll(filters: {
     status?: string;
@@ -71,16 +82,16 @@ export class ThreatAnalyticsBusinessLogic {
     limit?: number;
     search?: string;
   }): Promise<{
-    data: IThreatAnalyticsData[];
+    data: I${toPascalCase(page.name)}Data[];
     total: number;
     page: number;
     limit: number;
   }> {
     // Mock implementation - replace with actual data layer integration
-    const mockData: IThreatAnalyticsData[] = [
+    const mockData: I${toPascalCase(page.name)}Data[] = [
       {
-        id: `${this.pageInfo.category}-001`,
-        title: `Sample ${this.pageInfo.title} Entry`,
+        id: \`\${this.pageInfo.category}-001\`,
+        title: \`Sample \${this.pageInfo.title} Entry\`,
         description: this.pageInfo.description,
         status: 'active',
         severity: 'high',
@@ -88,7 +99,7 @@ export class ThreatAnalyticsBusinessLogic {
         tags: [this.pageInfo.category, 'threat-intelligence', 'automated'],
         metadata: {
           category: this.pageInfo.category,
-          processingEngine: 'ThreatAnalyticsEngine',
+          processingEngine: '${toPascalCase(page.name)}Engine',
           lastAnalysis: new Date().toISOString()
         },
         createdAt: new Date(),
@@ -128,13 +139,13 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Get specific advanced threat analytics entry by ID
+   * Get specific ${page.title.toLowerCase()} entry by ID
    */
-  async getById(id: string): Promise<IThreatAnalyticsData | null> {
+  async getById(id: string): Promise<I${toPascalCase(page.name)}Data | null> {
     // Mock implementation
     return {
       id,
-      title: `${this.pageInfo.title} Entry ${id}`,
+      title: \`\${this.pageInfo.title} Entry \${id}\`,
       description: this.pageInfo.description,
       status: 'active',
       severity: 'medium',
@@ -152,12 +163,12 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Create new advanced threat analytics entry
+   * Create new ${page.title.toLowerCase()} entry
    */
-  async create(data: Omit<IThreatAnalyticsData, 'id' | 'createdAt' | 'updatedAt'>): Promise<IThreatAnalyticsData> {
+  async create(data: Omit<I${toPascalCase(page.name)}Data, 'id' | 'createdAt' | 'updatedAt'>): Promise<I${toPascalCase(page.name)}Data> {
     // Mock implementation
-    const newEntry: IThreatAnalyticsData = {
-      id: `${this.pageInfo.category}-${Date.now()}`,
+    const newEntry: I${toPascalCase(page.name)}Data = {
+      id: \`\${this.pageInfo.category}-\${Date.now()}\`,
       ...data,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -172,13 +183,13 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Update advanced threat analytics entry
+   * Update ${page.title.toLowerCase()} entry
    */
-  async update(id: string, data: Partial<IThreatAnalyticsData>): Promise<IThreatAnalyticsData | null> {
+  async update(id: string, data: Partial<I${toPascalCase(page.name)}Data>): Promise<I${toPascalCase(page.name)}Data | null> {
     const existing = await this.getById(id);
     if (!existing) return null;
 
-    const updated: IThreatAnalyticsData = {
+    const updated: I${toPascalCase(page.name)}Data = {
       ...existing,
       ...data,
       updatedAt: new Date()
@@ -188,7 +199,7 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Delete advanced threat analytics entry
+   * Delete ${page.title.toLowerCase()} entry
    */
   async delete(id: string): Promise<boolean> {
     // Mock implementation
@@ -196,9 +207,9 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Get analytics and metrics for advanced threat analytics
+   * Get analytics and metrics for ${page.title.toLowerCase()}
    */
-  async getAnalytics(timeRange?: { from: Date; to: Date }): Promise<IThreatAnalyticsAnalytics> {
+  async getAnalytics(timeRange?: { from: Date; to: Date }): Promise<I${toPascalCase(page.name)}Analytics> {
     // Mock implementation
     return {
       totalItems: 1547,
@@ -215,15 +226,15 @@ export class ThreatAnalyticsBusinessLogic {
   }
 
   /**
-   * Process analysis for advanced threat analytics
+   * Process analysis for ${page.title.toLowerCase()}
    */
-  async processAnalysis(data: IThreatAnalyticsData): Promise<void> {
+  async processAnalysis(data: I${toPascalCase(page.name)}Data): Promise<void> {
     // Mock analysis processing
-    console.log(`Processing ${this.pageInfo.title} analysis for entry: ${data.id}`);
+    console.log(\`Processing \${this.pageInfo.title} analysis for entry: \${data.id}\`);
     
     // Simulate analysis workflow
     if (data.confidence >= this.config.confidenceThreshold) {
-      console.log(`High confidence detection in ${this.pageInfo.title}: ${data.title}`);
+      console.log(\`High confidence detection in \${this.pageInfo.title}: \${data.title}\`);
       
       if (this.config.alertingEnabled) {
         await this.triggerAlert(data);
@@ -234,29 +245,29 @@ export class ThreatAnalyticsBusinessLogic {
   /**
    * Trigger alert for high-priority items
    */
-  async triggerAlert(data: IThreatAnalyticsData): Promise<void> {
+  async triggerAlert(data: I${toPascalCase(page.name)}Data): Promise<void> {
     // Mock alerting system
-    console.log(`Alert triggered for ${this.pageInfo.title}: ${data.title} (Confidence: ${data.confidence}%)`);
+    console.log(\`Alert triggered for \${this.pageInfo.title}: \${data.title} (Confidence: \${data.confidence}%)\`);
   }
 
   /**
-   * Get configuration for advanced threat analytics
+   * Get configuration for ${page.title.toLowerCase()}
    */
-  getConfig(): IThreatAnalyticsConfig {
+  getConfig(): I${toPascalCase(page.name)}Config {
     return { ...this.config };
   }
 
   /**
-   * Update configuration for advanced threat analytics
+   * Update configuration for ${page.title.toLowerCase()}
    */
-  updateConfig(newConfig: Partial<IThreatAnalyticsConfig>): void {
+  updateConfig(newConfig: Partial<I${toPascalCase(page.name)}Config>): void {
     this.config = { ...this.config, ...newConfig };
   }
 
   /**
-   * Validate advanced threat analytics data
+   * Validate ${page.title.toLowerCase()} data
    */
-  validateData(data: Partial<IThreatAnalyticsData>): { valid: boolean; errors: string[] } {
+  validateData(data: Partial<I${toPascalCase(page.name)}Data>): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     if (data.title && data.title.length < 3) {
@@ -278,4 +289,40 @@ export class ThreatAnalyticsBusinessLogic {
   }
 }
 
-export default ThreatAnalyticsBusinessLogic;
+export default ${toPascalCase(page.name)}BusinessLogic;
+`;
+
+// Convert kebab-case to PascalCase
+function toPascalCase(str) {
+  return str
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+}
+
+// Just generate one corrected file to test
+const testPage = {
+  name: 'threat-analytics',
+  category: 'advanced-analytics',
+  title: 'Advanced Threat Analytics',
+  description: 'Advanced analytics and machine learning for threat detection'
+};
+
+async function fixBusinessLogicService() {
+  console.log('🔧 Fixing threat intelligence business logic template...\n');
+  
+  const businessLogicDir = 'src/services/business-logic/modules/threat-intelligence';
+  const testFileName = `${toPascalCase(testPage.name)}BusinessLogic.ts`;
+  const correctedContent = fixedBusinessLogicTemplate(testPage);
+  
+  await fs.writeFile(
+    path.join(businessLogicDir, testFileName),
+    correctedContent
+  );
+
+  console.log(`✅ Fixed: ${testFileName}`);
+  console.log('\n🧪 Testing compilation...');
+}
+
+// Run the fix
+fixBusinessLogicService().catch(console.error);
