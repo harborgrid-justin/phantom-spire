@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { apiClient } from '../../lib/api';
+import { threatIntelligenceNavigation, threatIntelligenceCategories } from './index';
 
 interface DashboardMetrics {
   totalIOCs: number;
@@ -346,6 +348,67 @@ export default function ThreatIntelligenceDashboard() {
           <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
             📥 Export Report
           </button>
+        </div>
+      </div>
+
+      {/* Threat Intelligence Navigation */}
+      <div className="bg-white rounded-lg shadow-md border p-6 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">🎯 Threat Intelligence Modules</h2>
+            <p className="text-gray-600 mt-1">Access all 48 specialized threat intelligence pages</p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-blue-600">{threatIntelligenceNavigation.length}</div>
+            <div className="text-sm text-gray-500">Total Modules</div>
+          </div>
+        </div>
+
+        {/* Category Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Object.entries(threatIntelligenceCategories).map(([categoryKey, category]) => {
+            const categoryPages = threatIntelligenceNavigation.filter(page => page.category === categoryKey);
+            const colorClasses = {
+              blue: 'bg-blue-50 border-blue-200 text-blue-800',
+              green: 'bg-green-50 border-green-200 text-green-800',
+              purple: 'bg-purple-50 border-purple-200 text-purple-800',
+              orange: 'bg-orange-50 border-orange-200 text-orange-800',
+              red: 'bg-red-50 border-red-200 text-red-800',
+              cyan: 'bg-cyan-50 border-cyan-200 text-cyan-800'
+            };
+
+            return (
+              <div key={categoryKey} className={`border rounded-lg p-4 ${colorClasses[category.color as keyof typeof colorClasses] || 'bg-gray-50 border-gray-200 text-gray-800'}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-2">{category.icon}</span>
+                    <div>
+                      <h3 className="font-semibold text-sm">{category.name}</h3>
+                      <p className="text-xs opacity-75 mt-1">{category.description}</p>
+                    </div>
+                  </div>
+                  <div className="text-lg font-bold">{categoryPages.length}</div>
+                </div>
+                
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {categoryPages.slice(0, 4).map((page) => (
+                    <Link 
+                      key={page.id} 
+                      href={page.path}
+                      className="block text-xs hover:underline py-1 opacity-90 hover:opacity-100 transition-opacity"
+                    >
+                      {page.icon} {page.title.replace(/^[^\s]+ /, '')}
+                    </Link>
+                  ))}
+                  {categoryPages.length > 4 && (
+                    <div className="text-xs opacity-60 py-1">
+                      ... and {categoryPages.length - 4} more
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
