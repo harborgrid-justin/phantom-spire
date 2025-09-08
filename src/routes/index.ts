@@ -13,6 +13,7 @@ import attackVectorRoutes from './attackVectors.js';
 import cveRoutes from './cve.js';
 import cveAdvancedRoutes from './cveAdvanced.js';
 import vulnerabilityManagementRoutes from './vulnerabilityManagement.js';
+import threatIntelligenceRoutes from './threatIntelligence.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Create router factory that accepts orchestrator
@@ -30,6 +31,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/cve', cveRoutes);
   router.use('/cve-advanced', cveAdvancedRoutes);
   router.use('/vulnerability-management', vulnerabilityManagementRoutes);
+  router.use('/threat-intelligence', threatIntelligenceRoutes);
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
@@ -59,6 +61,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         cve: '/api/v1/cve',
         cveAdvanced: '/api/v1/cve-advanced',
         vulnerabilityManagement: '/api/v1/vulnerability-management',
+        threatIntelligence: '/api/v1/threat-intelligence',
         tasks: orchestrator
           ? '/api/v1/tasks'
           : 'not available (orchestrator not initialized)',
