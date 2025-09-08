@@ -33,8 +33,7 @@ import {
 import { 
   Refresh,
   Settings,
-  TrendingUp,
-  Error,
+  TrendingUp,  Error as ErrorIcon,
   CheckCircle,
   Warning,
   Info,

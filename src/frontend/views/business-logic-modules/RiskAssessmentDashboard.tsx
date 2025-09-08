@@ -31,8 +31,7 @@ import {
 import { 
   Assessment,
   Warning,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   TrendingUp,
   Security,
   Business,
@@ -110,7 +109,7 @@ export const RiskAssessmentDashboard: React.FC = () => {
 
   const getRiskIcon = (level: string) => {
     switch (level) {
-      case 'critical': return <Error color="error" />;
+      case 'critical': return <ErrorIcon color="error" />;
       case 'high': return <Warning color="warning" />;
       case 'medium': return <Assessment color="info" />;
       case 'low': return <CheckCircle color="success" />;

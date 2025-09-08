@@ -47,8 +47,7 @@ import {
 import {
   Notifications,
   NotificationsActive,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   Info,
   CheckCircle,
   Search,

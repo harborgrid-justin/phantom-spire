@@ -115,8 +115,7 @@ import {
   FindReplace,
   BugReport,
   Security,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   CheckCircle,
   Info,
   Timeline as TimelineIcon,
@@ -1009,7 +1008,7 @@ level: medium`;
                   ) : execution.status === 'completed' ? (
                     <CheckCircle fontSize="small" />
                   ) : execution.status === 'error' ? (
-                    <Error fontSize="small" />
+                    <ErrorIcon fontSize="small" />
                   ) : (
                     <Pause fontSize="small" />
                   )}

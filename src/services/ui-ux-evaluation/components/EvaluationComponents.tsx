@@ -34,8 +34,7 @@ import {
   Assessment,
   BugReport,
   CheckCircle,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   Info,
   Visibility,
   VisibilityOff,
@@ -175,7 +174,7 @@ export const EvaluationWidget: React.FC<EvaluationWidgetProps> = ({
   const getSeverityIcon = (severity: EvaluationSeverity) => {
     switch (severity) {
       case EvaluationSeverity.CRITICAL:
-        return <Error />;
+        return <ErrorIcon />;
       case EvaluationSeverity.HIGH:
         return <Warning />;
       case EvaluationSeverity.MEDIUM:

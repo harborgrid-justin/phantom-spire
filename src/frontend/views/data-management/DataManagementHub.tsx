@@ -145,10 +145,7 @@ export const DataManagementHub: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to load data:', error);
-        addNotification({
-          type: 'error',
-          message: 'Failed to load dashboard data'
-        });
+        addNotification('error', 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -163,10 +160,7 @@ export const DataManagementHub: React.FC = () => {
       await refresh();
     } catch (err) {
       console.error('Failed to refresh data:', err);
-      addNotification({
-        type: 'error',
-        message: 'Failed to refresh data'
-      });
+      addNotification('error', 'Failed to refresh data');
     } finally {
       setRefreshing(false);
     }

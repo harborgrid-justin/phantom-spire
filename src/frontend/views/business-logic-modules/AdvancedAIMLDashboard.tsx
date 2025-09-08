@@ -51,8 +51,7 @@ import {
   Memory,
   Speed,
   CheckCircle,
-  Warning,
-  Error,
+  Warning,  Error as ErrorIcon,
   AutoGraph,
   DataUsage,
   ModelTraining
@@ -204,7 +203,7 @@ const AdvancedAIMLDashboard: React.FC = () => {
       retired: { color: 'default' as const, icon: <Stop /> },
       active: { color: 'success' as const, icon: <PlayArrow /> },
       paused: { color: 'warning' as const, icon: <Pause /> },
-      error: { color: 'error' as const, icon: <Error /> },
+      error: { color: 'error' as const, icon: <ErrorIcon /> },
       completed: { color: 'success' as const, icon: <CheckCircle /> }
     };
     const config = configs[status as keyof typeof configs] || configs.ready;

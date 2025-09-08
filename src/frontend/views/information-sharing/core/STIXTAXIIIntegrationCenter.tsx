@@ -49,8 +49,7 @@ import {
   Add,
   Edit,
   Delete,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Warning,
   Sync,
   Download,
@@ -252,8 +251,8 @@ export const STIXTAXIIIntegrationCenter: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'connected': return <CheckCircle />;
-      case 'disconnected': return <Error />;
-      case 'error': return <Error />;
+      case 'disconnected': return <ErrorIcon />;
+      case 'error': return <ErrorIcon />;
       case 'syncing': return <Sync className="rotate" />;
       default: return <Warning />;
     }

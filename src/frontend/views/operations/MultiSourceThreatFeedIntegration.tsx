@@ -91,8 +91,7 @@ import {
   CloudDownload,
   Sync,
   SyncProblem,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Warning,
   Info,
   Schedule,
@@ -999,7 +998,7 @@ const MultiSourceThreatFeedIntegration: React.FC = () => {
     const icons = {
       active: <CheckCircle sx={{ fontSize: 16 }} />,
       inactive: <Pause sx={{ fontSize: 16 }} />,
-      error: <Error sx={{ fontSize: 16 }} />,
+      error: <ErrorIcon sx={{ fontSize: 16 }} />,
       maintenance: <Settings sx={{ fontSize: 16 }} />,
       testing: <Schedule sx={{ fontSize: 16 }} />
     };

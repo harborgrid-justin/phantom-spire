@@ -61,8 +61,7 @@ import {
   Search,
   Refresh,
   OpenInNew,
-  CheckCircle,
-  Error,
+  CheckCircle,  Error as ErrorIcon,
   Code,
   Computer,
   Memory,
@@ -593,7 +592,7 @@ const PowerShellAttackVectors: React.FC = () => {
                   {vector.amsi_bypass ? (
                     <CheckCircle color="error" />
                   ) : (
-                    <Error color="success" />
+                    <ErrorIcon color="success" />
                   )}
                 </TableCell>
                 <TableCell>
