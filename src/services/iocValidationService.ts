@@ -413,16 +413,16 @@ export class IOCValidationService {
         status: Math.random() > 0.9 ? 'error' : 'success',
         id: op.id || `ioc-${index}`,
         errors: Math.random() > 0.9 ? ['Validation failed'] : [],
-        warnings: Math.random() > 0.7 ? ['Low confidence value'] : []
+        warnings: Math.random() > 0.7 ? ['Low confidence value'] : [],
       })),
       summary: {
         total: options.operations.length,
         successful: options.operations.length - Math.floor(Math.random() * 2),
         failed: Math.floor(Math.random() * 2),
-        warnings: Math.floor(Math.random() * 3)
+        warnings: Math.floor(Math.random() * 3),
       },
       timestamp: new Date().toISOString(),
-      operator: options.userId || 'system'
+      operator: options.userId || 'system',
     };
 
     return results;
@@ -442,59 +442,61 @@ export class IOCValidationService {
         accuracy: 0.82,
         consistency: 0.87,
         timeliness: 0.79,
-        relevance: 0.91
+        relevance: 0.91,
       },
       issues: [
         {
           type: 'missing_metadata',
           count: 45,
           severity: 'medium',
-          description: 'IOCs missing enrichment metadata'
+          description: 'IOCs missing enrichment metadata',
         },
         {
           type: 'low_confidence',
           count: 23,
           severity: 'low',
-          description: 'IOCs with confidence below threshold'
+          description: 'IOCs with confidence below threshold',
         },
         {
           type: 'stale_data',
           count: 12,
           severity: 'high',
-          description: 'IOCs not updated in 90+ days'
-        }
+          description: 'IOCs not updated in 90+ days',
+        },
       ],
       trends: Array.from({ length: 30 }, (_, i) => ({
         date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-        qualityScore: 0.8 + Math.random() * 0.2
-      }))
+        qualityScore: 0.8 + Math.random() * 0.2,
+      })),
     };
 
-    const recommendations = options.includeRecommendations ? [
-      {
-        priority: 'high',
-        action: 'Implement automated metadata enrichment',
-        impact: 'Improve completeness by 15%',
-        effort: 'medium'
-      },
-      {
-        priority: 'medium',
-        action: 'Set up confidence threshold alerts',
-        impact: 'Reduce low-confidence IOCs by 50%',
-        effort: 'low'
-      },
-      {
-        priority: 'low',
-        action: 'Regular data freshness audits',
-        impact: 'Improve timeliness by 10%',
-        effort: 'high'
-      }
-    ] : null;
+    const recommendations = options.includeRecommendations
+      ? [
+          {
+            priority: 'high',
+            action: 'Implement automated metadata enrichment',
+            impact: 'Improve completeness by 15%',
+            effort: 'medium',
+          },
+          {
+            priority: 'medium',
+            action: 'Set up confidence threshold alerts',
+            impact: 'Reduce low-confidence IOCs by 50%',
+            effort: 'low',
+          },
+          {
+            priority: 'low',
+            action: 'Regular data freshness audits',
+            impact: 'Improve timeliness by 10%',
+            effort: 'high',
+          },
+        ]
+      : null;
 
     return {
       assessment: qualityMetrics,
       recommendations,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
     };
   }
 
@@ -510,40 +512,49 @@ export class IOCValidationService {
     const reviews = Array.from({ length: 15 }, (_, i) => ({
       id: `review-${i}`,
       iocId: `ioc-${Math.floor(Math.random() * 1000)}`,
-      reviewerId: options.reviewerId || `reviewer-${Math.floor(Math.random() * 10)}`,
-      status: options.reviewStatus || ['pending', 'approved', 'rejected'][Math.floor(Math.random() * 3)],
+      reviewerId:
+        options.reviewerId || `reviewer-${Math.floor(Math.random() * 10)}`,
+      status:
+        options.reviewStatus ||
+        ['pending', 'approved', 'rejected'][Math.floor(Math.random() * 3)],
       confidence: Math.random(),
       comments: `Review comment ${i + 1}`,
-      submittedAt: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-      resolvedAt: Math.random() > 0.3 ? new Date().toISOString() : null
+      submittedAt: new Date(
+        Date.now() - Math.random() * 86400000 * 7
+      ).toISOString(),
+      resolvedAt: Math.random() > 0.3 ? new Date().toISOString() : null,
     }));
 
-    const metrics = options.includeMetrics ? {
-      totalReviews: reviews.length,
-      pendingReviews: reviews.filter(r => r.status === 'pending').length,
-      approvedReviews: reviews.filter(r => r.status === 'approved').length,
-      rejectedReviews: reviews.filter(r => r.status === 'rejected').length,
-      averageReviewTime: 2.5, // hours
-      reviewerStats: Array.from({ length: 5 }, (_, i) => ({
-        reviewerId: `reviewer-${i}`,
-        totalReviews: Math.floor(Math.random() * 50) + 10,
-        accuracy: 0.8 + Math.random() * 0.2,
-        averageTime: 1 + Math.random() * 3
-      }))
-    } : null;
+    const metrics = options.includeMetrics
+      ? {
+          totalReviews: reviews.length,
+          pendingReviews: reviews.filter(r => r.status === 'pending').length,
+          approvedReviews: reviews.filter(r => r.status === 'approved').length,
+          rejectedReviews: reviews.filter(r => r.status === 'rejected').length,
+          averageReviewTime: 2.5, // hours
+          reviewerStats: Array.from({ length: 5 }, (_, i) => ({
+            reviewerId: `reviewer-${i}`,
+            totalReviews: Math.floor(Math.random() * 50) + 10,
+            accuracy: 0.8 + Math.random() * 0.2,
+            averageTime: 1 + Math.random() * 3,
+          })),
+        }
+      : null;
 
     return {
       reviews: reviews.filter(review => {
-        if (options.reviewStatus && review.status !== options.reviewStatus) return false;
-        if (options.reviewerId && review.reviewerId !== options.reviewerId) return false;
+        if (options.reviewStatus && review.status !== options.reviewStatus)
+          return false;
+        if (options.reviewerId && review.reviewerId !== options.reviewerId)
+          return false;
         return true;
       }),
       metrics,
       userPermissions: {
         canReview: true,
         canApprove: true,
-        canReject: options.userId?.includes('admin') || false
-      }
+        canReject: options.userId?.includes('admin') || false,
+      },
     };
   }
 
@@ -566,7 +577,7 @@ export class IOCValidationService {
         action: 'alert',
         confidence: 0.85,
         createdBy: 'analyst-001',
-        createdAt: new Date(Date.now() - 86400000 * 30).toISOString()
+        createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
       },
       {
         id: 'rule-002',
@@ -577,7 +588,7 @@ export class IOCValidationService {
         action: 'block',
         confidence: 0.92,
         createdBy: 'analyst-002',
-        createdAt: new Date(Date.now() - 86400000 * 15).toISOString()
+        createdAt: new Date(Date.now() - 86400000 * 15).toISOString(),
       },
       {
         id: 'rule-003',
@@ -588,32 +599,37 @@ export class IOCValidationService {
         action: 'investigate',
         confidence: 0.78,
         createdBy: 'analyst-003',
-        createdAt: new Date(Date.now() - 86400000 * 7).toISOString()
-      }
+        createdAt: new Date(Date.now() - 86400000 * 7).toISOString(),
+      },
     ];
 
     const filteredRules = rules.filter(rule => {
       if (options.ruleType && rule.type !== options.ruleType) return false;
-      if (options.statusFilter && rule.status !== options.statusFilter) return false;
+      if (options.statusFilter && rule.status !== options.statusFilter)
+        return false;
       return true;
     });
 
-    const performance = options.includePerformance ? {
-      ruleStats: filteredRules.map(rule => ({
-        ruleId: rule.id,
-        triggers: Math.floor(Math.random() * 100) + 10,
-        falsePositives: Math.floor(Math.random() * 10),
-        truePositives: Math.floor(Math.random() * 80) + 20,
-        accuracy: 0.8 + Math.random() * 0.2,
-        lastTriggered: new Date(Date.now() - Math.random() * 86400000).toISOString()
-      })),
-      overall: {
-        totalRules: rules.length,
-        activeRules: rules.filter(r => r.status === 'active').length,
-        averageAccuracy: 0.87,
-        totalTriggers: Math.floor(Math.random() * 1000) + 500
-      }
-    } : null;
+    const performance = options.includePerformance
+      ? {
+          ruleStats: filteredRules.map(rule => ({
+            ruleId: rule.id,
+            triggers: Math.floor(Math.random() * 100) + 10,
+            falsePositives: Math.floor(Math.random() * 10),
+            truePositives: Math.floor(Math.random() * 80) + 20,
+            accuracy: 0.8 + Math.random() * 0.2,
+            lastTriggered: new Date(
+              Date.now() - Math.random() * 86400000
+            ).toISOString(),
+          })),
+          overall: {
+            totalRules: rules.length,
+            activeRules: rules.filter(r => r.status === 'active').length,
+            averageAccuracy: 0.87,
+            totalTriggers: Math.floor(Math.random() * 1000) + 500,
+          },
+        }
+      : null;
 
     return {
       rules: filteredRules,
@@ -622,8 +638,8 @@ export class IOCValidationService {
         canCreate: true,
         canEdit: true,
         canDelete: options.userId?.includes('admin') || false,
-        canActivate: options.userId?.includes('analyst') || false
-      }
+        canActivate: options.userId?.includes('analyst') || false,
+      },
     };
   }
 }

@@ -11,7 +11,9 @@ export function createCaseManagementRouter(): Router {
 
   // Register all case management routes
   caseManagementRoutes.forEach(route => {
-    console.log(`📋 Registering case management route: ${route.path} (${route.title})`);
+    console.log(
+      `📋 Registering case management route: ${route.path} (${route.title})`
+    );
     router.use(route.path, route.createRouter());
   });
 
@@ -24,17 +26,23 @@ export function createCaseManagementRouter(): Router {
         path: `/api/v1/case-management${route.path}`,
         title: route.title,
         category: route.category,
-        description: `API endpoints for ${route.title.toLowerCase()}`
+        description: `API endpoints for ${route.title.toLowerCase()}`,
       })),
       totalModules: caseManagementRoutes.length,
       categories: {
-        lifecycle: caseManagementRoutes.filter(r => r.category === 'lifecycle').length,
-        evidence: caseManagementRoutes.filter(r => r.category === 'evidence').length,
-        workflows: caseManagementRoutes.filter(r => r.category === 'workflows').length,
-        analytics: caseManagementRoutes.filter(r => r.category === 'analytics').length,
-        compliance: caseManagementRoutes.filter(r => r.category === 'compliance').length
+        lifecycle: caseManagementRoutes.filter(r => r.category === 'lifecycle')
+          .length,
+        evidence: caseManagementRoutes.filter(r => r.category === 'evidence')
+          .length,
+        workflows: caseManagementRoutes.filter(r => r.category === 'workflows')
+          .length,
+        analytics: caseManagementRoutes.filter(r => r.category === 'analytics')
+          .length,
+        compliance: caseManagementRoutes.filter(
+          r => r.category === 'compliance'
+        ).length,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   });
 

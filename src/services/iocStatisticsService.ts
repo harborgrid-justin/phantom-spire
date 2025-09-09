@@ -956,20 +956,35 @@ export class IOCStatisticsService {
       timeframe: options.timeframe,
       trends: {
         volume: [
-          { date: '2024-01-01', count: 150, predicted: options.includePredictive ? 160 : undefined },
-          { date: '2024-01-02', count: 170, predicted: options.includePredictive ? 175 : undefined },
-          { date: '2024-01-03', count: 145, predicted: options.includePredictive ? 155 : undefined },
+          {
+            date: '2024-01-01',
+            count: 150,
+            predicted: options.includePredictive ? 160 : undefined,
+          },
+          {
+            date: '2024-01-02',
+            count: 170,
+            predicted: options.includePredictive ? 175 : undefined,
+          },
+          {
+            date: '2024-01-03',
+            count: 145,
+            predicted: options.includePredictive ? 155 : undefined,
+          },
         ],
-        categories: options.categories?.map(cat => ({
-          name: cat,
-          trend: 'increasing',
-          confidence: 0.85
-        })) || [],
-        predictions: options.includePredictive ? {
-          nextWeek: { expected: 1200, confidence: 0.78 },
-          nextMonth: { expected: 5200, confidence: 0.65 }
-        } : null
-      }
+        categories:
+          options.categories?.map(cat => ({
+            name: cat,
+            trend: 'increasing',
+            confidence: 0.85,
+          })) || [],
+        predictions: options.includePredictive
+          ? {
+              nextWeek: { expected: 1200, confidence: 0.78 },
+              nextMonth: { expected: 5200, confidence: 0.65 },
+            }
+          : null,
+      },
     };
 
     return mockData;
@@ -986,21 +1001,23 @@ export class IOCStatisticsService {
     return {
       granularity: options.granularity,
       timeRange: {
-        start: options.startDate?.toISOString() || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        end: options.endDate?.toISOString() || new Date().toISOString()
+        start:
+          options.startDate?.toISOString() ||
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+        end: options.endDate?.toISOString() || new Date().toISOString(),
       },
       metrics: {
         detectionRate: 0.94,
         falsePositiveRate: 0.12,
         averageResponseTime: 2.3,
         throughput: 1250,
-        accuracy: 0.88
+        accuracy: 0.88,
       },
       historicalData: Array.from({ length: 30 }, (_, i) => ({
         timestamp: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
         detections: Math.floor(Math.random() * 100) + 50,
-        accuracy: 0.85 + Math.random() * 0.1
-      }))
+        accuracy: 0.85 + Math.random() * 0.1,
+      })),
     };
   }
 
@@ -1012,11 +1029,11 @@ export class IOCStatisticsService {
     exportFormat: 'json' | 'pdf' | 'csv';
   }) {
     const frameworks = {
-      'all': ['NIST', 'ISO27001', 'SOC2', 'GDPR'],
-      'NIST': ['NIST'],
-      'ISO27001': ['ISO27001'],
-      'SOC2': ['SOC2'],
-      'GDPR': ['GDPR']
+      all: ['NIST', 'ISO27001', 'SOC2', 'GDPR'],
+      NIST: ['NIST'],
+      ISO27001: ['ISO27001'],
+      SOC2: ['SOC2'],
+      GDPR: ['GDPR'],
     };
 
     return {
@@ -1024,20 +1041,22 @@ export class IOCStatisticsService {
       exportFormat: options.exportFormat,
       compliance: {
         overall: 0.87,
-        frameworks: (frameworks[options.framework] || frameworks['all']).map(fw => ({
-          name: fw,
-          score: 0.8 + Math.random() * 0.2,
-          requirements: {
-            met: Math.floor(Math.random() * 20) + 15,
-            total: Math.floor(Math.random() * 5) + 20
-          }
-        }))
+        frameworks: (frameworks[options.framework] || frameworks['all']).map(
+          fw => ({
+            name: fw,
+            score: 0.8 + Math.random() * 0.2,
+            requirements: {
+              met: Math.floor(Math.random() * 20) + 15,
+              total: Math.floor(Math.random() * 5) + 20,
+            },
+          })
+        ),
       },
       recommendations: [
         'Implement automated IOC validation workflows',
         'Enhance audit logging for compliance tracking',
-        'Regular security assessments required'
-      ]
+        'Regular security assessments required',
+      ],
     };
   }
 
@@ -1049,8 +1068,12 @@ export class IOCStatisticsService {
     refreshInterval: number;
   }) {
     const availableWidgets = [
-      'threat-overview', 'recent-detections', 'risk-distribution',
-      'source-breakdown', 'geographic-distribution', 'performance-metrics'
+      'threat-overview',
+      'recent-detections',
+      'risk-distribution',
+      'source-breakdown',
+      'geographic-distribution',
+      'performance-metrics',
     ];
 
     const widgets = options.selectedWidgets || availableWidgets;
@@ -1061,13 +1084,13 @@ export class IOCStatisticsService {
         id: widget,
         type: widget,
         data: this.generateWidgetData(widget),
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
       })),
       realTimeMetrics: {
         activeThreats: Math.floor(Math.random() * 50) + 10,
         newIOCs: Math.floor(Math.random() * 20) + 5,
-        riskScore: Math.floor(Math.random() * 30) + 70
-      }
+        riskScore: Math.floor(Math.random() * 30) + 70,
+      },
     };
   }
 
@@ -1088,10 +1111,10 @@ export class IOCStatisticsService {
         processed: Math.floor(Math.random() * 100) + 50,
         successful: Math.floor(Math.random() * 80) + 45,
         failed: Math.floor(Math.random() * 5),
-        warnings: Math.floor(Math.random() * 10)
+        warnings: Math.floor(Math.random() * 10),
       },
       timestamp: new Date().toISOString(),
-      operator: options.userId || 'system'
+      operator: options.userId || 'system',
     };
   }
 
@@ -1107,21 +1130,41 @@ export class IOCStatisticsService {
         totalFeeds: 24,
         activeFeeds: 21,
         errorFeeds: 2,
-        pendingFeeds: 1
+        pendingFeeds: 1,
       },
-      schedules: options.includeSchedules ? [
-        { feedId: 'misp-feed-1', nextRun: new Date(Date.now() + 3600000).toISOString(), frequency: 'hourly' },
-        { feedId: 'osint-feed-1', nextRun: new Date(Date.now() + 7200000).toISOString(), frequency: 'every-2h' }
-      ] : null,
-      errors: options.includeErrors ? [
-        { feedId: 'external-feed-3', error: 'Connection timeout', timestamp: new Date().toISOString() },
-        { feedId: 'api-feed-2', error: 'Authentication failed', timestamp: new Date().toISOString() }
-      ] : null,
+      schedules: options.includeSchedules
+        ? [
+            {
+              feedId: 'misp-feed-1',
+              nextRun: new Date(Date.now() + 3600000).toISOString(),
+              frequency: 'hourly',
+            },
+            {
+              feedId: 'osint-feed-1',
+              nextRun: new Date(Date.now() + 7200000).toISOString(),
+              frequency: 'every-2h',
+            },
+          ]
+        : null,
+      errors: options.includeErrors
+        ? [
+            {
+              feedId: 'external-feed-3',
+              error: 'Connection timeout',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              feedId: 'api-feed-2',
+              error: 'Authentication failed',
+              timestamp: new Date().toISOString(),
+            },
+          ]
+        : null,
       performance: {
         averageLatency: 2.3,
         successRate: 0.94,
-        dataQuality: 0.89
-      }
+        dataQuality: 0.89,
+      },
     };
   }
 
@@ -1135,21 +1178,21 @@ export class IOCStatisticsService {
           total: Math.floor(Math.random() * 1000) + 500,
           high: Math.floor(Math.random() * 100) + 50,
           medium: Math.floor(Math.random() * 200) + 100,
-          low: Math.floor(Math.random() * 300) + 200
+          low: Math.floor(Math.random() * 300) + 200,
         };
       case 'recent-detections':
         return Array.from({ length: 10 }, (_, i) => ({
           id: `detection-${i}`,
           type: ['ip', 'domain', 'hash'][Math.floor(Math.random() * 3)],
           severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-          timestamp: new Date(Date.now() - i * 300000).toISOString()
+          timestamp: new Date(Date.now() - i * 300000).toISOString(),
         }));
       case 'risk-distribution':
         return {
           critical: Math.floor(Math.random() * 20) + 5,
           high: Math.floor(Math.random() * 50) + 25,
           medium: Math.floor(Math.random() * 100) + 75,
-          low: Math.floor(Math.random() * 200) + 150
+          low: Math.floor(Math.random() * 200) + 150,
         };
       default:
         return { message: `Data for ${widgetType}` };

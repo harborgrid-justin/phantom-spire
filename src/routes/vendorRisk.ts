@@ -28,7 +28,10 @@ router.use(authMiddleware);
  *       200:
  *         description: Risk evaluation data retrieved successfully
  */
-router.get('/vendor-assessment/risk-evaluation', VendorRiskController.getRiskEvaluation);
+router.get(
+  '/vendor-assessment/risk-evaluation',
+  VendorRiskController.getRiskEvaluation
+);
 
 /**
  * @swagger
@@ -42,7 +45,10 @@ router.get('/vendor-assessment/risk-evaluation', VendorRiskController.getRiskEva
  *       200:
  *         description: Security assessment data retrieved successfully
  */
-router.get('/vendor-assessment/security-assessment', VendorRiskController.getSecurityAssessment);
+router.get(
+  '/vendor-assessment/security-assessment',
+  VendorRiskController.getSecurityAssessment
+);
 
 /**
  * @swagger
@@ -56,7 +62,10 @@ router.get('/vendor-assessment/security-assessment', VendorRiskController.getSec
  *       200:
  *         description: Compliance review data retrieved successfully
  */
-router.get('/vendor-assessment/compliance-review', VendorRiskController.getComplianceReview);
+router.get(
+  '/vendor-assessment/compliance-review',
+  VendorRiskController.getComplianceReview
+);
 
 /**
  * @swagger
@@ -70,7 +79,10 @@ router.get('/vendor-assessment/compliance-review', VendorRiskController.getCompl
  *       200:
  *         description: Due diligence data retrieved successfully
  */
-router.get('/vendor-assessment/due-diligence', VendorRiskController.getDueDiligence);
+router.get(
+  '/vendor-assessment/due-diligence',
+  VendorRiskController.getDueDiligence
+);
 
 /**
  * @swagger
@@ -84,7 +96,10 @@ router.get('/vendor-assessment/due-diligence', VendorRiskController.getDueDilige
  *       200:
  *         description: Performance metrics retrieved successfully
  */
-router.get('/vendor-assessment/performance-metrics', VendorRiskController.getPerformanceMetrics);
+router.get(
+  '/vendor-assessment/performance-metrics',
+  VendorRiskController.getPerformanceMetrics
+);
 
 /**
  * @swagger
@@ -98,7 +113,10 @@ router.get('/vendor-assessment/performance-metrics', VendorRiskController.getPer
  *       200:
  *         description: Financial stability data retrieved successfully
  */
-router.get('/vendor-assessment/financial-stability', VendorRiskController.getFinancialStability);
+router.get(
+  '/vendor-assessment/financial-stability',
+  VendorRiskController.getFinancialStability
+);
 
 /**
  * Risk Monitoring Routes (6 endpoints)
@@ -116,7 +134,10 @@ router.get('/vendor-assessment/financial-stability', VendorRiskController.getFin
  *       200:
  *         description: Continuous monitoring data retrieved successfully
  */
-router.get('/risk-monitoring/continuous-monitoring', VendorRiskController.getContinuousMonitoring);
+router.get(
+  '/risk-monitoring/continuous-monitoring',
+  VendorRiskController.getContinuousMonitoring
+);
 
 /**
  * @swagger
@@ -130,7 +151,10 @@ router.get('/risk-monitoring/continuous-monitoring', VendorRiskController.getCon
  *       200:
  *         description: Risk dashboard data retrieved successfully
  */
-router.get('/risk-monitoring/risk-dashboards', VendorRiskController.getRiskDashboards);
+router.get(
+  '/risk-monitoring/risk-dashboards',
+  VendorRiskController.getRiskDashboards
+);
 
 /**
  * @swagger
@@ -144,7 +168,10 @@ router.get('/risk-monitoring/risk-dashboards', VendorRiskController.getRiskDashb
  *       200:
  *         description: Alert management data retrieved successfully
  */
-router.get('/risk-monitoring/alert-management', VendorRiskController.getAlertManagement);
+router.get(
+  '/risk-monitoring/alert-management',
+  VendorRiskController.getAlertManagement
+);
 
 /**
  * @swagger
@@ -158,7 +185,10 @@ router.get('/risk-monitoring/alert-management', VendorRiskController.getAlertMan
  *       200:
  *         description: Threshold configuration retrieved successfully
  */
-router.get('/risk-monitoring/threshold-configuration', VendorRiskController.getThresholdConfiguration);
+router.get(
+  '/risk-monitoring/threshold-configuration',
+  VendorRiskController.getThresholdConfiguration
+);
 
 /**
  * @swagger
@@ -172,7 +202,10 @@ router.get('/risk-monitoring/threshold-configuration', VendorRiskController.getT
  *       200:
  *         description: Trend analysis data retrieved successfully
  */
-router.get('/risk-monitoring/trend-analysis', VendorRiskController.getTrendAnalysis);
+router.get(
+  '/risk-monitoring/trend-analysis',
+  VendorRiskController.getTrendAnalysis
+);
 
 /**
  * @swagger
@@ -186,7 +219,10 @@ router.get('/risk-monitoring/trend-analysis', VendorRiskController.getTrendAnaly
  *       200:
  *         description: Escalation procedures retrieved successfully
  */
-router.get('/risk-monitoring/escalation-procedures', VendorRiskController.getEscalationProcedures);
+router.get(
+  '/risk-monitoring/escalation-procedures',
+  VendorRiskController.getEscalationProcedures
+);
 
 /**
  * Contract Management Routes (6 endpoints)
@@ -204,7 +240,10 @@ router.get('/risk-monitoring/escalation-procedures', VendorRiskController.getEsc
  *       200:
  *         description: Contract templates retrieved successfully
  */
-router.get('/contract-management/contract-templates', VendorRiskController.getContractTemplates);
+router.get(
+  '/contract-management/contract-templates',
+  VendorRiskController.getContractTemplates
+);
 
 /**
  * @swagger
@@ -218,7 +257,10 @@ router.get('/contract-management/contract-templates', VendorRiskController.getCo
  *       200:
  *         description: SLA management data retrieved successfully
  */
-router.get('/contract-management/sla-management', VendorRiskController.getSlaManagement);
+router.get(
+  '/contract-management/sla-management',
+  VendorRiskController.getSlaManagement
+);
 
 /**
  * @swagger
@@ -232,7 +274,10 @@ router.get('/contract-management/sla-management', VendorRiskController.getSlaMan
  *       200:
  *         description: Renewal tracking data retrieved successfully
  */
-router.get('/contract-management/renewal-tracking', VendorRiskController.getRenewalTracking);
+router.get(
+  '/contract-management/renewal-tracking',
+  VendorRiskController.getRenewalTracking
+);
 
 /**
  * @swagger
@@ -246,7 +291,10 @@ router.get('/contract-management/renewal-tracking', VendorRiskController.getRene
  *       200:
  *         description: Compliance terms retrieved successfully
  */
-router.get('/contract-management/compliance-terms', VendorRiskController.getComplianceTerms);
+router.get(
+  '/contract-management/compliance-terms',
+  VendorRiskController.getComplianceTerms
+);
 
 /**
  * @swagger
@@ -260,7 +308,10 @@ router.get('/contract-management/compliance-terms', VendorRiskController.getComp
  *       200:
  *         description: Liability assessment retrieved successfully
  */
-router.get('/contract-management/liability-assessment', VendorRiskController.getLiabilityAssessment);
+router.get(
+  '/contract-management/liability-assessment',
+  VendorRiskController.getLiabilityAssessment
+);
 
 /**
  * @swagger
@@ -274,7 +325,10 @@ router.get('/contract-management/liability-assessment', VendorRiskController.get
  *       200:
  *         description: Termination procedures retrieved successfully
  */
-router.get('/contract-management/termination-procedures', VendorRiskController.getTerminationProcedures);
+router.get(
+  '/contract-management/termination-procedures',
+  VendorRiskController.getTerminationProcedures
+);
 
 /**
  * Security Compliance Routes (6 endpoints)
@@ -292,7 +346,10 @@ router.get('/contract-management/termination-procedures', VendorRiskController.g
  *       200:
  *         description: Security standards data retrieved successfully
  */
-router.get('/security-compliance/security-standards', VendorRiskController.getSecurityStandards);
+router.get(
+  '/security-compliance/security-standards',
+  VendorRiskController.getSecurityStandards
+);
 
 /**
  * @swagger
@@ -306,7 +363,10 @@ router.get('/security-compliance/security-standards', VendorRiskController.getSe
  *       200:
  *         description: Audit management data retrieved successfully
  */
-router.get('/security-compliance/audit-management', VendorRiskController.getAuditManagement);
+router.get(
+  '/security-compliance/audit-management',
+  VendorRiskController.getAuditManagement
+);
 
 /**
  * @swagger
@@ -320,7 +380,10 @@ router.get('/security-compliance/audit-management', VendorRiskController.getAudi
  *       200:
  *         description: Certification tracking retrieved successfully
  */
-router.get('/security-compliance/certification-tracking', VendorRiskController.getCertificationTracking);
+router.get(
+  '/security-compliance/certification-tracking',
+  VendorRiskController.getCertificationTracking
+);
 
 /**
  * @swagger
@@ -334,7 +397,10 @@ router.get('/security-compliance/certification-tracking', VendorRiskController.g
  *       200:
  *         description: Penetration testing data retrieved successfully
  */
-router.get('/security-compliance/penetration-testing', VendorRiskController.getPenetrationTesting);
+router.get(
+  '/security-compliance/penetration-testing',
+  VendorRiskController.getPenetrationTesting
+);
 
 /**
  * @swagger
@@ -348,7 +414,10 @@ router.get('/security-compliance/penetration-testing', VendorRiskController.getP
  *       200:
  *         description: Vulnerability disclosure data retrieved successfully
  */
-router.get('/security-compliance/vulnerability-disclosure', VendorRiskController.getVulnerabilityDisclosure);
+router.get(
+  '/security-compliance/vulnerability-disclosure',
+  VendorRiskController.getVulnerabilityDisclosure
+);
 
 /**
  * @swagger
@@ -362,7 +431,10 @@ router.get('/security-compliance/vulnerability-disclosure', VendorRiskController
  *       200:
  *         description: Incident response data retrieved successfully
  */
-router.get('/security-compliance/incident-response', VendorRiskController.getIncidentResponse);
+router.get(
+  '/security-compliance/incident-response',
+  VendorRiskController.getIncidentResponse
+);
 
 /**
  * Performance Management Routes (6 endpoints)
@@ -380,7 +452,10 @@ router.get('/security-compliance/incident-response', VendorRiskController.getInc
  *       200:
  *         description: KPI tracking data retrieved successfully
  */
-router.get('/performance-management/kpi-tracking', VendorRiskController.getKpiTracking);
+router.get(
+  '/performance-management/kpi-tracking',
+  VendorRiskController.getKpiTracking
+);
 
 /**
  * @swagger
@@ -394,7 +469,10 @@ router.get('/performance-management/kpi-tracking', VendorRiskController.getKpiTr
  *       200:
  *         description: Service level monitoring retrieved successfully
  */
-router.get('/performance-management/service-level-monitoring', VendorRiskController.getServiceLevelMonitoring);
+router.get(
+  '/performance-management/service-level-monitoring',
+  VendorRiskController.getServiceLevelMonitoring
+);
 
 /**
  * @swagger
@@ -408,7 +486,10 @@ router.get('/performance-management/service-level-monitoring', VendorRiskControl
  *       200:
  *         description: Performance benchmarks retrieved successfully
  */
-router.get('/performance-management/performance-benchmarks', VendorRiskController.getPerformanceBenchmarks);
+router.get(
+  '/performance-management/performance-benchmarks',
+  VendorRiskController.getPerformanceBenchmarks
+);
 
 /**
  * @swagger
@@ -422,7 +503,10 @@ router.get('/performance-management/performance-benchmarks', VendorRiskControlle
  *       200:
  *         description: Capacity planning data retrieved successfully
  */
-router.get('/performance-management/capacity-planning', VendorRiskController.getCapacityPlanning);
+router.get(
+  '/performance-management/capacity-planning',
+  VendorRiskController.getCapacityPlanning
+);
 
 /**
  * @swagger
@@ -436,7 +520,10 @@ router.get('/performance-management/capacity-planning', VendorRiskController.get
  *       200:
  *         description: Availability monitoring retrieved successfully
  */
-router.get('/performance-management/availability-monitoring', VendorRiskController.getAvailabilityMonitoring);
+router.get(
+  '/performance-management/availability-monitoring',
+  VendorRiskController.getAvailabilityMonitoring
+);
 
 /**
  * @swagger
@@ -450,7 +537,10 @@ router.get('/performance-management/availability-monitoring', VendorRiskControll
  *       200:
  *         description: Quality assurance data retrieved successfully
  */
-router.get('/performance-management/quality-assurance', VendorRiskController.getQualityAssurance);
+router.get(
+  '/performance-management/quality-assurance',
+  VendorRiskController.getQualityAssurance
+);
 
 /**
  * Financial Risk Routes (6 endpoints)
@@ -468,7 +558,10 @@ router.get('/performance-management/quality-assurance', VendorRiskController.get
  *       200:
  *         description: Financial analysis data retrieved successfully
  */
-router.get('/financial-risk/financial-analysis', VendorRiskController.getFinancialAnalysis);
+router.get(
+  '/financial-risk/financial-analysis',
+  VendorRiskController.getFinancialAnalysis
+);
 
 /**
  * @swagger
@@ -482,7 +575,10 @@ router.get('/financial-risk/financial-analysis', VendorRiskController.getFinanci
  *       200:
  *         description: Cost management data retrieved successfully
  */
-router.get('/financial-risk/cost-management', VendorRiskController.getCostManagement);
+router.get(
+  '/financial-risk/cost-management',
+  VendorRiskController.getCostManagement
+);
 
 /**
  * @swagger
@@ -496,7 +592,10 @@ router.get('/financial-risk/cost-management', VendorRiskController.getCostManage
  *       200:
  *         description: Budget tracking data retrieved successfully
  */
-router.get('/financial-risk/budget-tracking', VendorRiskController.getBudgetTracking);
+router.get(
+  '/financial-risk/budget-tracking',
+  VendorRiskController.getBudgetTracking
+);
 
 /**
  * @swagger
@@ -510,7 +609,10 @@ router.get('/financial-risk/budget-tracking', VendorRiskController.getBudgetTrac
  *       200:
  *         description: Payment monitoring data retrieved successfully
  */
-router.get('/financial-risk/payment-monitoring', VendorRiskController.getPaymentMonitoring);
+router.get(
+  '/financial-risk/payment-monitoring',
+  VendorRiskController.getPaymentMonitoring
+);
 
 /**
  * @swagger
@@ -524,7 +626,10 @@ router.get('/financial-risk/payment-monitoring', VendorRiskController.getPayment
  *       200:
  *         description: Insurance coverage data retrieved successfully
  */
-router.get('/financial-risk/insurance-coverage', VendorRiskController.getInsuranceCoverage);
+router.get(
+  '/financial-risk/insurance-coverage',
+  VendorRiskController.getInsuranceCoverage
+);
 
 /**
  * @swagger
@@ -538,7 +643,10 @@ router.get('/financial-risk/insurance-coverage', VendorRiskController.getInsuran
  *       200:
  *         description: Business continuity data retrieved successfully
  */
-router.get('/financial-risk/business-continuity', VendorRiskController.getBusinessContinuity);
+router.get(
+  '/financial-risk/business-continuity',
+  VendorRiskController.getBusinessContinuity
+);
 
 /**
  * Operational Risk Routes (6 endpoints)
@@ -556,7 +664,10 @@ router.get('/financial-risk/business-continuity', VendorRiskController.getBusine
  *       200:
  *         description: Operational assessments retrieved successfully
  */
-router.get('/operational-risk/operational-assessments', VendorRiskController.getOperationalAssessments);
+router.get(
+  '/operational-risk/operational-assessments',
+  VendorRiskController.getOperationalAssessments
+);
 
 /**
  * @swagger
@@ -570,7 +681,10 @@ router.get('/operational-risk/operational-assessments', VendorRiskController.get
  *       200:
  *         description: Business impact analysis retrieved successfully
  */
-router.get('/operational-risk/business-impact-analysis', VendorRiskController.getBusinessImpactAnalysis);
+router.get(
+  '/operational-risk/business-impact-analysis',
+  VendorRiskController.getBusinessImpactAnalysis
+);
 
 /**
  * @swagger
@@ -584,7 +698,10 @@ router.get('/operational-risk/business-impact-analysis', VendorRiskController.ge
  *       200:
  *         description: Dependency mapping data retrieved successfully
  */
-router.get('/operational-risk/dependency-mapping', VendorRiskController.getDependencyMapping);
+router.get(
+  '/operational-risk/dependency-mapping',
+  VendorRiskController.getDependencyMapping
+);
 
 /**
  * @swagger
@@ -598,7 +715,10 @@ router.get('/operational-risk/dependency-mapping', VendorRiskController.getDepen
  *       200:
  *         description: Recovery planning data retrieved successfully
  */
-router.get('/operational-risk/recovery-planning', VendorRiskController.getRecoveryPlanning);
+router.get(
+  '/operational-risk/recovery-planning',
+  VendorRiskController.getRecoveryPlanning
+);
 
 /**
  * @swagger
@@ -612,7 +732,10 @@ router.get('/operational-risk/recovery-planning', VendorRiskController.getRecove
  *       200:
  *         description: Change management data retrieved successfully
  */
-router.get('/operational-risk/change-management', VendorRiskController.getChangeManagement);
+router.get(
+  '/operational-risk/change-management',
+  VendorRiskController.getChangeManagement
+);
 
 /**
  * @swagger
@@ -626,7 +749,10 @@ router.get('/operational-risk/change-management', VendorRiskController.getChange
  *       200:
  *         description: Communication protocols retrieved successfully
  */
-router.get('/operational-risk/communication-protocols', VendorRiskController.getCommunicationProtocols);
+router.get(
+  '/operational-risk/communication-protocols',
+  VendorRiskController.getCommunicationProtocols
+);
 
 /**
  * Governance Routes (6 endpoints)
@@ -644,7 +770,10 @@ router.get('/operational-risk/communication-protocols', VendorRiskController.get
  *       200:
  *         description: Policy management data retrieved successfully
  */
-router.get('/governance/policy-management', VendorRiskController.getPolicyManagement);
+router.get(
+  '/governance/policy-management',
+  VendorRiskController.getPolicyManagement
+);
 
 /**
  * @swagger
@@ -658,7 +787,10 @@ router.get('/governance/policy-management', VendorRiskController.getPolicyManage
  *       200:
  *         description: Approval workflows retrieved successfully
  */
-router.get('/governance/approval-workflows', VendorRiskController.getApprovalWorkflows);
+router.get(
+  '/governance/approval-workflows',
+  VendorRiskController.getApprovalWorkflows
+);
 
 /**
  * @swagger
@@ -672,7 +804,10 @@ router.get('/governance/approval-workflows', VendorRiskController.getApprovalWor
  *       200:
  *         description: Documentation standards retrieved successfully
  */
-router.get('/governance/documentation-standards', VendorRiskController.getDocumentationStandards);
+router.get(
+  '/governance/documentation-standards',
+  VendorRiskController.getDocumentationStandards
+);
 
 /**
  * @swagger
@@ -686,7 +821,10 @@ router.get('/governance/documentation-standards', VendorRiskController.getDocume
  *       200:
  *         description: Reporting frameworks retrieved successfully
  */
-router.get('/governance/reporting-frameworks', VendorRiskController.getReportingFrameworks);
+router.get(
+  '/governance/reporting-frameworks',
+  VendorRiskController.getReportingFrameworks
+);
 
 /**
  * @swagger
@@ -700,7 +838,10 @@ router.get('/governance/reporting-frameworks', VendorRiskController.getReporting
  *       200:
  *         description: Stakeholder management retrieved successfully
  */
-router.get('/governance/stakeholder-management', VendorRiskController.getStakeholderManagement);
+router.get(
+  '/governance/stakeholder-management',
+  VendorRiskController.getStakeholderManagement
+);
 
 /**
  * @swagger
@@ -714,6 +855,9 @@ router.get('/governance/stakeholder-management', VendorRiskController.getStakeho
  *       200:
  *         description: Regulatory compliance data retrieved successfully
  */
-router.get('/governance/regulatory-compliance', VendorRiskController.getRegulatoryCompliance);
+router.get(
+  '/governance/regulatory-compliance',
+  VendorRiskController.getRegulatoryCompliance
+);
 
 export default router;

@@ -721,11 +721,11 @@ export const getQualityReport = asyncHandler(
 export const getIOCTrendAnalytics = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { timeframe = '30d', categories, predictive = false } = req.query;
-    
+
     const analytics = await IOCStatisticsService.generateAdvancedTrends({
       timeframe: timeframe as string,
       categories: categories ? (categories as string).split(',') : undefined,
-      includePredictive: predictive === 'true'
+      includePredictive: predictive === 'true',
     });
 
     res.json({
@@ -746,10 +746,12 @@ export const getIOCTrendAnalytics = asyncHandler(
 export const getIOCRiskAssessment = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { severity, confidence_threshold } = req.query;
-    
+
     const riskData = await IOCAnalysisService.generateRiskAssessmentReport({
       severityFilter: severity as string,
-      confidenceThreshold: confidence_threshold ? parseInt(confidence_threshold as string) : 70
+      confidenceThreshold: confidence_threshold
+        ? parseInt(confidence_threshold as string)
+        : 70,
     });
 
     res.json({
@@ -770,11 +772,11 @@ export const getIOCRiskAssessment = asyncHandler(
 export const getIOCPerformanceMetrics = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { start_date, end_date, granularity = 'daily' } = req.query;
-    
+
     const metrics = await IOCStatisticsService.generatePerformanceMetrics({
       startDate: start_date ? new Date(start_date as string) : undefined,
       endDate: end_date ? new Date(end_date as string) : undefined,
-      granularity: granularity as 'hourly' | 'daily' | 'weekly'
+      granularity: granularity as 'hourly' | 'daily' | 'weekly',
     });
 
     res.json({
@@ -795,10 +797,10 @@ export const getIOCPerformanceMetrics = asyncHandler(
 export const getIOCComplianceReport = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { framework = 'all', export_format = 'json' } = req.query;
-    
+
     const complianceData = await IOCStatisticsService.generateComplianceReport({
       framework: framework as string,
-      exportFormat: export_format as 'json' | 'pdf' | 'csv'
+      exportFormat: export_format as 'json' | 'pdf' | 'csv',
     });
 
     res.json({
@@ -823,10 +825,10 @@ export const getIOCComplianceReport = asyncHandler(
 export const getIOCThreatAttribution = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_id, confidence_min = 50 } = req.query;
-    
+
     const attribution = await IOCAnalysisService.generateThreatAttribution({
       iocId: ioc_id as string,
-      minConfidence: parseInt(confidence_min as string)
+      minConfidence: parseInt(confidence_min as string),
     });
 
     res.json({
@@ -847,11 +849,11 @@ export const getIOCThreatAttribution = asyncHandler(
 export const getIOCOSINTEnrichment = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_value, sources = 'all', real_time = false } = req.query;
-    
+
     const osintData = await IOCEnrichmentService.performOSINTEnrichment({
       iocValue: ioc_value as string,
       sources: sources === 'all' ? [] : (sources as string).split(','),
-      realTime: real_time === 'true'
+      realTime: real_time === 'true',
     });
 
     res.json({
@@ -872,11 +874,11 @@ export const getIOCOSINTEnrichment = asyncHandler(
 export const getIOCContextualAnalysis = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_id, include_campaigns = true, include_ttps = true } = req.query;
-    
+
     const context = await IOCAnalysisService.generateContextualAnalysis({
       iocId: ioc_id as string,
       includeCampaigns: include_campaigns === 'true',
-      includeTTPs: include_ttps === 'true'
+      includeTTPs: include_ttps === 'true',
     });
 
     res.json({
@@ -896,12 +898,16 @@ export const getIOCContextualAnalysis = asyncHandler(
  */
 export const getIOCReputationScoring = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { ioc_value, algorithm = 'weighted', include_history = false } = req.query;
-    
+    const {
+      ioc_value,
+      algorithm = 'weighted',
+      include_history = false,
+    } = req.query;
+
     const reputation = await IOCEnrichmentService.calculateReputationScore({
       iocValue: ioc_value as string,
       algorithm: algorithm as 'weighted' | 'bayesian' | 'consensus',
-      includeHistory: include_history === 'true'
+      includeHistory: include_history === 'true',
     });
 
     res.json({
@@ -926,11 +932,11 @@ export const getIOCReputationScoring = asyncHandler(
 export const performIOCBatchOperations = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { operations, dry_run = false } = req.body;
-    
+
     const results = await IOCValidationService.performBatchOperations({
       operations,
       dryRun: dry_run,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -951,11 +957,11 @@ export const performIOCBatchOperations = asyncHandler(
 export const getIOCLifecycleManagement = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { status, age_threshold, include_rules = true } = req.query;
-    
+
     const lifecycle = await IOCAnalysisService.generateLifecycleReport({
       statusFilter: status as string,
       ageThreshold: age_threshold ? parseInt(age_threshold as string) : 90,
-      includeAutomationRules: include_rules === 'true'
+      includeAutomationRules: include_rules === 'true',
     });
 
     res.json({
@@ -976,10 +982,10 @@ export const getIOCLifecycleManagement = asyncHandler(
 export const getIOCDataQuality = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { include_recommendations = true, severity_filter } = req.query;
-    
+
     const quality = await IOCValidationService.generateQualityAssessment({
       includeRecommendations: include_recommendations === 'true',
-      severityFilter: severity_filter as string
+      severityFilter: severity_filter as string,
     });
 
     res.json({
@@ -1000,12 +1006,12 @@ export const getIOCDataQuality = asyncHandler(
 export const manageIOCArchive = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { action, criteria, retention_policy } = req.body;
-    
+
     const archiveResult = await IOCStatisticsService.manageArchival({
       action: action as 'archive' | 'restore' | 'purge',
       criteria,
       retentionPolicy: retention_policy,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -1030,11 +1036,11 @@ export const manageIOCArchive = asyncHandler(
 export const getIOCFeedSources = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { status, type, include_stats = true } = req.query;
-    
+
     const sources = await IOCEnrichmentService.getFeedSources({
       statusFilter: status as string,
       typeFilter: type as string,
-      includeStatistics: include_stats === 'true'
+      includeStatistics: include_stats === 'true',
     });
 
     res.json({
@@ -1055,10 +1061,10 @@ export const getIOCFeedSources = asyncHandler(
 export const getIOCAPIConnectors = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { provider, health_check = false } = req.query;
-    
+
     const connectors = await IOCEnrichmentService.getAPIConnectors({
       providerFilter: provider as string,
-      performHealthCheck: health_check === 'true'
+      performHealthCheck: health_check === 'true',
     });
 
     res.json({
@@ -1079,10 +1085,10 @@ export const getIOCAPIConnectors = asyncHandler(
 export const getIOCFeedManagement = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { include_schedules = true, include_errors = true } = req.query;
-    
+
     const management = await IOCStatisticsService.getFeedManagement({
       includeSchedules: include_schedules === 'true',
-      includeErrors: include_errors === 'true'
+      includeErrors: include_errors === 'true',
     });
 
     res.json({
@@ -1102,13 +1108,17 @@ export const getIOCFeedManagement = asyncHandler(
  */
 export const performIOCDataSync = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { target_systems, sync_type = 'incremental', dry_run = false } = req.body;
-    
+    const {
+      target_systems,
+      sync_type = 'incremental',
+      dry_run = false,
+    } = req.body;
+
     const syncResult = await IOCEnrichmentService.performDataSync({
       targetSystems: target_systems,
       syncType: sync_type as 'full' | 'incremental' | 'delta',
       dryRun: dry_run,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -1133,11 +1143,11 @@ export const performIOCDataSync = asyncHandler(
 export const getIOCGeolocation = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { time_range, clustering = true, heat_map = false } = req.query;
-    
+
     const geoData = await IOCAnalysisService.generateGeolocationData({
       timeRange: time_range as string,
       enableClustering: clustering === 'true',
-      generateHeatMap: heat_map === 'true'
+      generateHeatMap: heat_map === 'true',
     });
 
     res.json({
@@ -1158,11 +1168,13 @@ export const getIOCGeolocation = asyncHandler(
 export const getIOCRelationshipNetwork = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { center_ioc, depth = 2, relationship_types } = req.query;
-    
+
     const network = await IOCAnalysisService.generateRelationshipNetwork({
       centerIOC: center_ioc as string,
       depth: parseInt(depth as string),
-      relationshipTypes: relationship_types ? (relationship_types as string).split(',') : undefined
+      relationshipTypes: relationship_types
+        ? (relationship_types as string).split(',')
+        : undefined,
     });
 
     res.json({
@@ -1183,11 +1195,11 @@ export const getIOCRelationshipNetwork = asyncHandler(
 export const getIOCTimeline = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_id, granularity = 'daily', include_context = true } = req.query;
-    
+
     const timeline = await IOCAnalysisService.generateActivityTimeline({
       iocId: ioc_id as string,
       granularity: granularity as 'hourly' | 'daily' | 'weekly',
-      includeContext: include_context === 'true'
+      includeContext: include_context === 'true',
     });
 
     res.json({
@@ -1208,10 +1220,10 @@ export const getIOCTimeline = asyncHandler(
 export const getIOCInteractiveDashboard = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { widgets, refresh_interval = 30 } = req.query;
-    
+
     const dashboard = await IOCStatisticsService.generateInteractiveDashboard({
       selectedWidgets: widgets ? (widgets as string).split(',') : undefined,
-      refreshInterval: parseInt(refresh_interval as string)
+      refreshInterval: parseInt(refresh_interval as string),
     });
 
     res.json({
@@ -1232,11 +1244,11 @@ export const getIOCInteractiveDashboard = asyncHandler(
 export const getIOCPlaybooks = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_type, severity, status } = req.query;
-    
+
     const playbooks = await IOCAnalysisService.getSecurityPlaybooks({
       iocType: ioc_type as string,
       severityFilter: severity as string,
-      statusFilter: status as string
+      statusFilter: status as string,
     });
 
     res.json({
@@ -1256,12 +1268,16 @@ export const getIOCPlaybooks = asyncHandler(
  */
 export const getIOCAutomationWorkflows = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { trigger_type, execution_status, include_metrics = true } = req.query;
-    
+    const {
+      trigger_type,
+      execution_status,
+      include_metrics = true,
+    } = req.query;
+
     const workflows = await IOCAnalysisService.getAutomationWorkflows({
       triggerType: trigger_type as string,
       executionStatus: execution_status as string,
-      includeMetrics: include_metrics === 'true'
+      includeMetrics: include_metrics === 'true',
     });
 
     res.json({
@@ -1282,12 +1298,12 @@ export const getIOCAutomationWorkflows = asyncHandler(
 export const getIOCCaseManagement = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { status, assignee, priority, include_timeline = true } = req.query;
-    
+
     const cases = await IOCAnalysisService.getCaseManagement({
       statusFilter: status as string,
       assigneeFilter: assignee as string,
       priorityFilter: priority as string,
-      includeTimeline: include_timeline === 'true'
+      includeTimeline: include_timeline === 'true',
     });
 
     res.json({
@@ -1308,11 +1324,11 @@ export const getIOCCaseManagement = asyncHandler(
 export const getIOCInvestigationTools = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { ioc_id, investigation_type, include_artifacts = true } = req.query;
-    
+
     const investigation = await IOCAnalysisService.getInvestigationTools({
       iocId: ioc_id as string,
       investigationType: investigation_type as string,
-      includeArtifacts: include_artifacts === 'true'
+      includeArtifacts: include_artifacts === 'true',
     });
 
     res.json({
@@ -1333,12 +1349,12 @@ export const getIOCInvestigationTools = asyncHandler(
 export const getIOCCollaborationWorkspaces = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { team_id, project_status, include_activity = true } = req.query;
-    
+
     const workspaces = await IOCAnalysisService.getCollaborationWorkspaces({
       teamId: team_id as string,
       projectStatus: project_status as string,
       includeActivity: include_activity === 'true',
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -1358,14 +1374,19 @@ export const getIOCCollaborationWorkspaces = asyncHandler(
  */
 export const manageIOCSharing = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { ioc_ids, sharing_level, target_organizations, include_metadata = true } = req.body;
-    
+    const {
+      ioc_ids,
+      sharing_level,
+      target_organizations,
+      include_metadata = true,
+    } = req.body;
+
     const sharingResult = await IOCEnrichmentService.manageExternalSharing({
       iocIds: ioc_ids,
       sharingLevel: sharing_level as 'public' | 'community' | 'trusted',
       targetOrganizations: target_organizations,
       includeMetadata: include_metadata,
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -1385,12 +1406,16 @@ export const manageIOCSharing = asyncHandler(
  */
 export const getIOCCommunityIntelligence = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { source_filter, confidence_min = 50, include_votes = true } = req.query;
-    
+    const {
+      source_filter,
+      confidence_min = 50,
+      include_votes = true,
+    } = req.query;
+
     const community = await IOCEnrichmentService.getCommunityIntelligence({
       sourceFilter: source_filter as string,
       minConfidence: parseInt(confidence_min as string),
-      includeVotes: include_votes === 'true'
+      includeVotes: include_votes === 'true',
     });
 
     res.json({
@@ -1411,12 +1436,12 @@ export const getIOCCommunityIntelligence = asyncHandler(
 export const getIOCPeerReviews = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { review_status, reviewer_id, include_metrics = true } = req.query;
-    
+
     const reviews = await IOCValidationService.getPeerReviews({
       reviewStatus: review_status as string,
       reviewerId: reviewer_id as string,
       includeMetrics: include_metrics === 'true',
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({
@@ -1436,12 +1461,16 @@ export const getIOCPeerReviews = asyncHandler(
  */
 export const getIOCMLDetection = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { model_type = 'ensemble', confidence_threshold = 0.8, include_explanations = true } = req.query;
-    
+    const {
+      model_type = 'ensemble',
+      confidence_threshold = 0.8,
+      include_explanations = true,
+    } = req.query;
+
     const mlResults = await IOCAnalysisService.performMLDetection({
       modelType: model_type as string,
       confidenceThreshold: parseFloat(confidence_threshold as string),
-      includeExplanations: include_explanations === 'true'
+      includeExplanations: include_explanations === 'true',
     });
 
     res.json({
@@ -1461,12 +1490,16 @@ export const getIOCMLDetection = asyncHandler(
  */
 export const getIOCBehavioralAnalysis = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { analysis_window = '7d', anomaly_sensitivity = 'medium', include_patterns = true } = req.query;
-    
+    const {
+      analysis_window = '7d',
+      anomaly_sensitivity = 'medium',
+      include_patterns = true,
+    } = req.query;
+
     const behavioral = await IOCAnalysisService.performBehavioralAnalysis({
       analysisWindow: analysis_window as string,
       anomalySensitivity: anomaly_sensitivity as 'low' | 'medium' | 'high',
-      includePatterns: include_patterns === 'true'
+      includePatterns: include_patterns === 'true',
     });
 
     res.json({
@@ -1486,12 +1519,16 @@ export const getIOCBehavioralAnalysis = asyncHandler(
  */
 export const getIOCPredictiveIntelligence = asyncHandler(
   async (req: AuthRequest, res: Response) => {
-    const { forecast_horizon = '30d', prediction_type = 'emergence', include_confidence = true } = req.query;
-    
+    const {
+      forecast_horizon = '30d',
+      prediction_type = 'emergence',
+      include_confidence = true,
+    } = req.query;
+
     const predictive = await IOCAnalysisService.generatePredictiveIntelligence({
       forecastHorizon: forecast_horizon as string,
       predictionType: prediction_type as string,
-      includeConfidence: include_confidence === 'true'
+      includeConfidence: include_confidence === 'true',
     });
 
     res.json({
@@ -1512,12 +1549,12 @@ export const getIOCPredictiveIntelligence = asyncHandler(
 export const getIOCCustomRules = asyncHandler(
   async (req: AuthRequest, res: Response) => {
     const { rule_type, status, include_performance = true } = req.query;
-    
+
     const rules = await IOCValidationService.getCustomRules({
       ruleType: rule_type as string,
       statusFilter: status as string,
       includePerformance: include_performance === 'true',
-      userId: req.user?.id
+      userId: req.user?.id,
     });
 
     res.json({

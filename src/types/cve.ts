@@ -41,7 +41,14 @@ export interface CVEReference {
   url: string;
   name?: string;
   source?: string;
-  type: 'advisory' | 'exploit' | 'patch' | 'analysis' | 'tool' | 'vendor' | 'third-party';
+  type:
+    | 'advisory'
+    | 'exploit'
+    | 'patch'
+    | 'analysis'
+    | 'tool'
+    | 'vendor'
+    | 'third-party';
   tags?: string[];
 }
 
@@ -63,7 +70,11 @@ export interface CVEConfiguration {
 
 export interface CVEExploitInfo {
   exploitAvailable: boolean;
-  exploitabilityLevel: 'proof-of-concept' | 'functional' | 'weaponized' | 'none';
+  exploitabilityLevel:
+    | 'proof-of-concept'
+    | 'functional'
+    | 'weaponized'
+    | 'none';
   exploitInWild: boolean;
   exploitMaturity?: 'unproven' | 'proof-of-concept' | 'functional' | 'high';
   publicExploits: number;
@@ -131,7 +142,14 @@ export interface CVERiskAssessment {
 }
 
 export interface CVEWorkflow {
-  status: 'new' | 'triaged' | 'investigating' | 'patching' | 'testing' | 'closed' | 'accepted-risk';
+  status:
+    | 'new'
+    | 'triaged'
+    | 'investigating'
+    | 'patching'
+    | 'testing'
+    | 'closed'
+    | 'accepted-risk';
   assignedTo?: string;
   dueDate?: string;
   priority: 'p1' | 'p2' | 'p3' | 'p4';
@@ -172,7 +190,7 @@ export interface CVE extends CVEBase {
   riskAssessment: CVERiskAssessment;
   workflow: CVEWorkflow;
   metrics?: CVEMetrics;
-  
+
   // Metadata
   source: string; // e.g., 'NVD', 'MITRE', 'manual'
   tags: string[];
@@ -273,7 +291,12 @@ export interface CVEFeed {
 export interface CVENotification {
   id: string;
   cveId: string;
-  type: 'new-cve' | 'severity-change' | 'exploit-available' | 'patch-available' | 'sla-breach';
+  type:
+    | 'new-cve'
+    | 'severity-change'
+    | 'exploit-available'
+    | 'patch-available'
+    | 'sla-breach';
   severity: 'critical' | 'high' | 'medium' | 'low' | 'info';
   title: string;
   message: string;
@@ -302,7 +325,12 @@ export interface CVEReport {
 export interface CVEIntegration {
   id: string;
   name: string;
-  type: 'scanner' | 'ticketing' | 'patch-management' | 'asset-management' | 'siem';
+  type:
+    | 'scanner'
+    | 'ticketing'
+    | 'patch-management'
+    | 'asset-management'
+    | 'siem';
   vendor: string;
   enabled: boolean;
   configuration: {

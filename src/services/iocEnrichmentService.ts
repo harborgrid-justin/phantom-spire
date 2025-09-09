@@ -727,9 +727,16 @@ export class IOCEnrichmentService {
     sources: string[];
     realTime: boolean;
   }) {
-    const availableSources = ['virustotal', 'shodan', 'censys', 'passivetotal', 'hybrid-analysis'];
-    const sources = options.sources.length > 0 ? options.sources : availableSources;
-    
+    const availableSources = [
+      'virustotal',
+      'shodan',
+      'censys',
+      'passivetotal',
+      'hybrid-analysis',
+    ];
+    const sources =
+      options.sources.length > 0 ? options.sources : availableSources;
+
     return {
       iocValue: options.iocValue,
       realTime: options.realTime,
@@ -738,14 +745,14 @@ export class IOCEnrichmentService {
           name: source,
           status: 'success',
           data: this.generateMockSourceData(source, options.iocValue),
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         })),
         summary: {
           totalSources: sources.length,
           successfulSources: sources.length - Math.floor(Math.random() * 2),
-          confidence: 0.75 + Math.random() * 0.2
-        }
-      }
+          confidence: 0.75 + Math.random() * 0.2,
+        },
+      },
     };
   }
 
@@ -762,22 +769,26 @@ export class IOCEnrichmentService {
       algorithm: options.algorithm,
       score: {
         current: Math.random() * 100,
-        historical: options.includeHistory ? Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
-          score: Math.random() * 100
-        })) : null,
+        historical: options.includeHistory
+          ? Array.from({ length: 30 }, (_, i) => ({
+              date: new Date(
+                Date.now() - i * 24 * 60 * 60 * 1000
+              ).toISOString(),
+              score: Math.random() * 100,
+            }))
+          : null,
         breakdown: {
           sourceReliability: 0.8,
           recency: 0.7,
           prevalence: 0.6,
-          context: 0.9
-        }
+          context: 0.9,
+        },
       },
       sources: [
         { name: 'VirusTotal', score: 85, weight: 0.3 },
         { name: 'Shodan', score: 72, weight: 0.2 },
-        { name: 'ThreatConnect', score: 91, weight: 0.5 }
-      ]
+        { name: 'ThreatConnect', score: 91, weight: 0.5 },
+      ],
     };
   }
 
@@ -797,7 +808,7 @@ export class IOCEnrichmentService {
         status: 'active',
         url: 'https://misp.example.com/feeds',
         lastSync: new Date().toISOString(),
-        iocCount: 2847
+        iocCount: 2847,
       },
       {
         id: 'otx-feed-1',
@@ -806,7 +817,7 @@ export class IOCEnrichmentService {
         status: 'active',
         url: 'https://otx.alienvault.com/api/v1/indicators',
         lastSync: new Date(Date.now() - 3600000).toISOString(),
-        iocCount: 15634
+        iocCount: 15634,
       },
       {
         id: 'custom-feed-1',
@@ -815,25 +826,29 @@ export class IOCEnrichmentService {
         status: 'error',
         url: 'https://internal.company.com/threats',
         lastSync: new Date(Date.now() - 86400000).toISOString(),
-        iocCount: 456
-      }
+        iocCount: 456,
+      },
     ];
 
     const filteredSources = sources.filter(source => {
-      if (options.statusFilter && source.status !== options.statusFilter) return false;
-      if (options.typeFilter && source.type !== options.typeFilter) return false;
+      if (options.statusFilter && source.status !== options.statusFilter)
+        return false;
+      if (options.typeFilter && source.type !== options.typeFilter)
+        return false;
       return true;
     });
 
     return {
       sources: filteredSources,
-      statistics: options.includeStatistics ? {
-        totalSources: sources.length,
-        activeSources: sources.filter(s => s.status === 'active').length,
-        errorSources: sources.filter(s => s.status === 'error').length,
-        totalIOCs: sources.reduce((sum, s) => sum + s.iocCount, 0),
-        averageLatency: 2.3
-      } : null
+      statistics: options.includeStatistics
+        ? {
+            totalSources: sources.length,
+            activeSources: sources.filter(s => s.status === 'active').length,
+            errorSources: sources.filter(s => s.status === 'error').length,
+            totalIOCs: sources.reduce((sum, s) => sum + s.iocCount, 0),
+            averageLatency: 2.3,
+          }
+        : null,
     };
   }
 
@@ -852,7 +867,7 @@ export class IOCEnrichmentService {
         status: 'healthy',
         version: 'v3',
         rateLimit: '1000/day',
-        lastCheck: new Date().toISOString()
+        lastCheck: new Date().toISOString(),
       },
       {
         id: 'shodan-connector',
@@ -861,7 +876,7 @@ export class IOCEnrichmentService {
         status: 'healthy',
         version: 'v1',
         rateLimit: '100/month',
-        lastCheck: new Date(Date.now() - 1800000).toISOString()
+        lastCheck: new Date(Date.now() - 1800000).toISOString(),
       },
       {
         id: 'misp-connector',
@@ -870,8 +885,8 @@ export class IOCEnrichmentService {
         status: 'warning',
         version: 'v2.4',
         rateLimit: 'unlimited',
-        lastCheck: new Date(Date.now() - 3600000).toISOString()
-      }
+        lastCheck: new Date(Date.now() - 3600000).toISOString(),
+      },
     ];
 
     const filteredConnectors = options.providerFilter
@@ -894,8 +909,8 @@ export class IOCEnrichmentService {
         total: filteredConnectors.length,
         healthy: filteredConnectors.filter(c => c.status === 'healthy').length,
         warning: filteredConnectors.filter(c => c.status === 'warning').length,
-        error: filteredConnectors.filter(c => c.status === 'error').length
-      }
+        error: filteredConnectors.filter(c => c.status === 'error').length,
+      },
     };
   }
 
@@ -909,7 +924,7 @@ export class IOCEnrichmentService {
     userId?: string;
   }) {
     const systems = options.targetSystems || ['misp', 'splunk', 'qradar'];
-    
+
     return {
       syncId: `sync-${Date.now()}`,
       type: options.syncType,
@@ -921,15 +936,15 @@ export class IOCEnrichmentService {
         recordsProcessed: Math.floor(Math.random() * 1000) + 100,
         recordsUpdated: Math.floor(Math.random() * 500) + 50,
         recordsCreated: Math.floor(Math.random() * 200) + 20,
-        errors: Math.random() > 0.8 ? ['Connection timeout'] : []
+        errors: Math.random() > 0.8 ? ['Connection timeout'] : [],
       })),
       summary: {
         totalRecords: Math.floor(Math.random() * 1000) + 500,
         successfulSyncs: systems.length - (Math.random() > 0.8 ? 1 : 0),
-        duration: Math.floor(Math.random() * 300) + 30
+        duration: Math.floor(Math.random() * 300) + 30,
       },
       timestamp: new Date().toISOString(),
-      operator: options.userId || 'system'
+      operator: options.userId || 'system',
     };
   }
 
@@ -948,23 +963,26 @@ export class IOCEnrichmentService {
       iocIds: options.iocIds,
       sharingLevel: options.sharingLevel,
       targetOrganizations: options.targetOrganizations || [],
-      metadata: options.includeMetadata ? {
-        timestamp: new Date().toISOString(),
-        operator: options.userId || 'system',
-        retentionPolicy: '90 days',
-        accessLog: true
-      } : null,
+      metadata: options.includeMetadata
+        ? {
+            timestamp: new Date().toISOString(),
+            operator: options.userId || 'system',
+            retentionPolicy: '90 days',
+            accessLog: true,
+          }
+        : null,
       status: {
         total: options.iocIds.length,
         shared: options.iocIds.length - Math.floor(Math.random() * 2),
         failed: Math.floor(Math.random() * 2),
-        pending: 0
+        pending: 0,
       },
-      recipients: options.targetOrganizations?.map(org => ({
-        organization: org,
-        status: 'delivered',
-        timestamp: new Date().toISOString()
-      })) || []
+      recipients:
+        options.targetOrganizations?.map(org => ({
+          organization: org,
+          status: 'delivered',
+          timestamp: new Date().toISOString(),
+        })) || [],
     };
   }
 
@@ -982,22 +1000,30 @@ export class IOCEnrichmentService {
           id: `contrib-${i}`,
           iocValue: `example-${i}.com`,
           contributor: `user-${Math.floor(Math.random() * 100)}`,
-          confidence: options.minConfidence + Math.random() * (100 - options.minConfidence),
-          source: options.sourceFilter || ['community', 'osint', 'research'][Math.floor(Math.random() * 3)],
-          timestamp: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(),
-          votes: options.includeVotes ? {
-            positive: Math.floor(Math.random() * 20),
-            negative: Math.floor(Math.random() * 5),
-            neutral: Math.floor(Math.random() * 3)
-          } : null
+          confidence:
+            options.minConfidence +
+            Math.random() * (100 - options.minConfidence),
+          source:
+            options.sourceFilter ||
+            ['community', 'osint', 'research'][Math.floor(Math.random() * 3)],
+          timestamp: new Date(
+            Date.now() - Math.random() * 86400000 * 30
+          ).toISOString(),
+          votes: options.includeVotes
+            ? {
+                positive: Math.floor(Math.random() * 20),
+                negative: Math.floor(Math.random() * 5),
+                neutral: Math.floor(Math.random() * 3),
+              }
+            : null,
         })),
         statistics: {
           totalContributions: 1247,
           activeContributors: 89,
           averageConfidence: 0.78,
-          validationRate: 0.85
-        }
-      }
+          validationRate: 0.85,
+        },
+      },
     };
   }
 
@@ -1011,33 +1037,37 @@ export class IOCEnrichmentService {
           detectionRatio: '15/68',
           scanDate: new Date().toISOString(),
           malicious: Math.random() > 0.7,
-          engines: Math.floor(Math.random() * 70) + 60
+          engines: Math.floor(Math.random() * 70) + 60,
         };
       case 'shodan':
         return {
           ports: [80, 443, 22, 21].filter(() => Math.random() > 0.5),
           services: ['http', 'ssh', 'ftp'].filter(() => Math.random() > 0.6),
           country: ['US', 'CN', 'RU', 'DE'][Math.floor(Math.random() * 4)],
-          lastSeen: new Date().toISOString()
+          lastSeen: new Date().toISOString(),
         };
       case 'censys':
         return {
           certificates: Math.floor(Math.random() * 10),
           protocols: ['TLSv1.2', 'TLSv1.3'],
           organization: 'Example Org',
-          firstSeen: new Date(Date.now() - Math.random() * 86400000 * 365).toISOString()
+          firstSeen: new Date(
+            Date.now() - Math.random() * 86400000 * 365
+          ).toISOString(),
         };
       case 'passivetotal':
         return {
           resolutions: Math.floor(Math.random() * 20) + 5,
           whoisData: { registrar: 'Example Registrar' },
-          subdomains: Math.floor(Math.random() * 15) + 3
+          subdomains: Math.floor(Math.random() * 15) + 3,
         };
       case 'hybrid-analysis':
         return {
-          malwareFamily: ['Zeus', 'Emotet', 'TrickBot'][Math.floor(Math.random() * 3)],
+          malwareFamily: ['Zeus', 'Emotet', 'TrickBot'][
+            Math.floor(Math.random() * 3)
+          ],
           threatScore: Math.floor(Math.random() * 100),
-          analysisComplete: true
+          analysisComplete: true,
         };
       default:
         return { data: `Mock data for ${source}` };

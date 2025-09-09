@@ -169,48 +169,112 @@ router.delete(
 router.get('/analytics/trends', authMiddleware, getIOCTrendAnalytics);
 router.get('/analytics/risk-assessment', authMiddleware, getIOCRiskAssessment);
 router.get('/analytics/performance', authMiddleware, getIOCPerformanceMetrics);
-router.get('/analytics/compliance', authMiddleware, requireRole(['admin', 'analyst']), getIOCComplianceReport);
+router.get(
+  '/analytics/compliance',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  getIOCComplianceReport
+);
 
 // IOC Intelligence & Enrichment (4 routes)
-router.get('/intelligence/attribution', authMiddleware, getIOCThreatAttribution);
+router.get(
+  '/intelligence/attribution',
+  authMiddleware,
+  getIOCThreatAttribution
+);
 router.get('/intelligence/osint', authMiddleware, getIOCOSINTEnrichment);
 router.get('/intelligence/context', authMiddleware, getIOCContextualAnalysis);
 router.get('/intelligence/reputation', authMiddleware, getIOCReputationScoring);
 
 // IOC Operations & Management (4 routes)
-router.post('/operations/batch', authMiddleware, requireRole(['admin', 'analyst']), performIOCBatchOperations);
+router.post(
+  '/operations/batch',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  performIOCBatchOperations
+);
 router.get('/operations/lifecycle', authMiddleware, getIOCLifecycleManagement);
 router.get('/operations/data-quality', authMiddleware, getIOCDataQuality);
-router.post('/operations/archive', authMiddleware, requireRole(['admin']), manageIOCArchive);
+router.post(
+  '/operations/archive',
+  authMiddleware,
+  requireRole(['admin']),
+  manageIOCArchive
+);
 
 // IOC Integration & Feeds (4 routes)
 router.get('/feeds/sources', authMiddleware, getIOCFeedSources);
 router.get('/feeds/connectors', authMiddleware, getIOCAPIConnectors);
-router.get('/feeds/management', authMiddleware, requireRole(['admin', 'analyst']), getIOCFeedManagement);
-router.post('/feeds/synchronization', authMiddleware, requireRole(['admin']), performIOCDataSync);
+router.get(
+  '/feeds/management',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  getIOCFeedManagement
+);
+router.post(
+  '/feeds/synchronization',
+  authMiddleware,
+  requireRole(['admin']),
+  performIOCDataSync
+);
 
 // IOC Visualization (4 routes)
 router.get('/visualization/geolocation', authMiddleware, getIOCGeolocation);
-router.get('/visualization/relationships', authMiddleware, getIOCRelationshipNetwork);
+router.get(
+  '/visualization/relationships',
+  authMiddleware,
+  getIOCRelationshipNetwork
+);
 router.get('/visualization/timeline', authMiddleware, getIOCTimeline);
-router.get('/visualization/dashboard', authMiddleware, getIOCInteractiveDashboard);
+router.get(
+  '/visualization/dashboard',
+  authMiddleware,
+  getIOCInteractiveDashboard
+);
 
 // IOC Workflows (4 routes)
 router.get('/workflows/playbooks', authMiddleware, getIOCPlaybooks);
 router.get('/workflows/automation', authMiddleware, getIOCAutomationWorkflows);
 router.get('/workflows/cases', authMiddleware, getIOCCaseManagement);
-router.get('/workflows/investigation', authMiddleware, getIOCInvestigationTools);
+router.get(
+  '/workflows/investigation',
+  authMiddleware,
+  getIOCInvestigationTools
+);
 
 // IOC Collaboration (4 routes)
-router.get('/collaboration/workspaces', authMiddleware, getIOCCollaborationWorkspaces);
-router.post('/collaboration/sharing', authMiddleware, requireRole(['admin', 'analyst']), manageIOCSharing);
-router.get('/collaboration/community', authMiddleware, getIOCCommunityIntelligence);
+router.get(
+  '/collaboration/workspaces',
+  authMiddleware,
+  getIOCCollaborationWorkspaces
+);
+router.post(
+  '/collaboration/sharing',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  manageIOCSharing
+);
+router.get(
+  '/collaboration/community',
+  authMiddleware,
+  getIOCCommunityIntelligence
+);
 router.get('/collaboration/reviews', authMiddleware, getIOCPeerReviews);
 
 // IOC Advanced Features (4 routes)
-router.get('/advanced/ml-detection', authMiddleware, requireRole(['admin', 'analyst']), getIOCMLDetection);
+router.get(
+  '/advanced/ml-detection',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  getIOCMLDetection
+);
 router.get('/advanced/behavioral', authMiddleware, getIOCBehavioralAnalysis);
-router.get('/advanced/predictive', authMiddleware, requireRole(['admin', 'analyst']), getIOCPredictiveIntelligence);
+router.get(
+  '/advanced/predictive',
+  authMiddleware,
+  requireRole(['admin', 'analyst']),
+  getIOCPredictiveIntelligence
+);
 router.get('/advanced/custom-rules', authMiddleware, getIOCCustomRules);
 
 export default router;

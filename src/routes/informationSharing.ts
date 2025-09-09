@@ -114,7 +114,7 @@ router.use(authMiddleware);
 router.get('/exchange', async (req, res) => {
   try {
     const { classification, type, limit = 50 } = req.query;
-    
+
     // Mock data for demonstration
     const mockSharedIntelligence = [
       {
@@ -127,11 +127,11 @@ router.get('/exchange', async (req, res) => {
         data: {
           indicators: ['192.168.1.100', 'malicious-domain.com'],
           ttps: ['T1566.001', 'T1027'],
-          description: 'Updated infrastructure used by APT29 group'
+          description: 'Updated infrastructure used by APT29 group',
         },
         sharedAt: '2024-01-15T10:30:00Z',
         expiresAt: '2024-02-15T10:30:00Z',
-        confidence: 95
+        confidence: 95,
       },
       {
         id: 'share-002',
@@ -143,18 +143,20 @@ router.get('/exchange', async (req, res) => {
         data: {
           indicators: ['hash:abc123', 'domain:evil-bank.com'],
           family: 'Zeus Variant',
-          description: 'IOCs for new banking trojan variant'
+          description: 'IOCs for new banking trojan variant',
         },
         sharedAt: '2024-01-15T09:15:00Z',
         expiresAt: '2024-03-15T09:15:00Z',
-        confidence: 88
-      }
+        confidence: 88,
+      },
     ];
 
     // Apply filters
     let filteredData = mockSharedIntelligence;
     if (classification) {
-      filteredData = filteredData.filter(item => item.classification === classification);
+      filteredData = filteredData.filter(
+        item => item.classification === classification
+      );
     }
     if (type) {
       filteredData = filteredData.filter(item => item.type === type);
@@ -169,14 +171,14 @@ router.get('/exchange', async (req, res) => {
       pagination: {
         total: mockSharedIntelligence.length,
         page: 1,
-        limit: parseInt(limit)
-      }
+        limit: parseInt(limit),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve shared intelligence',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -238,14 +240,28 @@ router.get('/exchange', async (req, res) => {
  */
 router.post('/exchange', async (req, res) => {
   try {
-    const { title, type, classification, data, targetOrganizations, confidence = 50, expiresAt } = req.body;
+    const {
+      title,
+      type,
+      classification,
+      data,
+      targetOrganizations,
+      confidence = 50,
+      expiresAt,
+    } = req.body;
 
     // Validate required fields
     if (!title || !type || !classification || !data || !targetOrganizations) {
       return res.status(400).json({
         success: false,
         error: 'Missing required fields',
-        required: ['title', 'type', 'classification', 'data', 'targetOrganizations']
+        required: [
+          'title',
+          'type',
+          'classification',
+          'data',
+          'targetOrganizations',
+        ],
       });
     }
 
@@ -259,8 +275,10 @@ router.post('/exchange', async (req, res) => {
       targetOrganizations,
       data,
       sharedAt: new Date().toISOString(),
-      expiresAt: expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default 30 days
-      confidence
+      expiresAt:
+        expiresAt ||
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // Default 30 days
+      confidence,
     };
 
     // In a real implementation, save to database and notify target organizations
@@ -268,13 +286,13 @@ router.post('/exchange', async (req, res) => {
     res.status(201).json({
       success: true,
       data: sharingRecord,
-      message: 'Threat intelligence shared successfully'
+      message: 'Threat intelligence shared successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to share intelligence',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -302,7 +320,7 @@ router.get('/partners', async (req, res) => {
         trustLevel: 'verified',
         lastActivity: '2024-01-15T10:30:00Z',
         sharedAssets: 1247,
-        collaborativeProjects: 8
+        collaborativeProjects: 8,
       },
       {
         id: 'partner-002',
@@ -312,19 +330,19 @@ router.get('/partners', async (req, res) => {
         trustLevel: 'verified',
         lastActivity: '2024-01-15T09:15:00Z',
         sharedAssets: 2156,
-        collaborativeProjects: 12
-      }
+        collaborativeProjects: 12,
+      },
     ];
 
     res.json({
       success: true,
-      data: mockPartners
+      data: mockPartners,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve partners',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -355,7 +373,7 @@ router.get('/feeds', async (req, res) => {
         subscribers: 15420,
         rating: 4.7,
         isFree: true,
-        isVerified: true
+        isVerified: true,
       },
       {
         id: 'feed-002',
@@ -368,19 +386,19 @@ router.get('/feeds', async (req, res) => {
         subscribers: 8900,
         rating: 4.3,
         isFree: true,
-        isVerified: true
-      }
+        isVerified: true,
+      },
     ];
 
     res.json({
       success: true,
-      data: mockFeeds
+      data: mockFeeds,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve feeds',
-      details: error.message
+      details: error.message,
     });
   }
 });
@@ -408,7 +426,7 @@ router.get('/agreements', async (req, res) => {
         effectiveDate: '2023-06-15',
         expirationDate: '2024-06-15',
         classification: 'TLP:AMBER',
-        parties: ['Our Organization', 'Financial Services ISAC']
+        parties: ['Our Organization', 'Financial Services ISAC'],
       },
       {
         id: 'agreement-002',
@@ -418,19 +436,19 @@ router.get('/agreements', async (req, res) => {
         effectiveDate: '2023-09-01',
         expirationDate: '2025-09-01',
         classification: 'TLP:GREEN',
-        parties: ['Our Organization', 'US-CERT', 'NCSC-UK', 'CERT-EU']
-      }
+        parties: ['Our Organization', 'US-CERT', 'NCSC-UK', 'CERT-EU'],
+      },
     ];
 
     res.json({
       success: true,
-      data: mockAgreements
+      data: mockAgreements,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve agreements',
-      details: error.message
+      details: error.message,
     });
   }
 });

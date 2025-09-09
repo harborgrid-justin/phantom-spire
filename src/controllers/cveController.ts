@@ -13,7 +13,7 @@ import {
   CVEFeed,
   CVENotification,
   CVEReport,
-  CVEIntegration
+  CVEIntegration,
 } from '../types/cve.js';
 
 // Mock data store - in real implementation, this would use databases
@@ -33,27 +33,47 @@ export class CVEDataController {
       const { page = 1, limit = 20, sort, filters } = req.query;
       const searchRequest: CVESearchRequest = {
         filters: filters ? JSON.parse(filters as string) : {},
-        sort: sort ? JSON.parse(sort as string) : { field: 'publishedDate', order: 'desc' },
-        pagination: { page: parseInt(page as string), limit: parseInt(limit as string) }
+        sort: sort
+          ? JSON.parse(sort as string)
+          : { field: 'publishedDate', order: 'desc' },
+        pagination: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+        },
       };
 
       const cves = Array.from(cveStore.values());
-      
+
       // Apply filters
       let filteredCVEs = cves;
       if (searchRequest.filters) {
         filteredCVEs = cves.filter(cve => {
           const filters = searchRequest.filters!;
-          
-          if (filters.severity && !filters.severity.includes(cve.scoring.severity)) return false;
+
+          if (
+            filters.severity &&
+            !filters.severity.includes(cve.scoring.severity)
+          )
+            return false;
           if (filters.cvssScore) {
-            const score = cve.scoring.cvssV3Score || cve.scoring.cvssV2Score || 0;
-            if (filters.cvssScore.min && score < filters.cvssScore.min) return false;
-            if (filters.cvssScore.max && score > filters.cvssScore.max) return false;
+            const score =
+              cve.scoring.cvssV3Score || cve.scoring.cvssV2Score || 0;
+            if (filters.cvssScore.min && score < filters.cvssScore.min)
+              return false;
+            if (filters.cvssScore.max && score > filters.cvssScore.max)
+              return false;
           }
-          if (filters.exploitAvailable !== undefined && cve.exploitInfo.exploitAvailable !== filters.exploitAvailable) return false;
-          if (filters.patchAvailable !== undefined && cve.patchInfo.patchAvailable !== filters.patchAvailable) return false;
-          
+          if (
+            filters.exploitAvailable !== undefined &&
+            cve.exploitInfo.exploitAvailable !== filters.exploitAvailable
+          )
+            return false;
+          if (
+            filters.patchAvailable !== undefined &&
+            cve.patchInfo.patchAvailable !== filters.patchAvailable
+          )
+            return false;
+
           return true;
         });
       }
@@ -63,7 +83,7 @@ export class CVEDataController {
         const { field, order } = searchRequest.sort;
         filteredCVEs.sort((a, b) => {
           let aVal: any, bVal: any;
-          
+
           switch (field) {
             case 'cvssScore':
               aVal = a.scoring.cvssV3Score || a.scoring.cvssV2Score || 0;
@@ -81,7 +101,7 @@ export class CVEDataController {
               aVal = a[field as keyof CVE];
               bVal = b[field as keyof CVE];
           }
-          
+
           if (order === 'desc') return bVal > aVal ? 1 : -1;
           return aVal > bVal ? 1 : -1;
         });
@@ -89,15 +109,19 @@ export class CVEDataController {
 
       // Apply pagination
       const total = filteredCVEs.length;
-      const startIndex = (searchRequest.pagination!.page - 1) * searchRequest.pagination!.limit;
-      const paginatedCVEs = filteredCVEs.slice(startIndex, startIndex + searchRequest.pagination!.limit);
+      const startIndex =
+        (searchRequest.pagination!.page - 1) * searchRequest.pagination!.limit;
+      const paginatedCVEs = filteredCVEs.slice(
+        startIndex,
+        startIndex + searchRequest.pagination!.limit
+      );
 
       const response: CVESearchResponse = {
         cves: paginatedCVEs,
         total,
         page: searchRequest.pagination!.page,
         limit: searchRequest.pagination!.limit,
-        totalPages: Math.ceil(total / searchRequest.pagination!.limit)
+        totalPages: Math.ceil(total / searchRequest.pagination!.limit),
       };
 
       res.json(response);
@@ -111,11 +135,11 @@ export class CVEDataController {
     try {
       const { id } = req.params;
       const cve = cveStore.get(id);
-      
+
       if (!cve) {
         return res.status(404).json({ error: 'CVE not found' });
       }
-      
+
       res.json(cve);
     } catch (error) {
       next(error);
@@ -140,7 +164,7 @@ export class CVEDataController {
         updatedBy: req.user?.id || 'system',
         source: 'manual',
         tags: [],
-        ...cveData
+        ...cveData,
       } as CVE;
 
       cveStore.set(cve.id, cve);
@@ -155,7 +179,7 @@ export class CVEDataController {
     try {
       const { id } = req.params;
       const existingCVE = cveStore.get(id);
-      
+
       if (!existingCVE) {
         return res.status(404).json({ error: 'CVE not found' });
       }
@@ -164,7 +188,7 @@ export class CVEDataController {
         ...existingCVE,
         ...req.body,
         updatedAt: new Date().toISOString(),
-        updatedBy: req.user?.id || 'system'
+        updatedBy: req.user?.id || 'system',
       };
 
       cveStore.set(id, updatedCVE);
@@ -178,7 +202,7 @@ export class CVEDataController {
   static async deleteCVE(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      
+
       if (!cveStore.has(id)) {
         return res.status(404).json({ error: 'CVE not found' });
       }
@@ -195,27 +219,29 @@ export class CVEDataController {
     try {
       const { q, ...filters } = req.query;
       const cves = Array.from(cveStore.values());
-      
+
       let results = cves;
-      
+
       // Text search
       if (q) {
         const query = (q as string).toLowerCase();
-        results = results.filter(cve => 
-          cve.cveId.toLowerCase().includes(query) ||
-          cve.title.toLowerCase().includes(query) ||
-          cve.description.toLowerCase().includes(query) ||
-          cve.affectedProducts.some(p => 
-            p.vendor.toLowerCase().includes(query) || 
-            p.product.toLowerCase().includes(query)
-          )
+        results = results.filter(
+          cve =>
+            cve.cveId.toLowerCase().includes(query) ||
+            cve.title.toLowerCase().includes(query) ||
+            cve.description.toLowerCase().includes(query) ||
+            cve.affectedProducts.some(
+              p =>
+                p.vendor.toLowerCase().includes(query) ||
+                p.product.toLowerCase().includes(query)
+            )
         );
       }
 
       res.json({
         results,
         total: results.length,
-        query: q
+        query: q,
       });
     } catch (error) {
       next(error);
@@ -231,7 +257,7 @@ export class CVEAnalyticsController {
   static async getCVEStats(req: Request, res: Response, next: NextFunction) {
     try {
       const cves = Array.from(cveStore.values());
-      
+
       const stats: CVEStats = {
         total: cves.length,
         bySeverity: {
@@ -239,12 +265,14 @@ export class CVEAnalyticsController {
           high: cves.filter(c => c.scoring.severity === 'high').length,
           medium: cves.filter(c => c.scoring.severity === 'medium').length,
           low: cves.filter(c => c.scoring.severity === 'low').length,
-          info: cves.filter(c => c.scoring.severity === 'info').length
+          info: cves.filter(c => c.scoring.severity === 'info').length,
         },
         byStatus: {},
         withExploits: cves.filter(c => c.exploitInfo.exploitAvailable).length,
         withPatches: cves.filter(c => c.patchInfo.patchAvailable).length,
-        pastDue: cves.filter(c => c.workflow.dueDate && new Date(c.workflow.dueDate) < new Date()).length,
+        pastDue: cves.filter(
+          c => c.workflow.dueDate && new Date(c.workflow.dueDate) < new Date()
+        ).length,
         trending: {
           period: 'last30days',
           newCVEs: cves.filter(c => {
@@ -256,26 +284,36 @@ export class CVEAnalyticsController {
           criticalNew: cves.filter(c => {
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return new Date(c.createdAt) > thirtyDaysAgo && c.scoring.severity === 'critical';
-          }).length
+            return (
+              new Date(c.createdAt) > thirtyDaysAgo &&
+              c.scoring.severity === 'critical'
+            );
+          }).length,
         },
         topVendors: [],
-        topProducts: []
+        topProducts: [],
       };
 
       // Calculate status distribution
       cves.forEach(cve => {
-        stats.byStatus[cve.workflow.status] = (stats.byStatus[cve.workflow.status] || 0) + 1;
+        stats.byStatus[cve.workflow.status] =
+          (stats.byStatus[cve.workflow.status] || 0) + 1;
       });
 
       // Calculate top vendors and products
       const vendorCounts = new Map<string, number>();
       const productCounts = new Map<string, number>();
-      
+
       cves.forEach(cve => {
         cve.affectedProducts.forEach(product => {
-          vendorCounts.set(product.vendor, (vendorCounts.get(product.vendor) || 0) + 1);
-          productCounts.set(product.product, (productCounts.get(product.product) || 0) + 1);
+          vendorCounts.set(
+            product.vendor,
+            (vendorCounts.get(product.vendor) || 0) + 1
+          );
+          productCounts.set(
+            product.product,
+            (productCounts.get(product.product) || 0) + 1
+          );
         });
       });
 
@@ -296,19 +334,27 @@ export class CVEAnalyticsController {
   }
 
   // Get risk assessment analytics
-  static async getRiskAnalytics(req: Request, res: Response, next: NextFunction) {
+  static async getRiskAnalytics(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const cves = Array.from(cveStore.values());
-      
+
       const riskDistribution = {
-        critical: cves.filter(c => c.riskAssessment.businessRisk === 'critical').length,
+        critical: cves.filter(c => c.riskAssessment.businessRisk === 'critical')
+          .length,
         high: cves.filter(c => c.riskAssessment.businessRisk === 'high').length,
-        medium: cves.filter(c => c.riskAssessment.businessRisk === 'medium').length,
-        low: cves.filter(c => c.riskAssessment.businessRisk === 'low').length
+        medium: cves.filter(c => c.riskAssessment.businessRisk === 'medium')
+          .length,
+        low: cves.filter(c => c.riskAssessment.businessRisk === 'low').length,
       };
 
-      const avgRiskScore = cves.reduce((sum, cve) => sum + cve.riskAssessment.riskScore, 0) / cves.length;
-      
+      const avgRiskScore =
+        cves.reduce((sum, cve) => sum + cve.riskAssessment.riskScore, 0) /
+        cves.length;
+
       const topRisks = cves
         .sort((a, b) => b.riskAssessment.riskScore - a.riskAssessment.riskScore)
         .slice(0, 10)
@@ -316,14 +362,17 @@ export class CVEAnalyticsController {
           cveId: cve.cveId,
           title: cve.title,
           riskScore: cve.riskAssessment.riskScore,
-          businessRisk: cve.riskAssessment.businessRisk
+          businessRisk: cve.riskAssessment.businessRisk,
         }));
 
       res.json({
         riskDistribution,
         avgRiskScore,
         topRisks,
-        totalFinancialImpact: cves.reduce((sum, cve) => sum + cve.riskAssessment.financialImpact, 0)
+        totalFinancialImpact: cves.reduce(
+          (sum, cve) => sum + cve.riskAssessment.financialImpact,
+          0
+        ),
       });
     } catch (error) {
       next(error);
@@ -355,7 +404,7 @@ export class CVEFeedController {
         syncStatus: 'active',
         itemsProcessed: 0,
         enabled: true,
-        ...feedData
+        ...feedData,
       } as CVEFeed;
 
       feedStore.set(feed.id, feed);
@@ -370,7 +419,7 @@ export class CVEFeedController {
     try {
       const { id } = req.params;
       const feed = feedStore.get(id);
-      
+
       if (!feed) {
         return res.status(404).json({ error: 'Feed not found' });
       }
@@ -379,7 +428,7 @@ export class CVEFeedController {
       feed.lastSync = new Date().toISOString();
       feed.syncStatus = 'active';
       feed.itemsProcessed += Math.floor(Math.random() * 50);
-      
+
       feedStore.set(id, feed);
       res.json({ message: 'Feed sync initiated', feed });
     } catch (error) {
@@ -393,7 +442,11 @@ export class CVEFeedController {
  */
 export class CVENotificationController {
   // Get notifications
-  static async getNotifications(req: Request, res: Response, next: NextFunction) {
+  static async getNotifications(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const notifications = Array.from(notificationStore.values());
       res.json(notifications);
@@ -403,14 +456,18 @@ export class CVENotificationController {
   }
 
   // Create notification
-  static async createNotification(req: Request, res: Response, next: NextFunction) {
+  static async createNotification(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
       const notificationData: Partial<CVENotification> = req.body;
       const notification: CVENotification = {
         id: `notification-${Date.now()}`,
         status: 'pending',
         createdAt: new Date().toISOString(),
-        ...notificationData
+        ...notificationData,
       } as CVENotification;
 
       notificationStore.set(notification.id, notification);
@@ -433,11 +490,11 @@ export class CVEReportController {
         id: `report-${Date.now()}`,
         status: 'generating',
         generatedAt: new Date().toISOString(),
-        ...reportData
+        ...reportData,
       } as CVEReport;
 
       reportStore.set(report.id, report);
-      
+
       // Simulate report generation
       setTimeout(() => {
         report.status = 'completed';
@@ -467,10 +524,18 @@ export const cveValidation = [
   body('cveId').notEmpty().withMessage('CVE ID is required'),
   body('title').notEmpty().withMessage('Title is required'),
   body('description').notEmpty().withMessage('Description is required'),
-  body('scoring.severity').isIn(['critical', 'high', 'medium', 'low', 'info']).withMessage('Invalid severity'),
+  body('scoring.severity')
+    .isIn(['critical', 'high', 'medium', 'low', 'info'])
+    .withMessage('Invalid severity'),
 ];
 
 export const searchValidation = [
-  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
-  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100'),
 ];
