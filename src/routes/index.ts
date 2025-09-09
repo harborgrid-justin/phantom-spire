@@ -24,6 +24,7 @@ import xdrRoutes from './xdr.js';
 import { createNetworkManagementRoutes } from './networkManagementRoutes.js';
 import etlRoutes from './etl/index.js';
 import modernizationRoutes from './modernization/index.js';
+import windmillRoutes from './windmill/index.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Import new comprehensive reporting routes
@@ -58,6 +59,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/xdr', xdrRoutes);
   router.use('/network-management', createNetworkManagementRoutes());
   router.use('/modernization', modernizationRoutes);
+  router.use('/windmill', windmillRoutes);
   router.use('/etl', etlRoutes);
 
   // New comprehensive reporting routes
@@ -105,6 +107,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         xdr: '/api/v1/xdr',
         networkManagement: '/api/v1/network-management',
         modernization: '/api/v1/modernization',
+        windmill: '/api/v1/windmill',
         etl: '/api/v1/etl',
         tasks: orchestrator
           ? '/api/v1/tasks'
@@ -129,6 +132,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
         xdrPlatform: true,
         networkManagement: true,
         modernizationPlatform: true,
+        windmillFeatures: true,
         etlPlatform: true,
       },
     });
