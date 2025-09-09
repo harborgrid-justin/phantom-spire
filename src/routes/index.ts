@@ -26,6 +26,13 @@ import etlRoutes from './etl/index.js';
 import modernizationRoutes from './modernization/index.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
+// Import new comprehensive reporting routes
+import { createAdvancedAnalyticsRoutes } from './advanced-analytics/index.js';
+import { createSecurityIntelligenceRoutes } from './security-intelligence/index.js';
+import { createOperationalEfficiencyRoutes } from './operational-efficiency/index.js';
+import { createComplianceAuditRoutes } from './compliance-audit/index.js';
+import { createBusinessIntelligenceRoutes } from './business-intelligence/index.js';
+
 // Create router factory that accepts orchestrator
 export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   const router = Router();
@@ -52,6 +59,13 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/network-management', createNetworkManagementRoutes());
   router.use('/modernization', modernizationRoutes);
   router.use('/etl', etlRoutes);
+
+  // New comprehensive reporting routes
+  router.use('/advanced-analytics', createAdvancedAnalyticsRoutes());
+  router.use('/security-intelligence', createSecurityIntelligenceRoutes());
+  router.use('/operational-efficiency', createOperationalEfficiencyRoutes());
+  router.use('/compliance-audit', createComplianceAuditRoutes());
+  router.use('/business-intelligence', createBusinessIntelligenceRoutes());
 
   // Task management routes (only if orchestrator is provided)
   if (orchestrator) {
