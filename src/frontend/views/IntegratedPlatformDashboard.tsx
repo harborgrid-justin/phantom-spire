@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Status, Priority } from '../types/index';
 import {
   Box,
   Typography,

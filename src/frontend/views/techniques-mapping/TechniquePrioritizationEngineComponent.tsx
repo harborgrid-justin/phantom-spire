@@ -69,6 +69,7 @@ import {
   Gavel
 } from '@mui/icons-material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Status, Priority } from '../../types/index';
 
 interface TTPData {
   id: string;

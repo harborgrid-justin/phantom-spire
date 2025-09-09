@@ -58,6 +58,7 @@ import {
 } from '@mui/icons-material';
 import { addUIUXEvaluation } from '../../../../services/ui-ux-evaluation/hooks/useUIUXEvaluation';
 import { useServicePage } from '../../../../services/business-logic/hooks/useBusinessLogic';
+import { Status, Priority } from '../../../types/index';
 
 interface Partner {
   id: string;

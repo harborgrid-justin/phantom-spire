@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { Warning, Security, Assessment, TrendingUp } from '@mui/icons-material';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Status, Priority } from '../../types/index';
 
 export const IOCRiskAssessment: React.FC = () => {
   const [loading, setLoading] = useState(true);

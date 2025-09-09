@@ -51,6 +51,7 @@ import {
   Info
 } from '@mui/icons-material';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
+import { Status, Priority } from '../../types/index';
 
 interface AlertCorrelationEngineData {
   id: string;

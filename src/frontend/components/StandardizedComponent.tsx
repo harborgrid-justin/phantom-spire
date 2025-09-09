@@ -50,7 +50,7 @@ import {
   createFormData,
   BaseEntity,
   ApiResponse 
-} from '../types/common';
+} from '../../types/common';
 
 /**
  * Component-specific interfaces extending base types

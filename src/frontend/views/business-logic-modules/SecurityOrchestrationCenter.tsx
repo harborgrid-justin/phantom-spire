@@ -36,6 +36,7 @@ import {
   Sync
 } from '@mui/icons-material';
 import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
+import { Status, Priority } from '../../types/index';
 
 export const SecurityOrchestrationCenter: React.FC = () => {
   const {

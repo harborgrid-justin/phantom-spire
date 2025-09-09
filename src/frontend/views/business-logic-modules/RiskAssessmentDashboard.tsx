@@ -39,6 +39,7 @@ import {
   Timeline
 } from '@mui/icons-material';
 import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
+import { Status, Priority } from '../../types/index';
 
 export const RiskAssessmentDashboard: React.FC = () => {
   const {
