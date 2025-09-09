@@ -143,7 +143,7 @@ const CodeMigrationAssistantComponent: React.FC<CodeMigrationAssistantComponentP
     setSelectedItem(null);
     setFormData({
       name: '',
-      status: 'active',
+      status: 'active' as Status,
       metadata: {
         version: '1.0.0',
         tags: ['windmill'],
@@ -157,7 +157,7 @@ const CodeMigrationAssistantComponent: React.FC<CodeMigrationAssistantComponentP
     setSelectedItem(item);
     setFormData({
       name: item.name,
-      status: item.status,
+      status: item.status as Status,
       metadata: item.metadata
     });
     setDialogOpen(true);
@@ -368,7 +368,7 @@ const CodeMigrationAssistantComponent: React.FC<CodeMigrationAssistantComponentP
                 <Select
                   value={formData.status}
                   label="Status"
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as Status })}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="inactive">Inactive</MenuItem>
@@ -385,7 +385,7 @@ const CodeMigrationAssistantComponent: React.FC<CodeMigrationAssistantComponentP
                   label="Priority"
                   onChange={(e) => setFormData({
                     ...formData,
-                    metadata: { ...formData.metadata, priority: e.target.value as any }
+                    metadata: { ...formData.metadata, priority: e.target.value as Priority }
                   })}
                 >
                   <MenuItem value="low">Low</MenuItem>

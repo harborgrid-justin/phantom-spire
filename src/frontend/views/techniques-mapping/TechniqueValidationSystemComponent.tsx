@@ -437,13 +437,19 @@ const TechniqueValidationSystem: React.FC<TechniqueValidationSystemProps> = ({
         <Card>
           <CardContent>
             <DataGrid
-              rows={data}
+        rows={data}
               columns={columns}
-              pageSize={25}
-              rowsPerPageOptions={[25]}
+             
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 25, page: 0 }
+          }
+        }}
+        pageSizeOptions={[25]}
               autoHeight
-              disableSelectionOnClick
-            />
+              disableRowSelectionOnClick
+            
+      />
           </CardContent>
         </Card>
       )}

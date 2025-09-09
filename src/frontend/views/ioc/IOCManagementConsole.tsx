@@ -653,7 +653,7 @@ export const IOCManagementConsole: React.FC = () => {
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[10, 25, 50, 100]}
+          pageSizeOptions={[10, 25, 50, 100]}
           component="div"
           count={indicators.length}
           rowsPerPage={pageSize}
