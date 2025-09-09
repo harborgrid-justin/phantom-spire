@@ -24,6 +24,9 @@ export * from './user-management';
 // XDR (Extended Detection and Response) (49 modules) - comprehensive XDR platform
 export * from './xdr';
 
+// Windmill GitHub Repository Features (32 modules) - comprehensive GitHub automation
+export * from './windmill';
+
 // Import all rules for registration
 import { allThreatAnalysisRules } from './threat-analysis';
 import { allSecurityOperationsRules } from './security-operations';
@@ -146,15 +149,49 @@ export const moduleCategories = {
     'performance-optimization',
     'resource-allocation-engine',
     'advanced-aiml-integration-engine'
+  ],
+  'windmill': [
+    'automated-branch-management',
+    'repository-template-engine', 
+    'issue-auto-classification',
+    'pr-review-automation',
+    'dependency-update-manager',
+    'release-automation-hub',
+    'repository-health-monitor',
+    'code-migration-assistant',
+    'pipeline-orchestrator',
+    'build-status-dashboard',
+    'test-automation-manager',
+    'deployment-strategy-engine',
+    'environment-configuration',
+    'performance-benchmarking',
+    'rollback-management',
+    'infrastructure-as-code',
+    'code-quality-analyzer',
+    'security-scanning-hub',
+    'license-compliance-manager',
+    'code-coverage-tracker',
+    'vulnerability-assessment',
+    'code-review-analytics',
+    'technical-debt-monitor',
+    'documentation-generator',
+    'team-productivity-analytics',
+    'project-timeline-manager',
+    'communication-hub',
+    'knowledge-base-manager',
+    'onboarding-automation',
+    'workflow-templates',
+    'integration-manager',
+    'reporting-dashboard'
   ]
 };
 
 export const moduleMetadata = {
-  totalModules: 40, // 33 business logic + 7 generic revolutionary modules
-  businessLogicModules: 33,
-  genericModules: 7,
-  categories: 4,
-  modulesPerCategory: [8, 8, 8, 9], // Updated to reflect 9 in enterprise-integration
-  version: '2.0.0',
-  description: '72 precision-engineered modules (40 business logic + 32 SOA enhancements) with complete frontend-backend integration'
+  totalModules: 72, // 40 business logic + 32 windmill features
+  businessLogicModules: 40,
+  windmillFeatures: 32,
+  categories: 5,
+  modulesPerCategory: [8, 8, 8, 9, 32], // Added windmill features
+  version: '3.0.0',
+  description: '72 precision-engineered modules (40 business logic + 32 windmill GitHub features) with complete frontend-backend integration'
 };
