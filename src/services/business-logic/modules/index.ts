@@ -24,6 +24,9 @@ export * from './user-management';
 // XDR (Extended Detection and Response) (49 modules) - comprehensive XDR platform
 export * from './xdr';
 
+// Cost Systems Engineering (1 centralized module) - standardized cost systems
+export * from './cost-systems-engineering';
+
 // Windmill GitHub Repository Features (32 modules) - comprehensive GitHub automation
 export * from './windmill';
 

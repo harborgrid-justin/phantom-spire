@@ -56,6 +56,19 @@ export {
   moduleMetadata 
 } from './modules';
 
+// Cost Systems Engineering - New centralized module
+export * from './modules/cost-systems-engineering';
+export { 
+  CostSystemsEngineeringOrchestrator,
+  BusinessReadyCostTracker,
+  CustomerReadyCostAnalyzer,
+  UnifiedCostManagementService,
+  CostOptimizationEngine,
+  CostSystemsIntegrator,
+  costSystemsConfig,
+  costSystemsModuleMetadata
+} from './modules/cost-systems-engineering';
+
 // Utility function to initialize business logic for a service page
 export function initializeServicePage(serviceId: string, options?: {
   realTimeEnabled?: boolean;
