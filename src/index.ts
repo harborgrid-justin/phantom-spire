@@ -14,6 +14,7 @@ import setupRoutes from './routes/setup.js';
 import comprehensiveSetupRoutes from './setup/routes/setupRoutes.js';
 import vulnerabilityManagementRoutes from './routes/vulnerabilityManagement.js';
 import secopsRoutes from './routes/secopsRoutes.js';
+import ttpRoutes from './routes/ttpRoutes.js';
 import swaggerSpec from './config/swagger.js';
 import swaggerUi from 'swagger-ui-express';
 import { WorkflowBPMOrchestrator } from './workflow-bpm/index.js';
@@ -128,6 +129,7 @@ app.get('/', (_req, res) => {
       apiDocs: '/api-docs',
       api: '/api/v1',
       secops: '/api/v1/secops',
+      ttp: '/api/v1/ttp',
       workflow: '/api/v1/workflow',
       platform: '/api/v1/platform',
       vulnerabilityManagement: '/api/v1/vulnerability-management',
@@ -143,6 +145,7 @@ app.get('/', (_req, res) => {
 app.use('/api/v1', routes);
 app.use('/api/v1/vulnerability-management', vulnerabilityManagementRoutes);
 app.use('/api/v1/secops', secopsRoutes);
+app.use('/api/v1/ttp', ttpRoutes);
 app.use('/api/setup', setupRoutes);
 app.use('/api/setup', comprehensiveSetupRoutes);
 
