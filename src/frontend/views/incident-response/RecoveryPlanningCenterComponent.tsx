@@ -335,13 +335,19 @@ const RecoveryPlanningCenter: React.FC<RecoveryPlanningCenterProps> = ({
           {selectedTab === 0 && (
             <Box sx={{ height: 400, width: '100%' }}>
               <DataGrid
-                rows={data}
+        rows={data}
                 columns={columns}
-                pageSize={10}
-                rowsPerPageOptions={[10, 25, 50]}
+               
+        initialState={{
+          pagination: {
+            paginationModel: { pageSize: 10, page: 0 }
+          }
+        }}
+        pageSizeOptions={[10, 25, 50]}
                 checkboxSelection
-                disableSelectionOnClick
-              />
+                disableRowSelectionOnClick
+              
+      />
             </Box>
           )}
           

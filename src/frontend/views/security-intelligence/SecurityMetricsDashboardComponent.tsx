@@ -88,14 +88,23 @@ export const SecurityMetricsDashboardComponent: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<SecurityMetricsDashboardData | null>(null);
-  const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    status: 'active' | 'pending' | 'completed' | 'archived';
+    metadata: {
+      category: string;
+      tags: string[];
+      priority: 'low' | 'medium' | 'high' | 'critical';
+    };
+  }>({
     title: '',
     description: '',
-    status: 'active' as const,
+    status: 'active',
     metadata: {
-      category: 'security-intelligence',
-      tags: ['security-intelligence', 'analytics'],
-      priority: 'medium' as const
+      category: 'advanced-analytics',
+      tags: ['advanced-analytics', 'analytics'],
+      priority: 'medium'
     }
   });
 
@@ -150,7 +159,7 @@ export const SecurityMetricsDashboardComponent: React.FC = () => {
     setFormData({
       title: '',
       description: '',
-      status: 'active',
+      status: 'active' as Status,
       metadata: {
         category: 'security-intelligence',
         tags: ['security-intelligence', 'analytics'],
@@ -165,7 +174,7 @@ export const SecurityMetricsDashboardComponent: React.FC = () => {
     setFormData({
       title: item.title,
       description: item.description,
-      status: item.status,
+      status: item.status as Status,
       metadata: item.metadata || {
         category: 'security-intelligence',
         tags: ['security-intelligence', 'analytics'],
@@ -475,7 +484,7 @@ export const SecurityMetricsDashboardComponent: React.FC = () => {
                 <Select
                   value={formData.status}
                   label="Status"
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as Status }))}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
@@ -492,7 +501,7 @@ export const SecurityMetricsDashboardComponent: React.FC = () => {
                   label="Priority"
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
-                    metadata: { ...prev.metadata, priority: e.target.value as any }
+                    metadata: { ...prev.metadata, priority: e.target.value as Priority }
                   }))}
                 >
                   <MenuItem value="low">Low</MenuItem>

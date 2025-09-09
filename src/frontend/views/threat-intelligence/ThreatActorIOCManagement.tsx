@@ -521,7 +521,7 @@ const ThreatActorIOCManagement: React.FC = () => {
               setRowsPerPage(parseInt(e.target.value, 10));
               setPage(0);
             }}
-            rowsPerPageOptions={[25, 50, 100]}
+            pageSizeOptions={[25, 50, 100]}
           />
         </CardContent>
       </Card>

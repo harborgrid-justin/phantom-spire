@@ -113,7 +113,7 @@ export const NetworkConfigBackupComponent: React.FC = () => {
 
   const handleCreate = () => {
     setEditingItem(null);
-    setFormData({ title: '', description: '', status: 'active', priority: 'medium' });
+    setFormData({ title: '', description: '', status: 'active' as Status, priority: 'medium' });
     setOpenDialog(true);
   };
 
@@ -122,7 +122,7 @@ export const NetworkConfigBackupComponent: React.FC = () => {
     setFormData({
       title: item.title,
       description: item.description,
-      status: item.status,
+      status: item.status as Status,
       priority: item.metadata?.priority || 'medium'
     });
     setOpenDialog(true);
@@ -304,7 +304,7 @@ export const NetworkConfigBackupComponent: React.FC = () => {
                 <InputLabel>Status</InputLabel>
                 <Select
                   value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as Status })}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
@@ -318,7 +318,7 @@ export const NetworkConfigBackupComponent: React.FC = () => {
                 <InputLabel>Priority</InputLabel>
                 <Select
                   value={formData.priority}
-                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value as Priority })}
                 >
                   <MenuItem value="low">Low</MenuItem>
                   <MenuItem value="medium">Medium</MenuItem>

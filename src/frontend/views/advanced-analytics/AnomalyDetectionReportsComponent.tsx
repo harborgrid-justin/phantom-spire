@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { StandardFormData, Status, Priority, createFormData } from '../../../types/common';
 import {
   Box,
   Card,
@@ -88,14 +89,23 @@ export const AnomalyDetectionReportsComponent: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<AnomalyDetectionReportsData | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    status: 'active' | 'pending' | 'completed' | 'archived';
+    metadata: {
+      category: string;
+      tags: string[];
+      priority: 'low' | 'medium' | 'high' | 'critical';
+    };
+  }>({
     title: '',
     description: '',
-    status: 'active' as const,
+    status: 'active',
     metadata: {
       category: 'advanced-analytics',
       tags: ['advanced-analytics', 'analytics'],
-      priority: 'medium' as const
+      priority: 'medium'
     }
   });
 
@@ -150,7 +160,7 @@ export const AnomalyDetectionReportsComponent: React.FC = () => {
     setFormData({
       title: '',
       description: '',
-      status: 'active',
+      status: 'active' as Status,
       metadata: {
         category: 'advanced-analytics',
         tags: ['advanced-analytics', 'analytics'],
@@ -165,7 +175,7 @@ export const AnomalyDetectionReportsComponent: React.FC = () => {
     setFormData({
       title: item.title,
       description: item.description,
-      status: item.status,
+      status: item.status as Status,
       metadata: item.metadata || {
         category: 'advanced-analytics',
         tags: ['advanced-analytics', 'analytics'],
@@ -475,7 +485,7 @@ export const AnomalyDetectionReportsComponent: React.FC = () => {
                 <Select
                   value={formData.status}
                   label="Status"
-                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as Status }))}
                 >
                   <MenuItem value="active">Active</MenuItem>
                   <MenuItem value="pending">Pending</MenuItem>
@@ -492,7 +502,7 @@ export const AnomalyDetectionReportsComponent: React.FC = () => {
                   label="Priority"
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
-                    metadata: { ...prev.metadata, priority: e.target.value as any }
+                    metadata: { ...prev.metadata, priority: e.target.value as Priority }
                   }))}
                 >
                   <MenuItem value="low">Low</MenuItem>
