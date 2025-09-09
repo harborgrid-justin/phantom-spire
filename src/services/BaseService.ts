@@ -3,7 +3,7 @@
  * Standardized service implementation for business logic
  */
 
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger';
 
 /**
  * Service Operation Result Interface
@@ -93,17 +93,27 @@ export abstract class BaseService {
    */
   protected async executeOperation<T>(
     operation: () => Promise<T>,
-    operationName: string
+    operationName?: string
   ): Promise<ServiceResult<T>> {
     try {
-      logger.info(`${this.serviceName}: Starting ${operationName}`);
+      logger.info(`${this.serviceName}: Starting ${operationName || 'operation'}`);
       const result = await operation();
-      logger.info(`${this.serviceName}: Completed ${operationName}`);
+      logger.info(`${this.serviceName}: Completed ${operationName || 'operation'}`);
       return this.createSuccessResult(result);
     } catch (error) {
-      logger.error(`${this.serviceName}: Failed ${operationName}`, { error });
+      logger.error(`${this.serviceName}: Failed ${operationName || 'operation'}`, { error });
       return this.createErrorResult(error as Error);
     }
+  }
+
+  /**
+   * Alias for executeOperation for backward compatibility
+   */
+  protected async executeWithErrorHandling<T>(
+    operation: () => Promise<T>,
+    operationName?: string
+  ): Promise<ServiceResult<T>> {
+    return this.executeOperation(operation, operationName);
   }
 
   /**
@@ -289,10 +299,10 @@ export class ExampleService extends BaseService {
     filters: FilterOptions = {},
     pagination: PaginationOptions
   ): Promise<ServiceResult<PaginatedResult<any>>> {
-    return this.executeOperation(async () => {
+    return this.executeOperation<PaginatedResult<any>>(async () => {
       // Check cache first
       const cacheKey = `items:${JSON.stringify(filters)}:${JSON.stringify(pagination)}`;
-      const cached = await this.getCachedResult(cacheKey);
+      const cached = await this.getCachedResult(cacheKey) as PaginatedResult<any> | null;
       if (cached) {
         return cached;
       }

@@ -1,5 +1,18 @@
 import winston from 'winston';
-import { config } from '../config/config.js';
+
+// Simple config fallback for testing
+const testConfig = {
+  LOG_LEVEL: 'info',
+  NODE_ENV: 'test'
+};
+
+let config;
+try {
+  // Try to import config, fallback to test config if it fails
+  config = require('../config/config').config;
+} catch (error) {
+  config = testConfig;
+}
 
 const { combine, timestamp, printf, colorize, json } = winston.format;
 

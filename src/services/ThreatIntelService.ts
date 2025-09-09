@@ -41,10 +41,9 @@ export class ThreatIntelService extends BaseService {
       ];
 
       return {
-        data: mockThreats,
+        items: mockThreats,
         total: mockThreats.length,
-        page: Math.floor(pagination.offset / pagination.limit) + 1,
-        pageSize: pagination.limit
+        hasMore: false
       };
     }, 'getThreats');
   }
