@@ -2,13 +2,27 @@
   "name": "phantom-secop-core",
   "version": "1.0.0",
   "description": "Advanced Security Operations (SecOps) engine for comprehensive incident response, automation, and security orchestration",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "phantom-secop-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "node test.js",
-    "clean": "rimraf dist"
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version"
   },
   "keywords": [
     "security",
@@ -25,13 +39,10 @@
   "author": "Phantom Spire Security",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.0.0",
+    "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
   },
-  "dependencies": {},
-  "files": [
-    "dist/**/*",
-    "src-ts/**/*",
-    "README.md"
-  ]
+  "engines": {
+    "node": ">= 10"
+  }
 }

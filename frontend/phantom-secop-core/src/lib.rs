@@ -3,6 +3,8 @@
 //! This library provides comprehensive security operations capabilities including
 //! incident response, security orchestration, automation, and operational intelligence.
 
+use napi::bindgen_prelude::*;
+use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
@@ -10,7 +12,7 @@ use uuid::Uuid;
 use indexmap::IndexMap;
 
 /// Incident severity levels
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum IncidentSeverity {
     Low,
     Medium,
@@ -19,7 +21,7 @@ pub enum IncidentSeverity {
 }
 
 /// Incident status types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum IncidentStatus {
     New,
     Assigned,
@@ -28,28 +30,29 @@ pub enum IncidentStatus {
     Contained,
     Eradicated,
     Recovering,
+    Resolved,
     Closed,
     Reopened,
 }
 
 /// Incident categories
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum IncidentCategory {
     Malware,
     Phishing,
     DataBreach,
-    Unauthorized Access,
+    UnauthorizedAccess,
     DenialOfService,
-    Insider Threat,
-    Physical Security,
-    Compliance Violation,
-    System Compromise,
-    Network Intrusion,
+    InsiderThreat,
+    PhysicalSecurity,
+    ComplianceViolation,
+    SystemCompromise,
+    NetworkIntrusion,
     Other,
 }
 
 /// Alert priority levels
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum AlertPriority {
     Info,
     Low,
@@ -661,7 +664,7 @@ impl SecOpCore {
     }
 
     /// Update incident status
-    pub fn update_incident_status(&mut self, incident_id: &str, status: IncidentStatus, actor: &str) -> Result<(), String> {
+    pub fn update_incident_status(&mut self, incident_id: &str, status: IncidentStatus, actor: &str) -> std::result::Result<(), String> {
         if let Some(incident) = self.incidents.get_mut(incident_id) {
             let now = Utc::now();
             incident.status = status.clone();
@@ -675,9 +678,9 @@ impl SecOpCore {
                 details: HashMap::new(),
             });
             
-            Ok(())
+            std::result::Result::Ok(())
         } else {
-            Err("Incident not found".to_string())
+            std::result::Result::Err("Incident not found".to_string())
         }
     }
 
@@ -717,7 +720,7 @@ impl SecOpCore {
     }
 
     /// Execute a security playbook
-    pub fn execute_playbook(&mut self, playbook_id: &str, triggered_by: &str, trigger_event: &str) -> Result<String, String> {
+    pub fn execute_playbook(&mut self, playbook_id: &str, triggered_by: &str, trigger_event: &str) -> std::result::Result<String, String> {
         if let Some(playbook) = self.playbooks.get(playbook_id) {
             let execution_id = Uuid::new_v4().to_string();
             let now = Utc::now();
@@ -741,9 +744,9 @@ impl SecOpCore {
             };
 
             self.executions.insert(execution_id.clone(), execution);
-            Ok(execution_id)
+            std::result::Result::Ok(execution_id)
         } else {
-            Err("Playbook not found".to_string())
+            std::result::Result::Err("Playbook not found".to_string())
         }
     }
 
@@ -780,8 +783,8 @@ impl SecOpCore {
                     incident.title.to_lowercase().contains(&query.to_lowercase()) ||
                     incident.description.to_lowercase().contains(&query.to_lowercase());
                 
-                let matches_status = status.is_none() || incident.status == status.unwrap();
-                let matches_severity = severity.is_none() || incident.severity == severity.unwrap();
+                let matches_status = status.is_none() || incident.status == *status.as_ref().unwrap();
+                let matches_severity = severity.is_none() || incident.severity == *severity.as_ref().unwrap();
                 
                 matches_query && matches_status && matches_severity
             })
@@ -1131,6 +1134,97 @@ impl Default for SecOpCore {
         let mut core = Self::new();
         core.initialize_with_sample_data();
         core
+    }
+}
+
+// NAPI wrapper for JavaScript bindings
+#[napi]
+pub struct SecOpCoreNapi {
+    inner: SecOpCore,
+}
+
+#[napi]
+impl SecOpCoreNapi {
+    #[napi(constructor)]
+    pub fn new() -> Self {
+        Self {
+            inner: SecOpCore::default(),
+        }
+    }
+
+    #[napi]
+    pub fn create_incident(&mut self, title: String, description: String, category: String, severity: String) -> Result<String> {
+        let category_enum = match category.as_str() {
+            "Malware" => IncidentCategory::Malware,
+            "Phishing" => IncidentCategory::Phishing,
+            "DataBreach" => IncidentCategory::DataBreach,
+            "UnauthorizedAccess" => IncidentCategory::UnauthorizedAccess,
+            "DenialOfService" => IncidentCategory::DenialOfService,
+            "InsiderThreat" => IncidentCategory::InsiderThreat,
+            "PhysicalSecurity" => IncidentCategory::PhysicalSecurity,
+            "ComplianceViolation" => IncidentCategory::ComplianceViolation,
+            "SystemCompromise" => IncidentCategory::SystemCompromise,
+            "NetworkIntrusion" => IncidentCategory::NetworkIntrusion,
+            _ => IncidentCategory::Other,
+        };
+        
+        let severity_enum = match severity.as_str() {
+            "Low" => IncidentSeverity::Low,
+            "Medium" => IncidentSeverity::Medium,
+            "High" => IncidentSeverity::High,
+            "Critical" => IncidentSeverity::Critical,
+            _ => IncidentSeverity::Low,
+        };
+        
+        Ok(self.inner.create_incident(title, description, category_enum, severity_enum))
+    }
+
+    #[napi]
+    pub fn get_incident(&self, id: String) -> Result<Option<String>> {
+        match self.inner.get_incident(&id) {
+            Some(incident) => {
+                let json = serde_json::to_string(incident)
+                    .map_err(|e| napi::Error::from_reason(format!("Failed to serialize incident: {}", e)))?;
+                Ok(Some(json))
+            }
+            None => Ok(None)
+        }
+    }
+
+    #[napi]
+    pub fn update_incident_status(&mut self, id: String, status: String, actor: String) -> Result<bool> {
+        let status_enum = match status.as_str() {
+            "New" => IncidentStatus::New,
+            "Assigned" => IncidentStatus::Assigned,
+            "InProgress" => IncidentStatus::InProgress,
+            "Investigating" => IncidentStatus::Investigating,
+            "Contained" => IncidentStatus::Contained,
+            "Eradicated" => IncidentStatus::Eradicated,
+            "Recovering" => IncidentStatus::Recovering,
+            "Resolved" => IncidentStatus::Resolved,
+            "Closed" => IncidentStatus::Closed,
+            _ => return Err(napi::Error::from_reason("Invalid incident status")),
+        };
+        
+        match self.inner.update_incident_status(&id, status_enum, &actor) {
+            std::result::Result::Ok(_) => Ok(true),
+            std::result::Result::Err(_) => Ok(false),
+        }
+    }
+
+    #[napi]
+    pub fn generate_security_metrics(&self, start_date: String, end_date: String) -> Result<String> {
+        // For simplicity, use 30 days ago to now if parsing fails
+        let start = chrono::DateTime::parse_from_rfc3339(&start_date)
+            .unwrap_or_else(|_| (Utc::now() - chrono::Duration::days(30)).into())
+            .with_timezone(&Utc);
+        let end = chrono::DateTime::parse_from_rfc3339(&end_date)
+            .unwrap_or_else(|_| Utc::now().into())
+            .with_timezone(&Utc);
+            
+        let metrics = self.inner.generate_metrics(start, end);
+        serde_json::to_string(&metrics)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize metrics: {}", e)))
     }
 }
 
