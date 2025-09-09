@@ -11,8 +11,18 @@
   "dependencies": {
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "phantom-cve-core": "file:phantom-cve-core",
+    "phantom-intel-core": "file:phantom-intel-core",
+    "phantom-ioc-core": "file:phantom-ioc-core",
+    "phantom-mitre-core": "file:phantom-mitre-core",
+    "phantom-secop-core": "file:phantom-secop-core",
+    "phantom-threatactor-core": "file:phantom-threatActor-core",
+    "phantom-xdr-core": "file:phantom-xdr-core",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "sequelize": "^6.37.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

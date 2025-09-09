@@ -1,0 +1,41 @@
+{
+  "name": "phantom-threatactor-core",
+  "version": "1.0.0",
+  "description": "Advanced threat actor intelligence and analysis system with comprehensive attribution capabilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node test.js",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "threat-intelligence",
+    "threat-actor",
+    "attribution",
+    "cybersecurity",
+    "apt",
+    "behavioral-analysis",
+    "campaign-tracking",
+    "security-analysis"
+  ],
+  "author": "Phantom Spire Security",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist/**/*",
+    "src-ts/**/*",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "frontend/phantom-threatActor-core"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "phantom-xdr-core",
+  "version": "0.1.0",
+  "description": "Phantom XDR Core provides advanced threat detection, behavioral analytics, zero trust security, and automated response capabilities.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "phantom-xdr-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "author": "Phantom Spire",
+  "license": "ISC",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  }
+}

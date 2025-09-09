@@ -1,0 +1,43 @@
+{
+  "name": "phantom-mitre-core",
+  "version": "1.0.0",
+  "description": "Advanced MITRE ATT&CK framework integration and threat analysis system with comprehensive technique mapping",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node test.js",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "mitre-attack",
+    "threat-intelligence",
+    "cybersecurity",
+    "attack-framework",
+    "technique-mapping",
+    "threat-analysis",
+    "security-analysis",
+    "attack-simulation",
+    "detection-rules",
+    "threat-hunting"
+  ],
+  "author": "Phantom Spire Security",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "dependencies": {},
+  "files": [
+    "dist/**/*",
+    "src-ts/**/*",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "frontend/phantom-mitre-core"
+  }
+}

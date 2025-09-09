@@ -1,240 +1,179 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Plus, 
-  Filter, 
-  Download, 
-  Upload, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import React, { useState, useEffect, useCallback } from 'react'
+import {
+  Search,
+  Plus,
+  Download,
+  Trash2,
+  Eye,
   Shield,
   AlertTriangle,
   Copy,
   Archive,
   Tag,
-  ThumbsUp
+  ThumbsUp,
+  Zap,
+  Target,
+  TrendingUp
 } from 'lucide-react';
+
+// Import the IOC Core - now using TypeScript implementation
+import { IOCCore, IOCType, Severity, IOCContext } from 'phantom-ioc-core';
+
+interface EnhancedIOC {
+  id: string;
+  indicator_type: IOCType;
+  value: string;
+  confidence: number;
+  severity: Severity;
+  source: string;
+  timestamp: Date;
+  tags: string[];
+  context: IOCContext;
+  status: 'active' | 'archived' | 'false_positive';
+  analysis?: {
+    threat_actors: string[];
+    campaigns: string[];
+    malware_families: string[];
+    attack_vectors: string[];
+    impact_assessment: {
+      business_impact: number;
+      technical_impact: number;
+      operational_impact: number;
+      overall_risk: number;
+    };
+    recommendations: string[];
+  };
+}
 
 interface IOCFilter {
   type?: string;
   severity?: string;
   confidence?: string;
-  tlpLevel?: string;
+  status?: 'active' | 'archived' | 'false_positive';
   source?: string;
   dateRange?: {
     start: Date;
     end: Date;
   };
   tags?: string[];
-  status?: 'active' | 'archived' | 'false_positive';
 }
 
-interface ThreatIndicator {
-  id: string;
-  type: string;
-  value: string;
-  confidence: string;
-  severity: string;
-  tags: string[];
-  source: string;
-  firstSeen: Date;
-  lastSeen: Date;
-  description: string;
-  tlpLevel: string;
-}
-
-interface IOCSearchResult {
-  indicators: ThreatIndicator[];
-  total: number;
-  page: number;
-  pageSize: number;
-  aggregations: {
-    types: Record<string, number>;
-    severities: Record<string, number>;
-    sources: Record<string, number>;
-    confidence: Record<string, number>;
-  };
-}
-
-export default function IOCManagementConsole() {
-  const [indicators, setIndicators] = useState<ThreatIndicator[]>([]);
+export default function EnhancedIOCManagementConsole() {
+  const [indicators, setIndicators] = useState<EnhancedIOC[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<IOCFilter>({});
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<IOCSearchResult | null>(null);
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(25);
+  const [iocCore, setIocCore] = useState<IOCCore | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [bulkMenuOpen, setBulkMenuOpen] = useState(false);
 
-  // Load IOCs
+  // Initialize IOC Core
   useEffect(() => {
-    loadIOCs();
-  }, [searchQuery, filters, page, pageSize]);
+    initializeIOCCore();
+  }, []);
 
-  const loadIOCs = async () => {
-    setLoading(true);
+  const initializeIOCCore = async () => {
     try {
-      const mockIOCs = generateMockIOCs();
-      const filteredIOCs = applyFilters(mockIOCs);
-      
-      setSearchResults({
-        indicators: filteredIOCs.slice(page * pageSize, (page + 1) * pageSize),
-        total: filteredIOCs.length,
-        page,
-        pageSize,
-        aggregations: generateAggregations(filteredIOCs)
-      });
-      
-      setIndicators(filteredIOCs.slice(page * pageSize, (page + 1) * pageSize));
+      setLoading(true);
+      // Initialize the IOC Core (this would normally be done once and shared)
+      const core = await IOCCore.new();
+      setIocCore(core);
     } catch (error) {
-      console.error('Failed to load IOCs:', error);
+      console.error('Failed to initialize IOC Core:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const generateMockIOCs = (): ThreatIndicator[] => {
-    const mockData: ThreatIndicator[] = [];
-    const types = ['ip', 'domain', 'url', 'hash_sha256', 'email', 'file_name'];
-    const severities = ['low', 'medium', 'high', 'critical'];
-    const confidences = ['low', 'medium', 'high', 'very_high'];
-    const sources = ['VirusTotal', 'AlienVault', 'Internal', 'MISP', 'Commercial Feed'];
-    
-    for (let i = 0; i < 500; i++) {
-      const type = types[Math.floor(Math.random() * types.length)];
-      const severity = severities[Math.floor(Math.random() * severities.length)];
-      const confidence = confidences[Math.floor(Math.random() * confidences.length)];
-      const source = sources[Math.floor(Math.random() * sources.length)];
-      
-      let value = '';
-      switch (type) {
-        case 'ip':
-          value = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-          break;
-        case 'domain':
-          value = `malicious-${Math.random().toString(36).substring(7)}.com`;
-          break;
-        case 'url':
-          value = `https://malicious-${Math.random().toString(36).substring(7)}.com/path`;
-          break;
-        case 'hash_sha256':
-          value = Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('');
-          break;
-        case 'email':
-          value = `malicious${Math.floor(Math.random() * 1000)}@evil.com`;
-          break;
-        case 'file_name':
-          value = `malware_${Math.random().toString(36).substring(7)}.exe`;
-          break;
-      }
+  // Load IOCs from API
+  const loadIOCs = useCallback(async (page = 1) => {
+    if (!iocCore) return;
 
-      mockData.push({
-        id: `ioc-${i + 1}`,
-        type,
-        value,
-        confidence,
-        severity,
-        tags: [`tag${Math.floor(Math.random() * 5) + 1}`, 'malware'],
-        source,
-        firstSeen: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-        lastSeen: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-        description: `${type} indicator with ${severity} severity`,
-        tlpLevel: 'amber'
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '20',
+        ...(searchQuery && { search: searchQuery }),
+        ...(filters.type && { type: filters.type }),
+        ...(filters.severity && { severity: filters.severity }),
+        ...(filters.confidence && { minConfidence: filters.confidence }),
+        ...(filters.status && { status: filters.status })
       });
-    }
-    
-    return mockData;
-  };
 
-  const applyFilters = (iocs: ThreatIndicator[]): ThreatIndicator[] => {
-    let filtered = [...iocs];
-    
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(ioc =>
-        ioc.value.toLowerCase().includes(query) ||
-        ioc.description?.toLowerCase().includes(query) ||
-        ioc.tags.some(tag => tag.toLowerCase().includes(query)) ||
-        ioc.source.toLowerCase().includes(query)
-      );
-    }
-    
-    if (filters.type) {
-      filtered = filtered.filter(ioc => ioc.type === filters.type);
-    }
-    
-    if (filters.severity) {
-      filtered = filtered.filter(ioc => ioc.severity === filters.severity);
-    }
-    
-    if (filters.confidence) {
-      filtered = filtered.filter(ioc => ioc.confidence === filters.confidence);
-    }
-    
-    if (filters.source) {
-      filtered = filtered.filter(ioc => ioc.source === filters.source);
-    }
-    
-    return filtered;
-  };
+      const response = await fetch(`/api/iocs?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch IOCs');
 
-  const generateAggregations = (iocs: ThreatIndicator[]) => {
-    const aggregations = {
-      types: {} as Record<string, number>,
-      severities: {} as Record<string, number>,
-      sources: {} as Record<string, number>,
-      confidence: {} as Record<string, number>
-    };
-    
-    iocs.forEach(ioc => {
-      aggregations.types[ioc.type] = (aggregations.types[ioc.type] || 0) + 1;
-      aggregations.severities[ioc.severity] = (aggregations.severities[ioc.severity] || 0) + 1;
-      aggregations.sources[ioc.source] = (aggregations.sources[ioc.source] || 0) + 1;
-      aggregations.confidence[ioc.confidence] = (aggregations.confidence[ioc.confidence] || 0) + 1;
-    });
-    
-    return aggregations;
-  };
+      const data = await response.json();
+      setIndicators(data.iocs);
+    } catch (error) {
+      console.error('Failed to load IOCs:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [iocCore, searchQuery, filters]);
+
+  // Load statistics
+  const loadStatistics = useCallback(async () => {
+    try {
+      const response = await fetch('/api/iocs/stats');
+      if (response.ok) {
+        const stats = await response.json();
+        // Statistics loaded but not stored in state for now
+        console.log('IOC Statistics:', stats);
+      }
+    } catch (error) {
+      console.error('Failed to load statistics:', error);
+    }
+  }, []);
+
+  // Load data when core is ready
+  useEffect(() => {
+    if (iocCore) {
+      loadIOCs();
+      loadStatistics();
+    }
+  }, [iocCore, loadIOCs, loadStatistics]);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setPage(0);
   };
 
   const handleFilterChange = (newFilters: Partial<IOCFilter>) => {
     setFilters({ ...filters, ...newFilters });
-    setPage(0);
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity: Severity) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-800 border-red-200';
-      case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      case Severity.Critical: return 'bg-red-100 text-red-800 border-red-200';
+      case Severity.High: return 'bg-orange-100 text-orange-800 border-orange-200';
+      case Severity.Medium: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case Severity.Low: return 'bg-green-100 text-green-800 border-green-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const getConfidenceColor = (confidence: string) => {
-    switch (confidence) {
-      case 'very_high': return 'bg-green-100 text-green-800 border-green-200';
-      case 'high': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 0.9) return 'bg-green-100 text-green-800 border-green-200';
+    if (confidence >= 0.7) return 'bg-blue-100 text-blue-800 border-blue-200';
+    if (confidence >= 0.5) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    return 'bg-red-100 text-red-800 border-red-200';
+  };
+
+  const getRiskColor = (risk: number) => {
+    if (risk >= 0.8) return 'bg-red-100 text-red-800';
+    if (risk >= 0.6) return 'bg-orange-100 text-orange-800';
+    if (risk >= 0.4) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
   };
 
   const handleRowSelect = (id: string) => {
-    setSelectedRows(prev => 
-      prev.includes(id) 
+    setSelectedRows(prev =>
+      prev.includes(id)
         ? prev.filter(rowId => rowId !== id)
         : [...prev, id]
     );
@@ -253,11 +192,11 @@ export default function IOCManagementConsole() {
   };
 
   const tabLabels = [
-    { label: 'All IOCs', count: searchResults?.total || 0 },
-    { label: 'Active Investigations', count: Math.floor(Math.random() * 50) },
-    { label: 'Recently Added', count: Math.floor(Math.random() * 25) },
-    { label: 'High Confidence', count: Math.floor(Math.random() * 75) },
-    { label: 'Archived', count: Math.floor(Math.random() * 100) }
+    { label: 'All IOCs', count: indicators.length },
+    { label: 'High Risk', count: indicators.filter(i => i.analysis?.impact_assessment?.overall_risk && i.analysis.impact_assessment.overall_risk >= 0.7).length },
+    { label: 'Analyzed', count: indicators.filter(i => i.analysis).length },
+    { label: 'Unanalyzed', count: indicators.filter(i => !i.analysis).length },
+    { label: 'Archived', count: 0 }
   ];
 
   return (
@@ -267,7 +206,8 @@ export default function IOCManagementConsole() {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Shield className="h-6 w-6 text-blue-600" />
-            IOC Management Console
+            Enhanced IOC Management Console
+            {iocCore && <span className="text-sm text-green-600 ml-2">✓ Core Active</span>}
           </h1>
           <div className="flex gap-3">
             <button
@@ -277,18 +217,17 @@ export default function IOCManagementConsole() {
               <Plus className="h-4 w-4" />
               Add IOC
             </button>
-            <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2">
-              <Upload className="h-4 w-4" />
-              Import
-            </button>
-            <button 
-              className={`border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 ${
-                selectedRows.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              disabled={selectedRows.length === 0}
+            <button
+              onClick={() => loadIOCs()}
+              disabled={loading}
+              className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50"
             >
+              <Zap className="h-4 w-4" />
+              {loading ? 'Processing...' : 'Re-analyze'}
+            </button>
+            <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2">
               <Download className="h-4 w-4" />
-              Export ({selectedRows.length})
+              Export
             </button>
           </div>
         </div>
@@ -300,14 +239,14 @@ export default function IOCManagementConsole() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder="Search IOCs by value, tags, source, or description..."
+                placeholder="Search IOCs by value, tags, threat actors, malware families..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
-          
+
           <div className="md:col-span-2">
             <select
               value={filters.type || ''}
@@ -318,12 +257,11 @@ export default function IOCManagementConsole() {
               <option value="ip">IP Address</option>
               <option value="domain">Domain</option>
               <option value="url">URL</option>
-              <option value="hash_sha256">SHA256 Hash</option>
+              <option value="hash">SHA256 Hash</option>
               <option value="email">Email</option>
-              <option value="file_name">File Name</option>
             </select>
           </div>
-          
+
           <div className="md:col-span-2">
             <select
               value={filters.severity || ''}
@@ -337,12 +275,19 @@ export default function IOCManagementConsole() {
               <option value="low">Low</option>
             </select>
           </div>
-          
+
           <div className="md:col-span-2">
-            <button className="w-full border border-gray-300 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2">
-              <Filter className="h-4 w-4" />
-              More Filters
-            </button>
+            <select
+              value={filters.confidence || ''}
+              onChange={(e) => handleFilterChange({ confidence: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">All Confidence</option>
+              <option value="0.9">Very High (≥90%)</option>
+              <option value="0.7">High (≥70%)</option>
+              <option value="0.5">Medium (≥50%)</option>
+              <option value="0.0">All</option>
+            </select>
           </div>
         </div>
       </div>
@@ -434,7 +379,7 @@ export default function IOCManagementConsole() {
             <div className="h-full bg-blue-600 animate-pulse"></div>
           </div>
         )}
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -451,9 +396,9 @@ export default function IOCManagementConsole() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indicator Value</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severity</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Seen</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk Score</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Threat Actors</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Malware Families</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -470,7 +415,7 @@ export default function IOCManagementConsole() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                      {ioc.type.toUpperCase()}
+                      {ioc.indicator_type.toString().split('::').pop()?.toUpperCase()}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -488,31 +433,58 @@ export default function IOCManagementConsole() {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSeverityColor(ioc.severity)}`}>
-                      {ioc.severity}
+                      {ioc.severity.toString().split('::').pop()}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getConfidenceColor(ioc.confidence)}`}>
-                      {ioc.confidence.replace('_', ' ').toUpperCase()}
+                      {(ioc.confidence * 100).toFixed(0)}%
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{ioc.source}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {ioc.firstSeen.toLocaleDateString()}
+                  <td className="px-6 py-4">
+                    {ioc.analysis ? (
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRiskColor(ioc.analysis.impact_assessment.overall_risk)}`}>
+                        {(ioc.analysis.impact_assessment.overall_risk * 100).toFixed(0)}%
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">Not analyzed</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      {ioc.tags.slice(0, 2).map((tag) => (
-                        <span key={tag} className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                          {tag}
-                        </span>
-                      ))}
-                      {ioc.tags.length > 2 && (
-                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                          +{ioc.tags.length - 2}
-                        </span>
-                      )}
-                    </div>
+                    {ioc.analysis && ioc.analysis.threat_actors.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {ioc.analysis.threat_actors.slice(0, 2).map((actor, idx) => (
+                          <span key={idx} className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                            {actor}
+                          </span>
+                        ))}
+                        {ioc.analysis.threat_actors.length > 2 && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                            +{ioc.analysis.threat_actors.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">None identified</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {ioc.analysis && ioc.analysis.malware_families.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {ioc.analysis.malware_families.slice(0, 2).map((family, idx) => (
+                          <span key={idx} className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                            {family}
+                          </span>
+                        ))}
+                        {ioc.analysis.malware_families.length > 2 && (
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                            +{ioc.analysis.malware_families.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">None identified</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
@@ -520,7 +492,7 @@ export default function IOCManagementConsole() {
                         <Eye className="h-4 w-4" />
                       </button>
                       <button className="text-gray-400 hover:text-green-600">
-                        <Edit className="h-4 w-4" />
+                        <TrendingUp className="h-4 w-4" />
                       </button>
                       <button className="text-gray-400 hover:text-red-600">
                         <Trash2 className="h-4 w-4" />
@@ -533,53 +505,19 @@ export default function IOCManagementConsole() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
-          <div className="flex-1 flex justify-between sm:hidden">
+        {indicators.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <Target className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No IOCs Found</h3>
+            <p className="text-gray-500 mb-4">Get started by adding your first indicator of compromise.</p>
             <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              onClick={() => setShowAddDialog(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={!searchResults || (page + 1) * pageSize >= searchResults.total}
-              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-            >
-              Next
+              Add IOC
             </button>
           </div>
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing{' '}
-                <span className="font-medium">{page * pageSize + 1}</span>
-                {' '}to{' '}
-                <span className="font-medium">
-                  {Math.min((page + 1) * pageSize, searchResults?.total || 0)}
-                </span>
-                {' '}of{' '}
-                <span className="font-medium">{searchResults?.total || 0}</span>
-                {' '}results
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <select
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span className="text-sm text-gray-700">per page</span>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Add IOC Dialog */}
@@ -598,9 +536,8 @@ export default function IOCManagementConsole() {
                     <option value="ip">IP Address</option>
                     <option value="domain">Domain</option>
                     <option value="url">URL</option>
-                    <option value="hash_sha256">SHA256 Hash</option>
+                    <option value="hash">SHA256 Hash</option>
                     <option value="email">Email</option>
-                    <option value="file_name">File Name</option>
                   </select>
                 </div>
                 <div>

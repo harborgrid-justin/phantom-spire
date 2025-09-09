@@ -1,0 +1,22 @@
+{
+  "name": "phantom-ioc-core",
+  "version": "0.1.0",
+  "description": "IOC processing core with threat intelligence",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublish": "npm run build"
+  },
+  "keywords": ["ioc", "threat-intelligence", "security"],
+  "author": "Phantom Spire",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  }
+}

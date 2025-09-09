@@ -106,6 +106,12 @@ export default function CVEMainPage() {
             Advanced Search
           </Link>
           <Link 
+            href="/cve/analysis"
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Analysis Engine
+          </Link>
+          <Link 
             href="/cve/dashboard"
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
           >

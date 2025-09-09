@@ -1,0 +1,70 @@
+{
+  "name": "phantom-incidentresponse-core",
+  "version": "1.0.0",
+  "description": "Advanced incident response management system with comprehensive forensic analysis, response automation, and recovery coordination capabilities",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "phantom-incidentresponse-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "ava",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "keywords": [
+    "incident-response",
+    "cybersecurity",
+    "forensics",
+    "security-automation",
+    "threat-response",
+    "incident-management",
+    "security-orchestration",
+    "digital-forensics",
+    "security-analytics",
+    "compliance",
+    "threat-intelligence",
+    "security-operations"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "frontend/phantom-incidentResponse-core"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0",
+    "ava": "^5.0.0",
+    "rimraf": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

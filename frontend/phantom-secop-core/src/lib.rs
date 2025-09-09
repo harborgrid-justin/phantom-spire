@@ -1,0 +1,1203 @@
+//! Phantom SecOp Core - Advanced Security Operations System
+//! 
+//! This library provides comprehensive security operations capabilities including
+//! incident response, security orchestration, automation, and operational intelligence.
+
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use chrono::{DateTime, Utc};
+use uuid::Uuid;
+use indexmap::IndexMap;
+
+/// Incident severity levels
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum IncidentSeverity {
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+/// Incident status types
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum IncidentStatus {
+    New,
+    Assigned,
+    InProgress,
+    Investigating,
+    Contained,
+    Eradicated,
+    Recovering,
+    Closed,
+    Reopened,
+}
+
+/// Incident categories
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum IncidentCategory {
+    Malware,
+    Phishing,
+    DataBreach,
+    Unauthorized Access,
+    DenialOfService,
+    Insider Threat,
+    Physical Security,
+    Compliance Violation,
+    System Compromise,
+    Network Intrusion,
+    Other,
+}
+
+/// Alert priority levels
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum AlertPriority {
+    Info,
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+/// Alert status
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum AlertStatus {
+    Open,
+    Acknowledged,
+    InProgress,
+    Resolved,
+    Closed,
+    FalsePositive,
+}
+
+/// Playbook execution status
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum PlaybookStatus {
+    Pending,
+    Running,
+    Paused,
+    Completed,
+    Failed,
+    Cancelled,
+}
+
+/// Action types for automation
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum ActionType {
+    Investigation,
+    Containment,
+    Eradication,
+    Recovery,
+    Communication,
+    Documentation,
+    Escalation,
+    Custom,
+}
+
+/// Task status
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum TaskStatus {
+    Pending,
+    InProgress,
+    Completed,
+    Failed,
+    Skipped,
+    Cancelled,
+}
+
+/// Security incident representation
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SecurityIncident {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub category: IncidentCategory,
+    pub severity: IncidentSeverity,
+    pub status: IncidentStatus,
+    pub priority_score: f64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub detected_at: DateTime<Utc>,
+    pub assigned_to: Option<String>,
+    pub assigned_team: Option<String>,
+    pub source_system: String,
+    pub affected_assets: Vec<String>,
+    pub indicators: Vec<String>,
+    pub tags: Vec<String>,
+    pub timeline: Vec<IncidentTimelineEntry>,
+    pub evidence: Vec<Evidence>,
+    pub related_alerts: Vec<String>,
+    pub related_incidents: Vec<String>,
+    pub containment_actions: Vec<String>,
+    pub eradication_actions: Vec<String>,
+    pub recovery_actions: Vec<String>,
+    pub lessons_learned: Vec<String>,
+    pub cost_impact: Option<f64>,
+    pub business_impact: BusinessImpact,
+    pub compliance_impact: Vec<String>,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Timeline entry for incidents
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IncidentTimelineEntry {
+    pub timestamp: DateTime<Utc>,
+    pub event_type: String,
+    pub description: String,
+    pub actor: String,
+    pub details: HashMap<String, String>,
+}
+
+/// Evidence collection
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Evidence {
+    pub id: String,
+    pub evidence_type: EvidenceType,
+    pub name: String,
+    pub description: String,
+    pub source: String,
+    pub collected_at: DateTime<Utc>,
+    pub collected_by: String,
+    pub file_path: Option<String>,
+    pub file_hash: Option<String>,
+    pub file_size: Option<u64>,
+    pub chain_of_custody: Vec<CustodyEntry>,
+    pub analysis_results: Vec<AnalysisResult>,
+    pub tags: Vec<String>,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Evidence types
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum EvidenceType {
+    NetworkCapture,
+    SystemLogs,
+    MemoryDump,
+    DiskImage,
+    FileSystem,
+    Registry,
+    Email,
+    Document,
+    Screenshot,
+    Other,
+}
+
+/// Chain of custody entry
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustodyEntry {
+    pub timestamp: DateTime<Utc>,
+    pub action: String,
+    pub actor: String,
+    pub location: String,
+    pub notes: String,
+}
+
+/// Analysis result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AnalysisResult {
+    pub id: String,
+    pub analysis_type: String,
+    pub tool_used: String,
+    pub analyst: String,
+    pub timestamp: DateTime<Utc>,
+    pub findings: Vec<String>,
+    pub confidence: f64,
+    pub details: HashMap<String, String>,
+}
+
+/// Business impact assessment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BusinessImpact {
+    pub financial_impact: f64,
+    pub operational_impact: OperationalImpact,
+    pub reputation_impact: ReputationImpact,
+    pub regulatory_impact: Vec<String>,
+    pub customer_impact: CustomerImpact,
+    pub service_disruption: Vec<String>,
+    pub data_impact: DataImpact,
+}
+
+/// Operational impact levels
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum OperationalImpact {
+    None,
+    Minimal,
+    Moderate,
+    Significant,
+    Severe,
+}
+
+/// Reputation impact levels
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum ReputationImpact {
+    None,
+    Minor,
+    Moderate,
+    Major,
+    Severe,
+}
+
+/// Customer impact assessment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CustomerImpact {
+    pub customers_affected: u32,
+    pub service_degradation: bool,
+    pub data_exposure: bool,
+    pub communication_required: bool,
+    pub compensation_required: bool,
+}
+
+/// Data impact assessment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DataImpact {
+    pub data_types_affected: Vec<String>,
+    pub records_affected: u32,
+    pub confidentiality_breach: bool,
+    pub integrity_compromise: bool,
+    pub availability_impact: bool,
+    pub regulatory_notification_required: bool,
+}
+
+/// Security alert
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SecurityAlert {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub priority: AlertPriority,
+    pub status: AlertStatus,
+    pub source: String,
+    pub rule_id: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub first_seen: DateTime<Utc>,
+    pub last_seen: DateTime<Utc>,
+    pub count: u32,
+    pub assigned_to: Option<String>,
+    pub indicators: Vec<String>,
+    pub affected_assets: Vec<String>,
+    pub tags: Vec<String>,
+    pub raw_data: HashMap<String, String>,
+    pub enrichment_data: HashMap<String, String>,
+    pub related_alerts: Vec<String>,
+    pub incident_id: Option<String>,
+    pub false_positive_likelihood: f64,
+    pub confidence_score: f64,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Security playbook
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SecurityPlaybook {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub version: String,
+    pub category: String,
+    pub trigger_conditions: Vec<TriggerCondition>,
+    pub actions: Vec<PlaybookAction>,
+    pub approval_required: bool,
+    pub timeout_minutes: u32,
+    pub created_by: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub enabled: bool,
+    pub execution_count: u32,
+    pub success_rate: f64,
+    pub average_execution_time: f64,
+    pub tags: Vec<String>,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Trigger condition for playbooks
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TriggerCondition {
+    pub condition_type: String,
+    pub field: String,
+    pub operator: String,
+    pub value: String,
+    pub case_sensitive: bool,
+}
+
+/// Playbook action
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlaybookAction {
+    pub id: String,
+    pub name: String,
+    pub action_type: ActionType,
+    pub description: String,
+    pub order: u32,
+    pub required: bool,
+    pub timeout_seconds: u32,
+    pub retry_count: u32,
+    pub parameters: HashMap<String, String>,
+    pub conditions: Vec<String>,
+    pub on_success: Vec<String>,
+    pub on_failure: Vec<String>,
+}
+
+/// Playbook execution
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlaybookExecution {
+    pub id: String,
+    pub playbook_id: String,
+    pub playbook_name: String,
+    pub status: PlaybookStatus,
+    pub triggered_by: String,
+    pub trigger_event: String,
+    pub started_at: DateTime<Utc>,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub duration_seconds: Option<f64>,
+    pub actions_executed: Vec<ActionExecution>,
+    pub success_count: u32,
+    pub failure_count: u32,
+    pub error_messages: Vec<String>,
+    pub output_data: HashMap<String, String>,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Action execution result
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActionExecution {
+    pub action_id: String,
+    pub action_name: String,
+    pub status: TaskStatus,
+    pub started_at: DateTime<Utc>,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub duration_seconds: Option<f64>,
+    pub retry_count: u32,
+    pub output: HashMap<String, String>,
+    pub error_message: Option<String>,
+}
+
+/// Security task
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SecurityTask {
+    pub id: String,
+    pub title: String,
+    pub description: String,
+    pub task_type: String,
+    pub priority: AlertPriority,
+    pub status: TaskStatus,
+    pub assigned_to: Option<String>,
+    pub assigned_team: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub due_date: Option<DateTime<Utc>>,
+    pub estimated_hours: Option<f64>,
+    pub actual_hours: Option<f64>,
+    pub incident_id: Option<String>,
+    pub alert_ids: Vec<String>,
+    pub dependencies: Vec<String>,
+    pub checklist: Vec<TaskChecklistItem>,
+    pub attachments: Vec<String>,
+    pub comments: Vec<TaskComment>,
+    pub tags: Vec<String>,
+    pub metadata: HashMap<String, String>,
+}
+
+/// Task checklist item
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaskChecklistItem {
+    pub id: String,
+    pub description: String,
+    pub completed: bool,
+    pub completed_by: Option<String>,
+    pub completed_at: Option<DateTime<Utc>>,
+    pub notes: Option<String>,
+}
+
+/// Task comment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TaskComment {
+    pub id: String,
+    pub author: String,
+    pub content: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: Option<DateTime<Utc>>,
+    pub attachments: Vec<String>,
+}
+
+/// Security metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SecurityMetrics {
+    pub period_start: DateTime<Utc>,
+    pub period_end: DateTime<Utc>,
+    pub incident_metrics: IncidentMetrics,
+    pub alert_metrics: AlertMetrics,
+    pub response_metrics: ResponseMetrics,
+    pub team_metrics: TeamMetrics,
+    pub automation_metrics: AutomationMetrics,
+    pub compliance_metrics: ComplianceMetrics,
+}
+
+/// Incident-related metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IncidentMetrics {
+    pub total_incidents: u32,
+    pub incidents_by_severity: HashMap<IncidentSeverity, u32>,
+    pub incidents_by_category: HashMap<IncidentCategory, u32>,
+    pub incidents_by_status: HashMap<IncidentStatus, u32>,
+    pub mean_time_to_detection: f64,
+    pub mean_time_to_response: f64,
+    pub mean_time_to_containment: f64,
+    pub mean_time_to_resolution: f64,
+    pub escalation_rate: f64,
+    pub reopened_incidents: u32,
+    pub cost_per_incident: f64,
+    pub total_cost_impact: f64,
+}
+
+/// Alert-related metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AlertMetrics {
+    pub total_alerts: u32,
+    pub alerts_by_priority: HashMap<AlertPriority, u32>,
+    pub alerts_by_source: HashMap<String, u32>,
+    pub false_positive_rate: f64,
+    pub alert_to_incident_ratio: f64,
+    pub mean_time_to_triage: f64,
+    pub auto_resolved_alerts: u32,
+    pub escalated_alerts: u32,
+}
+
+/// Response-related metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ResponseMetrics {
+    pub playbooks_executed: u32,
+    pub automation_success_rate: f64,
+    pub manual_interventions: u32,
+    pub sla_compliance_rate: f64,
+    pub escalations: u32,
+    pub after_hours_responses: u32,
+}
+
+/// Team performance metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TeamMetrics {
+    pub analysts_active: u32,
+    pub workload_distribution: HashMap<String, u32>,
+    pub response_times_by_analyst: HashMap<String, f64>,
+    pub resolution_rates: HashMap<String, f64>,
+    pub training_hours: f64,
+    pub certification_status: HashMap<String, String>,
+}
+
+/// Automation metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AutomationMetrics {
+    pub automated_actions: u32,
+    pub automation_success_rate: f64,
+    pub time_saved_hours: f64,
+    pub cost_savings: f64,
+    pub failed_automations: u32,
+    pub manual_overrides: u32,
+}
+
+/// Compliance metrics
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ComplianceMetrics {
+    pub frameworks_monitored: Vec<String>,
+    pub compliance_score: f64,
+    pub violations_detected: u32,
+    pub remediation_time: f64,
+    pub audit_findings: u32,
+    pub policy_exceptions: u32,
+}
+
+/// Threat intelligence feed
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreatIntelFeed {
+    pub id: String,
+    pub name: String,
+    pub source: String,
+    pub feed_type: String,
+    pub last_updated: DateTime<Utc>,
+    pub indicators_count: u32,
+    pub confidence_level: f64,
+    pub active: bool,
+    pub update_frequency: String,
+    pub cost: Option<f64>,
+    pub tags: Vec<String>,
+}
+
+/// Security orchestration workflow
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OrchestrationWorkflow {
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub trigger_type: String,
+    pub steps: Vec<WorkflowStep>,
+    pub enabled: bool,
+    pub created_at: DateTime<Utc>,
+    pub last_executed: Option<DateTime<Utc>>,
+    pub execution_count: u32,
+    pub success_rate: f64,
+}
+
+/// Workflow step
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkflowStep {
+    pub id: String,
+    pub name: String,
+    pub step_type: String,
+    pub order: u32,
+    pub configuration: HashMap<String, String>,
+    pub timeout_seconds: u32,
+    pub retry_policy: RetryPolicy,
+    pub conditions: Vec<String>,
+}
+
+/// Retry policy for workflow steps
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RetryPolicy {
+    pub max_attempts: u32,
+    pub delay_seconds: u32,
+    pub backoff_multiplier: f64,
+    pub max_delay_seconds: u32,
+}
+
+/// Main SecOp Core implementation
+pub struct SecOpCore {
+    incidents: IndexMap<String, SecurityIncident>,
+    alerts: IndexMap<String, SecurityAlert>,
+    playbooks: IndexMap<String, SecurityPlaybook>,
+    executions: IndexMap<String, PlaybookExecution>,
+    tasks: IndexMap<String, SecurityTask>,
+    evidence: IndexMap<String, Evidence>,
+    workflows: IndexMap<String, OrchestrationWorkflow>,
+    threat_feeds: IndexMap<String, ThreatIntelFeed>,
+}
+
+impl SecOpCore {
+    /// Create a new SecOp Core instance
+    pub fn new() -> Self {
+        Self {
+            incidents: IndexMap::new(),
+            alerts: IndexMap::new(),
+            playbooks: IndexMap::new(),
+            executions: IndexMap::new(),
+            tasks: IndexMap::new(),
+            evidence: IndexMap::new(),
+            workflows: IndexMap::new(),
+            threat_feeds: IndexMap::new(),
+        }
+    }
+
+    /// Initialize with sample data
+    pub fn initialize_with_sample_data(&mut self) {
+        self.load_sample_incidents();
+        self.load_sample_alerts();
+        self.load_sample_playbooks();
+        self.load_sample_tasks();
+        self.load_sample_workflows();
+    }
+
+    /// Create a new security incident
+    pub fn create_incident(&mut self, title: String, description: String, category: IncidentCategory, severity: IncidentSeverity) -> String {
+        let incident_id = Uuid::new_v4().to_string();
+        let now = Utc::now();
+
+        let incident = SecurityIncident {
+            id: incident_id.clone(),
+            title,
+            description,
+            category,
+            severity: severity.clone(),
+            status: IncidentStatus::New,
+            priority_score: self.calculate_priority_score(&severity),
+            created_at: now,
+            updated_at: now,
+            detected_at: now,
+            assigned_to: None,
+            assigned_team: None,
+            source_system: "Phantom SecOp Core".to_string(),
+            affected_assets: Vec::new(),
+            indicators: Vec::new(),
+            tags: Vec::new(),
+            timeline: vec![IncidentTimelineEntry {
+                timestamp: now,
+                event_type: "Created".to_string(),
+                description: "Incident created".to_string(),
+                actor: "System".to_string(),
+                details: HashMap::new(),
+            }],
+            evidence: Vec::new(),
+            related_alerts: Vec::new(),
+            related_incidents: Vec::new(),
+            containment_actions: Vec::new(),
+            eradication_actions: Vec::new(),
+            recovery_actions: Vec::new(),
+            lessons_learned: Vec::new(),
+            cost_impact: None,
+            business_impact: BusinessImpact {
+                financial_impact: 0.0,
+                operational_impact: OperationalImpact::None,
+                reputation_impact: ReputationImpact::None,
+                regulatory_impact: Vec::new(),
+                customer_impact: CustomerImpact {
+                    customers_affected: 0,
+                    service_degradation: false,
+                    data_exposure: false,
+                    communication_required: false,
+                    compensation_required: false,
+                },
+                service_disruption: Vec::new(),
+                data_impact: DataImpact {
+                    data_types_affected: Vec::new(),
+                    records_affected: 0,
+                    confidentiality_breach: false,
+                    integrity_compromise: false,
+                    availability_impact: false,
+                    regulatory_notification_required: false,
+                },
+            },
+            compliance_impact: Vec::new(),
+            metadata: HashMap::new(),
+        };
+
+        self.incidents.insert(incident_id.clone(), incident);
+        incident_id
+    }
+
+    /// Update incident status
+    pub fn update_incident_status(&mut self, incident_id: &str, status: IncidentStatus, actor: &str) -> Result<(), String> {
+        if let Some(incident) = self.incidents.get_mut(incident_id) {
+            let now = Utc::now();
+            incident.status = status.clone();
+            incident.updated_at = now;
+            
+            incident.timeline.push(IncidentTimelineEntry {
+                timestamp: now,
+                event_type: "Status Update".to_string(),
+                description: format!("Status changed to {:?}", status),
+                actor: actor.to_string(),
+                details: HashMap::new(),
+            });
+            
+            Ok(())
+        } else {
+            Err("Incident not found".to_string())
+        }
+    }
+
+    /// Create a security alert
+    pub fn create_alert(&mut self, title: String, description: String, priority: AlertPriority, source: String) -> String {
+        let alert_id = Uuid::new_v4().to_string();
+        let now = Utc::now();
+
+        let alert = SecurityAlert {
+            id: alert_id.clone(),
+            title,
+            description,
+            priority,
+            status: AlertStatus::Open,
+            source,
+            rule_id: None,
+            created_at: now,
+            updated_at: now,
+            first_seen: now,
+            last_seen: now,
+            count: 1,
+            assigned_to: None,
+            indicators: Vec::new(),
+            affected_assets: Vec::new(),
+            tags: Vec::new(),
+            raw_data: HashMap::new(),
+            enrichment_data: HashMap::new(),
+            related_alerts: Vec::new(),
+            incident_id: None,
+            false_positive_likelihood: 0.1,
+            confidence_score: 0.8,
+            metadata: HashMap::new(),
+        };
+
+        self.alerts.insert(alert_id.clone(), alert);
+        alert_id
+    }
+
+    /// Execute a security playbook
+    pub fn execute_playbook(&mut self, playbook_id: &str, triggered_by: &str, trigger_event: &str) -> Result<String, String> {
+        if let Some(playbook) = self.playbooks.get(playbook_id) {
+            let execution_id = Uuid::new_v4().to_string();
+            let now = Utc::now();
+
+            let execution = PlaybookExecution {
+                id: execution_id.clone(),
+                playbook_id: playbook_id.to_string(),
+                playbook_name: playbook.name.clone(),
+                status: PlaybookStatus::Running,
+                triggered_by: triggered_by.to_string(),
+                trigger_event: trigger_event.to_string(),
+                started_at: now,
+                completed_at: None,
+                duration_seconds: None,
+                actions_executed: Vec::new(),
+                success_count: 0,
+                failure_count: 0,
+                error_messages: Vec::new(),
+                output_data: HashMap::new(),
+                metadata: HashMap::new(),
+            };
+
+            self.executions.insert(execution_id.clone(), execution);
+            Ok(execution_id)
+        } else {
+            Err("Playbook not found".to_string())
+        }
+    }
+
+    /// Generate security metrics
+    pub fn generate_metrics(&self, start_date: DateTime<Utc>, end_date: DateTime<Utc>) -> SecurityMetrics {
+        let incidents_in_period: Vec<&SecurityIncident> = self.incidents
+            .values()
+            .filter(|i| i.created_at >= start_date && i.created_at <= end_date)
+            .collect();
+
+        let alerts_in_period: Vec<&SecurityAlert> = self.alerts
+            .values()
+            .filter(|a| a.created_at >= start_date && a.created_at <= end_date)
+            .collect();
+
+        SecurityMetrics {
+            period_start: start_date,
+            period_end: end_date,
+            incident_metrics: self.calculate_incident_metrics(&incidents_in_period),
+            alert_metrics: self.calculate_alert_metrics(&alerts_in_period),
+            response_metrics: self.calculate_response_metrics(),
+            team_metrics: self.calculate_team_metrics(),
+            automation_metrics: self.calculate_automation_metrics(),
+            compliance_metrics: self.calculate_compliance_metrics(),
+        }
+    }
+
+    /// Search incidents by criteria
+    pub fn search_incidents(&self, query: &str, status: Option<IncidentStatus>, severity: Option<IncidentSeverity>) -> Vec<&SecurityIncident> {
+        self.incidents
+            .values()
+            .filter(|incident| {
+                let matches_query = query.is_empty() || 
+                    incident.title.to_lowercase().contains(&query.to_lowercase()) ||
+                    incident.description.to_lowercase().contains(&query.to_lowercase());
+                
+                let matches_status = status.is_none() || incident.status == status.unwrap();
+                let matches_severity = severity.is_none() || incident.severity == severity.unwrap();
+                
+                matches_query && matches_status && matches_severity
+            })
+            .collect()
+    }
+
+    /// Get incident by ID
+    pub fn get_incident(&self, incident_id: &str) -> Option<&SecurityIncident> {
+        self.incidents.get(incident_id)
+    }
+
+    /// Get alert by ID
+    pub fn get_alert(&self, alert_id: &str) -> Option<&SecurityAlert> {
+        self.alerts.get(alert_id)
+    }
+
+    /// Get playbook by ID
+    pub fn get_playbook(&self, playbook_id: &str) -> Option<&SecurityPlaybook> {
+        self.playbooks.get(playbook_id)
+    }
+
+    /// Get all active alerts
+    pub fn get_active_alerts(&self) -> Vec<&SecurityAlert> {
+        self.alerts
+            .values()
+            .filter(|alert| matches!(alert.status, AlertStatus::Open | AlertStatus::Acknowledged | AlertStatus::InProgress))
+            .collect()
+    }
+
+    /// Get incidents by severity
+    pub fn get_incidents_by_severity(&self, severity: IncidentSeverity) -> Vec<&SecurityIncident> {
+        self.incidents
+            .values()
+            .filter(|incident| incident.severity == severity)
+            .collect()
+    }
+
+    // Private helper methods
+
+    fn load_sample_incidents(&mut self) {
+        let sample_incidents = vec![
+            ("Malware Detection", "Suspicious executable detected on workstation", IncidentCategory::Malware, IncidentSeverity::High),
+            ("Phishing Campaign", "Multiple users received suspicious emails", IncidentCategory::Phishing, IncidentSeverity::Medium),
+            ("Data Breach", "Unauthorized access to customer database", IncidentCategory::DataBreach, IncidentSeverity::Critical),
+        ];
+
+        for (title, description, category, severity) in sample_incidents {
+            self.create_incident(title.to_string(), description.to_string(), category, severity);
+        }
+    }
+
+    fn load_sample_alerts(&mut self) {
+        let sample_alerts = vec![
+            ("Suspicious Network Traffic", "Unusual outbound connections detected", AlertPriority::High, "Network Monitor"),
+            ("Failed Login Attempts", "Multiple failed authentication attempts", AlertPriority::Medium, "SIEM"),
+            ("Malware Signature", "Known malware signature detected", AlertPriority::Critical, "Antivirus"),
+        ];
+
+        for (title, description, priority, source) in sample_alerts {
+            self.create_alert(title.to_string(), description.to_string(), priority, source.to_string());
+        }
+    }
+
+    fn load_sample_playbooks(&mut self) {
+        let playbook_id = Uuid::new_v4().to_string();
+        let now = Utc::now();
+
+        let playbook = SecurityPlaybook {
+            id: playbook_id.clone(),
+            name: "Malware Response".to_string(),
+            description: "Automated response to malware detection".to_string(),
+            version: "1.0".to_string(),
+            category: "Incident Response".to_string(),
+            trigger_conditions: vec![
+                TriggerCondition {
+                    condition_type: "alert".to_string(),
+                    field: "category".to_string(),
+                    operator: "equals".to_string(),
+                    value: "malware".to_string(),
+                    case_sensitive: false,
+                }
+            ],
+            actions: vec![
+                PlaybookAction {
+                    id: Uuid::new_v4().to_string(),
+                    name: "Isolate Host".to_string(),
+                    action_type: ActionType::Containment,
+                    description: "Isolate the affected host from network".to_string(),
+                    order: 1,
+                    required: true,
+                    timeout_seconds: 300,
+                    retry_count: 3,
+                    parameters: HashMap::new(),
+                    conditions: Vec::new(),
+                    on_success: Vec::new(),
+                    on_failure: Vec::new(),
+                }
+            ],
+            approval_required: false,
+            timeout_minutes: 60,
+            created_by: "System".to_string(),
+            created_at: now,
+            updated_at: now,
+            enabled: true,
+            execution_count: 0,
+            success_rate: 0.0,
+            average_execution_time: 0.0,
+            tags: vec!["malware".to_string(), "automated".to_string()],
+            metadata: HashMap::new(),
+        };
+
+        self.playbooks.insert(playbook_id, playbook);
+    }
+
+    fn load_sample_tasks(&mut self) {
+        let task_id = Uuid::new_v4().to_string();
+        let now = Utc::now();
+
+        let task = SecurityTask {
+            id: task_id.clone(),
+            title: "Investigate Malware Alert".to_string(),
+            description: "Analyze and investigate the malware detection alert".to_string(),
+            task_type: "Investigation".to_string(),
+            priority: AlertPriority::High,
+            status: TaskStatus::Pending,
+            assigned_to: None,
+            assigned_team: Some("SOC Team".to_string()),
+            created_at: now,
+            updated_at: now,
+            due_date: Some(now + chrono::Duration::hours(4)),
+            estimated_hours: Some(2.0),
+            actual_hours: None,
+            incident_id: None,
+            alert_ids: Vec::new(),
+            dependencies: Vec::new(),
+            checklist: vec![
+                TaskChecklistItem {
+                    id: Uuid::new_v4().to_string(),
+                    description: "Review alert details".to_string(),
+                    completed: false,
+                    completed_by: None,
+                    completed_at: None,
+                    notes: None,
+                },
+                TaskChecklistItem {
+                    id: Uuid::new_v4().to_string(),
+                    description: "Analyze affected systems".to_string(),
+                    completed: false,
+                    completed_by: None,
+                    completed_at: None,
+                    notes: None,
+                },
+            ],
+            attachments: Vec::new(),
+            comments: Vec::new(),
+            tags: vec!["malware".to_string(), "investigation".to_string()],
+            metadata: HashMap::new(),
+        };
+
+        self.tasks.insert(task_id, task);
+    }
+
+    fn load_sample_workflows(&mut self) {
+        let workflow_id = Uuid::new_v4().to_string();
+        let now = Utc::now();
+
+        let workflow = OrchestrationWorkflow {
+            id: workflow_id.clone(),
+            name: "Incident Response Workflow".to_string(),
+            description: "Automated incident response and escalation workflow".to_string(),
+            trigger_type: "incident_created".to_string(),
+            steps: vec![
+                WorkflowStep {
+                    id: Uuid::new_v4().to_string(),
+                    name: "Initial Assessment".to_string(),
+                    step_type: "assessment".to_string(),
+                    order: 1,
+                    configuration: HashMap::new(),
+                    timeout_seconds: 300,
+                    retry_policy: RetryPolicy {
+                        max_attempts: 3,
+                        delay_seconds: 30,
+                        backoff_multiplier: 2.0,
+                        max_delay_seconds: 300,
+                    },
+                    conditions: Vec::new(),
+                },
+                WorkflowStep {
+                    id: Uuid::new_v4().to_string(),
+                    name: "Notify Team".to_string(),
+                    step_type: "notification".to_string(),
+                    order: 2,
+                    configuration: HashMap::new(),
+                    timeout_seconds: 60,
+                    retry_policy: RetryPolicy {
+                        max_attempts: 2,
+                        delay_seconds: 10,
+                        backoff_multiplier: 1.5,
+                        max_delay_seconds: 60,
+                    },
+                    conditions: Vec::new(),
+                },
+            ],
+            enabled: true,
+            created_at: now,
+            last_executed: None,
+            execution_count: 0,
+            success_rate: 0.0,
+        };
+
+        self.workflows.insert(workflow_id, workflow);
+    }
+
+    fn calculate_priority_score(&self, severity: &IncidentSeverity) -> f64 {
+        match severity {
+            IncidentSeverity::Low => 1.0,
+            IncidentSeverity::Medium => 2.5,
+            IncidentSeverity::High => 4.0,
+            IncidentSeverity::Critical => 5.0,
+        }
+    }
+
+    fn calculate_incident_metrics(&self, incidents: &[&SecurityIncident]) -> IncidentMetrics {
+        let total_incidents = incidents.len() as u32;
+        
+        let mut incidents_by_severity = HashMap::new();
+        let mut incidents_by_category = HashMap::new();
+        let mut incidents_by_status = HashMap::new();
+
+        for incident in incidents {
+            *incidents_by_severity.entry(incident.severity.clone()).or_insert(0) += 1;
+            *incidents_by_category.entry(incident.category.clone()).or_insert(0) += 1;
+            *incidents_by_status.entry(incident.status.clone()).or_insert(0) += 1;
+        }
+
+        IncidentMetrics {
+            total_incidents,
+            incidents_by_severity,
+            incidents_by_category,
+            incidents_by_status,
+            mean_time_to_detection: 15.5, // minutes
+            mean_time_to_response: 8.2,   // minutes
+            mean_time_to_containment: 45.0, // minutes
+            mean_time_to_resolution: 240.0, // minutes
+            escalation_rate: 0.15,
+            reopened_incidents: 2,
+            cost_per_incident: 5000.0,
+            total_cost_impact: total_incidents as f64 * 5000.0,
+        }
+    }
+
+    fn calculate_alert_metrics(&self, alerts: &[&SecurityAlert]) -> AlertMetrics {
+        let total_alerts = alerts.len() as u32;
+        
+        let mut alerts_by_priority = HashMap::new();
+        let mut alerts_by_source = HashMap::new();
+
+        for alert in alerts {
+            *alerts_by_priority.entry(alert.priority.clone()).or_insert(0) += 1;
+            *alerts_by_source.entry(alert.source.clone()).or_insert(0) += 1;
+        }
+
+        AlertMetrics {
+            total_alerts,
+            alerts_by_priority,
+            alerts_by_source,
+            false_positive_rate: 0.12,
+            alert_to_incident_ratio: 3.2,
+            mean_time_to_triage: 5.8, // minutes
+            auto_resolved_alerts: total_alerts / 4,
+            escalated_alerts: total_alerts / 8,
+        }
+    }
+
+    fn calculate_response_metrics(&self) -> ResponseMetrics {
+        ResponseMetrics {
+            playbooks_executed: self.executions.len() as u32,
+            automation_success_rate: 0.87,
+            manual_interventions: 15,
+            sla_compliance_rate: 0.92,
+            escalations: 8,
+            after_hours_responses: 12,
+        }
+    }
+
+    fn calculate_team_metrics(&self) -> TeamMetrics {
+        let mut workload_distribution = HashMap::new();
+        workload_distribution.insert("Alice".to_string(), 25);
+        workload_distribution.insert("Bob".to_string(), 18);
+        workload_distribution.insert("Charlie".to_string(), 22);
+
+        let mut response_times_by_analyst = HashMap::new();
+        response_times_by_analyst.insert("Alice".to_string(), 8.5);
+        response_times_by_analyst.insert("Bob".to_string(), 12.3);
+        response_times_by_analyst.insert("Charlie".to_string(), 9.8);
+
+        let mut resolution_rates = HashMap::new();
+        resolution_rates.insert("Alice".to_string(), 0.94);
+        resolution_rates.insert("Bob".to_string(), 0.89);
+        resolution_rates.insert("Charlie".to_string(), 0.91);
+
+        let mut certification_status = HashMap::new();
+        certification_status.insert("Alice".to_string(), "CISSP".to_string());
+        certification_status.insert("Bob".to_string(), "GCIH".to_string());
+        certification_status.insert("Charlie".to_string(), "GCFA".to_string());
+
+        TeamMetrics {
+            analysts_active: 3,
+            workload_distribution,
+            response_times_by_analyst,
+            resolution_rates,
+            training_hours: 120.0,
+            certification_status,
+        }
+    }
+
+    fn calculate_automation_metrics(&self) -> AutomationMetrics {
+        AutomationMetrics {
+            automated_actions: 156,
+            automation_success_rate: 0.87,
+            time_saved_hours: 48.5,
+            cost_savings: 12500.0,
+            failed_automations: 8,
+            manual_overrides: 3,
+        }
+    }
+
+    fn calculate_compliance_metrics(&self) -> ComplianceMetrics {
+        ComplianceMetrics {
+            frameworks_monitored: vec![
+                "SOX".to_string(),
+                "PCI DSS".to_string(),
+                "GDPR".to_string(),
+                "HIPAA".to_string(),
+            ],
+            compliance_score: 0.94,
+            violations_detected: 5,
+            remediation_time: 72.0, // hours
+            audit_findings: 2,
+            policy_exceptions: 1,
+        }
+    }
+}
+
+impl Default for SecOpCore {
+    fn default() -> Self {
+        let mut core = Self::new();
+        core.initialize_with_sample_data();
+        core
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_secop_core_creation() {
+        let core = SecOpCore::new();
+        assert!(core.incidents.is_empty());
+        assert!(core.alerts.is_empty());
+    }
+
+    #[test]
+    fn test_incident_creation() {
+        let mut core = SecOpCore::new();
+        let incident_id = core.create_incident(
+            "Test Incident".to_string(),
+            "Test Description".to_string(),
+            IncidentCategory::Malware,
+            IncidentSeverity::High,
+        );
+        
+        assert!(!incident_id.is_empty());
+        assert!(core.get_incident(&incident_id).is_some());
+    }
+
+    #[test]
+    fn test_alert_creation() {
+        let mut core = SecOpCore::new();
+        let alert_id = core.create_alert(
+            "Test Alert".to_string(),
+            "Test Description".to_string(),
+            AlertPriority::High,
+            "Test Source".to_string(),
+        );
+        
+        assert!(!alert_id.is_empty());
+        assert!(core.get_alert(&alert_id).is_some());
+    }
+
+    #[test]
+    fn test_incident_status_update() {
+        let mut core = SecOpCore::new();
+        let incident_id = core.create_incident(
+            "Test Incident".to_string(),
+            "Test Description".to_string(),
+            IncidentCategory::Malware,
+            IncidentSeverity::High,
+        );
+        
+        let result = core.update_incident_status(&incident_id, IncidentStatus::InProgress, "Test User");
+        assert!(result.is_ok());
+        
+        let incident = core.get_incident(&incident_id).unwrap();
+        assert_eq!(incident.status, IncidentStatus::InProgress);
+    }
+
+    #[test]
+    fn test_metrics_generation() {
+        let core = SecOpCore::default();
+        let start_date = Utc::now() - chrono::Duration::days(30);
+        let end_date = Utc::now();
+        
+        let metrics = core.generate_metrics(start_date, end_date);
+        assert!(metrics.incident_metrics.total_incidents > 0);
+        assert!(metrics.alert_metrics.total_alerts > 0);
+    }
+}

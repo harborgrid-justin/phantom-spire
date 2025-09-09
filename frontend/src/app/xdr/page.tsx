@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Shield, 
   Eye, 
@@ -10,10 +10,16 @@ import {
   Clock,
   Network,
   Cloud,
-  ShieldCheck
+  ShieldCheck,
+  Play,
+  Zap
 } from 'lucide-react';
+import { useXDR } from '@/hooks/useXDR';
 
 const XDRDashboard = () => {
+  const { loading, error, processThreatIndicator, evaluateAccess, analyzeTraffic, getSystemStatus } = useXDR();
+  const [demoResults, setDemoResults] = useState<any>(null);
+  const [showDemo, setShowDemo] = useState(false);
   const xdrModules = [
     // Core Detection & Response (1-10)
     { 
@@ -141,6 +147,68 @@ const XDRDashboard = () => {
     { id: 49, name: 'Visualization', description: 'Security data visualization', icon: BarChart3, status: 'active', path: '/xdr/visualization' }
   ];
 
+  const runThreatDemo = async () => {
+    const threatIndicator = {
+      id: `threat-${Date.now()}`,
+      indicator_type: 'IP',
+      value: '192.168.1.100',
+      confidence: 0.85,
+      severity: 'HIGH',
+      source: 'internal_scan',
+      timestamp: new Date(),
+      tags: ['malware', 'c2_server'],
+      context: {
+        geolocation: 'Unknown',
+        asn: 'AS12345',
+        category: 'Malicious'
+      }
+    };
+
+    const result = await processThreatIndicator(threatIndicator);
+    setDemoResults({ type: 'threat', data: result });
+  };
+
+  const runAccessDemo = async () => {
+    const accessRequest = {
+      id: `access-${Date.now()}`,
+      user_id: 'user123',
+      resource: '/api/sensitive-data',
+      action: 'READ',
+      timestamp: new Date(),
+      context: {
+        ip_address: '10.0.0.1',
+        user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        location: {
+          country: 'US',
+          city: 'New York',
+          trusted: true
+        },
+        device_fingerprint: 'abc123def456',
+        session_id: 'session_789',
+        risk_factors: ['unusual_time']
+      }
+    };
+
+    const result = await evaluateAccess(accessRequest);
+    setDemoResults({ type: 'access', data: result });
+  };
+
+  const runTrafficDemo = async () => {
+    const networkTraffic = {
+      id: `traffic-${Date.now()}`,
+      source_ip: '192.168.1.50',
+      destination_ip: '10.0.0.100',
+      protocol: 'TCP',
+      port: 443,
+      bytes_sent: 1500,
+      bytes_received: 2048,
+      timestamp: new Date()
+    };
+
+    const result = await analyzeTraffic(networkTraffic);
+    setDemoResults({ type: 'traffic', data: result });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
@@ -152,6 +220,86 @@ const XDRDashboard = () => {
 
   return (
     <div className="flex-1 p-6">
+      {/* XDR Core Demo Section */}
+      <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold mb-2 flex items-center">
+              <Zap className="w-8 h-8 mr-3" />
+              Live XDR Core Demo
+            </h2>
+            <p className="text-blue-100">
+              Experience the power of our high-performance Rust-based XDR engine
+            </p>
+          </div>
+          <button
+            onClick={() => setShowDemo(!showDemo)}
+            className="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+          >
+            {showDemo ? 'Hide Demo' : 'Show Demo'}
+          </button>
+        </div>
+
+        {showDemo && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <button
+                onClick={runThreatDemo}
+                disabled={loading}
+                className="bg-red-500 hover:bg-red-600 disabled:bg-red-400 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
+                <Shield className="w-5 h-5 mr-2" />
+                Process Threat
+              </button>
+
+              <button
+                onClick={runAccessDemo}
+                disabled={loading}
+                className="bg-green-500 hover:bg-green-600 disabled:bg-green-400 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
+                <ShieldCheck className="w-5 h-5 mr-2" />
+                Evaluate Access
+              </button>
+
+              <button
+                onClick={runTrafficDemo}
+                disabled={loading}
+                className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-yellow-400 text-white px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
+              >
+                <Network className="w-5 h-5 mr-2" />
+                Analyze Traffic
+              </button>
+            </div>
+
+            {loading && (
+              <div className="text-center py-4">
+                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                <p className="mt-2">Processing with XDR Core...</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-500/20 border border-red-300 rounded-lg p-4 mb-4">
+                <p className="text-red-100 font-medium">Error: {error}</p>
+              </div>
+            )}
+
+            {demoResults && (
+              <div className="bg-white/5 rounded-lg p-4">
+                <h4 className="font-semibold mb-2">
+                  {demoResults.type.toUpperCase()} Analysis Results:
+                </h4>
+                <div className="bg-black/20 rounded p-3 max-h-48 overflow-auto">
+                  <pre className="text-xs text-green-100 whitespace-pre-wrap">
+                    {JSON.stringify(demoResults.data, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <h1 className="text-3xl font-bold mb-2">
         XDR (Extended Detection and Response) Platform
       </h1>
