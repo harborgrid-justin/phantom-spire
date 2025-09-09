@@ -1,53 +1,462 @@
-import { Response } from 'express';
+/**
+ * IOC Controller - Standardized Implementation
+ * Follows BaseController pattern for enterprise-grade IOC management
+ */
+
+import { Request, Response } from 'express';
+import { BaseController } from './BaseController';
 import { IOC, IIOC } from '../models/IOC.js';
-import { AuthRequest } from '../middleware/auth.js';
-import { asyncHandler, createError } from '../middleware/errorHandler.js';
 import {
   CreateIOCRequest,
   UpdateIOCRequest,
   IOCQuery,
   ApiResponse,
 } from '../types/api.js';
-import { logger } from '../utils/logger.js';
 import { IOCValidationService } from '../services/iocValidationService.js';
 import { IOCAnalysisService } from '../services/iocAnalysisService.js';
 import { IOCEnrichmentService } from '../services/iocEnrichmentService.js';
 import { IOCStatisticsService } from '../services/iocStatisticsService.js';
 
 /**
- * @swagger
- * /iocs:
- *   get:
- *     summary: Get all IOCs with pagination and filtering
- *     tags: [IOCs]
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *       - in: query
- *         name: type
- *         schema:
- *           type: string
- *           enum: [ip, domain, url, hash, email]
- *       - in: query
- *         name: severity
- *         schema:
- *           type: string
- *           enum: [low, medium, high, critical]
- *     responses:
- *       200:
- *         description: List of IOCs
+ * IOC Controller extending BaseController
+ * Provides standardized IOC management with enterprise patterns
  */
-export const getIOCs = asyncHandler(async (req: AuthRequest, res: Response) => {
+export class IOCController extends BaseController {
+  constructor(
+    private iocValidationService: IOCValidationService,
+    private iocAnalysisService: IOCAnalysisService,
+    private iocEnrichmentService: IOCEnrichmentService,
+    private iocStatisticsService: IOCStatisticsService
+  ) {
+    super();
+  }
+
+  /**
+   * Get all IOCs with pagination and filtering
+   */
+  getIOCs = this.asyncHandler(async (req: Request, res: Response) => {
+    const { page, pageSize, offset } = this.getPaginationParams(req);
+    const filters = this.getFilterParams(req);
+    
+    try {
+      // Build query from filters
+      const query: any = {};
+      
+      if (filters.type) {
+        query.type = filters.type;
+      }
+      
+      if (filters.severity) {
+        query.severity = filters.severity;
+      }
+      
+      if (filters.status) {
+        query.status = filters.status;
+      }
+      
+      if (filters.search) {
+        query.$or = [
+          { value: { $regex: filters.search, $options: 'i' } },
+          { description: { $regex: filters.search, $options: 'i' } },
+          { source: { $regex: filters.search, $options: 'i' } }
+        ];
+      }
+
+      // Get paginated results
+      const [iocs, total] = await Promise.all([
+        IOC.find(query)
+          .skip(offset)
+          .limit(pageSize)
+          .sort({ createdAt: -1 }),
+        IOC.countDocuments(query)
+      ]);
+
+      this.sendPaginated(
+        res,
+        iocs,
+        total,
+        page,
+        pageSize,
+        'IOCs retrieved successfully'
+      );
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_FETCH_ERROR');
+    }
+  });
+
+  /**
+   * Get IOC by ID
+   */
+  getIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return this.sendError(res, 'IOC ID is required', 400, 'INVALID_ID');
+      }
+
+      const ioc = await IOC.findById(id);
+      
+      if (!ioc) {
+        return this.sendError(res, 'IOC not found', 404, 'IOC_NOT_FOUND');
+      }
+
+      this.sendSuccess(res, ioc, 'IOC retrieved successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_FETCH_ERROR');
+    }
+  });
+
+  /**
+   * Create new IOC
+   */
+  createIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const missingFields = this.validateRequiredFields(req.body, [
+        'type',
+        'value',
+        'severity'
+      ]);
+      
+      if (missingFields.length > 0) {
+        return this.handleValidationError(res, missingFields);
+      }
+
+      const createRequest: CreateIOCRequest = req.body;
+      
+      // Validate IOC data
+      const validationResult = await this.iocValidationService.validateIOC(createRequest);
+      if (!validationResult.isValid) {
+        return this.sendError(
+          res,
+          `Validation failed: ${validationResult.errors.join(', ')}`,
+          400,
+          'VALIDATION_ERROR'
+        );
+      }
+
+      // Check for duplicates
+      const existingIOC = await IOC.findOne({
+        type: createRequest.type,
+        value: createRequest.value
+      });
+      
+      if (existingIOC) {
+        return this.sendError(
+          res,
+          'IOC with this type and value already exists',
+          409,
+          'DUPLICATE_IOC'
+        );
+      }
+
+      // Create IOC
+      const ioc = new IOC({
+        ...createRequest,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: (req as any).user?.id
+      });
+
+      const savedIOC = await ioc.save();
+
+      // Trigger analysis and enrichment (async)
+      this.triggerIOCProcessing(savedIOC);
+
+      this.sendSuccess(res, savedIOC, 'IOC created successfully', {
+        id: savedIOC._id
+      });
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_CREATE_ERROR');
+    }
+  });
+
+  /**
+   * Update IOC
+   */
+  updateIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return this.sendError(res, 'IOC ID is required', 400, 'INVALID_ID');
+      }
+
+      const updateRequest: UpdateIOCRequest = req.body;
+      
+      const ioc = await IOC.findById(id);
+      if (!ioc) {
+        return this.sendError(res, 'IOC not found', 404, 'IOC_NOT_FOUND');
+      }
+
+      // Update fields
+      Object.assign(ioc, updateRequest, {
+        updatedAt: new Date(),
+        updatedBy: (req as any).user?.id
+      });
+
+      const updatedIOC = await ioc.save();
+
+      this.sendSuccess(res, updatedIOC, 'IOC updated successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_UPDATE_ERROR');
+    }
+  });
+
+  /**
+   * Delete IOC
+   */
+  deleteIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return this.sendError(res, 'IOC ID is required', 400, 'INVALID_ID');
+      }
+
+      const ioc = await IOC.findById(id);
+      if (!ioc) {
+        return this.sendError(res, 'IOC not found', 404, 'IOC_NOT_FOUND');
+      }
+
+      await IOC.findByIdAndDelete(id);
+
+      this.sendSuccess(res, null, 'IOC deleted successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_DELETE_ERROR');
+    }
+  });
+
+  /**
+   * Search IOCs
+   */
+  searchIOCs = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { query, filters = {} } = req.body;
+      const { page, pageSize, offset } = this.getPaginationParams(req);
+      
+      if (!query || query.trim().length === 0) {
+        return this.sendError(res, 'Search query is required', 400, 'INVALID_QUERY');
+      }
+
+      const searchQuery = {
+        $and: [
+          {
+            $or: [
+              { value: { $regex: query, $options: 'i' } },
+              { description: { $regex: query, $options: 'i' } },
+              { source: { $regex: query, $options: 'i' } },
+              { 'tags': { $regex: query, $options: 'i' } }
+            ]
+          },
+          ...(filters.type ? [{ type: filters.type }] : []),
+          ...(filters.severity ? [{ severity: filters.severity }] : []),
+          ...(filters.status ? [{ status: filters.status }] : [])
+        ]
+      };
+
+      const [iocs, total] = await Promise.all([
+        IOC.find(searchQuery)
+          .skip(offset)
+          .limit(pageSize)
+          .sort({ createdAt: -1 }),
+        IOC.countDocuments(searchQuery)
+      ]);
+
+      this.sendPaginated(
+        res,
+        iocs,
+        total,
+        page,
+        pageSize,
+        'IOC search completed successfully'
+      );
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_SEARCH_ERROR');
+    }
+  });
+
+  /**
+   * Analyze IOC
+   */
+  analyzeIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return this.sendError(res, 'IOC ID is required', 400, 'INVALID_ID');
+      }
+
+      const ioc = await IOC.findById(id);
+      if (!ioc) {
+        return this.sendError(res, 'IOC not found', 404, 'IOC_NOT_FOUND');
+      }
+
+      const analysisResult = await this.iocAnalysisService.analyzeIOC(ioc);
+      
+      this.sendSuccess(res, analysisResult, 'IOC analysis completed successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_ANALYSIS_ERROR');
+    }
+  });
+
+  /**
+   * Enrich IOC with external data
+   */
+  enrichIOC = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      if (!id) {
+        return this.sendError(res, 'IOC ID is required', 400, 'INVALID_ID');
+      }
+
+      const ioc = await IOC.findById(id);
+      if (!ioc) {
+        return this.sendError(res, 'IOC not found', 404, 'IOC_NOT_FOUND');
+      }
+
+      const enrichmentResult = await this.iocEnrichmentService.enrichIOC(ioc);
+      
+      // Update IOC with enrichment data
+      Object.assign(ioc, {
+        enrichmentData: enrichmentResult,
+        lastEnriched: new Date(),
+        updatedAt: new Date()
+      });
+      
+      await ioc.save();
+
+      this.sendSuccess(res, enrichmentResult, 'IOC enrichment completed successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_ENRICHMENT_ERROR');
+    }
+  });
+
+  /**
+   * Get IOC statistics
+   */
+  getIOCStatistics = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const statistics = await this.iocStatisticsService.getStatistics();
+      
+      this.sendSuccess(res, statistics, 'IOC statistics retrieved successfully');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'IOC_STATS_ERROR');
+    }
+  });
+
+  /**
+   * Bulk create IOCs
+   */
+  bulkCreateIOCs = this.asyncHandler(async (req: Request, res: Response) => {
+    try {
+      const { iocs } = req.body;
+      
+      if (!Array.isArray(iocs) || iocs.length === 0) {
+        return this.sendError(res, 'IOCs array is required', 400, 'INVALID_INPUT');
+      }
+
+      if (iocs.length > 100) {
+        return this.sendError(res, 'Maximum 100 IOCs allowed per bulk operation', 400, 'BULK_LIMIT_EXCEEDED');
+      }
+
+      const results = [];
+      const errors = [];
+
+      for (const iocData of iocs) {
+        try {
+          // Validate each IOC
+          const validationResult = await this.iocValidationService.validateIOC(iocData);
+          if (!validationResult.isValid) {
+            errors.push({
+              data: iocData,
+              error: `Validation failed: ${validationResult.errors.join(', ')}`
+            });
+            continue;
+          }
+
+          // Check for duplicates
+          const existingIOC = await IOC.findOne({
+            type: iocData.type,
+            value: iocData.value
+          });
+          
+          if (existingIOC) {
+            errors.push({
+              data: iocData,
+              error: 'IOC with this type and value already exists'
+            });
+            continue;
+          }
+
+          // Create IOC
+          const ioc = new IOC({
+            ...iocData,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userId: (req as any).user?.id
+          });
+
+          const savedIOC = await ioc.save();
+          results.push(savedIOC);
+
+          // Trigger processing (async)
+          this.triggerIOCProcessing(savedIOC);
+        } catch (error) {
+          errors.push({
+            data: iocData,
+            error: (error as Error).message
+          });
+        }
+      }
+
+      this.sendSuccess(res, {
+        created: results,
+        errors: errors,
+        summary: {
+          total: iocs.length,
+          created: results.length,
+          failed: errors.length
+        }
+      }, 'Bulk IOC creation completed');
+    } catch (error) {
+      this.sendError(res, error as Error, 500, 'BULK_CREATE_ERROR');
+    }
+  });
+
+  /**
+   * Trigger asynchronous IOC processing
+   */
+  private async triggerIOCProcessing(ioc: IIOC): Promise<void> {
+    try {
+      // Trigger analysis and enrichment in background
+      Promise.all([
+        this.iocAnalysisService.analyzeIOC(ioc),
+        this.iocEnrichmentService.enrichIOC(ioc)
+      ]).catch(error => {
+        console.error('IOC processing failed:', error);
+      });
+    } catch (error) {
+      console.error('Failed to trigger IOC processing:', error);
+    }
+  }
+}
+
+// Export standardized controller instance factory
+export const createIOCController = (
+  validationService: IOCValidationService,
+  analysisService: IOCAnalysisService,
+  enrichmentService: IOCEnrichmentService,
+  statisticsService: IOCStatisticsService
+) => {
+  return new IOCController(
+    validationService,
+    analysisService,
+    enrichmentService,
+    statisticsService
+  );
+};
   const {
     page = '1',
     limit = '10',
