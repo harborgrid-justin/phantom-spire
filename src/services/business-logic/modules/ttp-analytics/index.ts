@@ -1,0 +1,9 @@
+export { TTPTrendAnalyzerBusinessLogic } from './TTPTrendAnalyzerBusinessLogic';
+export { TTPPatternRecognitionBusinessLogic } from './TTPPatternRecognitionBusinessLogic';
+export { TTPPredictiveModelingBusinessLogic } from './TTPPredictiveModelingBusinessLogic';
+export { TTPRiskAssessmentBusinessLogic } from './TTPRiskAssessmentBusinessLogic';
+export { TTPImpactAnalyzerBusinessLogic } from './TTPImpactAnalyzerBusinessLogic';
+export { TTPFrequencyTrackerBusinessLogic } from './TTPFrequencyTrackerBusinessLogic';
+export { TTPEffectivenessMetricsBusinessLogic } from './TTPEffectivenessMetricsBusinessLogic';
+export { TTPBenchmarkingEngineBusinessLogic } from './TTPBenchmarkingEngineBusinessLogic';
+export { TTPPerformanceAnalyticsBusinessLogic } from './TTPPerformanceAnalyticsBusinessLogic';

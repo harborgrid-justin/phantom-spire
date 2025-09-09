@@ -1,0 +1,12 @@
+export { default as initialaccessanalyzerRoutes } from './initialaccessanalyzerRoutes';
+export { default as executiontacticsmapperRoutes } from './executiontacticsmapperRoutes';
+export { default as persistencetrackerRoutes } from './persistencetrackerRoutes';
+export { default as privilegeescalationdetectorRoutes } from './privilegeescalationdetectorRoutes';
+export { default as defenseevasionanalyzerRoutes } from './defenseevasionanalyzerRoutes';
+export { default as credentialaccessmonitorRoutes } from './credentialaccessmonitorRoutes';
+export { default as discoveryplatformRoutes } from './discoveryplatformRoutes';
+export { default as lateralmovementtrackerRoutes } from './lateralmovementtrackerRoutes';
+export { default as collectionanalyzerRoutes } from './collectionanalyzerRoutes';
+export { default as exfiltrationdetectorRoutes } from './exfiltrationdetectorRoutes';
+export { default as commandcontrolanalyzerRoutes } from './commandcontrolanalyzerRoutes';
+export { default as impactassessmentengineRoutes } from './impactassessmentengineRoutes';
