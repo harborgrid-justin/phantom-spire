@@ -40,7 +40,7 @@ import {
 } from '@mui/material';
 import { 
   Public, 
-  Rss, 
+  RssFeed as Rss, 
   OpenInNew, 
   Star,
   Search,

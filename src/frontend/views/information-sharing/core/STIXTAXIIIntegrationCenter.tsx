@@ -42,7 +42,7 @@ import {
   IconButton
 } from '@mui/material';
 import { 
-  Integration, 
+  Widgets as Integration, 
   CloudSync, 
   Security, 
   DataObject,

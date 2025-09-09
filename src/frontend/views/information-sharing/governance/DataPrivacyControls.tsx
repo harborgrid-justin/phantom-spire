@@ -47,7 +47,7 @@ import {
 } from '@mui/material';
 import { 
   Shield, 
-  Privacy, 
+  Lock as Privacy, 
   Lock, 
   Visibility,
   Add,
@@ -372,7 +372,7 @@ export const DataPrivacyControls: React.FC = () => {
         <Grid item xs={12} sm={6} md={2}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
-              <Assignment sx={{ fontSize: 40, color: 'warning.main', mb: 1 }} />
+              <Lock sx={{ fontSize: 40, color: 'warning.main', mb: 1 }} />
               <Typography variant="h5" color="warning.main">
                 {privacyMetrics.privacyRequests}
               </Typography>
