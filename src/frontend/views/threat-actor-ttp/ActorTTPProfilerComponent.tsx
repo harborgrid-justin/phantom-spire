@@ -94,7 +94,7 @@ interface TTPData {
   };
 }
 
-interface ${componentName}Props {
+interface ActorTTPProfilerProps {
   onDataUpdate?: (data: TTPData[]) => void;
   onRefresh?: () => void;
   onExport?: () => void;
@@ -105,7 +105,7 @@ interface ${componentName}Props {
   };
 }
 
-const ${componentName}: React.FC<${componentName}Props> = ({
+const ActorTTPProfiler: React.FC<ActorTTPProfilerProps> = ({
   onDataUpdate,
   onRefresh,
   onExport,
@@ -200,7 +200,7 @@ const ${componentName}: React.FC<${componentName}Props> = ({
     if (onExport) {
       onExport();
     }
-    console.log('Exporting ${category} TTP data...');
+    console.log('Exporting ttp-category TTP data...');
   };
 
   const getStatusColor = (status: string) => {
@@ -658,4 +658,4 @@ const ${componentName}: React.FC<${componentName}Props> = ({
   );
 };
 
-export default ${componentName};
+export default ActorTTPProfiler;
