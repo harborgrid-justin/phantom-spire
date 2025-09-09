@@ -1,0 +1,9 @@
+export { default as ttptrendanalyzerRoutes } from './ttptrendanalyzerRoutes';
+export { default as ttppatternrecognitionRoutes } from './ttppatternrecognitionRoutes';
+export { default as ttppredictivemodelingRoutes } from './ttppredictivemodelingRoutes';
+export { default as ttpriskassessmentRoutes } from './ttpriskassessmentRoutes';
+export { default as ttpimpactanalyzerRoutes } from './ttpimpactanalyzerRoutes';
+export { default as ttpfrequencytrackerRoutes } from './ttpfrequencytrackerRoutes';
+export { default as ttpeffectivenessmetricsRoutes } from './ttpeffectivenessmetricsRoutes';
+export { default as ttpbenchmarkingengineRoutes } from './ttpbenchmarkingengineRoutes';
+export { default as ttpperformanceanalyticsRoutes } from './ttpperformanceanalyticsRoutes';
