@@ -32,13 +32,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineDot,
-  TimelineConnector,
-  TimelineContent,
-  TimelineOppositeContent,
+
   Table,
   TableBody,
   TableCell,
@@ -48,6 +42,15 @@ import {
   IconButton,
   Divider
 } from '@mui/material';
+import {
+  Timeline,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineDot,
+  TimelineConnector,
+  TimelineContent,
+  TimelineOppositeContent,
+} from '@mui/lab';
 import { 
   Emergency, 
   Groups, 

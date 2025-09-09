@@ -35,7 +35,7 @@ import {
   Divider
 } from '@mui/material';
 import { 
-  Rss, 
+  RssFeed as Rss, 
   CloudDownload, 
   Security, 
   Groups,
