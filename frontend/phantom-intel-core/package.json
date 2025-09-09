@@ -2,13 +2,27 @@
   "name": "phantom-intel-core",
   "version": "1.0.0",
   "description": "Advanced Threat Intelligence Core - Comprehensive intelligence gathering, analysis, and correlation engine",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "phantom-intel-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "node test.js",
-    "clean": "rimraf dist"
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version"
   },
   "keywords": [
     "threat-intelligence",
@@ -26,22 +40,10 @@
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
+    "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
   },
-  "dependencies": {},
-  "files": [
-    "dist/**/*",
-    "src-ts/**/*",
-    "README.md"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
-    "directory": "frontend/phantom-intel-core"
-  },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">= 10"
   }
 }

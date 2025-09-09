@@ -10,10 +10,11 @@
 //! - Automated intelligence collection
 //! - Threat landscape analysis
 
+use napi::bindgen_prelude::*;
+use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 use indexmap::IndexMap;
 
 /// Threat Intelligence Platform Core
@@ -678,12 +679,12 @@ impl IntelCore {
     }
 
     /// Process intelligence feed data
-    pub fn process_feed(&mut self, feed_id: &str, data: &str) -> Result<usize, String> {
+    pub fn process_feed(&mut self, feed_id: &str, data: &str) -> std::result::Result<usize, String> {
         let feed = self.intelligence_feeds.get(feed_id)
             .ok_or_else(|| format!("Feed {} not found", feed_id))?;
 
         if !feed.enabled {
-            return Err("Feed is disabled".to_string());
+            return std::result::Result::Err("Feed is disabled".to_string());
         }
 
         // Simulate processing feed data
@@ -694,7 +695,7 @@ impl IntelCore {
             feed.last_updated = Utc::now();
         }
 
-        Ok(processed_count)
+        std::result::Result::Ok(processed_count)
     }
 
     /// Correlate indicators across campaigns and actors
@@ -918,5 +919,94 @@ pub struct IntelligenceSummary {
 impl Default for IntelCore {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// NAPI wrapper for JavaScript bindings
+#[napi]
+pub struct IntelCoreNapi {
+    inner: IntelCore,
+}
+
+#[napi]
+impl IntelCoreNapi {
+    #[napi(constructor)]
+    pub fn new() -> Self {
+        Self {
+            inner: IntelCore::new(),
+        }
+    }
+
+    #[napi]
+    pub fn add_indicator(&mut self, indicator_json: String) -> Result<String> {
+        let indicator: ThreatIndicator = serde_json::from_str(&indicator_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse indicator: {}", e)))?;
+        
+        Ok(self.inner.add_indicator(indicator))
+    }
+
+    #[napi]
+    pub fn get_indicator(&self, id: String) -> Result<Option<String>> {
+        match self.inner.get_indicator(&id) {
+            Some(indicator) => {
+                let json = serde_json::to_string(indicator)
+                    .map_err(|e| napi::Error::from_reason(format!("Failed to serialize indicator: {}", e)))?;
+                Ok(Some(json))
+            }
+            None => Ok(None)
+        }
+    }
+
+    #[napi]
+    pub fn search_indicators(&self, indicator_type: String, value: String) -> Result<String> {
+        let itype = match indicator_type.as_str() {
+            "IpAddress" => IndicatorType::IpAddress,
+            "Domain" => IndicatorType::Domain,
+            "Url" => IndicatorType::Url,
+            "FileHash" => IndicatorType::FileHash,
+            "Email" => IndicatorType::Email,
+            "Registry" => IndicatorType::Registry,
+            "Mutex" => IndicatorType::Mutex,
+            "Certificate" => IndicatorType::Certificate,
+            "UserAgent" => IndicatorType::UserAgent,
+            "JA3" => IndicatorType::JA3,
+            "YARA" => IndicatorType::YARA,
+            "Sigma" => IndicatorType::Sigma,
+            _ => IndicatorType::Custom(indicator_type),
+        };
+
+        let results = self.inner.search_indicators(&itype, &value);
+        serde_json::to_string(&results)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize results: {}", e)))
+    }
+
+    #[napi]
+    pub fn enrich_indicator(&mut self, id: String, enrichment_json: String) -> Result<bool> {
+        let enrichment: IndicatorEnrichment = serde_json::from_str(&enrichment_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse enrichment: {}", e)))?;
+        
+        Ok(self.inner.enrich_indicator(&id, enrichment))
+    }
+
+    #[napi]
+    pub fn add_threat_actor(&mut self, actor_json: String) -> Result<String> {
+        let actor: ThreatActor = serde_json::from_str(&actor_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse threat actor: {}", e)))?;
+        
+        Ok(self.inner.add_threat_actor(actor))
+    }
+
+    #[napi]
+    pub fn correlate_indicators(&self, indicator_id: String) -> Result<String> {
+        let correlations = self.inner.correlate_indicators(&indicator_id);
+        serde_json::to_string(&correlations)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize correlations: {}", e)))
+    }
+
+    #[napi]
+    pub fn generate_intelligence_summary(&self) -> Result<String> {
+        let summary = self.inner.generate_intelligence_summary();
+        serde_json::to_string(&summary)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize summary: {}", e)))
     }
 }
