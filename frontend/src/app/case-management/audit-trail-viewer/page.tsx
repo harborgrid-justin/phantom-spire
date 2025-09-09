@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useServicePage } from '../../../../lib/business-logic';
+import { useServicePage } from '../../../lib/business-logic';
 
 interface AuditTrailViewerData {
   id: string;
@@ -44,18 +44,10 @@ export default function AuditTrailViewerPage() {
       ];
 
       setData(mockData);
-      addNotification({
-        type: 'success',
-        message: 'Audit Trail Viewer data loaded successfully',
-        duration: 3000
-      });
+      addNotification('success', 'Audit Trail Viewer data loaded successfully');
     } catch (error) {
       console.error('Error fetching audit-trail-viewer data:', error);
-      addNotification({
-        type: 'error',
-        message: 'Failed to load Audit Trail Viewer data',
-        duration: 5000
-      });
+      addNotification('error', 'Failed to load Audit Trail Viewer data');
     } finally {
       setLoading(false);
     }
@@ -64,17 +56,9 @@ export default function AuditTrailViewerPage() {
   const handleAction = async (actionType: string, itemId?: string) => {
     try {
       // Implement specific actions based on page functionality
-      addNotification({
-        type: 'success',
-        message: `${actionType} completed successfully`,
-        duration: 3000
-      });
+      addNotification('success', `${actionType} completed successfully`);
     } catch (error) {
-      addNotification({
-        type: 'error',
-        message: `Failed to ${actionType}`,
-        duration: 5000
-      });
+      addNotification('error', `Failed to ${actionType}`);
     }
   };
 
@@ -233,7 +217,7 @@ export default function AuditTrailViewerPage() {
       </div>
 
       {/* Notifications */}
-      {notifications.map((notification) => (
+      {notifications.map((notification: any) => (
         <div key={notification.id} className="fixed bottom-4 right-4 z-40">
           <div className={`p-4 rounded-lg shadow-lg ${
             notification.type === 'success' ? 'bg-green-500' :

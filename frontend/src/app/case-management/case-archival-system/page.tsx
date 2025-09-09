@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useServicePage } from '../../../../lib/business-logic';
+import { useServicePage } from '../../../lib/business-logic';
 
 interface CaseArchivalSystemData {
   id: string;
