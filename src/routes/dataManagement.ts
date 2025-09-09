@@ -59,7 +59,10 @@ router.get('/ingestion/streams', DataIngestionController.getRealTimeStreams);
  *       200:
  *         description: Batch processing data retrieved successfully
  */
-router.get('/ingestion/batch-processing', DataIngestionController.getBatchProcessing);
+router.get(
+  '/ingestion/batch-processing',
+  DataIngestionController.getBatchProcessing
+);
 
 /**
  * @swagger
@@ -73,7 +76,10 @@ router.get('/ingestion/batch-processing', DataIngestionController.getBatchProces
  *       200:
  *         description: Data transformation data retrieved successfully
  */
-router.get('/ingestion/transformation', DataIngestionController.getDataTransformation);
+router.get(
+  '/ingestion/transformation',
+  DataIngestionController.getDataTransformation
+);
 
 /**
  * @swagger
@@ -87,7 +93,10 @@ router.get('/ingestion/transformation', DataIngestionController.getDataTransform
  *       200:
  *         description: Quality validation data retrieved successfully
  */
-router.get('/ingestion/quality-validation', DataIngestionController.getQualityValidation);
+router.get(
+  '/ingestion/quality-validation',
+  DataIngestionController.getQualityValidation
+);
 
 /**
  * @swagger
@@ -101,7 +110,10 @@ router.get('/ingestion/quality-validation', DataIngestionController.getQualityVa
  *       200:
  *         description: Pipeline monitoring data retrieved successfully
  */
-router.get('/ingestion/pipeline-monitor', DataIngestionController.getPipelineMonitor);
+router.get(
+  '/ingestion/pipeline-monitor',
+  DataIngestionController.getPipelineMonitor
+);
 
 /**
  * @swagger
@@ -115,7 +127,10 @@ router.get('/ingestion/pipeline-monitor', DataIngestionController.getPipelineMon
  *       200:
  *         description: Format conversion data retrieved successfully
  */
-router.get('/ingestion/format-conversion', DataIngestionController.getFormatConversion);
+router.get(
+  '/ingestion/format-conversion',
+  DataIngestionController.getFormatConversion
+);
 
 /**
  * @swagger
@@ -129,7 +144,10 @@ router.get('/ingestion/format-conversion', DataIngestionController.getFormatConv
  *       200:
  *         description: Schema registry data retrieved successfully
  */
-router.get('/ingestion/schema-registry', DataIngestionController.getSchemaRegistry);
+router.get(
+  '/ingestion/schema-registry',
+  DataIngestionController.getSchemaRegistry
+);
 
 /**
  * Data Governance & Compliance Routes (8 endpoints)
@@ -147,7 +165,10 @@ router.get('/ingestion/schema-registry', DataIngestionController.getSchemaRegist
  *       200:
  *         description: Governance dashboard data retrieved successfully
  */
-router.get('/governance/dashboard', DataGovernanceController.getGovernanceDashboard);
+router.get(
+  '/governance/dashboard',
+  DataGovernanceController.getGovernanceDashboard
+);
 
 /**
  * @swagger
@@ -161,7 +182,10 @@ router.get('/governance/dashboard', DataGovernanceController.getGovernanceDashbo
  *       200:
  *         description: Policy management data retrieved successfully
  */
-router.get('/governance/policy-management', DataGovernanceController.getPolicyManagement);
+router.get(
+  '/governance/policy-management',
+  DataGovernanceController.getPolicyManagement
+);
 
 /**
  * @swagger
@@ -175,7 +199,10 @@ router.get('/governance/policy-management', DataGovernanceController.getPolicyMa
  *       200:
  *         description: Compliance monitoring data retrieved successfully
  */
-router.get('/governance/compliance-monitoring', DataGovernanceController.getComplianceMonitoring);
+router.get(
+  '/governance/compliance-monitoring',
+  DataGovernanceController.getComplianceMonitoring
+);
 
 /**
  * @swagger
@@ -189,7 +216,10 @@ router.get('/governance/compliance-monitoring', DataGovernanceController.getComp
  *       200:
  *         description: Data lineage data retrieved successfully
  */
-router.get('/governance/lineage-tracking', DataGovernanceController.getLineageTracking);
+router.get(
+  '/governance/lineage-tracking',
+  DataGovernanceController.getLineageTracking
+);
 
 /**
  * @swagger
@@ -203,7 +233,10 @@ router.get('/governance/lineage-tracking', DataGovernanceController.getLineageTr
  *       200:
  *         description: Privacy controls data retrieved successfully
  */
-router.get('/governance/privacy-controls', DataGovernanceController.getPrivacyControls);
+router.get(
+  '/governance/privacy-controls',
+  DataGovernanceController.getPrivacyControls
+);
 
 /**
  * @swagger
@@ -231,7 +264,10 @@ router.get('/governance/audit-trail', DataGovernanceController.getAuditTrail);
  *       200:
  *         description: Retention policies data retrieved successfully
  */
-router.get('/governance/retention-policies', DataGovernanceController.getRetentionPolicies);
+router.get(
+  '/governance/retention-policies',
+  DataGovernanceController.getRetentionPolicies
+);
 
 /**
  * @swagger
@@ -245,7 +281,10 @@ router.get('/governance/retention-policies', DataGovernanceController.getRetenti
  *       200:
  *         description: Data classification data retrieved successfully
  */
-router.get('/governance/classification', DataGovernanceController.getDataClassification);
+router.get(
+  '/governance/classification',
+  DataGovernanceController.getDataClassification
+);
 
 /**
  * Data Analytics & Insights Routes (8 endpoints)
@@ -263,7 +302,10 @@ router.get('/governance/classification', DataGovernanceController.getDataClassif
  *       200:
  *         description: Analytics workbench data retrieved successfully
  */
-router.get('/analytics/workbench', DataAnalyticsController.getAnalyticsWorkbench);
+router.get(
+  '/analytics/workbench',
+  DataAnalyticsController.getAnalyticsWorkbench
+);
 
 /**
  * @swagger
@@ -277,7 +319,10 @@ router.get('/analytics/workbench', DataAnalyticsController.getAnalyticsWorkbench
  *       200:
  *         description: Report generation data retrieved successfully
  */
-router.get('/analytics/report-generation', DataAnalyticsController.getReportGeneration);
+router.get(
+  '/analytics/report-generation',
+  DataAnalyticsController.getReportGeneration
+);
 
 /**
  * @swagger
@@ -291,7 +336,10 @@ router.get('/analytics/report-generation', DataAnalyticsController.getReportGene
  *       200:
  *         description: Dashboard builder data retrieved successfully
  */
-router.get('/analytics/dashboard-builder', DataAnalyticsController.getDashboardBuilder);
+router.get(
+  '/analytics/dashboard-builder',
+  DataAnalyticsController.getDashboardBuilder
+);
 
 /**
  * @swagger
@@ -319,7 +367,10 @@ router.get('/analytics/metrics-kpi', DataAnalyticsController.getMetricsKPI);
  *       200:
  *         description: Trend analysis data retrieved successfully
  */
-router.get('/analytics/trend-analysis', DataAnalyticsController.getTrendAnalysis);
+router.get(
+  '/analytics/trend-analysis',
+  DataAnalyticsController.getTrendAnalysis
+);
 
 /**
  * @swagger
@@ -333,7 +384,10 @@ router.get('/analytics/trend-analysis', DataAnalyticsController.getTrendAnalysis
  *       200:
  *         description: Performance analytics data retrieved successfully
  */
-router.get('/analytics/performance-analytics', DataAnalyticsController.getPerformanceAnalytics);
+router.get(
+  '/analytics/performance-analytics',
+  DataAnalyticsController.getPerformanceAnalytics
+);
 
 /**
  * @swagger
@@ -361,7 +415,10 @@ router.get('/analytics/data-mining', DataAnalyticsController.getDataMining);
  *       200:
  *         description: Predictive analytics data retrieved successfully
  */
-router.get('/analytics/predictive-analytics', DataAnalyticsController.getPredictiveAnalytics);
+router.get(
+  '/analytics/predictive-analytics',
+  DataAnalyticsController.getPredictiveAnalytics
+);
 
 /**
  * Data Operations & Monitoring Routes (8 endpoints)
@@ -379,7 +436,10 @@ router.get('/analytics/predictive-analytics', DataAnalyticsController.getPredict
  *       200:
  *         description: Data health monitoring data retrieved successfully
  */
-router.get('/operations/health-monitor', DataOperationsController.getHealthMonitor);
+router.get(
+  '/operations/health-monitor',
+  DataOperationsController.getHealthMonitor
+);
 
 /**
  * @swagger
@@ -393,7 +453,10 @@ router.get('/operations/health-monitor', DataOperationsController.getHealthMonit
  *       200:
  *         description: Storage management data retrieved successfully
  */
-router.get('/operations/storage-management', DataOperationsController.getStorageManagement);
+router.get(
+  '/operations/storage-management',
+  DataOperationsController.getStorageManagement
+);
 
 /**
  * @swagger
@@ -407,7 +470,10 @@ router.get('/operations/storage-management', DataOperationsController.getStorage
  *       200:
  *         description: Backup and recovery data retrieved successfully
  */
-router.get('/operations/backup-recovery', DataOperationsController.getBackupRecovery);
+router.get(
+  '/operations/backup-recovery',
+  DataOperationsController.getBackupRecovery
+);
 
 /**
  * @swagger
@@ -421,7 +487,10 @@ router.get('/operations/backup-recovery', DataOperationsController.getBackupReco
  *       200:
  *         description: Access control data retrieved successfully
  */
-router.get('/operations/access-control', DataOperationsController.getAccessControl);
+router.get(
+  '/operations/access-control',
+  DataOperationsController.getAccessControl
+);
 
 /**
  * @swagger
@@ -435,7 +504,10 @@ router.get('/operations/access-control', DataOperationsController.getAccessContr
  *       200:
  *         description: Integration status data retrieved successfully
  */
-router.get('/operations/integration-status', DataOperationsController.getIntegrationStatus);
+router.get(
+  '/operations/integration-status',
+  DataOperationsController.getIntegrationStatus
+);
 
 /**
  * @swagger
@@ -449,7 +521,10 @@ router.get('/operations/integration-status', DataOperationsController.getIntegra
  *       200:
  *         description: Performance optimizer data retrieved successfully
  */
-router.get('/operations/performance-optimizer', DataOperationsController.getPerformanceOptimizer);
+router.get(
+  '/operations/performance-optimizer',
+  DataOperationsController.getPerformanceOptimizer
+);
 
 /**
  * @swagger
@@ -463,7 +538,10 @@ router.get('/operations/performance-optimizer', DataOperationsController.getPerf
  *       200:
  *         description: Error management data retrieved successfully
  */
-router.get('/operations/error-management', DataOperationsController.getErrorManagement);
+router.get(
+  '/operations/error-management',
+  DataOperationsController.getErrorManagement
+);
 
 /**
  * @swagger
@@ -477,6 +555,9 @@ router.get('/operations/error-management', DataOperationsController.getErrorMana
  *       200:
  *         description: Capacity planning data retrieved successfully
  */
-router.get('/operations/capacity-planning', DataOperationsController.getCapacityPlanning);
+router.get(
+  '/operations/capacity-planning',
+  DataOperationsController.getCapacityPlanning
+);
 
 export default router;

@@ -13,7 +13,7 @@ import {
   getAttackCampaigns,
   getAttackVectorStats,
   searchAttackVectors,
-  attackVectorValidation
+  attackVectorValidation,
 } from '../controllers/attackVectorController.js';
 import { authMiddleware } from '../middleware/auth.js';
 
@@ -104,7 +104,7 @@ router.use(authMiddleware);
  *         indicators: ["suspicious-email@evil.com", "malicious-link.com"]
  *         mitigations: ["User training", "Email security gateway"]
  *         references: ["https://attack.mitre.org/techniques/T1566/"]
- *     
+ *
  *     AttackCampaign:
  *       type: object
  *       properties:
@@ -151,7 +151,7 @@ router.use(authMiddleware);
  *         targets: ["Finance", "Government"]
  *         success_rate: 35
  *         attribution_confidence: "high"
- *     
+ *
  *     AttackVectorStats:
  *       type: object
  *       properties:

@@ -11,7 +11,7 @@ import {
   CVENotificationController,
   CVEReportController,
   cveValidation,
-  searchValidation
+  searchValidation,
 } from '../controllers/cveController.js';
 import { authMiddleware } from '../middleware/auth.js';
 

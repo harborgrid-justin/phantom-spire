@@ -20,7 +20,7 @@ export const createBusinessLogicRequest = (
     context: {
       ...context,
       userId,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   };
 };

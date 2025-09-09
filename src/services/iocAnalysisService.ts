@@ -738,19 +738,19 @@ export class IOCAnalysisService {
         totalIOCs: Math.floor(Math.random() * 1000) + 500,
         highRisk: Math.floor(Math.random() * 50) + 25,
         mediumRisk: Math.floor(Math.random() * 100) + 75,
-        lowRisk: Math.floor(Math.random() * 200) + 150
+        lowRisk: Math.floor(Math.random() * 200) + 150,
       },
       riskFactors: [
         { factor: 'Recent Activity', weight: 0.35, score: 0.8 },
         { factor: 'Source Reputation', weight: 0.25, score: 0.7 },
-        { factor: 'Threat Attribution', weight: 0.20, score: 0.6 },
-        { factor: 'Geographic Distribution', weight: 0.20, score: 0.9 }
+        { factor: 'Threat Attribution', weight: 0.2, score: 0.6 },
+        { factor: 'Geographic Distribution', weight: 0.2, score: 0.9 },
       ],
       recommendations: [
         'Monitor high-risk IOCs more frequently',
         'Implement automated blocking for critical threats',
-        'Enhance threat intelligence feeds'
-      ]
+        'Enhance threat intelligence feeds',
+      ],
     };
   }
 
@@ -765,22 +765,38 @@ export class IOCAnalysisService {
       iocId: options.iocId,
       attribution: {
         threatActors: [
-          { name: 'APT29', confidence: 0.85, campaigns: ['CozyBear', 'The Dukes'] },
-          { name: 'Lazarus Group', confidence: 0.72, campaigns: ['Operation Troy', 'WannaCry'] }
+          {
+            name: 'APT29',
+            confidence: 0.85,
+            campaigns: ['CozyBear', 'The Dukes'],
+          },
+          {
+            name: 'Lazarus Group',
+            confidence: 0.72,
+            campaigns: ['Operation Troy', 'WannaCry'],
+          },
         ],
         techniques: [
-          { id: 'T1566.001', name: 'Spearphishing Attachment', confidence: 0.9 },
-          { id: 'T1055', name: 'Process Injection', confidence: 0.75 }
+          {
+            id: 'T1566.001',
+            name: 'Spearphishing Attachment',
+            confidence: 0.9,
+          },
+          { id: 'T1055', name: 'Process Injection', confidence: 0.75 },
         ],
         campaigns: [
-          { name: 'SolarWinds Supply Chain', relevance: 0.8, timeframe: '2020-2021' }
-        ]
+          {
+            name: 'SolarWinds Supply Chain',
+            relevance: 0.8,
+            timeframe: '2020-2021',
+          },
+        ],
       },
       evidence: {
         indicators: Math.floor(Math.random() * 20) + 10,
         sources: ['MISP', 'VirusTotal', 'ThreatConnect'],
-        confidence: options.minConfidence / 100
-      }
+        confidence: options.minConfidence / 100,
+      },
     };
   }
 
@@ -798,23 +814,35 @@ export class IOCAnalysisService {
         relatedIOCs: Array.from({ length: 5 }, (_, i) => ({
           id: `related-${i}`,
           type: ['ip', 'domain', 'hash'][Math.floor(Math.random() * 3)],
-          relationship: ['infrastructure', 'campaign', 'family'][Math.floor(Math.random() * 3)],
-          confidence: 0.6 + Math.random() * 0.3
+          relationship: ['infrastructure', 'campaign', 'family'][
+            Math.floor(Math.random() * 3)
+          ],
+          confidence: 0.6 + Math.random() * 0.3,
         })),
-        campaigns: options.includeCampaigns ? [
-          { name: 'Operation Ghost', active: true, firstSeen: '2024-01-15' },
-          { name: 'Silent Storm', active: false, firstSeen: '2023-11-20' }
-        ] : null,
-        ttps: options.includeTTPs ? [
-          { id: 'T1059', name: 'Command and Scripting Interpreter' },
-          { id: 'T1105', name: 'Ingress Tool Transfer' }
-        ] : null
+        campaigns: options.includeCampaigns
+          ? [
+              {
+                name: 'Operation Ghost',
+                active: true,
+                firstSeen: '2024-01-15',
+              },
+              { name: 'Silent Storm', active: false, firstSeen: '2023-11-20' },
+            ]
+          : null,
+        ttps: options.includeTTPs
+          ? [
+              { id: 'T1059', name: 'Command and Scripting Interpreter' },
+              { id: 'T1105', name: 'Ingress Tool Transfer' },
+            ]
+          : null,
       },
       timeline: Array.from({ length: 10 }, (_, i) => ({
         date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
         event: `Event ${i + 1}`,
-        type: ['detection', 'enrichment', 'validation'][Math.floor(Math.random() * 3)]
-      }))
+        type: ['detection', 'enrichment', 'validation'][
+          Math.floor(Math.random() * 3)
+        ],
+      })),
     };
   }
 
@@ -836,14 +864,18 @@ export class IOCAnalysisService {
           lng: (Math.random() - 0.5) * 360,
           count: Math.floor(Math.random() * 100) + 1,
           severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-          country: ['US', 'CN', 'RU', 'DE', 'UK'][Math.floor(Math.random() * 5)]
+          country: ['US', 'CN', 'RU', 'DE', 'UK'][
+            Math.floor(Math.random() * 5)
+          ],
         })),
-        clusters: options.enableClustering ? [
-          { region: 'Eastern Europe', count: 145, riskLevel: 'high' },
-          { region: 'East Asia', count: 89, riskLevel: 'medium' },
-          { region: 'North America', count: 234, riskLevel: 'low' }
-        ] : null
-      }
+        clusters: options.enableClustering
+          ? [
+              { region: 'Eastern Europe', count: 145, riskLevel: 'high' },
+              { region: 'East Asia', count: 89, riskLevel: 'medium' },
+              { region: 'North America', count: 234, riskLevel: 'low' },
+            ]
+          : null,
+      },
     };
   }
 
@@ -864,15 +896,18 @@ export class IOCAnalysisService {
           type: ['ip', 'domain', 'hash', 'url'][Math.floor(Math.random() * 4)],
           value: `example-${i}.com`,
           severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
-          distance: Math.floor(Math.random() * options.depth) + 1
+          distance: Math.floor(Math.random() * options.depth) + 1,
         })),
         edges: Array.from({ length: 30 }, (_, i) => ({
           source: `node-${Math.floor(Math.random() * 10)}`,
           target: `node-${Math.floor(Math.random() * 10) + 10}`,
-          relationship: options.relationshipTypes?.[Math.floor(Math.random() * options.relationshipTypes.length)] || 'related',
-          weight: Math.random()
-        }))
-      }
+          relationship:
+            options.relationshipTypes?.[
+              Math.floor(Math.random() * options.relationshipTypes.length)
+            ] || 'related',
+          weight: Math.random(),
+        })),
+      },
     };
   }
 
@@ -891,12 +926,14 @@ export class IOCAnalysisService {
         timestamp: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString(),
         activity: Math.floor(Math.random() * 100),
         events: Math.floor(Math.random() * 10),
-        context: options.includeContext ? {
-          sources: Math.floor(Math.random() * 5) + 1,
-          detections: Math.floor(Math.random() * 20),
-          enrichments: Math.floor(Math.random() * 5)
-        } : null
-      }))
+        context: options.includeContext
+          ? {
+              sources: Math.floor(Math.random() * 5) + 1,
+              detections: Math.floor(Math.random() * 20),
+              enrichments: Math.floor(Math.random() * 5),
+            }
+          : null,
+      })),
     };
   }
 
@@ -917,7 +954,7 @@ export class IOCAnalysisService {
           triggers: ['high-confidence-ip'],
           status: 'active',
           actions: ['block', 'alert', 'investigate'],
-          lastExecuted: new Date().toISOString()
+          lastExecuted: new Date().toISOString(),
         },
         {
           id: 'pb-002',
@@ -926,15 +963,15 @@ export class IOCAnalysisService {
           triggers: ['malicious-domain'],
           status: 'active',
           actions: ['notify', 'request-takedown', 'monitor'],
-          lastExecuted: new Date(Date.now() - 86400000).toISOString()
-        }
+          lastExecuted: new Date(Date.now() - 86400000).toISOString(),
+        },
       ],
       statistics: {
         totalPlaybooks: 15,
         activePlaybooks: 12,
         executionsToday: 47,
-        successRate: 0.94
-      }
+        successRate: 0.94,
+      },
     };
   }
 
@@ -954,7 +991,7 @@ export class IOCAnalysisService {
           triggerType: 'new-ioc',
           status: 'running',
           lastExecution: new Date().toISOString(),
-          successRate: 0.92
+          successRate: 0.92,
         },
         {
           id: 'wf-002',
@@ -962,15 +999,17 @@ export class IOCAnalysisService {
           triggerType: 'high-confidence',
           status: 'completed',
           lastExecution: new Date(Date.now() - 3600000).toISOString(),
-          successRate: 0.87
-        }
+          successRate: 0.87,
+        },
       ],
-      metrics: options.includeMetrics ? {
-        totalExecutions: 1247,
-        successfulExecutions: 1156,
-        averageExecutionTime: 23.5,
-        errorRate: 0.073
-      } : null
+      metrics: options.includeMetrics
+        ? {
+            totalExecutions: 1247,
+            successfulExecutions: 1156,
+            averageExecutionTime: 23.5,
+            errorRate: 0.073,
+          }
+        : null,
     };
   }
 
@@ -993,7 +1032,7 @@ export class IOCAnalysisService {
           assignee: 'analyst-001',
           iocCount: 47,
           created: new Date(Date.now() - 86400000 * 3).toISOString(),
-          updated: new Date().toISOString()
+          updated: new Date().toISOString(),
         },
         {
           id: 'case-002',
@@ -1003,15 +1042,19 @@ export class IOCAnalysisService {
           assignee: 'analyst-002',
           iocCount: 23,
           created: new Date(Date.now() - 86400000 * 7).toISOString(),
-          updated: new Date(Date.now() - 86400000 * 2).toISOString()
-        }
+          updated: new Date(Date.now() - 86400000 * 2).toISOString(),
+        },
       ],
-      timeline: options.includeTimeline ? Array.from({ length: 10 }, (_, i) => ({
-        date: new Date(Date.now() - i * 3600000).toISOString(),
-        action: ['created', 'updated', 'assigned', 'completed'][Math.floor(Math.random() * 4)],
-        caseId: `case-${String(Math.floor(Math.random() * 10)).padStart(3, '0')}`,
-        user: `analyst-${String(Math.floor(Math.random() * 5)).padStart(3, '0')}`
-      })) : null
+      timeline: options.includeTimeline
+        ? Array.from({ length: 10 }, (_, i) => ({
+            date: new Date(Date.now() - i * 3600000).toISOString(),
+            action: ['created', 'updated', 'assigned', 'completed'][
+              Math.floor(Math.random() * 4)
+            ],
+            caseId: `case-${String(Math.floor(Math.random() * 10)).padStart(3, '0')}`,
+            user: `analyst-${String(Math.floor(Math.random() * 5)).padStart(3, '0')}`,
+          }))
+        : null,
     };
   }
 
@@ -1031,35 +1074,37 @@ export class IOCAnalysisService {
           name: 'Network Analysis',
           type: 'automated',
           status: 'available',
-          description: 'Deep packet inspection and traffic analysis'
+          description: 'Deep packet inspection and traffic analysis',
         },
         {
           name: 'Malware Sandbox',
           type: 'dynamic',
           status: 'running',
-          description: 'Automated malware analysis environment'
+          description: 'Automated malware analysis environment',
         },
         {
           name: 'OSINT Collection',
           type: 'intelligence',
           status: 'available',
-          description: 'Open source intelligence gathering'
-        }
-      ],
-      artifacts: options.includeArtifacts ? [
-        {
-          type: 'network_capture',
-          size: '2.4 MB',
-          created: new Date().toISOString(),
-          status: 'processed'
+          description: 'Open source intelligence gathering',
         },
-        {
-          type: 'memory_dump',
-          size: '150 MB',
-          created: new Date(Date.now() - 3600000).toISOString(),
-          status: 'analyzing'
-        }
-      ] : null
+      ],
+      artifacts: options.includeArtifacts
+        ? [
+            {
+              type: 'network_capture',
+              size: '2.4 MB',
+              created: new Date().toISOString(),
+              status: 'processed',
+            },
+            {
+              type: 'memory_dump',
+              size: '150 MB',
+              created: new Date(Date.now() - 3600000).toISOString(),
+              status: 'analyzing',
+            },
+          ]
+        : null,
     };
   }
 
@@ -1081,7 +1126,7 @@ export class IOCAnalysisService {
           status: 'active',
           memberCount: 8,
           iocCount: 234,
-          created: new Date(Date.now() - 86400000 * 30).toISOString()
+          created: new Date(Date.now() - 86400000 * 30).toISOString(),
         },
         {
           id: 'ws-002',
@@ -1090,15 +1135,19 @@ export class IOCAnalysisService {
           status: 'archived',
           memberCount: 5,
           iocCount: 156,
-          created: new Date(Date.now() - 86400000 * 90).toISOString()
-        }
+          created: new Date(Date.now() - 86400000 * 90).toISOString(),
+        },
       ],
-      activity: options.includeActivity ? Array.from({ length: 15 }, (_, i) => ({
-        timestamp: new Date(Date.now() - i * 1800000).toISOString(),
-        user: `user-${Math.floor(Math.random() * 10)}`,
-        action: ['shared', 'commented', 'analyzed', 'tagged'][Math.floor(Math.random() * 4)],
-        workspace: `ws-${String(Math.floor(Math.random() * 5)).padStart(3, '0')}`
-      })) : null
+      activity: options.includeActivity
+        ? Array.from({ length: 15 }, (_, i) => ({
+            timestamp: new Date(Date.now() - i * 1800000).toISOString(),
+            user: `user-${Math.floor(Math.random() * 10)}`,
+            action: ['shared', 'commented', 'analyzed', 'tagged'][
+              Math.floor(Math.random() * 4)
+            ],
+            workspace: `ws-${String(Math.floor(Math.random() * 5)).padStart(3, '0')}`,
+          }))
+        : null,
     };
   }
 
@@ -1115,28 +1164,30 @@ export class IOCAnalysisService {
         totalIOCs: 2847,
         activeIOCs: 2156,
         expiredIOCs: 234,
-        archivedIOCs: 457
+        archivedIOCs: 457,
       },
       ageDistribution: [
         { range: '0-30 days', count: 845, percentage: 29.7 },
         { range: '31-90 days', count: 1234, percentage: 43.3 },
         { range: '91-365 days', count: 567, percentage: 19.9 },
-        { range: '365+ days', count: 201, percentage: 7.1 }
+        { range: '365+ days', count: 201, percentage: 7.1 },
       ],
-      automationRules: options.includeAutomationRules ? [
-        {
-          name: 'Auto-archive old IOCs',
-          criteria: 'age > 365 days AND confidence < 50%',
-          status: 'active',
-          lastExecuted: new Date().toISOString()
-        },
-        {
-          name: 'Promote high-confidence IOCs',
-          criteria: 'confidence > 90% AND recent activity',
-          status: 'active',
-          lastExecuted: new Date(Date.now() - 3600000).toISOString()
-        }
-      ] : null
+      automationRules: options.includeAutomationRules
+        ? [
+            {
+              name: 'Auto-archive old IOCs',
+              criteria: 'age > 365 days AND confidence < 50%',
+              status: 'active',
+              lastExecuted: new Date().toISOString(),
+            },
+            {
+              name: 'Promote high-confidence IOCs',
+              criteria: 'confidence > 90% AND recent activity',
+              status: 'active',
+              lastExecuted: new Date(Date.now() - 3600000).toISOString(),
+            },
+          ]
+        : null,
     };
   }
 
@@ -1154,25 +1205,30 @@ export class IOCAnalysisService {
       results: {
         detections: Array.from({ length: 10 }, (_, i) => ({
           iocId: `ioc-${i}`,
-          prediction: ['malicious', 'benign', 'suspicious'][Math.floor(Math.random() * 3)],
+          prediction: ['malicious', 'benign', 'suspicious'][
+            Math.floor(Math.random() * 3)
+          ],
           confidence: Math.random(),
-          modelScore: Math.random()
+          modelScore: Math.random(),
         })),
         modelPerformance: {
           accuracy: 0.94,
           precision: 0.91,
           recall: 0.87,
-          f1Score: 0.89
-        }
+          f1Score: 0.89,
+        },
       },
-      explanations: options.includeExplanations ? {
-        featureImportance: [
-          { feature: 'Domain Age', importance: 0.23 },
-          { feature: 'DNS Records', importance: 0.19 },
-          { feature: 'Certificate Info', importance: 0.15 }
-        ],
-        decisionPath: 'High domain age -> Low DNS diversity -> Suspicious certificate'
-      } : null
+      explanations: options.includeExplanations
+        ? {
+            featureImportance: [
+              { feature: 'Domain Age', importance: 0.23 },
+              { feature: 'DNS Records', importance: 0.19 },
+              { feature: 'Certificate Info', importance: 0.15 },
+            ],
+            decisionPath:
+              'High domain age -> Low DNS diversity -> Suspicious certificate',
+          }
+        : null,
     };
   }
 
@@ -1193,28 +1249,30 @@ export class IOCAnalysisService {
           type: 'volume_spike',
           score: 0.85,
           description: 'Unusual increase in detection frequency',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         },
         {
           iocId: 'ioc-002',
           type: 'geographic_anomaly',
           score: 0.72,
           description: 'IOC observed in unexpected geographic regions',
-          timestamp: new Date(Date.now() - 3600000).toISOString()
-        }
-      ],
-      patterns: options.includePatterns ? [
-        {
-          name: 'Daily Peak Activity',
-          description: 'IOC activity peaks between 14:00-16:00 UTC',
-          confidence: 0.78
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
         },
-        {
-          name: 'Weekend Lull',
-          description: 'Reduced activity on weekends',
-          confidence: 0.83
-        }
-      ] : null
+      ],
+      patterns: options.includePatterns
+        ? [
+            {
+              name: 'Daily Peak Activity',
+              description: 'IOC activity peaks between 14:00-16:00 UTC',
+              confidence: 0.78,
+            },
+            {
+              name: 'Weekend Lull',
+              description: 'Reduced activity on weekends',
+              confidence: 0.83,
+            },
+          ]
+        : null,
     };
   }
 
@@ -1235,22 +1293,24 @@ export class IOCAnalysisService {
           prediction: 'New APT campaign targeting financial sector',
           probability: 0.73,
           timeframe: '7-14 days',
-          indicators: ['Unusual domain registrations', 'Certificate patterns']
+          indicators: ['Unusual domain registrations', 'Certificate patterns'],
         },
         {
           type: 'ioc_evolution',
           prediction: 'Known malware family infrastructure changes',
           probability: 0.68,
           timeframe: '3-7 days',
-          indicators: ['Historical patterns', 'Current activity']
-        }
+          indicators: ['Historical patterns', 'Current activity'],
+        },
       ],
-      confidence: options.includeConfidence ? {
-        overall: 0.71,
-        dataQuality: 0.85,
-        modelAccuracy: 0.79,
-        historicalValidation: 0.73
-      } : null
+      confidence: options.includeConfidence
+        ? {
+            overall: 0.71,
+            dataQuality: 0.85,
+            modelAccuracy: 0.79,
+            historicalValidation: 0.73,
+          }
+        : null,
     };
   }
 }

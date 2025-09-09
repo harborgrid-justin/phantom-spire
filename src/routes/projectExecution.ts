@@ -11,10 +11,10 @@ const router = Router();
 // Mount all project execution route modules
 for (const routeConfig of projectExecutionRoutes) {
   const categoryRouter = Router();
-  
+
   // Mount the specific module route under its category path
   categoryRouter.use(routeConfig.path, routeConfig.createRouter());
-  
+
   // Mount the category router under the project execution namespace
   router.use(`/${routeConfig.category}`, categoryRouter);
 }
@@ -26,7 +26,7 @@ router.get('/health', (req, res) => {
     message: 'Project Execution module is operational',
     modules: projectExecutionRoutes.length,
     categories: [...new Set(projectExecutionRoutes.map(r => r.category))],
-    timestamp: new Date()
+    timestamp: new Date(),
   });
 });
 
@@ -38,14 +38,15 @@ router.get('/', (req, res) => {
     }
     acc[route.category].push({
       path: route.path,
-      title: route.title
+      title: route.title,
     });
     return acc;
   }, {});
 
   res.json({
     success: true,
-    message: 'Project Execution API - 48 modules for comprehensive project management',
+    message:
+      'Project Execution API - 48 modules for comprehensive project management',
     totalModules: projectExecutionRoutes.length,
     categories,
     endpoints: {
@@ -53,10 +54,10 @@ router.get('/', (req, res) => {
       modules: Object.keys(categories).map(category => ({
         category,
         baseUrl: `/api/v1/project-execution/${category}`,
-        modules: categories[category].length
-      }))
+        modules: categories[category].length,
+      })),
     },
-    timestamp: new Date()
+    timestamp: new Date(),
   });
 });
 

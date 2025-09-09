@@ -405,41 +405,81 @@ export class EnterprisePlatformIntegration extends EventEmitter {
     await this.registerBuiltinService({
       id: 'advanced-threat-detection',
       name: 'Advanced Threat Detection Engine',
-      description: 'AI-powered threat detection with behavioral analysis and machine learning',
+      description:
+        'AI-powered threat detection with behavioral analysis and machine learning',
       endpoints: [
-        { name: 'detect-threats', path: '/api/v1/threat-detection/detect', method: 'POST' },
-        { name: 'train-model', path: '/api/v1/threat-detection/train', method: 'POST' },
-        { name: 'get-model-status', path: '/api/v1/threat-detection/models/:id', method: 'GET' },
+        {
+          name: 'detect-threats',
+          path: '/api/v1/threat-detection/detect',
+          method: 'POST',
+        },
+        {
+          name: 'train-model',
+          path: '/api/v1/threat-detection/train',
+          method: 'POST',
+        },
+        {
+          name: 'get-model-status',
+          path: '/api/v1/threat-detection/models/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'threat-intelligence-correlation',
       name: 'Threat Intelligence Correlation Service',
-      description: 'Cross-reference and correlate threat intelligence from multiple sources',
+      description:
+        'Cross-reference and correlate threat intelligence from multiple sources',
       endpoints: [
-        { name: 'correlate-intelligence', path: '/api/v1/intel-correlation/correlate', method: 'POST' },
-        { name: 'attribute-threat-actor', path: '/api/v1/intel-correlation/attribution', method: 'POST' },
+        {
+          name: 'correlate-intelligence',
+          path: '/api/v1/intel-correlation/correlate',
+          method: 'POST',
+        },
+        {
+          name: 'attribute-threat-actor',
+          path: '/api/v1/intel-correlation/attribution',
+          method: 'POST',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'attribution-analysis',
       name: 'Attribution Analysis Engine',
-      description: 'Advanced threat actor attribution using multiple analysis techniques',
+      description:
+        'Advanced threat actor attribution using multiple analysis techniques',
       endpoints: [
-        { name: 'analyze-attribution', path: '/api/v1/attribution/analyze', method: 'POST' },
-        { name: 'get-attribution-report', path: '/api/v1/attribution/:id', method: 'GET' },
+        {
+          name: 'analyze-attribution',
+          path: '/api/v1/attribution/analyze',
+          method: 'POST',
+        },
+        {
+          name: 'get-attribution-report',
+          path: '/api/v1/attribution/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'threat-campaign-tracking',
       name: 'Threat Campaign Tracking',
-      description: 'Track and analyze threat campaigns across time and infrastructure',
+      description:
+        'Track and analyze threat campaigns across time and infrastructure',
       endpoints: [
-        { name: 'track-campaign', path: '/api/v1/campaigns/track', method: 'POST' },
-        { name: 'get-campaign-status', path: '/api/v1/campaigns/:id', method: 'GET' },
+        {
+          name: 'track-campaign',
+          path: '/api/v1/campaigns/track',
+          method: 'POST',
+        },
+        {
+          name: 'get-campaign-status',
+          path: '/api/v1/campaigns/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -448,18 +488,35 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Malware Analysis Automation',
       description: 'Automated malware analysis and classification',
       endpoints: [
-        { name: 'analyze-malware', path: '/api/v1/malware/analyze', method: 'POST' },
-        { name: 'get-analysis-report', path: '/api/v1/malware/reports/:id', method: 'GET' },
+        {
+          name: 'analyze-malware',
+          path: '/api/v1/malware/analyze',
+          method: 'POST',
+        },
+        {
+          name: 'get-analysis-report',
+          path: '/api/v1/malware/reports/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'vulnerability-impact-assessment',
       name: 'Vulnerability Impact Assessment',
-      description: 'Assess the impact and priority of vulnerabilities in the environment',
+      description:
+        'Assess the impact and priority of vulnerabilities in the environment',
       endpoints: [
-        { name: 'assess-impact', path: '/api/v1/vuln-impact/assess', method: 'POST' },
-        { name: 'get-assessment', path: '/api/v1/vuln-impact/:id', method: 'GET' },
+        {
+          name: 'assess-impact',
+          path: '/api/v1/vuln-impact/assess',
+          method: 'POST',
+        },
+        {
+          name: 'get-assessment',
+          path: '/api/v1/vuln-impact/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -468,8 +525,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Threat Landscape Monitoring',
       description: 'Monitor and analyze the evolving threat landscape',
       endpoints: [
-        { name: 'monitor-landscape', path: '/api/v1/threat-landscape/monitor', method: 'POST' },
-        { name: 'get-trends', path: '/api/v1/threat-landscape/trends', method: 'GET' },
+        {
+          name: 'monitor-landscape',
+          path: '/api/v1/threat-landscape/monitor',
+          method: 'POST',
+        },
+        {
+          name: 'get-trends',
+          path: '/api/v1/threat-landscape/trends',
+          method: 'GET',
+        },
       ],
     });
 
@@ -478,8 +543,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Intelligence Quality Scoring',
       description: 'Score and validate the quality of threat intelligence',
       endpoints: [
-        { name: 'score-intelligence', path: '/api/v1/intel-quality/score', method: 'POST' },
-        { name: 'get-quality-report', path: '/api/v1/intel-quality/:id', method: 'GET' },
+        {
+          name: 'score-intelligence',
+          path: '/api/v1/intel-quality/score',
+          method: 'POST',
+        },
+        {
+          name: 'get-quality-report',
+          path: '/api/v1/intel-quality/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -489,18 +562,35 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Incident Response Automation',
       description: 'Automated incident response workflows and orchestration',
       endpoints: [
-        { name: 'automate-response', path: '/api/v1/incident-response/automate', method: 'POST' },
-        { name: 'get-response-status', path: '/api/v1/incident-response/:id', method: 'GET' },
+        {
+          name: 'automate-response',
+          path: '/api/v1/incident-response/automate',
+          method: 'POST',
+        },
+        {
+          name: 'get-response-status',
+          path: '/api/v1/incident-response/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'security-orchestration',
       name: 'Security Orchestration Engine',
-      description: 'Orchestrate security tools and processes across the environment',
+      description:
+        'Orchestrate security tools and processes across the environment',
       endpoints: [
-        { name: 'orchestrate-workflow', path: '/api/v1/security-orchestration/orchestrate', method: 'POST' },
-        { name: 'get-workflow-status', path: '/api/v1/security-orchestration/:id', method: 'GET' },
+        {
+          name: 'orchestrate-workflow',
+          path: '/api/v1/security-orchestration/orchestrate',
+          method: 'POST',
+        },
+        {
+          name: 'get-workflow-status',
+          path: '/api/v1/security-orchestration/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -509,8 +599,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Alert Triage & Prioritization',
       description: 'Intelligent alert triage and priority assignment',
       endpoints: [
-        { name: 'triage-alerts', path: '/api/v1/alert-triage/triage', method: 'POST' },
-        { name: 'get-triage-results', path: '/api/v1/alert-triage/:id', method: 'GET' },
+        {
+          name: 'triage-alerts',
+          path: '/api/v1/alert-triage/triage',
+          method: 'POST',
+        },
+        {
+          name: 'get-triage-results',
+          path: '/api/v1/alert-triage/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -519,8 +617,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Forensic Analysis Workflow',
       description: 'Automated digital forensics and evidence collection',
       endpoints: [
-        { name: 'start-forensic-analysis', path: '/api/v1/forensics/analyze', method: 'POST' },
-        { name: 'get-analysis-status', path: '/api/v1/forensics/:id', method: 'GET' },
+        {
+          name: 'start-forensic-analysis',
+          path: '/api/v1/forensics/analyze',
+          method: 'POST',
+        },
+        {
+          name: 'get-analysis-status',
+          path: '/api/v1/forensics/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -529,18 +635,35 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Containment Strategy Engine',
       description: 'Intelligent containment strategy selection and execution',
       endpoints: [
-        { name: 'select-strategy', path: '/api/v1/containment/strategy', method: 'POST' },
-        { name: 'execute-containment', path: '/api/v1/containment/execute', method: 'POST' },
+        {
+          name: 'select-strategy',
+          path: '/api/v1/containment/strategy',
+          method: 'POST',
+        },
+        {
+          name: 'execute-containment',
+          path: '/api/v1/containment/execute',
+          method: 'POST',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'recovery-operations',
       name: 'Recovery Operations Manager',
-      description: 'Manage and orchestrate recovery operations after security incidents',
+      description:
+        'Manage and orchestrate recovery operations after security incidents',
       endpoints: [
-        { name: 'manage-recovery', path: '/api/v1/recovery/manage', method: 'POST' },
-        { name: 'get-recovery-status', path: '/api/v1/recovery/:id', method: 'GET' },
+        {
+          name: 'manage-recovery',
+          path: '/api/v1/recovery/manage',
+          method: 'POST',
+        },
+        {
+          name: 'get-recovery-status',
+          path: '/api/v1/recovery/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -549,8 +672,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Threat Hunting Automation',
       description: 'Automated threat hunting workflows and hypothesis testing',
       endpoints: [
-        { name: 'execute-hunt', path: '/api/v1/threat-hunting/execute', method: 'POST' },
-        { name: 'get-hunt-results', path: '/api/v1/threat-hunting/:id', method: 'GET' },
+        {
+          name: 'execute-hunt',
+          path: '/api/v1/threat-hunting/execute',
+          method: 'POST',
+        },
+        {
+          name: 'get-hunt-results',
+          path: '/api/v1/threat-hunting/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -559,8 +690,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Security Metrics Dashboard',
       description: 'Comprehensive security metrics collection and analysis',
       endpoints: [
-        { name: 'generate-metrics', path: '/api/v1/security-metrics/generate', method: 'POST' },
-        { name: 'get-dashboard-data', path: '/api/v1/security-metrics/dashboard', method: 'GET' },
+        {
+          name: 'generate-metrics',
+          path: '/api/v1/security-metrics/generate',
+          method: 'POST',
+        },
+        {
+          name: 'get-dashboard-data',
+          path: '/api/v1/security-metrics/dashboard',
+          method: 'GET',
+        },
       ],
     });
 
@@ -568,20 +707,38 @@ export class EnterprisePlatformIntegration extends EventEmitter {
     await this.registerBuiltinService({
       id: 'risk-assessment',
       name: 'Risk Assessment Engine',
-      description: 'Comprehensive risk assessment and scoring for cybersecurity threats',
+      description:
+        'Comprehensive risk assessment and scoring for cybersecurity threats',
       endpoints: [
-        { name: 'assess-risk', path: '/api/v1/risk-assessment/assess', method: 'POST' },
-        { name: 'get-assessment-report', path: '/api/v1/risk-assessment/:id', method: 'GET' },
+        {
+          name: 'assess-risk',
+          path: '/api/v1/risk-assessment/assess',
+          method: 'POST',
+        },
+        {
+          name: 'get-assessment-report',
+          path: '/api/v1/risk-assessment/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'compliance-monitoring',
       name: 'Compliance Monitoring Service',
-      description: 'Monitor and track compliance with various regulatory frameworks',
+      description:
+        'Monitor and track compliance with various regulatory frameworks',
       endpoints: [
-        { name: 'monitor-compliance', path: '/api/v1/compliance/monitor', method: 'POST' },
-        { name: 'get-compliance-status', path: '/api/v1/compliance/status', method: 'GET' },
+        {
+          name: 'monitor-compliance',
+          path: '/api/v1/compliance/monitor',
+          method: 'POST',
+        },
+        {
+          name: 'get-compliance-status',
+          path: '/api/v1/compliance/status',
+          method: 'GET',
+        },
       ],
     });
 
@@ -590,8 +747,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Policy Enforcement Engine',
       description: 'Automated policy enforcement and violation detection',
       endpoints: [
-        { name: 'enforce-policies', path: '/api/v1/policy-enforcement/enforce', method: 'POST' },
-        { name: 'get-enforcement-status', path: '/api/v1/policy-enforcement/status', method: 'GET' },
+        {
+          name: 'enforce-policies',
+          path: '/api/v1/policy-enforcement/enforce',
+          method: 'POST',
+        },
+        {
+          name: 'get-enforcement-status',
+          path: '/api/v1/policy-enforcement/status',
+          method: 'GET',
+        },
       ],
     });
 
@@ -600,8 +765,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Audit Trail Management',
       description: 'Comprehensive audit logging and trail management',
       endpoints: [
-        { name: 'manage-audit-trail', path: '/api/v1/audit-trail/manage', method: 'POST' },
-        { name: 'query-audit-logs', path: '/api/v1/audit-trail/query', method: 'POST' },
+        {
+          name: 'manage-audit-trail',
+          path: '/api/v1/audit-trail/manage',
+          method: 'POST',
+        },
+        {
+          name: 'query-audit-logs',
+          path: '/api/v1/audit-trail/query',
+          method: 'POST',
+        },
       ],
     });
 
@@ -610,8 +783,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Control Effectiveness Measurement',
       description: 'Measure and analyze the effectiveness of security controls',
       endpoints: [
-        { name: 'measure-effectiveness', path: '/api/v1/control-effectiveness/measure', method: 'POST' },
-        { name: 'get-effectiveness-report', path: '/api/v1/control-effectiveness/:id', method: 'GET' },
+        {
+          name: 'measure-effectiveness',
+          path: '/api/v1/control-effectiveness/measure',
+          method: 'POST',
+        },
+        {
+          name: 'get-effectiveness-report',
+          path: '/api/v1/control-effectiveness/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -620,28 +801,54 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Regulatory Reporting Automation',
       description: 'Automated generation and submission of regulatory reports',
       endpoints: [
-        { name: 'generate-report', path: '/api/v1/regulatory-reporting/generate', method: 'POST' },
-        { name: 'submit-report', path: '/api/v1/regulatory-reporting/submit', method: 'POST' },
+        {
+          name: 'generate-report',
+          path: '/api/v1/regulatory-reporting/generate',
+          method: 'POST',
+        },
+        {
+          name: 'submit-report',
+          path: '/api/v1/regulatory-reporting/submit',
+          method: 'POST',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'business-impact-analysis',
       name: 'Business Impact Analysis',
-      description: 'Analyze and quantify business impact of security incidents and controls',
+      description:
+        'Analyze and quantify business impact of security incidents and controls',
       endpoints: [
-        { name: 'analyze-impact', path: '/api/v1/business-impact/analyze', method: 'POST' },
-        { name: 'get-impact-report', path: '/api/v1/business-impact/:id', method: 'GET' },
+        {
+          name: 'analyze-impact',
+          path: '/api/v1/business-impact/analyze',
+          method: 'POST',
+        },
+        {
+          name: 'get-impact-report',
+          path: '/api/v1/business-impact/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'third-party-risk-management',
       name: 'Third-Party Risk Management',
-      description: 'Assess and manage risks from third-party vendors and partners',
+      description:
+        'Assess and manage risks from third-party vendors and partners',
       endpoints: [
-        { name: 'assess-vendor-risk', path: '/api/v1/third-party-risk/assess', method: 'POST' },
-        { name: 'get-risk-assessment', path: '/api/v1/third-party-risk/:id', method: 'GET' },
+        {
+          name: 'assess-vendor-risk',
+          path: '/api/v1/third-party-risk/assess',
+          method: 'POST',
+        },
+        {
+          name: 'get-risk-assessment',
+          path: '/api/v1/third-party-risk/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -651,8 +858,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Workflow Process Engine',
       description: 'Advanced workflow orchestration and process automation',
       endpoints: [
-        { name: 'execute-workflow', path: '/api/v1/workflow-engine/execute', method: 'POST' },
-        { name: 'get-workflow-status', path: '/api/v1/workflow-engine/:id', method: 'GET' },
+        {
+          name: 'execute-workflow',
+          path: '/api/v1/workflow-engine/execute',
+          method: 'POST',
+        },
+        {
+          name: 'get-workflow-status',
+          path: '/api/v1/workflow-engine/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -661,8 +876,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Data Integration Pipeline',
       description: 'Comprehensive data integration and ETL processing',
       endpoints: [
-        { name: 'process-data', path: '/api/v1/data-integration/process', method: 'POST' },
-        { name: 'get-pipeline-status', path: '/api/v1/data-integration/:id', method: 'GET' },
+        {
+          name: 'process-data',
+          path: '/api/v1/data-integration/process',
+          method: 'POST',
+        },
+        {
+          name: 'get-pipeline-status',
+          path: '/api/v1/data-integration/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -671,18 +894,35 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'API Gateway Management',
       description: 'Manage and orchestrate API gateway operations and security',
       endpoints: [
-        { name: 'manage-gateway', path: '/api/v1/gateway-management/manage', method: 'POST' },
-        { name: 'get-gateway-status', path: '/api/v1/gateway-management/status', method: 'GET' },
+        {
+          name: 'manage-gateway',
+          path: '/api/v1/gateway-management/manage',
+          method: 'POST',
+        },
+        {
+          name: 'get-gateway-status',
+          path: '/api/v1/gateway-management/status',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'service-health-monitoring',
       name: 'Service Health Monitoring',
-      description: 'Comprehensive health monitoring and observability for all services',
+      description:
+        'Comprehensive health monitoring and observability for all services',
       endpoints: [
-        { name: 'monitor-health', path: '/api/v1/health-monitoring/monitor', method: 'POST' },
-        { name: 'get-health-status', path: '/api/v1/health-monitoring/status', method: 'GET' },
+        {
+          name: 'monitor-health',
+          path: '/api/v1/health-monitoring/monitor',
+          method: 'POST',
+        },
+        {
+          name: 'get-health-status',
+          path: '/api/v1/health-monitoring/status',
+          method: 'GET',
+        },
       ],
     });
 
@@ -691,8 +931,16 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Configuration Management',
       description: 'Centralized configuration management and version control',
       endpoints: [
-        { name: 'manage-config', path: '/api/v1/config-management/manage', method: 'POST' },
-        { name: 'get-config-status', path: '/api/v1/config-management/status', method: 'GET' },
+        {
+          name: 'manage-config',
+          path: '/api/v1/config-management/manage',
+          method: 'POST',
+        },
+        {
+          name: 'get-config-status',
+          path: '/api/v1/config-management/status',
+          method: 'GET',
+        },
       ],
     });
 
@@ -701,18 +949,35 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Deployment Automation',
       description: 'Automated deployment pipelines and release management',
       endpoints: [
-        { name: 'execute-deployment', path: '/api/v1/deployment-automation/deploy', method: 'POST' },
-        { name: 'get-deployment-status', path: '/api/v1/deployment-automation/:id', method: 'GET' },
+        {
+          name: 'execute-deployment',
+          path: '/api/v1/deployment-automation/deploy',
+          method: 'POST',
+        },
+        {
+          name: 'get-deployment-status',
+          path: '/api/v1/deployment-automation/:id',
+          method: 'GET',
+        },
       ],
     });
 
     await this.registerBuiltinService({
       id: 'performance-optimization',
       name: 'Performance Optimization',
-      description: 'Automated performance monitoring, analysis, and optimization',
+      description:
+        'Automated performance monitoring, analysis, and optimization',
       endpoints: [
-        { name: 'optimize-performance', path: '/api/v1/performance-optimization/optimize', method: 'POST' },
-        { name: 'get-optimization-report', path: '/api/v1/performance-optimization/:id', method: 'GET' },
+        {
+          name: 'optimize-performance',
+          path: '/api/v1/performance-optimization/optimize',
+          method: 'POST',
+        },
+        {
+          name: 'get-optimization-report',
+          path: '/api/v1/performance-optimization/:id',
+          method: 'GET',
+        },
       ],
     });
 
@@ -721,12 +986,22 @@ export class EnterprisePlatformIntegration extends EventEmitter {
       name: 'Resource Allocation Engine',
       description: 'Intelligent resource allocation and capacity management',
       endpoints: [
-        { name: 'allocate-resources', path: '/api/v1/resource-allocation/allocate', method: 'POST' },
-        { name: 'get-allocation-status', path: '/api/v1/resource-allocation/:id', method: 'GET' },
+        {
+          name: 'allocate-resources',
+          path: '/api/v1/resource-allocation/allocate',
+          method: 'POST',
+        },
+        {
+          name: 'get-allocation-status',
+          path: '/api/v1/resource-allocation/:id',
+          method: 'GET',
+        },
       ],
     });
 
-    console.log('✅ Successfully registered 32 additional business logic modules in Enterprise Platform');
+    console.log(
+      '✅ Successfully registered 32 additional business logic modules in Enterprise Platform'
+    );
   }
 
   private async registerBuiltinService(service: {

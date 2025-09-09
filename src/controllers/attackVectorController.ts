@@ -10,7 +10,19 @@ import { body, validationResult } from 'express-validator';
 interface AttackVector {
   id: string;
   name: string;
-  category: 'initial_access' | 'execution' | 'persistence' | 'privilege_escalation' | 'defense_evasion' | 'credential_access' | 'discovery' | 'lateral_movement' | 'collection' | 'command_control' | 'exfiltration' | 'impact';
+  category:
+    | 'initial_access'
+    | 'execution'
+    | 'persistence'
+    | 'privilege_escalation'
+    | 'defense_evasion'
+    | 'credential_access'
+    | 'discovery'
+    | 'lateral_movement'
+    | 'collection'
+    | 'command_control'
+    | 'exfiltration'
+    | 'impact';
   subcategory: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
@@ -59,7 +71,7 @@ const initializeAttackVectorData = () => {
       mitigations: ['User training', 'Email security gateway'],
       references: ['https://attack.mitre.org/techniques/T1566/'],
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     },
     {
       id: 'av-2',
@@ -76,8 +88,8 @@ const initializeAttackVectorData = () => {
       mitigations: ['PowerShell logging', 'Constrained language mode'],
       references: ['https://attack.mitre.org/techniques/T1059/001/'],
       created_at: new Date(),
-      updated_at: new Date()
-    }
+      updated_at: new Date(),
+    },
   ];
 
   attackCampaigns = [
@@ -90,8 +102,8 @@ const initializeAttackVectorData = () => {
       vectors_used: ['av-1'],
       targets: ['Finance', 'Government'],
       success_rate: 35,
-      attribution_confidence: 'high'
-    }
+      attribution_confidence: 'high',
+    },
   ];
 };
 
@@ -103,13 +115,13 @@ initializeAttackVectorData();
  */
 export const getAttackVectors = async (req: Request, res: Response) => {
   try {
-    const { 
+    const {
       category,
       severity,
       platform,
       page = 1,
       limit = 10,
-      search
+      search,
     } = req.query;
 
     let filteredVectors = [...attackVectors];
@@ -118,22 +130,25 @@ export const getAttackVectors = async (req: Request, res: Response) => {
     if (category) {
       filteredVectors = filteredVectors.filter(v => v.category === category);
     }
-    
+
     if (severity) {
       filteredVectors = filteredVectors.filter(v => v.severity === severity);
     }
-    
+
     if (platform) {
-      filteredVectors = filteredVectors.filter(v => 
-        v.platforms.some(p => p.toLowerCase().includes((platform as string).toLowerCase()))
+      filteredVectors = filteredVectors.filter(v =>
+        v.platforms.some(p =>
+          p.toLowerCase().includes((platform as string).toLowerCase())
+        )
       );
     }
-    
+
     if (search) {
       const searchTerm = (search as string).toLowerCase();
-      filteredVectors = filteredVectors.filter(v => 
-        v.name.toLowerCase().includes(searchTerm) ||
-        v.description.toLowerCase().includes(searchTerm)
+      filteredVectors = filteredVectors.filter(
+        v =>
+          v.name.toLowerCase().includes(searchTerm) ||
+          v.description.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -142,7 +157,7 @@ export const getAttackVectors = async (req: Request, res: Response) => {
     const limitNum = parseInt(limit as string);
     const startIndex = (pageNum - 1) * limitNum;
     const endIndex = startIndex + limitNum;
-    
+
     const paginatedVectors = filteredVectors.slice(startIndex, endIndex);
 
     res.json({
@@ -152,14 +167,14 @@ export const getAttackVectors = async (req: Request, res: Response) => {
         page: pageNum,
         limit: limitNum,
         total: filteredVectors.length,
-        pages: Math.ceil(filteredVectors.length / limitNum)
-      }
+        pages: Math.ceil(filteredVectors.length / limitNum),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error retrieving attack vectors',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -170,25 +185,25 @@ export const getAttackVectors = async (req: Request, res: Response) => {
 export const getAttackVectorById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    
+
     const vector = attackVectors.find(v => v.id === id);
-    
+
     if (!vector) {
       return res.status(404).json({
         success: false,
-        message: 'Attack vector not found'
+        message: 'Attack vector not found',
       });
     }
 
     res.json({
       success: true,
-      data: vector
+      data: vector,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error retrieving attack vector',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -203,7 +218,7 @@ export const createAttackVector = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
@@ -212,7 +227,7 @@ export const createAttackVector = async (req: Request, res: Response) => {
       id: `av-${Date.now()}`,
       ...vectorData,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     attackVectors.push(newVector);
@@ -220,13 +235,13 @@ export const createAttackVector = async (req: Request, res: Response) => {
     res.status(201).json({
       success: true,
       data: newVector,
-      message: 'Attack vector created successfully'
+      message: 'Attack vector created successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error creating attack vector',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -238,11 +253,11 @@ export const updateAttackVector = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const vectorIndex = attackVectors.findIndex(v => v.id === id);
-    
+
     if (vectorIndex === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Attack vector not found'
+        message: 'Attack vector not found',
       });
     }
 
@@ -251,14 +266,14 @@ export const updateAttackVector = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        errors: errors.array()
+        errors: errors.array(),
       });
     }
 
     const updatedVector = {
       ...attackVectors[vectorIndex],
       ...req.body,
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
     attackVectors[vectorIndex] = updatedVector;
@@ -266,13 +281,13 @@ export const updateAttackVector = async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: updatedVector,
-      message: 'Attack vector updated successfully'
+      message: 'Attack vector updated successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error updating attack vector',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -284,11 +299,11 @@ export const deleteAttackVector = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const vectorIndex = attackVectors.findIndex(v => v.id === id);
-    
+
     if (vectorIndex === -1) {
       return res.status(404).json({
         success: false,
-        message: 'Attack vector not found'
+        message: 'Attack vector not found',
       });
     }
 
@@ -296,13 +311,13 @@ export const deleteAttackVector = async (req: Request, res: Response) => {
 
     res.json({
       success: true,
-      message: 'Attack vector deleted successfully'
+      message: 'Attack vector deleted successfully',
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error deleting attack vector',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -312,22 +327,17 @@ export const deleteAttackVector = async (req: Request, res: Response) => {
  */
 export const getAttackCampaigns = async (req: Request, res: Response) => {
   try {
-    const { 
-      actor,
-      active_only,
-      page = 1,
-      limit = 10
-    } = req.query;
+    const { actor, active_only, page = 1, limit = 10 } = req.query;
 
     let filteredCampaigns = [...attackCampaigns];
 
     // Apply filters
     if (actor) {
-      filteredCampaigns = filteredCampaigns.filter(c => 
+      filteredCampaigns = filteredCampaigns.filter(c =>
         c.actor_group.toLowerCase().includes((actor as string).toLowerCase())
       );
     }
-    
+
     if (active_only === 'true') {
       filteredCampaigns = filteredCampaigns.filter(c => !c.end_date);
     }
@@ -337,7 +347,7 @@ export const getAttackCampaigns = async (req: Request, res: Response) => {
     const limitNum = parseInt(limit as string);
     const startIndex = (pageNum - 1) * limitNum;
     const endIndex = startIndex + limitNum;
-    
+
     const paginatedCampaigns = filteredCampaigns.slice(startIndex, endIndex);
 
     res.json({
@@ -347,14 +357,14 @@ export const getAttackCampaigns = async (req: Request, res: Response) => {
         page: pageNum,
         limit: limitNum,
         total: filteredCampaigns.length,
-        pages: Math.ceil(filteredCampaigns.length / limitNum)
-      }
+        pages: Math.ceil(filteredCampaigns.length / limitNum),
+      },
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error retrieving attack campaigns',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -366,33 +376,42 @@ export const getAttackVectorStats = async (req: Request, res: Response) => {
   try {
     const stats = {
       total_vectors: attackVectors.length,
-      by_category: attackVectors.reduce((acc, vector) => {
-        acc[vector.category] = (acc[vector.category] || 0) + 1;
-        return acc;
-      }, {} as { [key: string]: number }),
-      by_severity: attackVectors.reduce((acc, vector) => {
-        acc[vector.severity] = (acc[vector.severity] || 0) + 1;
-        return acc;
-      }, {} as { [key: string]: number }),
+      by_category: attackVectors.reduce(
+        (acc, vector) => {
+          acc[vector.category] = (acc[vector.category] || 0) + 1;
+          return acc;
+        },
+        {} as { [key: string]: number }
+      ),
+      by_severity: attackVectors.reduce(
+        (acc, vector) => {
+          acc[vector.severity] = (acc[vector.severity] || 0) + 1;
+          return acc;
+        },
+        {} as { [key: string]: number }
+      ),
       active_campaigns: attackCampaigns.filter(c => !c.end_date).length,
       total_campaigns: attackCampaigns.length,
       most_targeted_platforms: attackVectors
         .flatMap(v => v.platforms)
-        .reduce((acc, platform) => {
-          acc[platform] = (acc[platform] || 0) + 1;
-          return acc;
-        }, {} as { [key: string]: number })
+        .reduce(
+          (acc, platform) => {
+            acc[platform] = (acc[platform] || 0) + 1;
+            return acc;
+          },
+          {} as { [key: string]: number }
+        ),
     };
 
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error retrieving attack vector statistics',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -403,27 +422,28 @@ export const getAttackVectorStats = async (req: Request, res: Response) => {
 export const searchAttackVectors = async (req: Request, res: Response) => {
   try {
     const { q, category, severity } = req.query;
-    
+
     if (!q) {
       return res.status(400).json({
         success: false,
-        message: 'Search query is required'
+        message: 'Search query is required',
       });
     }
 
     const searchTerm = (q as string).toLowerCase();
-    let results = attackVectors.filter(vector => 
-      vector.name.toLowerCase().includes(searchTerm) ||
-      vector.description.toLowerCase().includes(searchTerm) ||
-      vector.techniques.some(t => t.toLowerCase().includes(searchTerm)) ||
-      vector.indicators.some(i => i.toLowerCase().includes(searchTerm))
+    let results = attackVectors.filter(
+      vector =>
+        vector.name.toLowerCase().includes(searchTerm) ||
+        vector.description.toLowerCase().includes(searchTerm) ||
+        vector.techniques.some(t => t.toLowerCase().includes(searchTerm)) ||
+        vector.indicators.some(i => i.toLowerCase().includes(searchTerm))
     );
 
     // Apply additional filters
     if (category) {
       results = results.filter(v => v.category === category);
     }
-    
+
     if (severity) {
       results = results.filter(v => v.severity === severity);
     }
@@ -431,13 +451,13 @@ export const searchAttackVectors = async (req: Request, res: Response) => {
     res.json({
       success: true,
       data: results,
-      total: results.length
+      total: results.length,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error searching attack vectors',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };
@@ -445,9 +465,28 @@ export const searchAttackVectors = async (req: Request, res: Response) => {
 // Validation rules
 export const attackVectorValidation = [
   body('name').isLength({ min: 1 }).withMessage('Name is required'),
-  body('category').isIn(['initial_access', 'execution', 'persistence', 'privilege_escalation', 'defense_evasion', 'credential_access', 'discovery', 'lateral_movement', 'collection', 'command_control', 'exfiltration', 'impact']).withMessage('Invalid category'),
-  body('severity').isIn(['low', 'medium', 'high', 'critical']).withMessage('Invalid severity'),
-  body('description').isLength({ min: 10 }).withMessage('Description must be at least 10 characters'),
+  body('category')
+    .isIn([
+      'initial_access',
+      'execution',
+      'persistence',
+      'privilege_escalation',
+      'defense_evasion',
+      'credential_access',
+      'discovery',
+      'lateral_movement',
+      'collection',
+      'command_control',
+      'exfiltration',
+      'impact',
+    ])
+    .withMessage('Invalid category'),
+  body('severity')
+    .isIn(['low', 'medium', 'high', 'critical'])
+    .withMessage('Invalid severity'),
+  body('description')
+    .isLength({ min: 10 })
+    .withMessage('Description must be at least 10 characters'),
   body('techniques').isArray().withMessage('Techniques must be an array'),
   body('platforms').isArray().withMessage('Platforms must be an array'),
 ];
@@ -461,5 +500,5 @@ export default {
   getAttackCampaigns,
   getAttackVectorStats,
   searchAttackVectors,
-  attackVectorValidation
+  attackVectorValidation,
 };

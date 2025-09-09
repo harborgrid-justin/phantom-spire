@@ -9,7 +9,7 @@ import {
   CVEWorkflowController,
   CVEComplianceController,
   CVEAssetController,
-  CVEMetricsController
+  CVEMetricsController,
 } from '../controllers/cveAdvancedController.js';
 import { authMiddleware } from '../middleware/auth.js';
 
@@ -87,7 +87,10 @@ router.post('/enrich/bulk', CVEEnrichmentController.bulkEnrichCVEs);
  *       200:
  *         description: Enrichment status
  */
-router.get('/enrich/status/:jobId', CVEEnrichmentController.getEnrichmentStatus);
+router.get(
+  '/enrich/status/:jobId',
+  CVEEnrichmentController.getEnrichmentStatus
+);
 
 /**
  * CVE Workflow Automation Routes
@@ -206,7 +209,10 @@ router.get('/compliance/status', CVEComplianceController.getComplianceStatus);
  *       201:
  *         description: Compliance report generation initiated
  */
-router.post('/compliance/reports', CVEComplianceController.generateComplianceReport);
+router.post(
+  '/compliance/reports',
+  CVEComplianceController.generateComplianceReport
+);
 
 /**
  * @swagger
@@ -227,7 +233,10 @@ router.post('/compliance/reports', CVEComplianceController.generateComplianceRep
  *       200:
  *         description: CVE compliance framework mappings
  */
-router.get('/compliance/mapping/:cveId', CVEComplianceController.mapCVEToFrameworks);
+router.get(
+  '/compliance/mapping/:cveId',
+  CVEComplianceController.mapCVEToFrameworks
+);
 
 /**
  * CVE Asset Management Routes
@@ -294,7 +303,10 @@ router.get('/assets/impact/:cveId', CVEAssetController.getAssetImpact);
  *       200:
  *         description: Asset status updated successfully
  */
-router.put('/assets/:assetId/cve/:cveId/status', CVEAssetController.updateAssetStatus);
+router.put(
+  '/assets/:assetId/cve/:cveId/status',
+  CVEAssetController.updateAssetStatus
+);
 
 /**
  * @swagger
