@@ -3,6 +3,8 @@
 //! This library provides comprehensive MITRE ATT&CK framework integration with advanced
 //! threat analysis, technique mapping, and tactical intelligence capabilities.
 
+use napi::bindgen_prelude::*;
+use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
@@ -29,7 +31,7 @@ pub enum MitreTactic {
 }
 
 /// MITRE ATT&CK Platform types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum MitrePlatform {
     Windows,
     MacOS,
@@ -501,6 +503,13 @@ impl MitreCore {
         self.techniques.get(technique_id)
     }
 
+    /// Add a new technique
+    pub fn add_technique(&mut self, technique: MitreTechnique) -> String {
+        let id = technique.id.clone();
+        self.techniques.insert(id.clone(), technique);
+        id
+    }
+
     /// Search techniques by criteria
     pub fn search_techniques(&self, criteria: &MitreSearchCriteria) -> Vec<MitreTechnique> {
         self.techniques
@@ -598,7 +607,7 @@ impl MitreCore {
                             .map_or(false, |tech| tech.detection_rules.iter().any(|dr| dr.id == rule.id))
                     })
                     .map(|rule| rule.coverage_percentage)
-                    .fold(0.0, |acc, coverage| acc.max(coverage));
+                    .fold(0.0f64, |acc, coverage| acc.max(coverage));
                 (id.clone(), coverage)
             })
             .collect()
@@ -969,6 +978,76 @@ impl Default for MitreCore {
         let mut core = Self::new();
         core.initialize_with_sample_data();
         core
+    }
+}
+
+// NAPI wrapper for JavaScript bindings
+#[napi]
+pub struct MitreCoreNapi {
+    inner: MitreCore,
+}
+
+#[napi]
+impl MitreCoreNapi {
+    #[napi(constructor)]
+    pub fn new() -> Self {
+        Self {
+            inner: MitreCore::default(),
+        }
+    }
+
+    #[napi]
+    pub fn add_technique(&mut self, technique_json: String) -> Result<String> {
+        let technique: MitreTechnique = serde_json::from_str(&technique_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse technique: {}", e)))?;
+        
+        Ok(self.inner.add_technique(technique))
+    }
+
+    #[napi]
+    pub fn get_technique(&self, id: String) -> Result<Option<String>> {
+        match self.inner.get_technique(&id) {
+            Some(technique) => {
+                let json = serde_json::to_string(technique)
+                    .map_err(|e| napi::Error::from_reason(format!("Failed to serialize technique: {}", e)))?;
+                Ok(Some(json))
+            }
+            None => Ok(None)
+        }
+    }
+
+    #[napi]
+    pub fn analyze_threat(&self, indicators: Vec<String>) -> Result<String> {
+        let analysis = self.inner.analyze_threat(&indicators);
+        serde_json::to_string(&analysis)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize analysis: {}", e)))
+    }
+
+    #[napi]
+    pub fn map_techniques(&self, technique_ids: Vec<String>) -> Result<String> {
+        let techniques = self.inner.map_techniques(&technique_ids);
+        serde_json::to_string(&techniques)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize techniques: {}", e)))
+    }
+
+    #[napi]
+    pub fn generate_navigator_layer(&self, analysis_json: String) -> Result<String> {
+        let analysis: ThreatAnalysis = serde_json::from_str(&analysis_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse analysis: {}", e)))?;
+        
+        let layer = self.inner.generate_navigator_layer(&analysis);
+        serde_json::to_string(&layer)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize layer: {}", e)))
+    }
+
+    #[napi]
+    pub fn search_techniques(&self, query_json: String) -> Result<String> {
+        let query: MitreSearchCriteria = serde_json::from_str(&query_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse query: {}", e)))?;
+        
+        let results = self.inner.search_techniques(&query);
+        serde_json::to_string(&results)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize results: {}", e)))
     }
 }
 

@@ -2,13 +2,27 @@
   "name": "phantom-mitre-core",
   "version": "1.0.0",
   "description": "Advanced MITRE ATT&CK framework integration and threat analysis system with comprehensive technique mapping",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "phantom-mitre-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "test": "node test.js",
-    "clean": "rimraf dist"
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version"
   },
   "keywords": [
     "mitre-attack",
@@ -25,19 +39,10 @@
   "author": "Phantom Spire Security",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
+    "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
   },
-  "dependencies": {},
-  "files": [
-    "dist/**/*",
-    "src-ts/**/*",
-    "README.md"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
-    "directory": "frontend/phantom-mitre-core"
+  "engines": {
+    "node": ">= 10"
   }
 }
