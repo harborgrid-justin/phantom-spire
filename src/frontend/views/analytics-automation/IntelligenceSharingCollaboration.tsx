@@ -210,6 +210,7 @@ import {
 
 // Business Logic Integration
 import { useServicePage } from '../../../services/business-logic/hooks/useBusinessLogic';
+import { Status, Priority } from '../../types/index';
 
 // Collaboration interfaces
 interface Organization {

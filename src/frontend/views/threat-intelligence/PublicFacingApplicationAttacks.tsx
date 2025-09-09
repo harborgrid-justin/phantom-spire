@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Status, Priority } from '../../types/index';
 import {
   Box,
   Grid,

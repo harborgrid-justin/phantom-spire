@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Status, Priority } from '../../types/index';
 import {
   Box,
   Card,

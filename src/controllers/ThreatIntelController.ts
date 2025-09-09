@@ -4,8 +4,8 @@
  */
 
 import { Request, Response } from 'express';
-import { BaseController } from './BaseController.js';
-import { ThreatIntelService } from '../services/ThreatIntelService.js';
+import { BaseController } from './BaseController';
+import { ThreatIntelService } from '../services/ThreatIntelService';
 
 /**
  * Threat Intelligence Data Interface
@@ -185,7 +185,7 @@ export class ThreatIntelController extends BaseController {
       return this.sendError(res, 'Search query is required', 400, 'VALIDATION_ERROR');
     }
 
-    const result = await this.threatService.searchThreats(query, filters, options);
+    const result = await this.threatService.searchThreats(query, filters);
     
     if (!result.success) {
       return this.sendError(res, result.error!, 400, result.code);
@@ -249,7 +249,7 @@ export class ThreatIntelController extends BaseController {
       return this.sendError(res, 'Update data is required', 400, 'VALIDATION_ERROR');
     }
 
-    const result = await this.threatService.bulkUpdateThreats(ids, updates);
+    const result = await this.threatService.bulkUpdateThreats(updates);
     
     if (!result.success) {
       return this.sendError(res, result.error!, 400, result.code);
@@ -269,10 +269,7 @@ export class ThreatIntelController extends BaseController {
       return this.sendError(res, 'Threat ID is required', 400, 'INVALID_ID');
     }
 
-    const result = await this.threatService.getThreatRelationships(id, {
-      depth: parseInt(depth as string) || 1,
-      types: types ? (types as string).split(',') : undefined
-    });
+    const result = await this.threatService.getThreatRelationships(id);
     
     if (!result.success) {
       return this.sendError(res, result.error!, 400, result.code);
