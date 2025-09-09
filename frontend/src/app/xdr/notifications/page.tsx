@@ -1,30 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  Card, 
-  CardContent, 
-  Button,
-  Grid,
-  Chip,
-  Alert,
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper
-} from '@mui/material';
-import { ArrowBack, Refresh, Settings } from '@mui/icons-material';
+import { ArrowLeft, RefreshCw, Settings } from 'lucide-react';
 
-const NotificationCenterPage = () => {
-  const [data, setData] = useState(null);
+interface NotificationsData {
+  status: string;
+  metrics: {
+    total: number;
+    active: number;
+    resolved: number;
+  };
+  lastUpdate: string;
+}
+
+const NotificationsPage = () => {
+  const [data, setData] = useState<NotificationsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -48,7 +40,7 @@ const NotificationCenterPage = () => {
       setData(result.data);
       setError(null);
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'An error occurred');
       // Mock data for demonstration
       setData({
         status: 'operational',
@@ -74,159 +66,146 @@ const NotificationCenterPage = () => {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center items-center h-96">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
     );
   }
 
   return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Button
-          startIcon={<ArrowBack />}
+    <div className="flex-1 p-6">
+      <div className="flex items-center mb-6">
+        <button
           onClick={handleGoBack}
-          sx={{ mr: 2 }}
+          className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 mr-4"
         >
+          <ArrowLeft className="w-4 h-4 mr-2" />
           Back
-        </Button>
-        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-          Notification Center
-        </Typography>
-        <Button
-          startIcon={<Refresh />}
+        </button>
+        <h1 className="text-3xl font-bold flex-1">
+          Notifications
+        </h1>
+        <button
           onClick={handleRefresh}
-          variant="outlined"
-          sx={{ mr: 1 }}
+          className="flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 mr-2"
         >
+          <RefreshCw className="w-4 h-4 mr-2" />
           Refresh
-        </Button>
-        <Button
-          startIcon={<Settings />}
-          variant="outlined"
-        >
+        </button>
+        <button className="flex items-center px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
+          <Settings className="w-4 h-4 mr-2" />
           Configure
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+      <p className="text-gray-600 mb-6">
         Alert notification system
-      </Typography>
+      </p>
 
       {error && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          Unable to connect to live data. Showing demo data.
-        </Alert>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+          <div className="text-yellow-800">
+            Unable to connect to live data. Showing demo data.
+          </div>
+        </div>
       )}
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow border">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">
                 Overview
-              </Typography>
+              </h2>
               
               {data && (
-                <TableContainer component={Paper} elevation={0}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Metric</TableCell>
-                        <TableCell align="right">Value</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Status
-                        </TableCell>
-                        <TableCell align="right">
-                          <Chip 
-                            label={data.status || 'Active'} 
-                            color="success" 
-                            size="small" 
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Total Items
-                        </TableCell>
-                        <TableCell align="right">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-3 px-4 font-medium text-gray-900">Metric</th>
+                        <th className="text-right py-3 px-4 font-medium text-gray-900">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b">
+                        <td className="py-3 px-4">Status</td>
+                        <td className="py-3 px-4 text-right">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {data.status || 'Active'}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-3 px-4">Total Items</td>
+                        <td className="py-3 px-4 text-right">
                           {data.metrics?.total || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Active
-                        </TableCell>
-                        <TableCell align="right">
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-3 px-4">Active</td>
+                        <td className="py-3 px-4 text-right">
                           {data.metrics?.active || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Resolved
-                        </TableCell>
-                        <TableCell align="right">
+                        </td>
+                      </tr>
+                      <tr className="border-b">
+                        <td className="py-3 px-4">Resolved</td>
+                        <td className="py-3 px-4 text-right">
                           {data.metrics?.resolved || 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell component="th" scope="row">
-                          Last Update
-                        </TableCell>
-                        <TableCell align="right">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-3 px-4">Last Update</td>
+                        <td className="py-3 px-4 text-right">
                           {data.lastUpdate ? new Date(data.lastUpdate).toLocaleString() : 'N/A'}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               )}
-            </CardContent>
-          </Card>
-        </Grid>
+            </div>
+          </div>
+        </div>
 
-        <Grid item xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+        <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow border">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">
                 Quick Actions
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button variant="contained" fullWidth>
+              </h2>
+              <div className="space-y-3">
+                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">
                   Execute Action
-                </Button>
-                <Button variant="outlined" fullWidth>
+                </button>
+                <button className="w-full border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50">
                   View History
-                </Button>
-                <Button variant="outlined" fullWidth>
+                </button>
+                <button className="w-full border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50">
                   Export Data
-                </Button>
-                <Button variant="outlined" fullWidth>
+                </button>
+                <button className="w-full border border-gray-300 py-2 px-4 rounded-md hover:bg-gray-50">
                   View Reports
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
+                </button>
+              </div>
+            </div>
+          </div>
 
-          <Card sx={{ mt: 2 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
+          <div className="bg-white rounded-lg shadow border">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold mb-4">
                 Module Information
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+              </h2>
+              <p className="text-gray-600 text-sm">
                 This module provides alert notification system. 
                 Use the controls above to interact with the system and configure settings as needed.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default NotificationCenterPage;
+export default NotificationsPage;

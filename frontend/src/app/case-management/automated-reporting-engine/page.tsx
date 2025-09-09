@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useServicePage } from '../../../../lib/business-logic';
+import { useServicePage } from '../../../lib/business-logic';
 
 interface AutomatedReportingEngineData {
   id: string;
@@ -44,18 +44,10 @@ export default function AutomatedReportingEnginePage() {
       ];
 
       setData(mockData);
-      addNotification({
-        type: 'success',
-        message: 'Automated Reporting Engine data loaded successfully',
-        duration: 3000
-      });
+      addNotification('success', 'Automated Reporting Engine data loaded successfully');
     } catch (error) {
       console.error('Error fetching automated-reporting-engine data:', error);
-      addNotification({
-        type: 'error',
-        message: 'Failed to load Automated Reporting Engine data',
-        duration: 5000
-      });
+      addNotification('error', 'Failed to load Automated Reporting Engine data');
     } finally {
       setLoading(false);
     }
@@ -64,17 +56,9 @@ export default function AutomatedReportingEnginePage() {
   const handleAction = async (actionType: string, itemId?: string) => {
     try {
       // Implement specific actions based on page functionality
-      addNotification({
-        type: 'success',
-        message: `${actionType} completed successfully`,
-        duration: 3000
-      });
-    } catch (error) {
-      addNotification({
-        type: 'error',
-        message: `Failed to ${actionType}`,
-        duration: 5000
-      });
+      addNotification('success', `${actionType} completed successfully`);
+    } catch {
+      addNotification('error', `Failed to ${actionType}`);
     }
   };
 
@@ -233,7 +217,7 @@ export default function AutomatedReportingEnginePage() {
       </div>
 
       {/* Notifications */}
-      {notifications.map((notification) => (
+      {notifications.map((notification: any) => (
         <div key={notification.id} className="fixed bottom-4 right-4 z-40">
           <div className={`p-4 rounded-lg shadow-lg ${
             notification.type === 'success' ? 'bg-green-500' :
