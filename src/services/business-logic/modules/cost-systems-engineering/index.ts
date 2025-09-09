@@ -3,12 +3,60 @@
  * Standardized platform architecture for business-ready and customer-ready cost systems
  */
 
-export { CostSystemsEngineeringOrchestrator, type CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
-export { BusinessReadyCostTracker, type BusinessCostMetrics } from './BusinessReadyCostTracker';
-export { CustomerReadyCostAnalyzer, type CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
-export { UnifiedCostManagementService, type CostManagementOptions } from './UnifiedCostManagementService';
-export { CostOptimizationEngine, type OptimizationRecommendation } from './CostOptimizationEngine';
-export { CostSystemsIntegrator, type SystemIntegrationConfig } from './CostSystemsIntegrator';
+export { CostSystemsEngineeringOrchestrator } from './CostSystemsEngineeringOrchestrator';
+export { BusinessReadyCostTracker } from './BusinessReadyCostTracker';
+export { CustomerReadyCostAnalyzer } from './CustomerReadyCostAnalyzer';
+export { UnifiedCostManagementService } from './UnifiedCostManagementService';
+export { CostOptimizationEngine } from './CostOptimizationEngine';
+export { CostSystemsIntegrator } from './CostSystemsIntegrator';
+
+// Export types separately to avoid TS4033 errors
+export type { CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
+export type { BusinessCostMetrics } from './BusinessReadyCostTracker';
+export type { CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
+export type { CostManagementOptions } from './UnifiedCostManagementService';
+export type { OptimizationRecommendation } from './CostOptimizationEngine';
+export type { SystemIntegrationConfig } from './CostSystemsIntegrator';
+
+// Additional supporting types
+export interface CostReport {
+  id: string;
+  type: string;
+  data: any;
+  generatedAt: string;
+}
+
+export interface CostInsight {
+  id: string;
+  category: string;
+  insight: string;
+  impact: number;
+}
+
+export interface CustomerRecommendation {
+  id: string;
+  type: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export interface StandardizationMetrics {
+  complianceScore: number;
+  standardsFollowed: string[];
+  deviations: string[];
+}
+
+export interface IntegrationStatus {
+  connected: boolean;
+  services: string[];
+  lastSync: string;
+}
+
+export interface ArchitectureHealth {
+  score: number;
+  issues: string[];
+  recommendations: string[];
+}
 
 // Core interfaces for standardized cost systems
 export interface CostSystemsAlignment {
