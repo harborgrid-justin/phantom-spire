@@ -1,13 +1,12 @@
 // phantom-ioc-core/src/lib.rs
-// Simplified IOC processing library for WASM compatibility
+// IOC processing library with napi bindings
 
+use napi::bindgen_prelude::*;
+use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
-
-#[cfg(target_arch = "wasm32")]
-use wasm_bindgen::prelude::*;
 
 // Core IOC types
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -74,16 +73,33 @@ pub struct IOCResult {
 }
 
 // Core processing logic
+#[napi]
 pub struct IOCCore {
     _internal: bool,
 }
 
+#[napi]
 impl IOCCore {
-    pub fn new() -> Result<Self, String> {
+    #[napi(constructor)]
+    pub fn new() -> Result<Self> {
         Ok(Self { _internal: true })
     }
 
-    pub fn process_ioc(&self, ioc: IOC) -> Result<IOCResult, String> {
+    #[napi]
+    pub fn process_ioc(&self, ioc_json: String) -> Result<String> {
+        let ioc: IOC = serde_json::from_str(&ioc_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse IOC: {}", e)))?;
+        
+        let result = self.process_ioc_internal(ioc)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to process IOC: {}", e)))?;
+        
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize result: {}", e)))
+    }
+}
+
+impl IOCCore {
+    fn process_ioc_internal(&self, ioc: IOC) -> Result<IOCResult, String> {
         // Mock analysis - in real implementation this would do threat intelligence lookup
         let analysis = AnalysisResult {
             threat_actors: vec!["APT29".to_string(), "Lazarus Group".to_string()]
@@ -121,39 +137,6 @@ impl IOCCore {
             analysis,
             processing_timestamp: Utc::now(),
         })
-    }
-}
-
-// WASM bindings for JavaScript interop
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-pub struct IOCCoreWasm {
-    inner: IOCCore,
-}
-
-#[cfg(target_arch = "wasm32")]
-#[wasm_bindgen]
-impl IOCCoreWasm {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> Result<IOCCoreWasm, JsValue> {
-        console_error_panic_hook::set_once();
-        
-        let core = IOCCore::new()
-            .map_err(|e| JsValue::from_str(&format!("Failed to create IOC Core: {}", e)))?;
-        
-        Ok(IOCCoreWasm { inner: core })
-    }
-
-    #[wasm_bindgen]
-    pub fn process_ioc(&self, ioc_json: &str) -> Result<String, JsValue> {
-        let ioc: IOC = serde_json::from_str(ioc_json)
-            .map_err(|e| JsValue::from_str(&format!("Failed to parse IOC: {}", e)))?;
-        
-        let result = self.inner.process_ioc(ioc)
-            .map_err(|e| JsValue::from_str(&format!("Failed to process IOC: {}", e)))?;
-        
-        serde_json::to_string(&result)
-            .map_err(|e| JsValue::from_str(&format!("Failed to serialize result: {}", e)))
     }
 }
 
@@ -203,7 +186,7 @@ mod tests {
             },
         };
 
-        let result = core.process_ioc(test_ioc);
+        let result = core.process_ioc_internal(test_ioc);
         assert!(result.is_ok());
     }
 }
