@@ -11,6 +11,9 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use indexmap::IndexMap;
 
+// Extended business modules
+pub mod modules;
+
 /// MITRE ATT&CK Tactic categories
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum MitreTactic {
@@ -151,7 +154,7 @@ pub enum DetectionRuleType {
 }
 
 /// Severity levels
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Severity {
     Low,
     Medium,
