@@ -11,21 +11,14 @@ export { CostOptimizationEngine } from './CostOptimizationEngine';
 export { CostSystemsIntegrator } from './CostSystemsIntegrator';
 
 // Export types separately to avoid TS4033 errors
-export type { CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
-export type { BusinessCostMetrics } from './BusinessReadyCostTracker';
-export type { CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
-export type { CostManagementOptions } from './UnifiedCostManagementService';
-export type { OptimizationRecommendation } from './CostOptimizationEngine';
-export type { SystemIntegrationConfig } from './CostSystemsIntegrator';
+export { type CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
+export { type BusinessCostMetrics } from './BusinessReadyCostTracker';
+export { type CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
+export { type CostManagementOptions } from './UnifiedCostManagementService';
+export { type OptimizationRecommendation } from './CostOptimizationEngine';
+export { type SystemIntegrationConfig } from './CostSystemsIntegrator';
 
 // Additional supporting types
-export interface CostReport {
-  id: string;
-  type: string;
-  data: any;
-  generatedAt: string;
-}
-
 export interface CostInsight {
   id: string;
   category: string;

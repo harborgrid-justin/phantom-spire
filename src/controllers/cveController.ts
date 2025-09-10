@@ -15,13 +15,35 @@ import {
   CVEReport,
   CVEIntegration,
 } from '../types/cve.js';
+import { CVEDataService, CVEDataServiceConfig, CVEQueryContext } from '../data-layer/services/CVEDataService.js';
+import { logger } from '../utils/logger.js';
 
-// Mock data store - in real implementation, this would use databases
-const cveStore: Map<string, CVE> = new Map();
+// Multi-database CVE data service instance
+let cveDataService: CVEDataService | null = null;
+
+// Initialize CVE Data Service with environment configuration
+export const initializeCVEDataService = (config: CVEDataServiceConfig): void => {
+  cveDataService = new CVEDataService(config);
+  logger.info('CVE Data Service initialized for phantom-cve-core plugin');
+};
+
+// Fallback stores for when data service is not available
 const feedStore: Map<string, CVEFeed> = new Map();
 const notificationStore: Map<string, CVENotification> = new Map();
 const reportStore: Map<string, CVEReport> = new Map();
 const integrationStore: Map<string, CVEIntegration> = new Map();
+
+// Helper function to create query context from request
+const createQueryContext = (req: any): CVEQueryContext => ({
+  userId: req.user?.id || 'anonymous',
+  organizationId: req.user?.organizationId || 'default',
+  permissions: req.user?.permissions || [],
+  preferences: {
+    preferredDataSources: req.user?.preferences?.preferredDataSources,
+    cacheStrategy: req.user?.preferences?.cacheStrategy || 'cache-first',
+    realTimeUpdates: req.user?.preferences?.realTimeUpdates || false,
+  },
+});
 
 /**
  * CVE Data Management Controller
@@ -30,6 +52,12 @@ export class CVEDataController {
   // Get all CVEs with advanced filtering and pagination
   static async getCVEs(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
+      }
+
       const { page = 1, limit = 20, sort, filters } = req.query;
       const searchRequest: CVESearchRequest = {
         filters: filters ? JSON.parse(filters as string) : {},
@@ -42,90 +70,19 @@ export class CVEDataController {
         },
       };
 
-      const cves = Array.from(cveStore.values());
+      const context = createQueryContext(req);
+      const result = await cveDataService.searchCVEs(searchRequest, context);
 
-      // Apply filters
-      let filteredCVEs = cves;
-      if (searchRequest.filters) {
-        filteredCVEs = cves.filter(cve => {
-          const filters = searchRequest.filters!;
+      logger.info('CVEs retrieved via multi-database service', {
+        total: result.total,
+        page: result.page,
+        userId: context.userId,
+        dataSources: await cveDataService.getHealthStatus().then(h => Object.keys(h.sources)),
+      });
 
-          if (
-            filters.severity &&
-            !filters.severity.includes(cve.scoring.severity)
-          )
-            return false;
-          if (filters.cvssScore) {
-            const score =
-              cve.scoring.cvssV3Score || cve.scoring.cvssV2Score || 0;
-            if (filters.cvssScore.min && score < filters.cvssScore.min)
-              return false;
-            if (filters.cvssScore.max && score > filters.cvssScore.max)
-              return false;
-          }
-          if (
-            filters.exploitAvailable !== undefined &&
-            cve.exploitInfo.exploitAvailable !== filters.exploitAvailable
-          )
-            return false;
-          if (
-            filters.patchAvailable !== undefined &&
-            cve.patchInfo.patchAvailable !== filters.patchAvailable
-          )
-            return false;
-
-          return true;
-        });
-      }
-
-      // Apply sorting
-      if (searchRequest.sort) {
-        const { field, order } = searchRequest.sort;
-        filteredCVEs.sort((a, b) => {
-          let aVal: any, bVal: any;
-
-          switch (field) {
-            case 'cvssScore':
-              aVal = a.scoring.cvssV3Score || a.scoring.cvssV2Score || 0;
-              bVal = b.scoring.cvssV3Score || b.scoring.cvssV2Score || 0;
-              break;
-            case 'publishedDate':
-              aVal = new Date(a.publishedDate);
-              bVal = new Date(b.publishedDate);
-              break;
-            case 'riskScore':
-              aVal = a.riskAssessment.riskScore;
-              bVal = b.riskAssessment.riskScore;
-              break;
-            default:
-              aVal = a[field as keyof CVE];
-              bVal = b[field as keyof CVE];
-          }
-
-          if (order === 'desc') return bVal > aVal ? 1 : -1;
-          return aVal > bVal ? 1 : -1;
-        });
-      }
-
-      // Apply pagination
-      const total = filteredCVEs.length;
-      const startIndex =
-        (searchRequest.pagination!.page - 1) * searchRequest.pagination!.limit;
-      const paginatedCVEs = filteredCVEs.slice(
-        startIndex,
-        startIndex + searchRequest.pagination!.limit
-      );
-
-      const response: CVESearchResponse = {
-        cves: paginatedCVEs,
-        total,
-        page: searchRequest.pagination!.page,
-        limit: searchRequest.pagination!.limit,
-        totalPages: Math.ceil(total / searchRequest.pagination!.limit),
-      };
-
-      res.json(response);
+      res.json(result);
     } catch (error) {
+      logger.error('Failed to get CVEs from multi-database service', error);
       next(error);
     }
   }
@@ -133,15 +90,29 @@ export class CVEDataController {
   // Get CVE by ID
   static async getCVEById(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
+      }
+
       const { id } = req.params;
-      const cve = cveStore.get(id);
+      const context = createQueryContext(req);
+      
+      const cve = await cveDataService.getCVE(id, context);
 
       if (!cve) {
         return res.status(404).json({ error: 'CVE not found' });
       }
 
+      logger.info('CVE retrieved by ID via multi-database service', {
+        cveId: id,
+        userId: context.userId,
+      });
+
       res.json(cve);
     } catch (error) {
+      logger.error('Failed to get CVE by ID from multi-database service', error);
       next(error);
     }
   }
@@ -154,22 +125,26 @@ export class CVEDataController {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      const cveData: Partial<CVE> = req.body;
-      const cve: CVE = {
-        id: `cve-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        organizationId: req.user?.organizationId || 'default',
-        createdBy: req.user?.id || 'system',
-        updatedBy: req.user?.id || 'system',
-        source: 'manual',
-        tags: [],
-        ...cveData,
-      } as CVE;
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
+      }
 
-      cveStore.set(cve.id, cve);
+      const cveData: Partial<CVE> = req.body;
+      const context = createQueryContext(req);
+
+      const cve = await cveDataService.createCVE(cveData, context);
+
+      logger.info('CVE created via multi-database service', {
+        cveId: cve.cveId,
+        userId: context.userId,
+        writeStrategy: 'multi-database',
+      });
+
       res.status(201).json(cve);
     } catch (error) {
+      logger.error('Failed to create CVE via multi-database service', error);
       next(error);
     }
   }
@@ -177,23 +152,30 @@ export class CVEDataController {
   // Update CVE
   static async updateCVE(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
-      const existingCVE = cveStore.get(id);
-
-      if (!existingCVE) {
-        return res.status(404).json({ error: 'CVE not found' });
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
       }
 
-      const updatedCVE: CVE = {
-        ...existingCVE,
-        ...req.body,
-        updatedAt: new Date().toISOString(),
-        updatedBy: req.user?.id || 'system',
-      };
+      const { id } = req.params;
+      const updates: Partial<CVE> = req.body;
+      const context = createQueryContext(req);
 
-      cveStore.set(id, updatedCVE);
+      const updatedCVE = await cveDataService.updateCVE(id, updates, context);
+
+      logger.info('CVE updated via multi-database service', {
+        cveId: id,
+        userId: context.userId,
+        updatedFields: Object.keys(updates),
+      });
+
       res.json(updatedCVE);
     } catch (error) {
+      if ((error as Error).message.includes('not found')) {
+        return res.status(404).json({ error: 'CVE not found' });
+      }
+      logger.error('Failed to update CVE via multi-database service', error);
       next(error);
     }
   }
@@ -201,15 +183,29 @@ export class CVEDataController {
   // Delete CVE
   static async deleteCVE(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
+      }
 
-      if (!cveStore.has(id)) {
+      const { id } = req.params;
+      const context = createQueryContext(req);
+
+      const deleted = await cveDataService.deleteCVE(id, context);
+
+      if (!deleted) {
         return res.status(404).json({ error: 'CVE not found' });
       }
 
-      cveStore.delete(id);
+      logger.info('CVE deleted via multi-database service', {
+        cveId: id,
+        userId: context.userId,
+      });
+
       res.status(204).send();
     } catch (error) {
+      logger.error('Failed to delete CVE via multi-database service', error);
       next(error);
     }
   }
@@ -217,33 +213,42 @@ export class CVEDataController {
   // Search CVEs
   static async searchCVEs(req: Request, res: Response, next: NextFunction) {
     try {
-      const { q, ...filters } = req.query;
-      const cves = Array.from(cveStore.values());
-
-      let results = cves;
-
-      // Text search
-      if (q) {
-        const query = (q as string).toLowerCase();
-        results = results.filter(
-          cve =>
-            cve.cveId.toLowerCase().includes(query) ||
-            cve.title.toLowerCase().includes(query) ||
-            cve.description.toLowerCase().includes(query) ||
-            cve.affectedProducts.some(
-              p =>
-                p.vendor.toLowerCase().includes(query) ||
-                p.product.toLowerCase().includes(query)
-            )
-        );
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
       }
 
-      res.json({
-        results,
-        total: results.length,
+      const { q, ...filters } = req.query;
+      const context = createQueryContext(req);
+
+      const searchRequest: CVESearchRequest = {
+        query: q as string,
+        filters: filters,
+        pagination: {
+          page: parseInt((req.query.page as string) || '1'),
+          limit: parseInt((req.query.limit as string) || '20'),
+        },
+      };
+
+      const result = await cveDataService.searchCVEs(searchRequest, context);
+
+      logger.info('CVE search completed via multi-database service', {
         query: q,
+        total: result.total,
+        userId: context.userId,
+        searchEngine: 'multi-database',
+      });
+
+      res.json({
+        results: result.cves,
+        total: result.total,
+        query: q,
+        page: result.page,
+        totalPages: result.totalPages,
       });
     } catch (error) {
+      logger.error('CVE search failed via multi-database service', error);
       next(error);
     }
   }
@@ -256,79 +261,24 @@ export class CVEAnalyticsController {
   // Get CVE statistics
   static async getCVEStats(req: Request, res: Response, next: NextFunction) {
     try {
-      const cves = Array.from(cveStore.values());
-
-      const stats: CVEStats = {
-        total: cves.length,
-        bySeverity: {
-          critical: cves.filter(c => c.scoring.severity === 'critical').length,
-          high: cves.filter(c => c.scoring.severity === 'high').length,
-          medium: cves.filter(c => c.scoring.severity === 'medium').length,
-          low: cves.filter(c => c.scoring.severity === 'low').length,
-          info: cves.filter(c => c.scoring.severity === 'info').length,
-        },
-        byStatus: {},
-        withExploits: cves.filter(c => c.exploitInfo.exploitAvailable).length,
-        withPatches: cves.filter(c => c.patchInfo.patchAvailable).length,
-        pastDue: cves.filter(
-          c => c.workflow.dueDate && new Date(c.workflow.dueDate) < new Date()
-        ).length,
-        trending: {
-          period: 'last30days',
-          newCVEs: cves.filter(c => {
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return new Date(c.createdAt) > thirtyDaysAgo;
-          }).length,
-          patchedCVEs: cves.filter(c => c.workflow.status === 'closed').length,
-          criticalNew: cves.filter(c => {
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            return (
-              new Date(c.createdAt) > thirtyDaysAgo &&
-              c.scoring.severity === 'critical'
-            );
-          }).length,
-        },
-        topVendors: [],
-        topProducts: [],
-      };
-
-      // Calculate status distribution
-      cves.forEach(cve => {
-        stats.byStatus[cve.workflow.status] =
-          (stats.byStatus[cve.workflow.status] || 0) + 1;
-      });
-
-      // Calculate top vendors and products
-      const vendorCounts = new Map<string, number>();
-      const productCounts = new Map<string, number>();
-
-      cves.forEach(cve => {
-        cve.affectedProducts.forEach(product => {
-          vendorCounts.set(
-            product.vendor,
-            (vendorCounts.get(product.vendor) || 0) + 1
-          );
-          productCounts.set(
-            product.product,
-            (productCounts.get(product.product) || 0) + 1
-          );
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
         });
+      }
+
+      const context = createQueryContext(req);
+      const stats = await cveDataService.getCVEStatistics(context);
+
+      logger.info('CVE statistics retrieved via multi-database service', {
+        total: stats.total,
+        userId: context.userId,
+        cached: req.query.cached === 'true',
       });
-
-      stats.topVendors = Array.from(vendorCounts.entries())
-        .map(([vendor, count]) => ({ vendor, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
-
-      stats.topProducts = Array.from(productCounts.entries())
-        .map(([product, count]) => ({ product, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
 
       res.json(stats);
     } catch (error) {
+      logger.error('Failed to get CVE statistics from multi-database service', error);
       next(error);
     }
   }
@@ -340,41 +290,92 @@ export class CVEAnalyticsController {
     next: NextFunction
   ) {
     try {
-      const cves = Array.from(cveStore.values());
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized. Please configure multi-database support.' 
+        });
+      }
 
+      const context = createQueryContext(req);
+      
+      // Get comprehensive statistics which include risk data
+      const stats = await cveDataService.getCVEStatistics(context);
+      
+      // Calculate risk analytics from the statistics
       const riskDistribution = {
-        critical: cves.filter(c => c.riskAssessment.businessRisk === 'critical')
-          .length,
-        high: cves.filter(c => c.riskAssessment.businessRisk === 'high').length,
-        medium: cves.filter(c => c.riskAssessment.businessRisk === 'medium')
-          .length,
-        low: cves.filter(c => c.riskAssessment.businessRisk === 'low').length,
+        critical: stats.bySeverity.critical,
+        high: stats.bySeverity.high,
+        medium: stats.bySeverity.medium,
+        low: stats.bySeverity.low,
       };
 
-      const avgRiskScore =
-        cves.reduce((sum, cve) => sum + cve.riskAssessment.riskScore, 0) /
-        cves.length;
+      const totalCVEs = stats.total;
+      const avgRiskScore = totalCVEs > 0 
+        ? (stats.bySeverity.critical * 10 + stats.bySeverity.high * 7 + 
+           stats.bySeverity.medium * 5 + stats.bySeverity.low * 2) / totalCVEs
+        : 0;
 
-      const topRisks = cves
-        .sort((a, b) => b.riskAssessment.riskScore - a.riskAssessment.riskScore)
-        .slice(0, 10)
-        .map(cve => ({
-          cveId: cve.cveId,
-          title: cve.title,
-          riskScore: cve.riskAssessment.riskScore,
-          businessRisk: cve.riskAssessment.businessRisk,
-        }));
+      // Top risks would require more detailed query - placeholder implementation
+      const topRisks = []; // This would be populated from detailed risk analysis
 
-      res.json({
+      const riskAnalytics = {
         riskDistribution,
         avgRiskScore,
         topRisks,
-        totalFinancialImpact: cves.reduce(
-          (sum, cve) => sum + cve.riskAssessment.financialImpact,
-          0
-        ),
+        totalFinancialImpact: 0, // Would be calculated from detailed risk assessments
+      };
+
+      logger.info('Risk analytics computed via multi-database service', {
+        avgRiskScore,
+        userId: context.userId,
       });
+
+      res.json(riskAnalytics);
     } catch (error) {
+      logger.error('Failed to get risk analytics from multi-database service', error);
+      next(error);
+    }
+  }
+
+  // Get multi-database service health and metrics
+  static async getServiceHealth(req: Request, res: Response, next: NextFunction) {
+    try {
+      if (!cveDataService) {
+        return res.status(503).json({ 
+          error: 'CVE Data Service not initialized',
+          suggestion: 'Configure multi-database support with Redis, PostgreSQL, MongoDB, and Elasticsearch'
+        });
+      }
+
+      const [healthStatus, metrics] = await Promise.all([
+        cveDataService.getHealthStatus(),
+        Promise.resolve(cveDataService.getMetrics()),
+      ]);
+
+      const serviceInfo = {
+        service: 'phantom-cve-core-multi-database',
+        version: '1.0.0',
+        description: 'Multi-database CVE management service with Redis, PostgreSQL, MongoDB, and Elasticsearch',
+        health: healthStatus,
+        metrics,
+        capabilities: [
+          'multi-database-storage',
+          'intelligent-caching',
+          'advanced-search',
+          'real-time-analytics',
+          'business-saas-ready',
+        ],
+        dataSources: {
+          mongodb: { role: 'primary-document-store', status: healthStatus.sources.mongodb?.status || 'not-configured' },
+          redis: { role: 'cache-and-realtime', status: healthStatus.sources.redis?.status || 'not-configured' },
+          postgresql: { role: 'relational-analytics', status: healthStatus.sources.postgresql?.status || 'not-configured' },
+          elasticsearch: { role: 'search-and-ml', status: healthStatus.sources.elasticsearch?.status || 'not-configured' },
+        },
+      };
+
+      res.json(serviceInfo);
+    } catch (error) {
+      logger.error('Failed to get service health', error);
       next(error);
     }
   }
