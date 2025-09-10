@@ -7,6 +7,7 @@ import { Router } from 'express';
 import cveRouter from './v1/cve';
 import threatActorRouter from './v1/threat-actor';
 import xdrRouter from './v1/xdr-extended';
+import iocRouter from './v1/ioc';
 import { DatabaseService } from '../../services/DatabaseService';
 import { LoggingService } from '../../services/LoggingService';
 import { CacheService } from '../../services/CacheService';
@@ -43,7 +44,8 @@ router.get('/health', async (req, res) => {
         packages: {
           cve_core: 'operational',
           threat_actor_core: 'operational',
-          xdr_core: 'operational'
+          xdr_core: 'operational',
+          ioc_core: 'operational'
         }
       }
     };
@@ -74,6 +76,7 @@ initializeServices().catch((error) => {
 router.use('/cve', cveRouter);
 router.use('/threat-actor', threatActorRouter);
 router.use('/xdr', xdrRouter);
+router.use('/ioc', iocRouter);
 
 // API documentation endpoint
 router.get('/docs', (req, res) => {
@@ -107,17 +110,16 @@ router.get('/docs', (req, res) => {
             'GET /health - Threat Actor Core health status'
           ]
         },
-        xdr: {
-          base: '/api/v1/xdr',
+        ioc: {
+          base: '/api/v1/ioc',
           endpoints: [
-            'POST /detect - Analyze events for threat detection',
-            'POST /respond - Execute automated response',
-            'POST /hunt - Execute threat hunting queries',
-            'GET /analytics - Get behavioral analytics',
-            'GET /dashboard - Get real-time dashboard data',
-            'GET /health - XDR Core health status'
+            'POST /analyze - Analyze and enrich IOCs',
+            'POST /correlate - Find IOC correlations',
+            'GET /search - Search IOCs with filtering',
+            'POST /bulk-import - Bulk import from feeds',
+            'GET /health - IOC Core health status'
           ]
-        }
+        },
       },
       features: [
         'Production-ready REST APIs',

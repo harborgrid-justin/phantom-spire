@@ -384,6 +384,66 @@ export class DatabaseService {
     }
   }
 
+  async storeIOCAnalysis(analysis: any): Promise<void> {
+    try {
+      // Store in MongoDB
+      if (this.mongodb) {
+        const collection: Collection = this.mongodb.collection('ioc_analyses');
+        await collection.insertOne({
+          ...analysis,
+          _id: `ioc_analysis_${Date.now()}`,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+      }
+
+      this.logger.info('IOC analysis stored');
+    } catch (error) {
+      this.logger.error('Failed to store IOC analysis:', error);
+      throw error;
+    }
+  }
+
+  async storeIOCCorrelations(correlations: any): Promise<void> {
+    try {
+      // Store in MongoDB
+      if (this.mongodb) {
+        const collection: Collection = this.mongodb.collection('ioc_correlations');
+        await collection.insertOne({
+          ...correlations,
+          _id: `ioc_correlation_${Date.now()}`,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+      }
+
+      this.logger.info('IOC correlations stored');
+    } catch (error) {
+      this.logger.error('Failed to store IOC correlations:', error);
+      throw error;
+    }
+  }
+
+  async storeIOCImport(importResult: any): Promise<void> {
+    try {
+      // Store in MongoDB
+      if (this.mongodb) {
+        const collection: Collection = this.mongodb.collection('ioc_imports');
+        await collection.insertOne({
+          ...importResult,
+          _id: `ioc_import_${Date.now()}`,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+      }
+
+      this.logger.info('IOC import stored');
+    } catch (error) {
+      this.logger.error('Failed to store IOC import:', error);
+      throw error;
+    }
+  }
+
   async searchCVEs(criteria: any): Promise<CVEAnalysisResult[]> {
     try {
       if (this.mongodb) {
