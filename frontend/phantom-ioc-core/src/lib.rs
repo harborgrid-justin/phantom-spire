@@ -28,6 +28,14 @@ mod reputation;
 mod scoring;
 mod validation;
 
+// Import new business-ready modules
+mod threat_hunting;
+mod incident_response;
+mod risk_assessment;
+mod compliance;
+mod analytics;
+mod integration;
+
 // Core processing logic
 #[napi]
 pub struct IOCCore {
