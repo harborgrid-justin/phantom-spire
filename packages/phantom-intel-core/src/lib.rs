@@ -9,6 +9,7 @@
 //! - STIX/TAXII integration
 //! - Automated intelligence collection
 //! - Threat landscape analysis
+//! - HIGH-PERFORMANCE PROCESSING with SIMD JSON, HNSW similarity search, and xxHash
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -16,6 +17,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use indexmap::IndexMap;
+
+// High-performance processing module 
+pub mod high_performance;
 
 /// Threat Intelligence Platform Core
 #[derive(Debug, Clone)]

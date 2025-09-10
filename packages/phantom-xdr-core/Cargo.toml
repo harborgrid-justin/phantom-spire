@@ -43,6 +43,10 @@ anyhow = "1.0"
 log = "0.4"
 env_logger = "0.10"
 libnode_rs = "0.0.2"
+# High-performance packages for competitive advantage
+crc32fast = "1.4"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+reed-solomon-erasure = "6.0"
 
 [build-dependencies]
 napi-build = "2.1.0"

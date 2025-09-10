@@ -1,0 +1,69 @@
+{
+  "name": "phantom-crypto-core",
+  "version": "1.0.0",
+  "description": "Advanced cryptographic core with secure authentication, JWT processing, and high-performance random generation",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-crypto-core"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "napi": {
+    "binaryName": "phantom-crypto-core",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-apple-darwin",
+      "aarch64-unknown-linux-gnu"
+    ]
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "clean": "rimraf dist",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version",
+    "lint": "cargo clippy",
+    "fmt": "cargo fmt"
+  },
+  "keywords": [
+    "cryptography",
+    "authentication",
+    "jwt",
+    "argon2",
+    "chacha",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0",
+    "rimraf": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
