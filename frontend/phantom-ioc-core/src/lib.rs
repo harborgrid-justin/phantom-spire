@@ -11,6 +11,7 @@ use uuid::Uuid;
 pub use types::*;
 
 mod types;
+mod data_stores;
 
 // ============================================================================
 // ENTERPRISE IOC CORE - COMPLETE BUSINESS-READY IMPLEMENTATION
