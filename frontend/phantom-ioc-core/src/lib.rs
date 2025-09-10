@@ -35,6 +35,26 @@ mod risk_assessment;
 mod compliance;
 mod analytics;
 mod integration;
+mod workflow_automation;
+mod reporting;
+mod notification;
+mod audit;
+mod performance_monitoring;
+mod user_management;
+
+// Re-export the main engines for easy access
+pub use threat_hunting::ThreatHuntingEngine;
+pub use incident_response::IncidentResponseEngine;
+pub use risk_assessment::RiskAssessmentEngine;
+pub use compliance::ComplianceEngine;
+pub use analytics::AnalyticsEngine;
+pub use integration::IntegrationEngine;
+pub use workflow_automation::WorkflowAutomationEngine;
+pub use reporting::ReportingEngine;
+pub use notification::NotificationEngine;
+pub use audit::AuditEngine;
+pub use performance_monitoring::PerformanceMonitoringEngine;
+pub use user_management::UserManagementEngine;
 
 // Core processing logic
 #[napi]
@@ -120,6 +140,129 @@ impl IOCCore {
             processing_timestamp: Utc::now(),
         })
     }
+}
+
+// NAPI exports for the new business modules
+#[napi]
+pub async fn create_threat_hunting_engine() -> Result<String> {
+    match ThreatHuntingEngine::new().await {
+        Ok(_) => Ok("Threat Hunting Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Threat Hunting Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_incident_response_engine() -> Result<String> {
+    match IncidentResponseEngine::new().await {
+        Ok(_) => Ok("Incident Response Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Incident Response Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_risk_assessment_engine() -> Result<String> {
+    match RiskAssessmentEngine::new().await {
+        Ok(_) => Ok("Risk Assessment Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Risk Assessment Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_compliance_engine() -> Result<String> {
+    match ComplianceEngine::new().await {
+        Ok(_) => Ok("Compliance Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Compliance Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_analytics_engine() -> Result<String> {
+    match AnalyticsEngine::new().await {
+        Ok(_) => Ok("Analytics Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Analytics Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_integration_engine() -> Result<String> {
+    match IntegrationEngine::new().await {
+        Ok(_) => Ok("Integration Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Integration Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_workflow_automation_engine() -> Result<String> {
+    match WorkflowAutomationEngine::new().await {
+        Ok(_) => Ok("Workflow Automation Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Workflow Automation Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_reporting_engine() -> Result<String> {
+    match ReportingEngine::new().await {
+        Ok(_) => Ok("Reporting Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Reporting Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_notification_engine() -> Result<String> {
+    match NotificationEngine::new().await {
+        Ok(_) => Ok("Notification Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Notification Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_audit_engine() -> Result<String> {
+    match AuditEngine::new().await {
+        Ok(_) => Ok("Audit Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Audit Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_performance_monitoring_engine() -> Result<String> {
+    match PerformanceMonitoringEngine::new().await {
+        Ok(_) => Ok("Performance Monitoring Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Performance Monitoring Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_user_management_engine() -> Result<String> {
+    match UserManagementEngine::new().await {
+        Ok(_) => Ok("User Management Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create User Management Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn get_all_engines_status() -> Result<String> {
+    Ok(serde_json::json!({
+        "phantom_ioc_core": {
+            "version": "0.1.0",
+            "modules": [
+                "threat_hunting",
+                "incident_response", 
+                "risk_assessment",
+                "compliance",
+                "analytics",
+                "integration",
+                "workflow_automation",
+                "reporting",
+                "notification",
+                "audit",
+                "performance_monitoring",
+                "user_management"
+            ],
+            "status": "operational",
+            "total_modules": 12,
+            "initialized_at": chrono::Utc::now().to_rfc3339()
+        }
+    }).to_string())
 }
 
 // Simple random number generator for mock data
