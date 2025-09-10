@@ -2,6 +2,12 @@
 //! 
 //! This library provides comprehensive security operations capabilities including
 //! incident response, security orchestration, automation, and operational intelligence.
+//! 
+//! Enhanced with multi-data store support for business SaaS readiness:
+//! - Redis: High-performance caching and real-time data
+//! - PostgreSQL: Structured data with ACID properties
+//! - MongoDB: Flexible document storage and horizontal scaling
+//! - Elasticsearch: Advanced search and analytics
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -10,6 +16,10 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use indexmap::IndexMap;
+
+// Data store modules
+pub mod datastore;
+pub mod stores;
 
 /// Incident severity levels
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -560,8 +570,9 @@ pub struct RetryPolicy {
     pub max_delay_seconds: u32,
 }
 
-/// Main SecOp Core implementation
+/// Main SecOp Core implementation with configurable data stores
 pub struct SecOpCore {
+    // Legacy in-memory storage for backward compatibility
     incidents: IndexMap<String, SecurityIncident>,
     alerts: IndexMap<String, SecurityAlert>,
     playbooks: IndexMap<String, SecurityPlaybook>,
@@ -570,10 +581,14 @@ pub struct SecOpCore {
     evidence: IndexMap<String, Evidence>,
     workflows: IndexMap<String, OrchestrationWorkflow>,
     threat_feeds: IndexMap<String, ThreatIntelFeed>,
+    
+    // New data store manager
+    data_store: Option<Box<dyn datastore::DataStoreManager>>,
+    config: Option<datastore::DataStoreConfig>,
 }
 
 impl SecOpCore {
-    /// Create a new SecOp Core instance
+    /// Create a new SecOp Core instance with in-memory storage
     pub fn new() -> Self {
         Self {
             incidents: IndexMap::new(),
@@ -584,6 +599,49 @@ impl SecOpCore {
             evidence: IndexMap::new(),
             workflows: IndexMap::new(),
             threat_feeds: IndexMap::new(),
+            data_store: None,
+            config: None,
+        }
+    }
+    
+    /// Create a new SecOp Core instance with configurable data store
+    pub async fn new_with_config(config: datastore::DataStoreConfig) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
+        let data_store = datastore::DataStoreFactory::create_hybrid_manager(config.clone()).await?;
+        
+        Ok(Self {
+            incidents: IndexMap::new(),
+            alerts: IndexMap::new(),
+            playbooks: IndexMap::new(),
+            executions: IndexMap::new(),
+            tasks: IndexMap::new(),
+            evidence: IndexMap::new(),
+            workflows: IndexMap::new(),
+            threat_feeds: IndexMap::new(),
+            data_store: Some(data_store),
+            config: Some(config),
+        })
+    }
+    
+    /// Initialize the data store
+    pub async fn initialize_data_store(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+        if let Some(data_store) = &mut self.data_store {
+            data_store.initialize().await?;
+            log::info!("Data store initialized successfully");
+        }
+        Ok(())
+    }
+    
+    /// Check if using external data stores
+    pub fn has_external_data_store(&self) -> bool {
+        self.data_store.is_some()
+    }
+    
+    /// Get data store health status
+    pub async fn data_store_health(&self) -> bool {
+        if let Some(data_store) = &self.data_store {
+            data_store.health_check().await.unwrap_or(false)
+        } else {
+            true // In-memory is always healthy
         }
     }
 
@@ -597,7 +655,7 @@ impl SecOpCore {
     }
 
     /// Create a new security incident
-    pub fn create_incident(&mut self, title: String, description: String, category: IncidentCategory, severity: IncidentSeverity) -> String {
+    pub async fn create_incident(&mut self, title: String, description: String, category: IncidentCategory, severity: IncidentSeverity) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
         let incident_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
@@ -659,8 +717,20 @@ impl SecOpCore {
             metadata: HashMap::new(),
         };
 
+        // Try to store in external data store first
+        if let Some(data_store) = &self.data_store {
+            match data_store.create_incident(&incident).await {
+                Ok(id) => return Ok(id),
+                Err(e) => {
+                    log::warn!("Failed to store incident in external data store: {}", e);
+                    // Fall back to in-memory storage
+                }
+            }
+        }
+
+        // Fallback to in-memory storage
         self.incidents.insert(incident_id.clone(), incident);
-        incident_id
+        Ok(incident_id)
     }
 
     /// Update incident status
@@ -1347,15 +1417,91 @@ impl Default for SecOpCore {
 #[napi]
 pub struct SecOpCoreNapi {
     inner: SecOpCore,
+    runtime: Option<tokio::runtime::Runtime>,
 }
 
 #[napi]
 impl SecOpCoreNapi {
     #[napi(constructor)]
     pub fn new() -> Self {
+        let runtime = tokio::runtime::Runtime::new().ok();
         Self {
             inner: SecOpCore::default(),
+            runtime,
         }
+    }
+    
+    /// Create a new SecOp Core instance with data store configuration
+    #[napi(factory)]
+    pub fn new_with_data_store(config_json: String) -> Result<SecOpCoreNapi> {
+        let runtime = tokio::runtime::Runtime::new()
+            .map_err(|e| napi::Error::from_reason(format!("Failed to create runtime: {}", e)))?;
+        
+        let config: datastore::DataStoreConfig = serde_json::from_str(&config_json)
+            .map_err(|e| napi::Error::from_reason(format!("Invalid config JSON: {}", e)))?;
+        
+        let inner = runtime.block_on(async {
+            SecOpCore::new_with_config(config).await
+        }).map_err(|e| napi::Error::from_reason(format!("Failed to create SecOpCore with config: {}", e)))?;
+        
+        Ok(Self {
+            inner,
+            runtime: Some(runtime),
+        })
+    }
+    
+    /// Initialize the data store
+    #[napi]
+    pub fn initialize_data_store(&mut self) -> Result<bool> {
+        if let Some(runtime) = &self.runtime {
+            match runtime.block_on(async {
+                self.inner.initialize_data_store().await
+            }) {
+                Ok(_) => Ok(true),
+                Err(e) => {
+                    log::warn!("Data store initialization failed: {}", e);
+                    Ok(false)
+                }
+            }
+        } else {
+            Ok(true) // No runtime needed for in-memory
+        }
+    }
+    
+    /// Check data store health
+    #[napi]
+    pub fn data_store_health(&self) -> Result<bool> {
+        if let Some(runtime) = &self.runtime {
+            Ok(runtime.block_on(async {
+                self.inner.data_store_health().await
+            }))
+        } else {
+            Ok(true) // In-memory is always healthy
+        }
+    }
+    
+    /// Get data store configuration info
+    #[napi]
+    pub fn get_data_store_info(&self) -> Result<String> {
+        let info = if self.inner.has_external_data_store() {
+            serde_json::json!({
+                "type": "external",
+                "has_redis": self.inner.config.as_ref().map(|c| c.redis_url.is_some()).unwrap_or(false),
+                "has_postgres": self.inner.config.as_ref().map(|c| c.postgres_url.is_some()).unwrap_or(false),
+                "has_mongodb": self.inner.config.as_ref().map(|c| c.mongodb_url.is_some()).unwrap_or(false),
+                "has_elasticsearch": self.inner.config.as_ref().map(|c| c.elasticsearch_url.is_some()).unwrap_or(false),
+                "cache_enabled": self.inner.config.as_ref().map(|c| c.cache_enabled).unwrap_or(false),
+                "default_store": self.inner.config.as_ref().map(|c| &c.default_store).unwrap_or(&datastore::DataStoreType::Memory)
+            })
+        } else {
+            serde_json::json!({
+                "type": "memory",
+                "description": "In-memory storage for development and testing"
+            })
+        };
+        
+        serde_json::to_string(&info)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize info: {}", e)))
     }
 
     #[napi]
@@ -1382,7 +1528,81 @@ impl SecOpCoreNapi {
             _ => IncidentSeverity::Low,
         };
         
-        Ok(self.inner.create_incident(title, description, category_enum, severity_enum))
+        // Use runtime if available for async operations
+        if let Some(runtime) = &self.runtime {
+            match runtime.block_on(async {
+                self.inner.create_incident(title, description, category_enum, severity_enum).await
+            }) {
+                Ok(id) => Ok(id),
+                Err(e) => Err(napi::Error::from_reason(format!("Failed to create incident: {}", e))),
+            }
+        } else {
+            // Fallback to synchronous in-memory operation
+            // This is a simplified version for backward compatibility
+            let incident_id = Uuid::new_v4().to_string();
+            let now = Utc::now();
+
+            let incident = SecurityIncident {
+                id: incident_id.clone(),
+                title,
+                description,
+                category: category_enum,
+                severity: severity_enum.clone(),
+                status: IncidentStatus::New,
+                priority_score: self.inner.calculate_priority_score(&severity_enum),
+                created_at: now,
+                updated_at: now,
+                detected_at: now,
+                assigned_to: None,
+                assigned_team: None,
+                source_system: "Phantom SecOp Core".to_string(),
+                affected_assets: Vec::new(),
+                indicators: Vec::new(),
+                tags: Vec::new(),
+                timeline: vec![IncidentTimelineEntry {
+                    timestamp: now,
+                    event_type: "Created".to_string(),
+                    description: "Incident created".to_string(),
+                    actor: "System".to_string(),
+                    details: HashMap::new(),
+                }],
+                evidence: Vec::new(),
+                related_alerts: Vec::new(),
+                related_incidents: Vec::new(),
+                containment_actions: Vec::new(),
+                eradication_actions: Vec::new(),
+                recovery_actions: Vec::new(),
+                lessons_learned: Vec::new(),
+                cost_impact: None,
+                business_impact: BusinessImpact {
+                    financial_impact: 0.0,
+                    operational_impact: OperationalImpact::None,
+                    reputation_impact: ReputationImpact::None,
+                    regulatory_impact: Vec::new(),
+                    customer_impact: CustomerImpact {
+                        customers_affected: 0,
+                        service_degradation: false,
+                        data_exposure: false,
+                        communication_required: false,
+                        compensation_required: false,
+                    },
+                    service_disruption: Vec::new(),
+                    data_impact: DataImpact {
+                        data_types_affected: Vec::new(),
+                        records_affected: 0,
+                        confidentiality_breach: false,
+                        integrity_compromise: false,
+                        availability_impact: false,
+                        regulatory_notification_required: false,
+                    },
+                },
+                compliance_impact: Vec::new(),
+                metadata: HashMap::new(),
+            };
+
+            self.inner.incidents.insert(incident_id.clone(), incident);
+            Ok(incident_id)
+        }
     }
 
     #[napi]
