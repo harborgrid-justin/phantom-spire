@@ -16,6 +16,9 @@ export {
 } from './core/DataFederationEngine.js';
 export { BaseDataSource } from './core/BaseDataSource.js';
 export { MongoDataSource } from './core/MongoDataSource.js';
+export { PostgreSQLDataSource } from './core/PostgreSQLDataSource.js';
+export { RedisDataSource } from './core/RedisDataSource.js';
+export { ElasticsearchDataSource } from './core/ElasticsearchDataSource.js';
 
 // Analytics
 export {
