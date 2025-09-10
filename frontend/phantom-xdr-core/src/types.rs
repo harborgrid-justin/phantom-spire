@@ -507,6 +507,12 @@ pub struct EngineStatus {
     pub risk_engine: ComponentStatus,
     pub ml_engine: ComponentStatus,
     pub network_analyzer: ComponentStatus,
+    
+    // New module statuses
+    pub asset_discovery_engine: ComponentStatus,
+    pub compliance_audit_engine: ComponentStatus,
+    pub data_loss_prevention_engine: ComponentStatus,
+    
     pub last_updated: i64,
 }
 

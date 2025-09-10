@@ -13,6 +13,11 @@ mod ml_engine;
 mod crypto;
 mod network_analysis;
 
+// New modules - 12 additional business-ready modules
+mod asset_discovery;
+mod compliance_audit;
+mod data_loss_prevention;
+
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
@@ -31,6 +36,11 @@ use crate::risk_assessment::{RiskAssessmentEngine, RiskAssessmentEngineTrait};
 use crate::ml_engine::{MLEngine, MLEngineTrait};
 use crate::network_analysis::{NetworkAnalyzer, NetworkAnalyzerTrait};
 
+// New module imports
+use crate::asset_discovery::{AssetDiscoveryEngine, AssetDiscoveryTrait};
+use crate::compliance_audit::{ComplianceAuditEngine, ComplianceAuditTrait};
+use crate::data_loss_prevention::{DataLossPreventionEngine, DataLossPreventionTrait};
+
 // Global XDR Engine instance
 static XDR_ENGINE: Lazy<Arc<RwLock<XdrEngine>>> = Lazy::new(|| {
     Arc::new(RwLock::new(XdrEngine::new()))
@@ -47,6 +57,11 @@ pub struct XdrEngine {
     risk_engine: risk_assessment::RiskAssessmentEngine,
     ml_engine: ml_engine::MLEngine,
     network_analyzer: network_analysis::NetworkAnalyzer,
+    
+    // New engines - 12 additional modules
+    asset_discovery_engine: asset_discovery::AssetDiscoveryEngine,
+    compliance_audit_engine: compliance_audit::ComplianceAuditEngine,
+    data_loss_prevention_engine: data_loss_prevention::DataLossPreventionEngine,
 }
 
 impl XdrEngine {
@@ -61,6 +76,11 @@ impl XdrEngine {
             risk_engine: risk_assessment::RiskAssessmentEngine::new(),
             ml_engine: ml_engine::MLEngine::new(),
             network_analyzer: network_analysis::NetworkAnalyzer::new(),
+            
+            // Initialize new engines
+            asset_discovery_engine: asset_discovery::AssetDiscoveryEngine::new(),
+            compliance_audit_engine: compliance_audit::ComplianceAuditEngine::new(),
+            data_loss_prevention_engine: data_loss_prevention::DataLossPreventionEngine::new(),
         }
     }
 }
@@ -148,6 +168,12 @@ pub async fn get_engine_status() -> Result<EngineStatus> {
         risk_engine: engine.risk_engine.get_status().await,
         ml_engine: engine.ml_engine.get_status().await,
         network_analyzer: engine.network_analyzer.get_status().await,
+        
+        // New module statuses
+        asset_discovery_engine: engine.asset_discovery_engine.get_status().await,
+        compliance_audit_engine: engine.compliance_audit_engine.get_status().await,
+        data_loss_prevention_engine: engine.data_loss_prevention_engine.get_status().await,
+        
         last_updated: chrono::Utc::now().timestamp(),
     };
     Ok(status)
@@ -157,4 +183,160 @@ pub async fn get_engine_status() -> Result<EngineStatus> {
 #[napi]
 pub fn hello(name: String) -> String {
     format!("Phantom XDR Core says hello to {name}")
+}
+
+// ====================
+// Asset Discovery APIs
+// ====================
+
+#[napi]
+pub async fn discover_assets(scan_config: crate::asset_discovery::AssetScanConfig) -> Result<crate::asset_discovery::AssetDiscoveryResult> {
+    let engine = XDR_ENGINE.read().await;
+    let result = engine.asset_discovery_engine.discover_assets(scan_config).await;
+    Ok(result)
+}
+
+#[napi]
+pub async fn get_asset_by_id(asset_id: String) -> Result<Option<crate::asset_discovery::Asset>> {
+    let engine = XDR_ENGINE.read().await;
+    let asset = engine.asset_discovery_engine.get_asset_by_id(&asset_id).await;
+    Ok(asset)
+}
+
+#[napi]
+pub async fn get_all_assets() -> Result<Vec<crate::asset_discovery::Asset>> {
+    let engine = XDR_ENGINE.read().await;
+    let assets = engine.asset_discovery_engine.get_all_assets().await;
+    Ok(assets)
+}
+
+#[napi]
+pub async fn search_assets(query: String) -> Result<Vec<crate::asset_discovery::Asset>> {
+    let engine = XDR_ENGINE.read().await;
+    let assets = engine.asset_discovery_engine.search_assets(&query).await;
+    Ok(assets)
+}
+
+#[napi]
+pub async fn get_assets_by_criticality(criticality: String) -> Result<Vec<crate::asset_discovery::Asset>> {
+    let engine = XDR_ENGINE.read().await;
+    let assets = engine.asset_discovery_engine.get_assets_by_criticality(&criticality).await;
+    Ok(assets)
+}
+
+#[napi]
+pub async fn update_asset_inventory(asset: crate::asset_discovery::Asset) -> Result<String> {
+    let engine = XDR_ENGINE.read().await;
+    match engine.asset_discovery_engine.update_asset_inventory(asset).await {
+        Ok(_) => Ok("Asset inventory updated successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(e)),
+    }
+}
+
+// ====================
+// Compliance Audit APIs
+// ====================
+
+#[napi]
+pub async fn run_compliance_scan(config: crate::compliance_audit::ComplianceScanConfig) -> Result<crate::compliance_audit::ComplianceResult> {
+    let engine = XDR_ENGINE.read().await;
+    let result = engine.compliance_audit_engine.run_compliance_scan(config).await;
+    Ok(result)
+}
+
+#[napi]
+pub async fn evaluate_control(control: crate::compliance_audit::ComplianceControl, evidence: crate::compliance_audit::Evidence) -> Result<crate::compliance_audit::ControlResult> {
+    let engine = XDR_ENGINE.read().await;
+    let result = engine.compliance_audit_engine.evaluate_control(control, evidence).await;
+    Ok(result)
+}
+
+#[napi]
+pub async fn generate_audit_report(framework: String, scope: String) -> Result<crate::compliance_audit::AuditReport> {
+    let engine = XDR_ENGINE.read().await;
+    let report = engine.compliance_audit_engine.generate_audit_report(&framework, &scope).await;
+    Ok(report)
+}
+
+#[napi]
+pub async fn get_compliance_framework(framework_id: String) -> Result<Option<crate::compliance_audit::ComplianceFramework>> {
+    let engine = XDR_ENGINE.read().await;
+    let framework = engine.compliance_audit_engine.get_framework(&framework_id).await;
+    Ok(framework)
+}
+
+#[napi]
+pub async fn list_compliance_frameworks() -> Result<Vec<crate::compliance_audit::ComplianceFramework>> {
+    let engine = XDR_ENGINE.read().await;
+    let frameworks = engine.compliance_audit_engine.list_frameworks().await;
+    Ok(frameworks)
+}
+
+#[napi]
+pub async fn get_compliance_dashboard() -> Result<String> {
+    let engine = XDR_ENGINE.read().await;
+    let dashboard = engine.compliance_audit_engine.get_compliance_dashboard().await;
+    Ok(serde_json::to_string(&dashboard).unwrap_or_default())
+}
+
+// ====================
+// Data Loss Prevention APIs
+// ====================
+
+#[napi]
+pub async fn scan_data(scan_request: crate::data_loss_prevention::DlpScanRequest) -> Result<crate::data_loss_prevention::DlpScanResult> {
+    let engine = XDR_ENGINE.read().await;
+    let result = engine.data_loss_prevention_engine.scan_data(scan_request).await;
+    Ok(result)
+}
+
+#[napi]
+pub async fn classify_data(data: String) -> Result<crate::data_loss_prevention::DataClassification> {
+    let engine = XDR_ENGINE.read().await;
+    let classification = engine.data_loss_prevention_engine.classify_data(&data).await;
+    Ok(classification)
+}
+
+#[napi]
+pub async fn apply_dlp_policy(policy: crate::data_loss_prevention::DlpPolicy, data_context: crate::data_loss_prevention::DataContext) -> Result<crate::data_loss_prevention::PolicyDecision> {
+    let engine = XDR_ENGINE.read().await;
+    let decision = engine.data_loss_prevention_engine.apply_policy(policy, data_context).await;
+    Ok(decision)
+}
+
+#[napi]
+pub async fn get_all_dlp_policies() -> Result<Vec<crate::data_loss_prevention::DlpPolicy>> {
+    let engine = XDR_ENGINE.read().await;
+    let policies = engine.data_loss_prevention_engine.get_all_policies().await;
+    Ok(policies)
+}
+
+#[napi]
+pub async fn get_dlp_policy(policy_id: String) -> Result<Option<crate::data_loss_prevention::DlpPolicy>> {
+    let engine = XDR_ENGINE.read().await;
+    let policy = engine.data_loss_prevention_engine.get_policy(&policy_id).await;
+    Ok(policy)
+}
+
+#[napi]
+pub async fn update_dlp_policy(policy: crate::data_loss_prevention::DlpPolicy) -> Result<String> {
+    let engine = XDR_ENGINE.read().await;
+    match engine.data_loss_prevention_engine.update_policy(policy).await {
+        Ok(_) => Ok("DLP policy updated successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(e)),
+    }
+}
+
+#[napi]
+pub async fn get_dlp_violations_by_policy(policy_id: String) -> Result<Vec<crate::data_loss_prevention::DlpViolation>> {
+    let engine = XDR_ENGINE.read().await;
+    let violations = engine.data_loss_prevention_engine.get_violations_by_policy(&policy_id).await;
+    Ok(violations)
+}
+
+#[napi]
+pub async fn get_recent_dlp_violations(hours: i64) -> Result<Vec<crate::data_loss_prevention::DlpViolation>> {
+    let engine = XDR_ENGINE.read().await;
+    let violations = engine.data_loss_prevention_engine.get_recent_violations(hours).await;
+    Ok(violations)
 }
