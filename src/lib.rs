@@ -46,7 +46,7 @@ pub fn get_native_capabilities() -> Result<Vec<String>> {
 /// Performance benchmark for native operations
 #[napi]
 pub fn benchmark_native_performance() -> Result<Object> {
-  let mut obj = Object::new();
+  let mut obj = Object::new()?;
   obj.set("threat_analysis_ops_per_sec", 1000000u32)?;
   obj.set("pattern_matching_ops_per_sec", 500000u32)?;
   obj.set("crypto_operations_per_sec", 250000u32)?;

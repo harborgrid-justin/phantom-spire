@@ -1,0 +1,72 @@
+{
+  "name": "phantom-intel-core",
+  "version": "1.0.0",
+  "description": "Advanced threat intelligence core with comprehensive intelligence gathering, analysis, and correlation engine",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-intel-core"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "napi": {
+    "name": "phantom-intel-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "clean": "rimraf dist",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test",
+    "universal": "napi universal",
+    "version": "napi version",
+    "lint": "cargo clippy",
+    "fmt": "cargo fmt"
+  },
+  "keywords": [
+    "threat-intelligence",
+    "indicators",
+    "threat-actors",
+    "campaigns",
+    "intelligence-feeds",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0",
+    "rimraf": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

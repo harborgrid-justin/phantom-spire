@@ -4,6 +4,9 @@
   "description": "Enterprise-grade Cyber Threat Intelligence Platform",
   "type": "module",
   "main": "dist/index.js",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "npm run build:native && tsc",
     "build:native": "cargo build --release && napi build --platform --release",
@@ -36,7 +39,12 @@
     "evaluate:installation:report": "npm run evaluate:installation -- --detailed --output installation-evaluation-report.md --format markdown",
     "analyze:system": "node dist/scripts/analyze-system.js",
     "analyze:system:report": "npm run analyze:system -- --report comprehensive-system-analysis.md",
-    "benchmark:native": "node -e \"const { nativeXDRService } = require('./dist/native-modules/NativeXDRIntegrationService.js'); nativeXDRService.benchmarkPerformance().then(console.log)\""
+    "benchmark:native": "node -e \"const { nativeXDRService } = require('./dist/native-modules/NativeXDRIntegrationService.js'); nativeXDRService.benchmarkPerformance().then(console.log)\"",
+    "packages:install": "npm install --workspaces",
+    "packages:build": "npm run build --workspaces",
+    "packages:test": "npm run test --workspaces",
+    "packages:lint": "npm run lint --workspaces",
+    "packages:clean": "npm run clean --workspaces"
   },
   "keywords": [
     "threat-intelligence",
