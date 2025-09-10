@@ -5,7 +5,15 @@
 //! - High-performance JWT processing for authentication systems
 //! - ChaCha20 cryptographically secure random number generation
 //! - Advanced key exchange and digital signatures
+//! - Enhanced crypto operations using ring for maximum performance
+//! - High-precision time handling and hex encoding
 //! - Designed to outperform Anomali's security capabilities
+
+// Core cryptographic modules
+mod enhanced_crypto;
+
+// Re-export enhanced crypto functionality
+pub use enhanced_crypto::*;
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -24,6 +32,8 @@ use hmac::{Hmac, Mac};
 use aes_gcm::{Aes256Gcm, Key, Nonce, aead::{Aead, KeyInit}};
 use x25519_dalek::{EphemeralSecret, PublicKey as X25519PublicKey};
 use ed25519_dalek::{Keypair, Signature, Signer, Verifier};
+use hex;
+use time::OffsetDateTime;
 
 /// Global ChaCha20 RNG for cryptographically secure random generation
 static SECURE_RNG: Lazy<std::sync::Mutex<ChaCha20Rng>> = Lazy::new(|| {
@@ -447,6 +457,52 @@ impl CryptoCore {
     pub fn get_metrics(&self) -> &CryptoMetrics {
         &self.performance_metrics
     }
+
+    /// Enhanced hex encoding with timing and validation
+    pub fn encode_hex_enhanced(&self, data: &[u8]) -> CryptoResult {
+        let start_time = std::time::Instant::now();
+        let precise_start = OffsetDateTime::now_utc();
+
+        let encoded = hex::encode(data);
+
+        let processing_time_ns = start_time.elapsed().as_nanos() as u64;
+
+        CryptoResult {
+            operation: "hex_encode".to_string(),
+            result: encoded,
+            processing_time_ns,
+            precise_timestamp: precise_start.unix_timestamp_nanos(),
+            algorithm: "hex".to_string(),
+            key_size: None,
+            success: true,
+        }
+    }
+
+    /// Enhanced hex decoding with validation
+    pub fn decode_hex_enhanced(&self, hex_data: &str) -> Result<CryptoResult, String> {
+        let start_time = std::time::Instant::now();
+        let precise_start = OffsetDateTime::now_utc();
+
+        let decoded = hex::decode(hex_data)
+            .map_err(|e| format!("Hex decode failed: {}", e))?;
+
+        let processing_time_ns = start_time.elapsed().as_nanos() as u64;
+
+        Ok(CryptoResult {
+            operation: "hex_decode".to_string(),
+            result: hex::encode(&decoded), // Re-encode for consistent result format
+            processing_time_ns,
+            precise_timestamp: precise_start.unix_timestamp_nanos(),
+            algorithm: "hex".to_string(),
+            key_size: None,
+            success: true,
+        })
+    }
+
+    /// Get high-precision timestamp with nanosecond accuracy
+    pub fn get_precise_timestamp(&self) -> i64 {
+        OffsetDateTime::now_utc().unix_timestamp_nanos()
+    }
 }
 
 impl Default for CryptoCore {
@@ -534,5 +590,28 @@ impl CryptoCoreNapi {
         let metrics = self.inner.get_metrics();
         serde_json::to_string(metrics)
             .map_err(|e| napi::Error::from_reason(format!("Serialization error: {}", e)))
+    }
+
+    /// Enhanced hex encoding with performance metrics
+    #[napi]
+    pub fn encode_hex_enhanced(&self, data: Buffer) -> Result<String> {
+        let result = self.inner.encode_hex_enhanced(data.as_ref());
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Serialization error: {}", e)))
+    }
+
+    /// Enhanced hex decoding with validation
+    #[napi]
+    pub fn decode_hex_enhanced(&self, hex_data: String) -> Result<String> {
+        let result = self.inner.decode_hex_enhanced(&hex_data)
+            .map_err(|e| napi::Error::from_reason(format!("Decode error: {}", e)))?;
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Serialization error: {}", e)))
+    }
+
+    /// Get high-precision timestamp with nanosecond accuracy
+    #[napi]
+    pub fn get_precise_timestamp(&self) -> i64 {
+        self.inner.get_precise_timestamp()
     }
 }

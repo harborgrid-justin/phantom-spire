@@ -2,6 +2,7 @@
 //! 
 //! Comprehensive risk scoring and assessment for MITRE ATT&CK techniques
 //! and attack scenarios with advanced mathematical models.
+//! Enhanced with high-precision decimal calculations for financial-grade accuracy.
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -9,6 +10,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use crate::{MitreTechnique, MitreTactic, Severity};
+use crate::data_stores::serialization::{PrecisionRiskScore, DataSerializer};
+use rust_decimal::Decimal;
+use time::OffsetDateTime;
 
 /// Risk calculation methodologies
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -349,6 +353,37 @@ pub struct RiskScores {
     pub risk_rating: String,
     pub confidence_interval: (f64, f64),
     pub monte_carlo_results: MonteCarloResults,
+}
+
+/// Enhanced Monte Carlo simulation results with high-precision calculations
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EnhancedMonteCarloResults {
+    pub iterations: u32,
+    pub mean: Decimal,
+    pub median: Decimal,
+    pub std_deviation: Decimal,
+    pub percentiles: HashMap<u8, Decimal>, // percentile -> value
+    pub value_at_risk_95: Decimal,
+    pub conditional_value_at_risk: Decimal,
+    pub skewness: Decimal,
+    pub kurtosis: Decimal,
+    pub confidence_intervals: HashMap<u8, (Decimal, Decimal)>, // confidence level -> (lower, upper)
+}
+
+/// High-precision financial impact with decimal accuracy
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PrecisionFinancialImpact {
+    pub direct_costs: Decimal,
+    pub indirect_costs: Decimal,
+    pub opportunity_costs: Decimal,
+    pub recovery_costs: Decimal,
+    pub legal_costs: Decimal,
+    pub regulatory_fines: Decimal,
+    pub total_financial_impact: Decimal,
+    pub currency: String,
+    pub exchange_rate: Option<Decimal>,
+    pub inflation_adjustment: Option<Decimal>,
+    pub precision_timestamp: i64,
 }
 
 /// Monte Carlo simulation results
@@ -1446,6 +1481,146 @@ impl RiskAssessmentCalculator {
     pub fn get_assessment_history(&self) -> &[RiskAssessment] {
         &self.assessment_history
     }
+
+    /// Calculate high-precision financial impact using rust_decimal
+    pub fn calculate_precision_financial_impact(
+        &self,
+        base_impact: f64,
+        impact_factors: &HashMap<String, f64>,
+        currency: &str,
+    ) -> PrecisionFinancialImpact {
+        use rust_decimal::prelude::*;
+
+        let direct_costs = Decimal::from_f64(base_impact).unwrap_or(Decimal::ZERO);
+        let indirect_multiplier = Decimal::from_str("1.5").unwrap(); // 150% of direct costs
+        let indirect_costs = direct_costs * indirect_multiplier;
+
+        // Calculate opportunity costs based on business disruption
+        let opportunity_rate = Decimal::from_str("0.02").unwrap(); // 2% daily revenue loss
+        let disruption_days = Decimal::from_str("3.0").unwrap();
+        let annual_revenue = Decimal::from_f64(impact_factors.get("annual_revenue").unwrap_or(&10000000.0))
+            .unwrap_or(Decimal::from(10000000));
+        let daily_revenue = annual_revenue / Decimal::from(365);
+        let opportunity_costs = daily_revenue * opportunity_rate * disruption_days;
+
+        // Recovery costs (typically 50-100% of direct costs)
+        let recovery_multiplier = Decimal::from_str("0.75").unwrap();
+        let recovery_costs = direct_costs * recovery_multiplier;
+
+        // Legal costs estimation
+        let legal_costs = Decimal::from_f64(impact_factors.get("legal_complexity").unwrap_or(&1.0))
+            .unwrap_or(Decimal::ONE) * Decimal::from(50000);
+
+        // Regulatory fines calculation
+        let compliance_severity = Decimal::from_f64(impact_factors.get("compliance_severity").unwrap_or(&1.0))
+            .unwrap_or(Decimal::ONE);
+        let regulatory_fines = compliance_severity * Decimal::from(100000);
+
+        let total_financial_impact = direct_costs + indirect_costs + opportunity_costs + 
+                                   recovery_costs + legal_costs + regulatory_fines;
+
+        PrecisionFinancialImpact {
+            direct_costs,
+            indirect_costs,
+            opportunity_costs,
+            recovery_costs,
+            legal_costs,
+            regulatory_fines,
+            total_financial_impact,
+            currency: currency.to_string(),
+            exchange_rate: None,
+            inflation_adjustment: None,
+            precision_timestamp: OffsetDateTime::now_utc().unix_timestamp_nanos(),
+        }
+    }
+
+    /// Enhanced Monte Carlo simulation with high precision
+    pub fn run_enhanced_monte_carlo_simulation(
+        &self,
+        iterations: u32,
+        base_impact: f64,
+        impact_factors: &HashMap<String, f64>,
+    ) -> EnhancedMonteCarloResults {
+        use rust_decimal::prelude::*;
+        
+        let mut results = Vec::with_capacity(iterations as usize);
+        
+        // Simple Monte Carlo simulation (in practice, this would be more sophisticated)
+        for _i in 0..iterations {
+            let random_factor = 0.8 + (rand_f64() * 0.4); // Random factor between 0.8 and 1.2
+            let simulated_impact = base_impact * random_factor;
+            let impact_decimal = Decimal::from_f64(simulated_impact).unwrap_or(Decimal::ZERO);
+            results.push(impact_decimal);
+        }
+
+        results.sort();
+
+        let mean = results.iter().sum::<Decimal>() / Decimal::from(iterations);
+        let median = if results.is_empty() {
+            Decimal::ZERO
+        } else {
+            results[results.len() / 2]
+        };
+
+        // Calculate standard deviation
+        let mean_squared = mean * mean;
+        let variance: Decimal = results.iter()
+            .map(|&value| {
+                let diff = value - mean;
+                diff * diff
+            })
+            .sum::<Decimal>() / Decimal::from(iterations);
+        
+        // Simple approximation for square root using iterative method
+        let mut std_deviation = variance / Decimal::TWO;
+        for _ in 0..10 { // Newton's method iterations
+            if std_deviation.is_zero() { break; }
+            let next = (std_deviation + variance / std_deviation) / Decimal::TWO;
+            if (next - std_deviation).abs() < Decimal::from_str("0.00001").unwrap() {
+                break;
+            }
+            std_deviation = next;
+        }
+
+        // Calculate percentiles
+        let mut percentiles = HashMap::new();
+        for &p in &[5, 10, 25, 50, 75, 90, 95, 99] {
+            let index = ((p as f64 / 100.0) * (results.len() - 1) as f64) as usize;
+            percentiles.insert(p, results.get(index).copied().unwrap_or(Decimal::ZERO));
+        }
+
+        let value_at_risk_95 = percentiles.get(&95).copied().unwrap_or(Decimal::ZERO);
+        let conditional_value_at_risk = results.iter()
+            .skip((0.95 * results.len() as f64) as usize)
+            .sum::<Decimal>() / Decimal::from(results.len() - (0.95 * results.len() as f64) as usize);
+
+        // Calculate higher moments
+        let skewness = Decimal::ZERO; // Simplified - would require more complex calculation
+        let kurtosis = Decimal::ZERO; // Simplified - would require more complex calculation
+
+        // Confidence intervals (simplified)
+        let mut confidence_intervals = HashMap::new();
+        let p2_5_index = ((2.5 / 100.0) * (results.len() - 1) as f64) as usize;
+        let p97_5_index = ((97.5 / 100.0) * (results.len() - 1) as f64) as usize;
+        let p2_5_value = results.get(p2_5_index).copied().unwrap_or(results[0]);
+        let p97_5_value = results.get(p97_5_index).copied().unwrap_or(results[results.len()-1]);
+        
+        confidence_intervals.insert(90, (percentiles[&5], percentiles[&95]));
+        confidence_intervals.insert(95, (p2_5_value, p97_5_value));
+
+        EnhancedMonteCarloResults {
+            iterations,
+            mean,
+            median,
+            std_deviation,
+            percentiles,
+            value_at_risk_95,
+            conditional_value_at_risk,
+            skewness,
+            kurtosis,
+            confidence_intervals,
+        }
+    }
 }
 
 impl Default for RiskAssessmentCalculator {
@@ -1487,6 +1662,54 @@ impl RiskAssessmentCalculatorNapi {
         serde_json::to_string(self.inner.get_assessment_history())
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize history: {}", e)))
     }
+
+    /// Calculate high-precision financial impact for financial-grade accuracy
+    #[napi]
+    pub fn calculate_precision_financial_impact(
+        &self,
+        base_impact: f64,
+        impact_factors_json: String,
+        currency: String,
+    ) -> Result<String> {
+        let impact_factors: HashMap<String, f64> = serde_json::from_str(&impact_factors_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse impact factors: {}", e)))?;
+        
+        let result = self.inner.calculate_precision_financial_impact(base_impact, &impact_factors, &currency);
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Serialization failed: {}", e)))
+    }
+
+    /// Run enhanced Monte Carlo simulation with high-precision calculations
+    #[napi]
+    pub fn run_enhanced_monte_carlo_simulation(
+        &self,
+        iterations: u32,
+        base_impact: f64,
+        impact_factors_json: String,
+    ) -> Result<String> {
+        let impact_factors: HashMap<String, f64> = serde_json::from_str(&impact_factors_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse impact factors: {}", e)))?;
+        
+        let result = self.inner.run_enhanced_monte_carlo_simulation(iterations, base_impact, &impact_factors);
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Serialization failed: {}", e)))
+    }
+
+    /// Calculate precision risk score using decimal arithmetic
+    #[napi]
+    pub fn calculate_precision_risk_score(
+        &self,
+        base_score: f64,
+        factors_json: String,
+        confidence_level: f64,
+    ) -> Result<String> {
+        let factors: HashMap<String, f64> = serde_json::from_str(&factors_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse factors: {}", e)))?;
+        
+        let result = DataSerializer::calculate_precision_risk_score(base_score, &factors, confidence_level);
+        serde_json::to_string(&result)
+            .map_err(|e| napi::Error::from_reason(format!("Serialization failed: {}", e)))
+    }
 }
 
 // Utility function for random number generation (simplified)
@@ -1501,4 +1724,9 @@ mod rand {
         SEED.store(next_seed, Ordering::Relaxed);
         T::from((next_seed as f64) / (u64::MAX as f64))
     }
+}
+
+/// Helper function for generating random f64 values
+fn rand_f64() -> f64 {
+    rand::random::<f64>()
 }

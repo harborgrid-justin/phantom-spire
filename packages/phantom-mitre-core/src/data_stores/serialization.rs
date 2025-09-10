@@ -1,6 +1,7 @@
 //! Data Serialization and Transformation
 //! 
 //! Handles serialization/deserialization of MITRE ATT&CK data for different data stores
+//! Enhanced with high-performance binary serialization and precision decimal support
 
 use crate::{MitreTechnique, MitreGroup, MitreSoftware, Mitigation, DetectionRule, ThreatAnalysis};
 use super::{DataStoreError, DataStoreResult, TenantContext};
@@ -8,28 +9,44 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
+use time::OffsetDateTime;
 
-/// Serializable wrapper for MITRE data with tenant context
+/// High-precision financial calculation result using rust_decimal
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PrecisionRiskScore {
+    pub risk_score: Decimal,
+    pub confidence_interval: (Decimal, Decimal),
+    pub calculation_timestamp: i64, // Nanosecond precision
+    pub factors: HashMap<String, Decimal>,
+}
+
+/// Enhanced serializable wrapper for MITRE data with tenant context
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TenantData<T> {
     pub tenant_id: String,
     pub data: T,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub precise_timestamp: i64, // Nanosecond precision with time crate
     pub version: u32,
     pub metadata: HashMap<String, Value>,
+    pub risk_score: Option<PrecisionRiskScore>,
 }
 
 impl<T> TenantData<T> {
     pub fn new(data: T, context: &TenantContext) -> Self {
         let now = Utc::now();
+        let precise_now = OffsetDateTime::now_utc();
         Self {
             tenant_id: context.tenant_id.clone(),
             data,
             created_at: now,
             updated_at: now,
+            precise_timestamp: precise_now.unix_timestamp_nanos() as i64,
             version: 1,
             metadata: HashMap::new(),
+            risk_score: None,
         }
     }
     
@@ -38,15 +55,21 @@ impl<T> TenantData<T> {
         self
     }
     
+    pub fn with_precision_risk_score(mut self, risk_score: PrecisionRiskScore) -> Self {
+        self.risk_score = Some(risk_score);
+        self
+    }
+    
     pub fn update_data(mut self, data: T) -> Self {
         self.data = data;
         self.updated_at = Utc::now();
+        self.precise_timestamp = OffsetDateTime::now_utc().unix_timestamp_nanos() as i64;
         self.version += 1;
         self
     }
 }
 
-/// Serialization utility for different data store formats
+/// Enhanced serialization utility for different data store formats with binary optimization
 pub struct DataSerializer;
 
 impl DataSerializer {
@@ -62,19 +85,90 @@ impl DataSerializer {
             .map_err(|e| DataStoreError::Serialization(e.to_string()))
     }
     
-    /// Serialize for Redis (compressed JSON)
-    pub fn to_redis_value<T: Serialize>(data: &T) -> DataStoreResult<Vec<u8>> {
-        let json = Self::to_json(data)?;
-        
-        // Use simple compression for Redis values
-        Ok(json.into_bytes())
+    /// Ultra-fast binary serialization using bincode for high-performance scenarios
+    pub fn to_binary<T: Serialize>(data: &T) -> DataStoreResult<Vec<u8>> {
+        bincode::serialize(data)
+            .map_err(|e| DataStoreError::Serialization(e.to_string()))
     }
     
-    /// Deserialize from Redis value
-    pub fn from_redis_value<T: for<'de> Deserialize<'de>>(bytes: &[u8]) -> DataStoreResult<T> {
-        let json = String::from_utf8(bytes.to_vec())
-            .map_err(|e| DataStoreError::Serialization(e.to_string()))?;
-        Self::from_json(&json)
+    /// Ultra-fast binary deserialization using bincode
+    pub fn from_binary<T: for<'de> Deserialize<'de>>(bytes: &[u8]) -> DataStoreResult<T> {
+        bincode::deserialize(bytes)
+            .map_err(|e| DataStoreError::Serialization(e.to_string()))
+    }
+    
+    /// MessagePack serialization for efficient binary protocols
+    pub fn to_messagepack<T: Serialize>(data: &T) -> DataStoreResult<Vec<u8>> {
+        rmp_serde::to_vec(data)
+            .map_err(|e| DataStoreError::Serialization(e.to_string()))
+    }
+    
+    /// MessagePack deserialization
+    pub fn from_messagepack<T: for<'de> Deserialize<'de>>(bytes: &[u8]) -> DataStoreResult<T> {
+        rmp_serde::from_slice(bytes)
+            .map_err(|e| DataStoreError::Serialization(e.to_string()))
+    }
+    
+    /// Serialize for Redis with binary optimization option
+    pub fn to_redis_value<T: Serialize>(data: &T, use_binary: bool) -> DataStoreResult<Vec<u8>> {
+        if use_binary {
+            Self::to_binary(data)
+        } else {
+            let json = Self::to_json(data)?;
+            Ok(json.into_bytes())
+        }
+    }
+    
+    /// Deserialize from Redis value with binary format detection
+    pub fn from_redis_value<T: for<'de> Deserialize<'de>>(bytes: &[u8], is_binary: bool) -> DataStoreResult<T> {
+        if is_binary {
+            Self::from_binary(bytes)
+        } else {
+            let json = String::from_utf8(bytes.to_vec())
+                .map_err(|e| DataStoreError::Serialization(e.to_string()))?;
+            Self::from_json(&json)
+        }
+    }
+    
+    /// Calculate high-precision risk score using rust_decimal for financial-grade accuracy
+    pub fn calculate_precision_risk_score(
+        base_score: f64,
+        factors: &HashMap<String, f64>,
+        confidence_level: f64,
+    ) -> PrecisionRiskScore {
+        use rust_decimal::prelude::*;
+        
+        let base_decimal = Decimal::from_f64(base_score).unwrap_or(Decimal::ZERO);
+        let confidence_decimal = Decimal::from_f64(confidence_level).unwrap_or(Decimal::from(95));
+        
+        // Convert factors to high-precision decimals
+        let decimal_factors: HashMap<String, Decimal> = factors
+            .iter()
+            .map(|(k, v)| (k.clone(), Decimal::from_f64(*v).unwrap_or(Decimal::ZERO)))
+            .collect();
+        
+        // Calculate weighted risk score with high precision
+        let mut weighted_score = base_decimal;
+        for (_, factor_value) in &decimal_factors {
+            weighted_score += *factor_value;
+        }
+        
+        // Normalize to 0-100 scale
+        weighted_score = weighted_score.min(Decimal::from(100)).max(Decimal::ZERO);
+        
+        // Calculate confidence interval (±5% for demonstration)
+        let margin = weighted_score * Decimal::from_str("0.05").unwrap();
+        let confidence_interval = (
+            (weighted_score - margin).max(Decimal::ZERO),
+            (weighted_score + margin).min(Decimal::from(100)),
+        );
+        
+        PrecisionRiskScore {
+            risk_score: weighted_score,
+            confidence_interval,
+            calculation_timestamp: OffsetDateTime::now_utc().unix_timestamp_nanos() as i64,
+            factors: decimal_factors,
+        }
     }
     
     /// Convert to Elasticsearch document format
