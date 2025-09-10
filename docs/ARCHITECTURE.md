@@ -66,6 +66,34 @@ src/
 └── setup/               # Application setup and initialization
 ```
 
+### Packages Structure (`/packages`)
+```
+packages/
+├── phantom-cve-core/           # CVE processing and vulnerability intelligence
+├── phantom-incident-response-core/ # Incident response and forensic analysis
+├── phantom-intel-core/         # Threat intelligence gathering and correlation
+├── phantom-ioc-core/           # IOC processing and indicator analysis
+├── phantom-mitre-core/         # MITRE ATT&CK framework integration
+├── phantom-secop-core/         # Security operations and automation
+├── phantom-threat-actor-core/  # Threat actor attribution and analysis
+└── phantom-xdr-core/           # Extended detection and response
+```
+
+Each package follows a standardized structure:
+```
+phantom-{name}-core/
+├── src/                 # Rust source code
+├── src-ts/              # TypeScript source (if applicable)
+├── Cargo.toml           # Rust dependencies and configuration
+├── package.json         # NPM package configuration
+├── README.md            # Package documentation
+├── LICENSE              # MIT license
+├── CHANGELOG.md         # Version history
+├── build.rs             # Build script
+├── tsconfig.json        # TypeScript configuration
+└── .gitignore           # Git ignore rules
+```
+
 ### Frontend Structure (`/frontend/src`)
 ```
 src/
@@ -264,6 +292,70 @@ src/frontend/
 - **APM**: Application performance monitoring
 - **Logging**: Structured logging with Winston
 - **Metrics**: Prometheus-based metrics collection
+
+## Package Architecture
+
+### Independent Package Design
+Each phantom-*-core package is designed to be completely independent and can be installed and used as a standalone Node.js package. This modular architecture provides:
+
+- **Isolated Dependencies**: Each package manages its own dependencies
+- **Independent Versioning**: Packages can be versioned and released independently
+- **Standalone Functionality**: Each package provides complete functionality for its domain
+- **Cross-Platform Support**: Native Rust implementations with NAPI bindings
+
+### Package Installation
+Each package can be installed independently via npm:
+
+```bash
+# Install individual packages
+npm install phantom-cve-core
+npm install phantom-intel-core
+npm install phantom-xdr-core
+
+# Or install multiple packages
+npm install phantom-cve-core phantom-intel-core phantom-mitre-core
+```
+
+### Package Usage
+```javascript
+// Use packages independently
+const cveCore = require('phantom-cve-core');
+const intelCore = require('phantom-intel-core');
+const xdrCore = require('phantom-xdr-core');
+
+// Each package provides its own API
+const cveResults = cveCore.searchCVEs({ severity: 'critical' });
+const threatIntel = intelCore.correlateIndicators(indicators);
+const xdrAnalysis = xdrCore.detectThreats(logs);
+```
+
+### Monorepo Management
+The project uses npm workspaces for monorepo management:
+
+```bash
+# Install all package dependencies
+npm run packages:install
+
+# Build all packages
+npm run packages:build
+
+# Test all packages
+npm run packages:test
+
+# Lint all packages
+npm run packages:lint
+```
+
+### Package Standards
+All packages follow consistent standards:
+
+- **Naming Convention**: `phantom-{domain}-core`
+- **Version Alignment**: Semantic versioning (semver)
+- **License**: MIT License
+- **Documentation**: Comprehensive README with API docs
+- **TypeScript**: Full TypeScript support with type definitions
+- **Testing**: Comprehensive test coverage
+- **CI/CD**: Automated building and testing
 
 ## Development Standards
 
