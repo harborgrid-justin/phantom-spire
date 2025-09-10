@@ -8,69 +8,25 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-// Core IOC types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum IOCType {
-    IPAddress,
-    Domain,
-    URL,
-    Hash,
-    Email,
-    FilePath,
-    Custom(String),
-}
+// Re-export types and error
+pub use types::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Severity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
+mod types;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOC {
-    pub id: Uuid,
-    pub indicator_type: IOCType,
-    pub value: String,
-    pub confidence: f64,
-    pub severity: Severity,
-    pub source: String,
-    pub timestamp: DateTime<Utc>,
-    pub tags: Vec<String>,
-    pub context: IOCContext,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOCContext {
-    pub description: Option<String>,
-    pub metadata: HashMap<String, String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AnalysisResult {
-    pub threat_actors: Vec<String>,
-    pub campaigns: Vec<String>,
-    pub malware_families: Vec<String>,
-    pub attack_vectors: Vec<String>,
-    pub impact_assessment: ImpactAssessment,
-    pub recommendations: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ImpactAssessment {
-    pub business_impact: f64,
-    pub technical_impact: f64,
-    pub operational_impact: f64,
-    pub overall_risk: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOCResult {
-    pub ioc: IOC,
-    pub analysis: AnalysisResult,
-    pub processing_timestamp: DateTime<Utc>,
-}
+// Import existing modules
+mod analysis;
+mod api;
+mod context;
+mod correlation;
+mod detection;
+mod enrichment;
+mod export;
+mod feeds;
+mod intelligence;
+mod persistence;
+mod reputation;
+mod scoring;
+mod validation;
 
 // Core processing logic
 #[napi]
@@ -132,8 +88,26 @@ impl IOCCore {
             ],
         };
 
+        // Create mock results for other components
+        let detection_result = DetectionResult {
+            matched_rules: vec!["suspicious_pattern".to_string()],
+            detection_methods: vec!["pattern_matching".to_string()],
+            false_positive_probability: 0.1,
+            detection_confidence: 0.8,
+        };
+
+        let intelligence = Intelligence {
+            sources: vec!["threat_feed_1".to_string()],
+            confidence: 0.8,
+            last_updated: Utc::now(),
+            related_threats: vec!["related_threat_1".to_string()],
+        };
+
         Ok(IOCResult {
             ioc,
+            detection_result,
+            intelligence,
+            correlations: vec![],
             analysis,
             processing_timestamp: Utc::now(),
         })
@@ -181,9 +155,15 @@ mod tests {
             timestamp: Utc::now(),
             tags: vec!["malware".to_string(), "c2".to_string()],
             context: IOCContext {
-                description: Some("Test IOC".to_string()),
+                geolocation: Some("US".to_string()),
+                asn: Some("AS12345".to_string()),
+                category: Some("test".to_string()),
+                first_seen: Some(Utc::now()),
+                last_seen: Some(Utc::now()),
+                related_indicators: vec![],
                 metadata: HashMap::new(),
             },
+            raw_data: None,
         };
 
         let result = core.process_ioc_internal(test_ioc);
