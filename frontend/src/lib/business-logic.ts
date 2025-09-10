@@ -49,29 +49,20 @@ class BusinessLogicClient {
 
   async executeBusinessLogic(request: BusinessLogicRequest): Promise<BusinessLogicResponse> {
     try {
-      let endpoint: string;
-      
-      // Handle vulnerability management services differently
-      if (request.serviceId.includes('assets-') || 
-          request.serviceId.includes('threat-intelligence-') ||
-          request.serviceId.includes('compliance-') ||
-          request.serviceId.includes('remediation-') ||
-          request.serviceId.includes('analytics-')) {
-        
-        // Map service ID to vulnerability management endpoint
-        const [category, page] = request.serviceId.split('-');
-        endpoint = `/api/v1/vulnerability-management/${category}/${page}`;
-      } else {
-        // Use the original platform services pattern
-        endpoint = `${this.baseUrl}/${request.serviceId}/execute`;
-      }
+      // Use the new integrated services API
+      const endpoint = `${this.baseUrl}/services/${request.serviceId}/execute`;
 
       const response = await fetch(endpoint, {
-        method: 'GET', // For now, we'll use GET for data fetching
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem('authToken') || ''
-        }
+          'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+        },
+        body: JSON.stringify({
+          operation: request.operation,
+          parameters: request.parameters,
+          context: request.options
+        })
       });
 
       if (!response.ok) {
@@ -80,13 +71,13 @@ class BusinessLogicClient {
 
       const data = await response.json();
       return {
-        success: true,
-        data,
-        metadata: {
+        success: data.success,
+        data: data.data,
+        error: data.error,
+        metadata: data.metadata || {
           requestId: `req-${Date.now()}`,
           timestamp: new Date(),
-          processingTime: response.headers.get('X-Response-Time') ? 
-            parseInt(response.headers.get('X-Response-Time')!) : 0,
+          processingTime: 0,
           serviceVersion: '1.0.0'
         }
       };
@@ -106,12 +97,85 @@ class BusinessLogicClient {
 
   async getServiceStats(serviceId: string) {
     try {
-      const response = await fetch(`${this.baseUrl}/${serviceId}/stats`);
+      const response = await fetch(`${this.baseUrl}/services/${serviceId}`, {
+        headers: {
+          'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+        }
+      });
       if (!response.ok) return null;
-      return response.json();
+      const result = await response.json();
+      return result.success ? result.data : null;
     } catch {
       return null;
     }
+  }
+
+  async getAllServices() {
+    try {
+      const response = await fetch(`${this.baseUrl}/services`, {
+        headers: {
+          'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+        }
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.success ? result.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async getSystemHealth() {
+    try {
+      const response = await fetch(`${this.baseUrl}/health`);
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.success ? result.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async getSystemMetrics() {
+    try {
+      const response = await fetch(`${this.baseUrl}/metrics`, {
+        headers: {
+          'Authorization': 'Bearer ' + (localStorage.getItem('authToken') || '')
+        }
+      });
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.success ? result.data : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async analyzeIOC(ioc: string, context?: any) {
+    return this.executeBusinessLogic({
+      serviceId: 'ioc-analysis',
+      operation: 'analyzeIOC',
+      parameters: { ioc },
+      options: context
+    });
+  }
+
+  async createIncident(title: string, description: string, severity: string, context?: any) {
+    return this.executeBusinessLogic({
+      serviceId: 'incident-response',
+      operation: 'createIncident',
+      parameters: { title, description, severity },
+      options: context
+    });
+  }
+
+  async analyzeThreatActor(actorId: string, context?: any) {
+    return this.executeBusinessLogic({
+      serviceId: 'threat-actor-analysis',
+      operation: 'analyzeThreatActor',
+      parameters: { actorId },
+      options: context
+    });
   }
 
   subscribeToRealTimeUpdates(serviceId: string, callback: (data: any) => void): () => void {
