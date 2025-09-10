@@ -27,6 +27,26 @@ mod network_segmentation;
 mod security_orchestration;
 mod vulnerability_scanning;
 
+// 18 additional enterprise-ready modules
+mod advanced_analytics;
+mod api_security;
+mod cloud_security;
+mod container_security;
+mod deception_technology;
+mod digital_forensics;
+mod insider_threat;
+mod iot_security;
+mod mobile_security;
+mod orchestration_automation;
+mod privacy_protection;
+mod regulatory_compliance;
+mod security_awareness;
+mod supply_chain_security;
+mod threat_simulation;
+mod user_behavior_analytics;
+mod vulnerability_management;
+mod zero_day_protection;
+
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
@@ -59,6 +79,26 @@ use crate::network_segmentation::{NetworkSegmentationController, NetworkSegmenta
 use crate::security_orchestration::{SecurityOrchestrationEngine, SecurityOrchestrationTrait};
 use crate::vulnerability_scanning::{VulnerabilityScanningEngine, VulnerabilityScanningTrait};
 
+// 18 additional enterprise module imports
+use crate::advanced_analytics::{AdvancedAnalyticsEngine, AdvancedAnalyticsTrait};
+use crate::api_security::{ApiSecurityEngine, ApiSecurityTrait};
+use crate::cloud_security::{CloudSecurityEngine, CloudSecurityTrait};
+use crate::container_security::{ContainerSecurityEngine, ContainerSecurityTrait};
+use crate::deception_technology::{DeceptionTechnologyEngine, DeceptionTechnologyTrait};
+use crate::digital_forensics::{DigitalForensicsEngine, DigitalForensicsTrait};
+use crate::insider_threat::{InsiderThreatEngine, InsiderThreatTrait};
+use crate::iot_security::{IoTSecurityEngine, IoTSecurityTrait};
+use crate::mobile_security::{MobileSecurityEngine, MobileSecurityTrait};
+use crate::orchestration_automation::{OrchestrationAutomationEngine, OrchestrationAutomationTrait};
+use crate::privacy_protection::{PrivacyProtectionEngine, PrivacyProtectionTrait};
+use crate::regulatory_compliance::{RegulatoryComplianceEngine, RegulatoryComplianceTrait};
+use crate::security_awareness::{SecurityAwarenessEngine, SecurityAwarenessTrait};
+use crate::supply_chain_security::{SupplyChainSecurityEngine, SupplyChainSecurityTrait};
+use crate::threat_simulation::{ThreatSimulationEngine, ThreatSimulationTrait};
+use crate::user_behavior_analytics::{UserBehaviorAnalyticsEngine, UserBehaviorAnalyticsTrait};
+use crate::vulnerability_management::{VulnerabilityManagementEngine, VulnerabilityManagementTrait};
+use crate::zero_day_protection::{ZeroDayProtectionEngine, ZeroDayProtectionTrait};
+
 // Global XDR Engine instance
 static XDR_ENGINE: Lazy<Arc<RwLock<XdrEngine>>> = Lazy::new(|| {
     Arc::new(RwLock::new(XdrEngine::new()))
@@ -89,6 +129,26 @@ pub struct XdrEngine {
     network_segmentation_controller: network_segmentation::NetworkSegmentationController,
     security_orchestration_engine: security_orchestration::SecurityOrchestrationEngine,
     vulnerability_scanning_engine: vulnerability_scanning::VulnerabilityScanningEngine,
+    
+    // 18 additional enterprise engines
+    advanced_analytics_engine: advanced_analytics::AdvancedAnalyticsEngine,
+    api_security_engine: api_security::ApiSecurityEngine,
+    cloud_security_engine: cloud_security::CloudSecurityEngine,
+    container_security_engine: container_security::ContainerSecurityEngine,
+    deception_technology_engine: deception_technology::DeceptionTechnologyEngine,
+    digital_forensics_engine: digital_forensics::DigitalForensicsEngine,
+    insider_threat_engine: insider_threat::InsiderThreatEngine,
+    iot_security_engine: iot_security::IoTSecurityEngine,
+    mobile_security_engine: mobile_security::MobileSecurityEngine,
+    orchestration_automation_engine: orchestration_automation::OrchestrationAutomationEngine,
+    privacy_protection_engine: privacy_protection::PrivacyProtectionEngine,
+    regulatory_compliance_engine: regulatory_compliance::RegulatoryComplianceEngine,
+    security_awareness_engine: security_awareness::SecurityAwarenessEngine,
+    supply_chain_security_engine: supply_chain_security::SupplyChainSecurityEngine,
+    threat_simulation_engine: threat_simulation::ThreatSimulationEngine,
+    user_behavior_analytics_engine: user_behavior_analytics::UserBehaviorAnalyticsEngine,
+    vulnerability_management_engine: vulnerability_management::VulnerabilityManagementEngine,
+    zero_day_protection_engine: zero_day_protection::ZeroDayProtectionEngine,
 }
 
 impl XdrEngine {
@@ -117,6 +177,26 @@ impl XdrEngine {
             network_segmentation_controller: network_segmentation::NetworkSegmentationController::new(),
             security_orchestration_engine: security_orchestration::SecurityOrchestrationEngine::new(),
             vulnerability_scanning_engine: vulnerability_scanning::VulnerabilityScanningEngine::new(),
+            
+            // Initialize 18 additional enterprise engines
+            advanced_analytics_engine: advanced_analytics::AdvancedAnalyticsEngine::new(),
+            api_security_engine: api_security::ApiSecurityEngine::new(),
+            cloud_security_engine: cloud_security::CloudSecurityEngine::new(),
+            container_security_engine: container_security::ContainerSecurityEngine::new(),
+            deception_technology_engine: deception_technology::DeceptionTechnologyEngine::new(),
+            digital_forensics_engine: digital_forensics::DigitalForensicsEngine::new(),
+            insider_threat_engine: insider_threat::InsiderThreatEngine::new(),
+            iot_security_engine: iot_security::IoTSecurityEngine::new(),
+            mobile_security_engine: mobile_security::MobileSecurityEngine::new(),
+            orchestration_automation_engine: orchestration_automation::OrchestrationAutomationEngine::new(),
+            privacy_protection_engine: privacy_protection::PrivacyProtectionEngine::new(),
+            regulatory_compliance_engine: regulatory_compliance::RegulatoryComplianceEngine::new(),
+            security_awareness_engine: security_awareness::SecurityAwarenessEngine::new(),
+            supply_chain_security_engine: supply_chain_security::SupplyChainSecurityEngine::new(),
+            threat_simulation_engine: threat_simulation::ThreatSimulationEngine::new(),
+            user_behavior_analytics_engine: user_behavior_analytics::UserBehaviorAnalyticsEngine::new(),
+            vulnerability_management_engine: vulnerability_management::VulnerabilityManagementEngine::new(),
+            zero_day_protection_engine: zero_day_protection::ZeroDayProtectionEngine::new(),
         }
     }
 }
