@@ -44,7 +44,8 @@
     "packages:build": "npm run build --workspaces",
     "packages:test": "npm run test --workspaces",
     "packages:lint": "npm run lint --workspaces",
-    "packages:clean": "npm run clean --workspaces"
+    "packages:clean": "npm run clean --workspaces",
+    "demo:cross-plugin-integration": "tsc src/examples/cross-plugin-integration-demo.ts --outDir dist --target ES2020 --module ESNext --moduleResolution bundler && node dist/examples/cross-plugin-integration-demo.js"
   },
   "keywords": [
     "threat-intelligence",
