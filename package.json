@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:native && tsc",
+    "build:native": "cargo build --release && napi build --platform --release",
+    "build:native:debug": "cargo build && napi build --platform",
     "copy:static": "node scripts/copy-static.js",
     "start": "node dist/index.js",
     "dev": "npm run build && npm start",
@@ -13,6 +15,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:native": "npm run build:native:debug && npm test",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier --write src/**/*.ts",
@@ -32,7 +35,8 @@
     "evaluate:installation:json": "npm run evaluate:installation -- --format json",
     "evaluate:installation:report": "npm run evaluate:installation -- --detailed --output installation-evaluation-report.md --format markdown",
     "analyze:system": "node dist/scripts/analyze-system.js",
-    "analyze:system:report": "npm run analyze:system -- --report comprehensive-system-analysis.md"
+    "analyze:system:report": "npm run analyze:system -- --report comprehensive-system-analysis.md",
+    "benchmark:native": "node -e \"const { nativeXDRService } = require('./dist/native-modules/NativeXDRIntegrationService.js'); nativeXDRService.benchmarkPerformance().then(console.log)\""
   },
   "keywords": [
     "threat-intelligence",
@@ -87,6 +91,7 @@
     "@eslint/js": "^9.34.0",
     "@mui/icons-material": "^6.1.0",
     "@mui/material": "^6.1.0",
+    "@napi-rs/cli": "^3.1.5",
     "@types/axios": "^0.9.36",
     "@types/bcryptjs": "^2.4.6",
     "@types/compression": "^1.8.1",
@@ -118,5 +123,19 @@
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
+  },
+  "napi": {
+    "name": "phantom-xdr-native",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "i686-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf",
+        "aarch64-apple-darwin",
+        "x86_64-unknown-freebsd"
+      ]
+    }
   }
 }
