@@ -97,8 +97,8 @@ export class ElasticsearchDataSource extends BaseDataSource {
       size: 100,
     });
 
-    let scrollId = scrollSearch.body._scroll_id;
-    let hits = scrollSearch.body.hits.hits;
+    let scrollId = scrollSearch._scroll_id;
+    let hits = scrollSearch.hits.hits;
 
     while (hits.length > 0) {
       for (const hit of hits) {
@@ -110,8 +110,8 @@ export class ElasticsearchDataSource extends BaseDataSource {
         scroll_id: scrollId,
       });
 
-      scrollId = scrollResponse.body._scroll_id;
-      hits = scrollResponse.body.hits.hits;
+      scrollId = scrollResponse._scroll_id;
+      hits = scrollResponse.hits.hits;
     }
 
     // Clear scroll
@@ -141,8 +141,8 @@ export class ElasticsearchDataSource extends BaseDataSource {
       ]);
 
       const responseTime = Date.now() - startTime;
-      const clusterHealth = healthResponse.body;
-      const clusterStats = statsResponse.body;
+      const clusterHealth = healthResponse;
+      const clusterStats = statsResponse;
 
       const status = clusterHealth.status === 'red' ? 'unhealthy' : 
                    clusterHealth.status === 'yellow' ? 'degraded' : 'healthy';

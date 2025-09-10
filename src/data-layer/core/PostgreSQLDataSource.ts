@@ -98,9 +98,9 @@ export class PostgreSQLDataSource extends BaseDataSource {
     const client = await this.pool.connect();
     try {
       const { sql, params } = this.buildSelectSQL(query, context);
-      const cursor = client.query(sql, params);
+      const result = await client.query(sql, params);
       
-      for await (const row of cursor) {
+      for (const row of result.rows) {
         yield this.transformRowToDataRecord(row, this.name);
       }
     } finally {

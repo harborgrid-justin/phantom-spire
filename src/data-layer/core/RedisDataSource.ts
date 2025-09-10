@@ -99,7 +99,7 @@ export class RedisDataSource extends BaseDataSource {
       const value = await this.client.get(key);
       if (value) {
         try {
-          const data = JSON.parse(value);
+          const data = JSON.parse(value as string);
           yield this.transformToDataRecord(data, this.name);
         } catch (error) {
           // Skip invalid JSON
@@ -176,7 +176,7 @@ export class RedisDataSource extends BaseDataSource {
       const value = await this.client.get(key);
       if (value) {
         try {
-          const parsedValue = JSON.parse(value);
+          const parsedValue = JSON.parse(value as string);
           data.push(this.transformToDataRecord(parsedValue, this.name, key));
         } catch (error) {
           logger.warn(`Invalid JSON in Redis key ${key}:`, error);
@@ -221,7 +221,7 @@ export class RedisDataSource extends BaseDataSource {
       const value = await this.client.get(key);
       if (value) {
         try {
-          const parsedValue = JSON.parse(value);
+          const parsedValue = JSON.parse(value as string);
           const recordData = this.transformToDataRecord(parsedValue, this.name, key);
           
           // Check if search term matches in the data
@@ -273,7 +273,7 @@ export class RedisDataSource extends BaseDataSource {
   /**
    * Transform Redis value to data record
    */
-  private transformToDataRecord(value: any, source: string, key?: string): IDataRecord {
+  protected transformToDataRecord(value: any, source: string, key?: string): IDataRecord {
     return {
       id: value.id || key || this.generateId(),
       type: value.type || 'cached_data',
@@ -397,7 +397,7 @@ export class RedisDataSource extends BaseDataSource {
     }
 
     try {
-      return JSON.parse(value);
+      return JSON.parse(value as string);
     } catch (error) {
       logger.warn(`Invalid JSON in Redis key ${key}:`, error);
       return null;

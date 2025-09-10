@@ -1,4 +1,4 @@
-import winston from 'winston';
+import * as winston from 'winston';
 
 // Simple config fallback for testing
 const testConfig = {
