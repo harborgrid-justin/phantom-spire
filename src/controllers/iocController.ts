@@ -457,6 +457,11 @@ export const createIOCController = (
     statisticsService
   );
 };
+
+/**
+ * Get all IOCs with filtering, pagination, and search
+ */
+export const getIOCs = async (req: Request, res: Response) => {
   const {
     page = '1',
     limit = '10',
@@ -523,7 +528,7 @@ export const createIOCController = (
       pages: Math.ceil(total / limitNum),
     },
   } as ApiResponse);
-});
+};
 
 /**
  * @swagger
