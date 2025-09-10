@@ -460,3 +460,83 @@ pub async fn get_recent_dlp_violations(hours: i64) -> Result<Vec<crate::data_los
     let violations = engine.data_loss_prevention_engine.get_recent_violations(hours).await;
     Ok(violations)
 }
+
+// ========================================
+// 18 Additional Enterprise Module APIs
+// ========================================
+
+// Basic status and info APIs for the new modules (avoiding complex type serialization for now)
+
+#[napi]
+pub async fn get_extended_engine_status() -> Result<String> {
+    let engine = XDR_ENGINE.read().await;
+    
+    let mut status_lines = Vec::new();
+    
+    // Original modules status (ComponentStatus)
+    let detection_status = engine.detection_engine.get_status().await;
+    status_lines.push(format!("Detection Engine: {}", detection_status.status));
+    
+    let zero_trust_status = engine.zero_trust_engine.get_status().await;
+    status_lines.push(format!("Zero Trust Engine: {}", zero_trust_status.status));
+    
+    let threat_intel_status = engine.threat_intel.get_status().await;
+    status_lines.push(format!("Threat Intelligence: {}", threat_intel_status.status));
+    
+    // New module status (String)
+    status_lines.push(engine.advanced_analytics_engine.get_analytics_status().await);
+    status_lines.push(engine.api_security_engine.get_api_security_status().await);
+    status_lines.push(engine.cloud_security_engine.get_cloud_security_status().await);
+    status_lines.push(engine.container_security_engine.get_container_security_status().await);
+    status_lines.push(engine.deception_technology_engine.get_deception_status().await);
+    status_lines.push(engine.digital_forensics_engine.get_forensics_status().await);
+    status_lines.push(engine.insider_threat_engine.get_insider_threat_status().await);
+    status_lines.push(engine.iot_security_engine.get_iot_security_status().await);
+    status_lines.push(engine.mobile_security_engine.get_mobile_security_status().await);
+    status_lines.push(engine.orchestration_automation_engine.get_orchestration_status().await);
+    status_lines.push(engine.privacy_protection_engine.get_privacy_status().await);
+    status_lines.push(engine.regulatory_compliance_engine.get_regulatory_status().await);
+    status_lines.push(engine.security_awareness_engine.get_awareness_status().await);
+    status_lines.push(engine.supply_chain_security_engine.get_supply_chain_status().await);
+    status_lines.push(engine.threat_simulation_engine.get_simulation_status().await);
+    status_lines.push(engine.user_behavior_analytics_engine.get_uba_status().await);
+    status_lines.push(engine.vulnerability_management_engine.get_vulnerability_status().await);
+    status_lines.push(engine.zero_day_protection_engine.get_zero_day_status().await);
+    
+    let combined_status = format!(
+        "Extended Phantom XDR Engine - {} total modules active:\n\n{}",
+        39, // 9 core + 12 existing + 18 new
+        status_lines.join("\n")
+    );
+    
+    Ok(combined_status)
+}
+
+#[napi]
+pub async fn get_module_count() -> Result<u32> {
+    Ok(39) // 9 core + 12 existing + 18 new enterprise modules
+}
+
+#[napi]
+pub async fn list_new_enterprise_modules() -> Result<Vec<String>> {
+    Ok(vec![
+        "Advanced Analytics Engine".to_string(),
+        "API Security Engine".to_string(),
+        "Cloud Security Engine".to_string(),
+        "Container Security Engine".to_string(),
+        "Deception Technology Engine".to_string(),
+        "Digital Forensics Engine".to_string(),
+        "Insider Threat Engine".to_string(),
+        "IoT Security Engine".to_string(),
+        "Mobile Security Engine".to_string(),
+        "Orchestration Automation Engine".to_string(),
+        "Privacy Protection Engine".to_string(),
+        "Regulatory Compliance Engine".to_string(),
+        "Security Awareness Engine".to_string(),
+        "Supply Chain Security Engine".to_string(),
+        "Threat Simulation Engine".to_string(),
+        "User Behavior Analytics Engine".to_string(),
+        "Vulnerability Management Engine".to_string(),
+        "Zero Day Protection Engine".to_string(),
+    ])
+}
