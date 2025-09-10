@@ -12,6 +12,11 @@ pub use types::*;
 
 mod types;
 mod data_stores;
+mod unified;
+
+// Re-export unified data layer interface
+pub use unified::*;
+pub use data_stores::{IOCUnifiedDataStore, DataStoreConfig};
 
 // ============================================================================
 // ENTERPRISE IOC CORE - COMPLETE BUSINESS-READY IMPLEMENTATION
@@ -342,6 +347,26 @@ impl IOCCore {
                 "security_posture": "excellent"
             },
             "generated_at": Utc::now().to_rfc3339()
+        }).to_string())
+    }
+
+    /// Create a unified data store instance for this IOC core
+    #[napi]
+    pub fn create_unified_data_store(&self) -> Result<String> {
+        // This would return a handle/ID for the unified data store
+        // In real implementation, this would initialize and return the store
+        Ok(serde_json::json!({
+            "store_id": "phantom-ioc-core",
+            "capabilities": [
+                "ioc_storage",
+                "threat_intelligence",
+                "relationship_mapping",
+                "full_text_search",
+                "analytics",
+                "bulk_operations"
+            ],
+            "initialized": true,
+            "store_type": "IOCUnifiedDataStore"
         }).to_string())
     }
 }

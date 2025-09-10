@@ -84,7 +84,7 @@ impl ThreatAnalysisEngine {
 
   /// Analyze threats in parallel for maximum throughput
   #[napi]
-  pub fn analyze_threats_batch(&self, indicators: Vec<String>) -> Result<Object> {
+  pub fn analyze_threats_batch(&self, indicators: Vec<String>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     let results: Vec<_> = indicators
@@ -114,7 +114,7 @@ impl ThreatAnalysisEngine {
 
   /// Real-time threat intelligence enrichment
   #[napi]
-  pub fn enrich_threat_intelligence(&self, indicator: String) -> Result<Object> {
+  pub fn enrich_threat_intelligence(&self, indicator: String) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     // Check cache first for performance
@@ -192,7 +192,7 @@ impl ThreatAnalysisEngine {
 
   /// Machine learning-based threat classification
   #[napi]
-  pub fn classify_threat_ml(&self, features: Vec<f64>) -> Result<Object> {
+  pub fn classify_threat_ml(&self, features: Vec<f64>) -> Result<serde_json::Value> {
     // Simulate ML inference - in production this would use actual ML models
     let feature_sum: f64 = features.iter().sum();
     let feature_avg = feature_sum / features.len() as f64;
@@ -227,7 +227,7 @@ impl ThreatAnalysisEngine {
 
   /// Behavioral analysis for advanced threat detection
   #[napi]
-  pub fn analyze_behavioral_patterns(&self, behavior_data: String) -> Result<Object> {
+  pub fn analyze_behavioral_patterns(&self, behavior_data: String) -> Result<serde_json::Value> {
     let mut analysis = Object::new();
     
     // Simulate advanced behavioral analysis
@@ -261,7 +261,7 @@ impl ThreatAnalysisEngine {
 
   /// Threat attribution and campaign correlation
   #[napi]
-  pub fn correlate_threat_campaigns(&self, indicators: Vec<String>) -> Result<Object> {
+  pub fn correlate_threat_campaigns(&self, indicators: Vec<String>) -> Result<serde_json::Value> {
     let mut correlation = Object::new();
     
     // Simulate threat attribution analysis
@@ -404,7 +404,7 @@ impl ThreatAnalysisEngine {
 
 /// High-performance IOC batch processing
 #[napi]
-pub fn process_ioc_batch_parallel(iocs: Vec<String>, worker_count: u32) -> Result<Object> {
+pub fn process_ioc_batch_parallel(iocs: Vec<String>, worker_count: u32) -> Result<serde_json::Value> {
   let start_time = std::time::Instant::now();
   
   // Configure Rayon thread pool for optimal performance
@@ -440,7 +440,7 @@ pub fn process_ioc_batch_parallel(iocs: Vec<String>, worker_count: u32) -> Resul
 
 /// Generate threat intelligence report optimized for Anomali compatibility
 #[napi]
-pub fn generate_anomali_compatible_report(threats: Vec<String>) -> Result<Object> {
+pub fn generate_anomali_compatible_report(threats: Vec<String>) -> Result<serde_json::Value> {
   let mut report = Object::new();
   
   // Anomali-style threat intelligence format

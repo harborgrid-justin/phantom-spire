@@ -11,6 +11,13 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
+// Import the unified data layer interface
+use crate::unified::{
+    UnifiedDataStore, UnifiedDataError, UnifiedResult, UniversalDataRecord, 
+    DataRelationship, UnifiedQuery, UnifiedQueryContext, UnifiedQueryResult,
+    UnifiedHealthStatus, BulkOperationResult
+};
+
 // ============================================================================
 // DATA STORE TRAITS AND TYPES
 // ============================================================================
@@ -40,6 +47,338 @@ pub struct ThreatIntelligence {
     pub analysis_data: HashMap<String, serde_json::Value>,
     pub created_at: DateTime<Utc>,
 }
+
+// ============================================================================
+// UNIFIED DATA STORE IMPLEMENTATIONS
+// ============================================================================
+
+/// Native IOC Data Store implementing UnifiedDataStore interface
+#[derive(Debug)]
+pub struct IOCUnifiedDataStore {
+    store_id: String,
+    ioc_records: RwLock<HashMap<String, IOCRecord>>,
+    threat_intel: RwLock<HashMap<String, ThreatIntelligence>>,
+    relationships: RwLock<HashMap<String, DataRelationship>>,
+    config: DataStoreConfig,
+    initialized: RwLock<bool>,
+}
+
+impl IOCUnifiedDataStore {
+    pub fn new(config: DataStoreConfig) -> Self {
+        Self {
+            store_id: "phantom-ioc-core".to_string(),
+            ioc_records: RwLock::new(HashMap::new()),
+            threat_intel: RwLock::new(HashMap::new()),
+            relationships: RwLock::new(HashMap::new()),
+            config,
+            initialized: RwLock::new(false),
+        }
+    }
+
+    /// Convert IOCRecord to UniversalDataRecord
+    fn ioc_to_universal(&self, ioc: &IOCRecord) -> UniversalDataRecord {
+        UniversalDataRecord {
+            id: ioc.id.clone(),
+            record_type: "ioc".to_string(),
+            source_plugin: self.store_id.clone(),
+            data: serde_json::to_value(ioc).unwrap_or_default(),
+            metadata: ioc.metadata.clone(),
+            relationships: vec![], // Will be populated separately
+            tags: ioc.tags.clone(),
+            created_at: ioc.created_at,
+            updated_at: ioc.updated_at,
+            tenant_id: None, // Would be extracted from context
+        }
+    }
+
+    /// Convert ThreatIntelligence to UniversalDataRecord
+    fn threat_intel_to_universal(&self, intel: &ThreatIntelligence) -> UniversalDataRecord {
+        UniversalDataRecord {
+            id: intel.id.clone(),
+            record_type: "threat_intelligence".to_string(),
+            source_plugin: self.store_id.clone(),
+            data: serde_json::to_value(intel).unwrap_or_default(),
+            metadata: intel.analysis_data.clone(),
+            relationships: vec![], // Will be populated separately
+            tags: intel.attribution.clone(), // Use attribution as tags
+            created_at: intel.created_at,
+            updated_at: intel.created_at, // No separate updated_at in ThreatIntelligence
+            tenant_id: None,
+        }
+    }
+
+    /// Convert UniversalDataRecord back to IOCRecord
+    fn universal_to_ioc(&self, record: &UniversalDataRecord) -> UnifiedResult<IOCRecord> {
+        if record.record_type != "ioc" {
+            return Err(UnifiedDataError::Query(
+                format!("Expected IOC record type, got {}", record.record_type)
+            ));
+        }
+
+        serde_json::from_value(record.data.clone())
+            .map_err(|e| UnifiedDataError::Serialization(e.to_string()))
+    }
+
+    /// Convert UniversalDataRecord back to ThreatIntelligence
+    fn universal_to_threat_intel(&self, record: &UniversalDataRecord) -> UnifiedResult<ThreatIntelligence> {
+        if record.record_type != "threat_intelligence" {
+            return Err(UnifiedDataError::Query(
+                format!("Expected threat_intelligence record type, got {}", record.record_type)
+            ));
+        }
+
+        serde_json::from_value(record.data.clone())
+            .map_err(|e| UnifiedDataError::Serialization(e.to_string()))
+    }
+}
+
+#[async_trait]
+impl UnifiedDataStore for IOCUnifiedDataStore {
+    fn store_id(&self) -> &str {
+        &self.store_id
+    }
+
+    fn capabilities(&self) -> Vec<String> {
+        vec![
+            "ioc_storage".to_string(),
+            "threat_intelligence".to_string(),
+            "relationship_mapping".to_string(),
+            "full_text_search".to_string(),
+            "analytics".to_string(),
+            "bulk_operations".to_string(),
+        ]
+    }
+
+    async fn initialize(&mut self) -> UnifiedResult<()> {
+        // Initialize the data store
+        let mut initialized = self.initialized.write().await;
+        *initialized = true;
+        Ok(())
+    }
+
+    async fn close(&mut self) -> UnifiedResult<()> {
+        // Clean shutdown
+        let mut initialized = self.initialized.write().await;
+        *initialized = false;
+        Ok(())
+    }
+
+    async fn health_check(&self) -> UnifiedResult<UnifiedHealthStatus> {
+        let initialized = *self.initialized.read().await;
+        let ioc_count = self.ioc_records.read().await.len();
+        let intel_count = self.threat_intel.read().await.len();
+        let relationship_count = self.relationships.read().await.len();
+
+        let mut metrics = HashMap::new();
+        metrics.insert("ioc_count".to_string(), serde_json::Value::Number(serde_json::Number::from(ioc_count)));
+        metrics.insert("threat_intel_count".to_string(), serde_json::Value::Number(serde_json::Number::from(intel_count)));
+        metrics.insert("relationship_count".to_string(), serde_json::Value::Number(serde_json::Number::from(relationship_count)));
+
+        Ok(UnifiedHealthStatus {
+            healthy: initialized,
+            response_time_ms: 10, // Mock response time
+            message: if initialized { None } else { Some("Store not initialized".to_string()) },
+            capabilities: self.capabilities(),
+            metrics,
+            last_check: Utc::now(),
+        })
+    }
+
+    async fn store_record(&self, record: &UniversalDataRecord, context: &UnifiedQueryContext) -> UnifiedResult<String> {
+        match record.record_type.as_str() {
+            "ioc" => {
+                let ioc = self.universal_to_ioc(record)?;
+                let mut iocs = self.ioc_records.write().await;
+                iocs.insert(ioc.id.clone(), ioc.clone());
+                Ok(ioc.id)
+            }
+            "threat_intelligence" => {
+                let intel = self.universal_to_threat_intel(record)?;
+                let mut threat_intel = self.threat_intel.write().await;
+                threat_intel.insert(intel.id.clone(), intel.clone());
+                Ok(intel.id)
+            }
+            _ => Err(UnifiedDataError::Query(
+                format!("Unsupported record type: {}", record.record_type)
+            ))
+        }
+    }
+
+    async fn get_record(&self, id: &str, context: &UnifiedQueryContext) -> UnifiedResult<Option<UniversalDataRecord>> {
+        // Check IOC records first
+        let iocs = self.ioc_records.read().await;
+        if let Some(ioc) = iocs.get(id) {
+            return Ok(Some(self.ioc_to_universal(ioc)));
+        }
+
+        // Check threat intelligence records
+        let intel = self.threat_intel.read().await;
+        if let Some(threat_intel) = intel.get(id) {
+            return Ok(Some(self.threat_intel_to_universal(threat_intel)));
+        }
+
+        Ok(None)
+    }
+
+    async fn update_record(&self, record: &UniversalDataRecord, context: &UnifiedQueryContext) -> UnifiedResult<()> {
+        match record.record_type.as_str() {
+            "ioc" => {
+                let ioc = self.universal_to_ioc(record)?;
+                let mut iocs = self.ioc_records.write().await;
+                iocs.insert(ioc.id.clone(), ioc);
+                Ok(())
+            }
+            "threat_intelligence" => {
+                let intel = self.universal_to_threat_intel(record)?;
+                let mut threat_intel = self.threat_intel.write().await;
+                threat_intel.insert(intel.id.clone(), intel);
+                Ok(())
+            }
+            _ => Err(UnifiedDataError::Query(
+                format!("Unsupported record type: {}", record.record_type)
+            ))
+        }
+    }
+
+    async fn delete_record(&self, id: &str, context: &UnifiedQueryContext) -> UnifiedResult<()> {
+        let mut iocs = self.ioc_records.write().await;
+        let mut intel = self.threat_intel.write().await;
+        
+        if iocs.remove(id).is_some() || intel.remove(id).is_some() {
+            Ok(())
+        } else {
+            Err(UnifiedDataError::NotFound(format!("Record with id {} not found", id)))
+        }
+    }
+
+    async fn query_records(&self, query: &UnifiedQuery, context: &UnifiedQueryContext) -> UnifiedResult<UnifiedQueryResult> {
+        let start_time = std::time::Instant::now();
+        let mut results = Vec::new();
+        let mut relationships = Vec::new();
+
+        // Filter by record types if specified
+        let should_include_ioc = query.record_types.as_ref()
+            .map_or(true, |types| types.contains(&"ioc".to_string()));
+        let should_include_intel = query.record_types.as_ref()
+            .map_or(true, |types| types.contains(&"threat_intelligence".to_string()));
+
+        // Query IOC records
+        if should_include_ioc {
+            let iocs = self.ioc_records.read().await;
+            for ioc in iocs.values() {
+                let universal = self.ioc_to_universal(ioc);
+                
+                // Apply filters
+                if let Some(text_query) = &query.text_query {
+                    if !ioc.value.contains(text_query) && !ioc.ioc_type.contains(text_query) {
+                        continue;
+                    }
+                }
+
+                // Apply tenant filter
+                if let Some(tenant_id) = &context.tenant_id {
+                    // For now, skip tenant filtering in this demo
+                }
+
+                results.push(universal);
+            }
+        }
+
+        // Query threat intelligence records
+        if should_include_intel {
+            let intel_map = self.threat_intel.read().await;
+            for intel in intel_map.values() {
+                let universal = self.threat_intel_to_universal(intel);
+                
+                // Apply filters
+                if let Some(text_query) = &query.text_query {
+                    if !intel.intel_type.contains(text_query) && 
+                       !intel.attribution.iter().any(|attr| attr.contains(text_query)) {
+                        continue;
+                    }
+                }
+
+                results.push(universal);
+            }
+        }
+
+        // Get relationships for the records
+        let rel_map = self.relationships.read().await;
+        for record in &results {
+            for relationship in rel_map.values() {
+                if relationship.source_id == record.id || relationship.target_id == record.id {
+                    relationships.push(relationship.clone());
+                }
+            }
+        }
+
+        // Apply limit
+        if let Some(limit) = query.limit {
+            results.truncate(limit);
+        }
+
+        let total_count = results.len();
+        let query_time = start_time.elapsed().as_millis() as u64;
+
+        Ok(UnifiedQueryResult {
+            records: results,
+            relationships,
+            total_count: Some(total_count),
+            query_time_ms: query_time,
+            pagination: None, // TODO: Implement pagination
+        })
+    }
+
+    async fn store_relationship(&self, relationship: &DataRelationship, context: &UnifiedQueryContext) -> UnifiedResult<String> {
+        let mut relationships = self.relationships.write().await;
+        relationships.insert(relationship.id.clone(), relationship.clone());
+        Ok(relationship.id.clone())
+    }
+
+    async fn get_relationships(&self, record_id: &str, context: &UnifiedQueryContext) -> UnifiedResult<Vec<DataRelationship>> {
+        let relationships = self.relationships.read().await;
+        let related = relationships.values()
+            .filter(|rel| rel.source_id == record_id || rel.target_id == record_id)
+            .cloned()
+            .collect();
+        Ok(related)
+    }
+
+    async fn bulk_store_records(&self, records: &[UniversalDataRecord], context: &UnifiedQueryContext) -> UnifiedResult<BulkOperationResult> {
+        let start_time = std::time::Instant::now();
+        let mut success_count = 0;
+        let mut error_count = 0;
+        let mut errors = Vec::new();
+        let mut processed_ids = Vec::new();
+
+        for record in records {
+            match self.store_record(record, context).await {
+                Ok(id) => {
+                    success_count += 1;
+                    processed_ids.push(id);
+                }
+                Err(e) => {
+                    error_count += 1;
+                    errors.push(e.to_string());
+                }
+            }
+        }
+
+        let operation_time = start_time.elapsed().as_millis() as u64;
+
+        Ok(BulkOperationResult {
+            success_count,
+            error_count,
+            errors,
+            processed_ids,
+            operation_time_ms: operation_time,
+        })
+    }
+}
+
+// ============================================================================
+// DATA STORE CONFIG AND LEGACY SUPPORT  
+// ============================================================================
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DataStoreConfig {

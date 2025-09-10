@@ -32,7 +32,7 @@ impl CryptoEvidenceManager {
 
   /// Generate cryptographic evidence fingerprint
   #[napi]
-  pub fn generate_evidence_fingerprint(&self, evidence_data: String) -> Result<Object> {
+  pub fn generate_evidence_fingerprint(&self, evidence_data: String) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     // Use BLAKE3 for high-performance hashing
@@ -54,7 +54,7 @@ impl CryptoEvidenceManager {
 
   /// Verify evidence integrity using cryptographic validation
   #[napi]
-  pub fn verify_evidence_integrity(&self, evidence_data: String, expected_hash: String) -> Result<Object> {
+  pub fn verify_evidence_integrity(&self, evidence_data: String, expected_hash: String) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     let mut hasher = Hasher::new();
@@ -113,7 +113,7 @@ impl CryptoEvidenceManager {
 
   /// Get complete chain of custody with cryptographic verification
   #[napi]
-  pub fn get_custody_chain(&self) -> Result<Object> {
+  pub fn get_custody_chain(&self) -> Result<serde_json::Value> {
     let mut chain = Object::new();
     
     chain.set("total_records", self.chain_of_custody.len() as u32)?;
@@ -137,7 +137,7 @@ impl CryptoEvidenceManager {
 
 /// High-performance batch hashing for large datasets
 #[napi]
-pub fn batch_hash_evidence(data_items: Vec<String>) -> Result<Object> {
+pub fn batch_hash_evidence(data_items: Vec<String>) -> Result<serde_json::Value> {
   let start_time = std::time::Instant::now();
   
   let hashes: Vec<String> = data_items
@@ -164,7 +164,7 @@ pub fn batch_hash_evidence(data_items: Vec<String>) -> Result<Object> {
 
 /// Generate cryptographic proof of data integrity for compliance
 #[napi]
-pub fn generate_compliance_proof(data: String, compliance_framework: String) -> Result<Object> {
+pub fn generate_compliance_proof(data: String, compliance_framework: String) -> Result<serde_json::Value> {
   let timestamp = chrono::Utc::now().timestamp();
   
   // Generate multiple hash algorithms for compliance requirements

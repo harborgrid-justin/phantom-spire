@@ -30,7 +30,7 @@ impl PatternMatchingEngine {
 
   /// High-performance parallel pattern matching
   #[napi]
-  pub fn match_patterns_parallel(&self, data: Vec<String>) -> Result<Object> {
+  pub fn match_patterns_parallel(&self, data: Vec<String>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     let matches: Vec<_> = data
@@ -82,7 +82,7 @@ impl PatternMatchingEngine {
 
 /// YARA-compatible rule engine
 #[napi]
-pub fn execute_yara_rules(file_content: String, rules: Vec<String>) -> Result<Object> {
+pub fn execute_yara_rules(file_content: String, rules: Vec<String>) -> Result<serde_json::Value> {
   let start_time = std::time::Instant::now();
   
   // Simulate YARA rule execution

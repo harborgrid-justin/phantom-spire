@@ -53,7 +53,7 @@ impl MLInferenceEngine {
 
   /// High-performance threat classification using ML
   #[napi]
-  pub fn classify_threat(&mut self, features: Vec<f64>) -> Result<Object> {
+  pub fn classify_threat(&mut self, features: Vec<f64>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     // Simulate advanced ML inference
@@ -99,7 +99,7 @@ impl MLInferenceEngine {
 
   /// Batch threat classification for high throughput
   #[napi]
-  pub fn classify_threats_batch(&mut self, feature_vectors: Vec<Vec<f64>>) -> Result<Object> {
+  pub fn classify_threats_batch(&mut self, feature_vectors: Vec<Vec<f64>>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     let mut predictions = Vec::new();
@@ -131,7 +131,7 @@ impl MLInferenceEngine {
 
   /// Real-time anomaly detection using unsupervised ML
   #[napi]
-  pub fn detect_anomalies(&self, behavior_data: Vec<f64>) -> Result<Object> {
+  pub fn detect_anomalies(&self, behavior_data: Vec<f64>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     // Simulate anomaly detection algorithm
@@ -202,7 +202,7 @@ impl MLInferenceEngine {
 
   /// Model performance evaluation and monitoring
   #[napi]
-  pub fn evaluate_model_performance(&self) -> Result<Object> {
+  pub fn evaluate_model_performance(&self) -> Result<serde_json::Value> {
     let mut performance = Object::new();
     
     performance.set("model_accuracy", 0.965)?;
@@ -316,25 +316,29 @@ impl MLInferenceEngine {
 
 /// Automated model retraining trigger
 #[napi]
-pub fn check_retrain_requirements(accuracy_threshold: f64, current_accuracy: f64) -> Result<Object> {
+pub fn check_retrain_requirements(accuracy_threshold: f64, current_accuracy: f64) -> Result<serde_json::Value> {
   let needs_retrain = current_accuracy < accuracy_threshold;
   let accuracy_drop = accuracy_threshold - current_accuracy;
   
-  let mut result = Object::new();
-  result.set("needs_retrain", needs_retrain)?;
-  result.set("current_accuracy", current_accuracy)?;
-  result.set("threshold_accuracy", accuracy_threshold)?;
-  result.set("accuracy_drop", accuracy_drop)?;
-  
   if needs_retrain {
-    result.set("priority", "high")?;
-    result.set("recommended_action", "schedule_immediate_retrain")?;
-    result.set("estimated_retrain_time", "4-6 hours")?;
+    Ok(serde_json::json!({
+      "needs_retrain": needs_retrain,
+      "current_accuracy": current_accuracy,
+      "threshold_accuracy": accuracy_threshold,
+      "accuracy_drop": accuracy_drop,
+      "priority": "high",
+      "recommended_action": "schedule_immediate_retrain",
+      "estimated_retrain_time": "4-6 hours"
+    }))
   } else {
-    result.set("priority", "normal")?;
-    result.set("recommended_action", "continue_monitoring")?;
-    result.set("next_evaluation", "7 days")?;
+    Ok(serde_json::json!({
+      "needs_retrain": needs_retrain,
+      "current_accuracy": current_accuracy,
+      "threshold_accuracy": accuracy_threshold,
+      "accuracy_drop": accuracy_drop,
+      "priority": "normal",
+      "recommended_action": "continue_monitoring",
+      "next_evaluation": "7 days"
+    }))
   }
-  
-  Ok(result)
 }
