@@ -42,7 +42,7 @@ impl ResponseEngineTrait for ResponseEngine {
             success: true,
             message: "Action executed successfully".to_string(),
             details: std::collections::HashMap::new(),
-            timestamp: Utc::now(),
+            timestamp: Utc::now().timestamp(),
         }
     }
 
@@ -54,7 +54,7 @@ impl ResponseEngineTrait for ResponseEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events: processed_actions,
+            processed_events: processed_actions as i64,
             active_alerts: failed_actions,
             last_error,
         }

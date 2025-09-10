@@ -282,7 +282,7 @@ impl DetectionEngineTrait for DetectionEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0, // Would need to track actual uptime
-            processed_events,
+            processed_events: processed_events as i64,
             active_alerts,
             last_error,
         }

@@ -19,7 +19,7 @@ pub struct ThreatIndicator {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum IndicatorType {
     IP,
     Domain,
@@ -34,7 +34,7 @@ pub enum IndicatorType {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Severity {
     Low,
     Medium,
@@ -119,7 +119,7 @@ pub struct RuleCondition {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ConditionOperator {
     Equals,
     Contains,
@@ -141,7 +141,7 @@ pub struct RuleAction {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum ActionType {
     Alert,
     Block,
@@ -194,7 +194,7 @@ pub struct Activity {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum EntityType {
     User,
     Device,
@@ -210,7 +210,7 @@ pub struct Location {
     pub ip: Option<String>,
     pub country: Option<String>,
     pub city: Option<String>,
-    pub coordinates: Option<(f64, f64)>,
+    pub coordinates: Option<String>, // Serialized as "lat,lng" for NAPI compatibility
 }
 
 #[napi(object)]
@@ -247,7 +247,7 @@ pub struct Pattern {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum PatternType {
     Temporal,
     Frequency,
@@ -284,7 +284,7 @@ pub struct Correlation {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum CorrelationStatus {
     Active,
     Resolved,
@@ -326,7 +326,7 @@ pub struct AccessDecision {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Decision {
     Allow,
     Deny,
@@ -405,8 +405,8 @@ pub struct NetworkTraffic {
     pub destination_port: u16,
     pub protocol: String,
     pub timestamp: i64,
-    pub bytes_sent: u64,
-    pub bytes_received: u64,
+    pub bytes_sent: i64,
+    pub bytes_received: i64,
     pub packets_sent: u32,
     pub packets_received: u32,
     pub flags: Vec<String>,
@@ -433,7 +433,7 @@ pub struct NetworkAnomaly {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum TrafficClassification {
     Normal,
     Suspicious,
@@ -449,7 +449,7 @@ pub struct ResponseAction {
     pub target: String,
     pub parameters: HashMap<String, serde_json::Value>,
     pub priority: u32,
-    pub timeout: Option<u64>,
+    pub timeout: Option<i64>,
 }
 
 #[napi(object)]
@@ -470,14 +470,14 @@ pub struct ThreatFeed {
     pub source: String,
     pub feed_type: FeedType,
     pub format: FeedFormat,
-    pub update_frequency: u64, // minutes
+    pub update_frequency: i32, // minutes - changed from u64 to i32 for NAPI compatibility
     pub last_update: i64,
     pub reliability: f64,
     pub indicators: Vec<ThreatIndicator>,
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum FeedType {
     Open,
     Commercial,
@@ -486,7 +486,7 @@ pub enum FeedType {
 }
 
 #[napi]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum FeedFormat {
     STIX,
     JSON,
@@ -507,6 +507,16 @@ pub struct EngineStatus {
     pub risk_engine: ComponentStatus,
     pub ml_engine: ComponentStatus,
     pub network_analyzer: ComponentStatus,
+    
+    // New module statuses
+    pub asset_discovery_engine: ComponentStatus,
+    pub compliance_audit_engine: ComponentStatus,
+    pub data_loss_prevention_engine: ComponentStatus,
+    pub email_security_gateway: ComponentStatus,
+    pub endpoint_protection_platform: ComponentStatus,
+    pub forensics_investigation_engine: ComponentStatus,
+    pub identity_access_management_engine: ComponentStatus,
+    
     pub last_updated: i64,
 }
 
@@ -514,8 +524,8 @@ pub struct EngineStatus {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComponentStatus {
     pub status: String,
-    pub uptime: u64,
-    pub processed_events: u64,
+    pub uptime: i64,
+    pub processed_events: i64,
     pub active_alerts: u32,
     pub last_error: Option<String>,
 }
