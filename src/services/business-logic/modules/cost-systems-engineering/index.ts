@@ -61,12 +61,12 @@ export interface ArchitectureHealth {
 // Core interfaces for standardized cost systems
 export interface CostSystemsAlignment {
   business: {
-    tracking: BusinessCostMetrics;
-    optimization: OptimizationRecommendation[];
+    tracking: any; // BusinessCostMetrics;
+    optimization: any[]; // OptimizationRecommendation[];
     reporting: CostReport[];
   };
   customer: {
-    analysis: CustomerCostAnalysis;
+    analysis: any; // CustomerCostAnalysis;
     insights: CostInsight[];
     recommendations: CustomerRecommendation[];
   };

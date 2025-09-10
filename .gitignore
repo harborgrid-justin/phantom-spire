@@ -23,6 +23,14 @@ frontend/node_modules/
 !install.sh
 !.development/demos/*.js
 
+# Rust/NAPI-RS build artifacts
+target/
+Cargo.lock
+*.node
+*.dll
+*.dylib
+*.so
+
 # Environment variables and secrets
 .env
 .env.local

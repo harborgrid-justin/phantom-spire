@@ -457,6 +457,9 @@ export const createIOCController = (
     statisticsService
   );
 };
+
+// Export additional IOC query function
+export const queryIOCs = async (req: AuthRequest, res: Response) => {
   const {
     page = '1',
     limit = '10',
@@ -523,7 +526,7 @@ export const createIOCController = (
       pages: Math.ceil(total / limitNum),
     },
   } as ApiResponse);
-});
+};
 
 /**
  * @swagger
