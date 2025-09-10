@@ -76,3 +76,18 @@ export {
   IEnhancedIOCResult,
   IIOCEnrichmentResult,
 } from '../services/enhancedIOCService.js';
+
+// Unified Data Layer
+export {
+  UniversalDataRecord,
+  DataRelationship,
+  UnifiedQueryContext,
+  UnifiedQuery,
+  UnifiedQueryResult,
+  UnifiedHealthStatus,
+  BulkOperationResult,
+  UnifiedDataStore,
+  UnifiedDataStoreRegistry,
+  UnifiedDataSourceAdapter,
+  UnifiedDataStoreFactory,
+} from './unified/typescript-bridge.js';
