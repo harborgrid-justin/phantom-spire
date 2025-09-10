@@ -14,6 +14,9 @@ use indexmap::IndexMap;
 // Extended business modules
 pub mod modules;
 
+// Data store modules for enterprise SaaS readiness
+pub mod data_stores;
+
 /// MITRE ATT&CK Tactic categories
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum MitreTactic {

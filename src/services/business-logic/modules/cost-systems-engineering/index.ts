@@ -11,21 +11,14 @@ export { CostOptimizationEngine } from './CostOptimizationEngine';
 export { CostSystemsIntegrator } from './CostSystemsIntegrator';
 
 // Export types separately to avoid TS4033 errors
-export type { CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
-export type { BusinessCostMetrics } from './BusinessReadyCostTracker';
-export type { CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
-export type { CostManagementOptions } from './UnifiedCostManagementService';
-export type { OptimizationRecommendation } from './CostOptimizationEngine';
-export type { SystemIntegrationConfig } from './CostSystemsIntegrator';
+export { type CostSystemsConfig } from './CostSystemsEngineeringOrchestrator';
+export { type BusinessCostMetrics } from './BusinessReadyCostTracker';
+export { type CustomerCostAnalysis } from './CustomerReadyCostAnalyzer';
+export { type CostManagementOptions } from './UnifiedCostManagementService';
+export { type OptimizationRecommendation } from './CostOptimizationEngine';
+export { type SystemIntegrationConfig } from './CostSystemsIntegrator';
 
 // Additional supporting types
-export interface CostReport {
-  id: string;
-  type: string;
-  data: any;
-  generatedAt: string;
-}
-
 export interface CostInsight {
   id: string;
   category: string;
@@ -61,12 +54,12 @@ export interface ArchitectureHealth {
 // Core interfaces for standardized cost systems
 export interface CostSystemsAlignment {
   business: {
-    tracking: any; // BusinessCostMetrics;
-    optimization: any[]; // OptimizationRecommendation[];
+    tracking: import('./BusinessReadyCostTracker').BusinessCostMetrics;
+    optimization: import('./CostOptimizationEngine').OptimizationRecommendation[];
     reporting: CostReport[];
   };
   customer: {
-    analysis: any; // CustomerCostAnalysis;
+    analysis: import('./CustomerReadyCostAnalyzer').CustomerCostAnalysis;
     insights: CostInsight[];
     recommendations: CustomerRecommendation[];
   };
@@ -77,65 +70,12 @@ export interface CostSystemsAlignment {
   };
 }
 
-export interface CostReport {
-  id: string;
-  type: 'operational' | 'strategic' | 'tactical';
-  period: string;
-  metrics: Record<string, number>;
-  trends: TrendAnalysis[];
-  recommendations: string[];
-  createdAt: Date;
-}
-
-export interface CostInsight {
-  id: string;
-  category: 'efficiency' | 'savings' | 'optimization' | 'risk';
-  title: string;
-  description: string;
-  impact: 'low' | 'medium' | 'high' | 'critical';
-  confidence: number;
-  actionable: boolean;
-}
-
-export interface CustomerRecommendation {
-  id: string;
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  title: string;
-  description: string;
-  estimatedSavings: number;
-  implementationEffort: 'minimal' | 'moderate' | 'significant';
-  timeline: string;
-}
-
 export interface TrendAnalysis {
   metric: string;
   direction: 'increasing' | 'decreasing' | 'stable';
   magnitude: number;
   period: string;
   forecast: number[];
-}
-
-export interface StandardizationMetrics {
-  consistency: number;
-  coverage: number;
-  compliance: number;
-  maturity: number;
-}
-
-export interface IntegrationStatus {
-  frontend: boolean;
-  backend: boolean;
-  businessLogic: boolean;
-  apis: boolean;
-  databases: boolean;
-}
-
-export interface ArchitectureHealth {
-  modularity: number;
-  maintainability: number;
-  scalability: number;
-  performance: number;
-  security: number;
 }
 
 // Placeholder types to be implemented

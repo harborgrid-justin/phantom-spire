@@ -3,6 +3,7 @@ export interface ApiResponse<T = any> {
   data?: T;
   message?: string;
   error?: string;
+  metadata?: Record<string, any>;
   pagination?: {
     page: number;
     limit: number;
@@ -22,6 +23,80 @@ export interface RegisterRequest {
   firstName: string;
   lastName: string;
   role?: 'admin' | 'analyst' | 'viewer';
+}
+
+// Enhanced Threat Actor API Types
+export interface AttributionAnalysisRequest {
+  indicators: string[];
+  context?: Record<string, string>;
+  confidence_threshold?: number;
+}
+
+export interface CampaignTrackingRequest {
+  campaign_name: string;
+  actor_id?: string;
+  objectives?: string[];
+  targets?: any[];
+}
+
+export interface ReputationAnalysisRequest {
+  factors: Record<string, number>;
+}
+
+export interface RiskAssessmentRequest {
+  assessment_type: string;
+  assets: any[];
+  threat_actors?: string[];
+}
+
+export interface ComplianceReportRequest {
+  compliance_framework: string;
+  report_type: string;
+  scope?: any;
+}
+
+export interface ThreatHuntingRequest {
+  hunt_type: string;
+  indicators?: string[];
+  timeframe?: string;
+}
+
+export interface IntelligenceSharingRequest {
+  protocol: string;
+  recipients: string[];
+  data: any;
+}
+
+export interface AlertConfigurationRequest {
+  alert_types: string[];
+  notification_channels: string[];
+  criteria?: any;
+}
+
+export interface CreateThreatActorRequest {
+  name: string;
+  aliases?: string[];
+  actor_type: string;
+  sophistication_level: string;
+  motivation: string[];
+  origin_country?: string;
+  capabilities?: any[];
+  targets?: any[];
+}
+
+export interface UpdateThreatActorRequest extends Partial<CreateThreatActorRequest> {
+  status?: string;
+}
+
+export interface ThreatActorQuery {
+  page?: string;
+  limit?: string;
+  actor_type?: string;
+  sophistication_level?: string;
+  status?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface CreateIOCRequest {
