@@ -8,69 +8,53 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
-// Core IOC types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum IOCType {
-    IPAddress,
-    Domain,
-    URL,
-    Hash,
-    Email,
-    FilePath,
-    Custom(String),
-}
+// Re-export types and error
+pub use types::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Severity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
+mod types;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOC {
-    pub id: Uuid,
-    pub indicator_type: IOCType,
-    pub value: String,
-    pub confidence: f64,
-    pub severity: Severity,
-    pub source: String,
-    pub timestamp: DateTime<Utc>,
-    pub tags: Vec<String>,
-    pub context: IOCContext,
-}
+// Import existing modules
+mod analysis;
+mod api;
+mod context;
+mod correlation;
+mod detection;
+mod enrichment;
+mod export;
+mod feeds;
+mod intelligence;
+mod persistence;
+mod reputation;
+mod scoring;
+mod validation;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOCContext {
-    pub description: Option<String>,
-    pub metadata: HashMap<String, String>,
-}
+// Import new business-ready modules
+mod threat_hunting;
+mod incident_response;
+mod risk_assessment;
+mod compliance;
+mod analytics;
+mod integration;
+mod workflow_automation;
+mod reporting;
+mod notification;
+mod audit;
+mod performance_monitoring;
+mod user_management;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AnalysisResult {
-    pub threat_actors: Vec<String>,
-    pub campaigns: Vec<String>,
-    pub malware_families: Vec<String>,
-    pub attack_vectors: Vec<String>,
-    pub impact_assessment: ImpactAssessment,
-    pub recommendations: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ImpactAssessment {
-    pub business_impact: f64,
-    pub technical_impact: f64,
-    pub operational_impact: f64,
-    pub overall_risk: f64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IOCResult {
-    pub ioc: IOC,
-    pub analysis: AnalysisResult,
-    pub processing_timestamp: DateTime<Utc>,
-}
+// Re-export the main engines for easy access
+pub use threat_hunting::ThreatHuntingEngine;
+pub use incident_response::IncidentResponseEngine;
+pub use risk_assessment::RiskAssessmentEngine;
+pub use compliance::ComplianceEngine;
+pub use analytics::AnalyticsEngine;
+pub use integration::IntegrationEngine;
+pub use workflow_automation::WorkflowAutomationEngine;
+pub use reporting::ReportingEngine;
+pub use notification::NotificationEngine;
+pub use audit::AuditEngine;
+pub use performance_monitoring::PerformanceMonitoringEngine;
+pub use user_management::UserManagementEngine;
 
 // Core processing logic
 #[napi]
@@ -132,12 +116,153 @@ impl IOCCore {
             ],
         };
 
+        // Create mock results for other components
+        let detection_result = DetectionResult {
+            matched_rules: vec!["suspicious_pattern".to_string()],
+            detection_methods: vec!["pattern_matching".to_string()],
+            false_positive_probability: 0.1,
+            detection_confidence: 0.8,
+        };
+
+        let intelligence = Intelligence {
+            sources: vec!["threat_feed_1".to_string()],
+            confidence: 0.8,
+            last_updated: Utc::now(),
+            related_threats: vec!["related_threat_1".to_string()],
+        };
+
         Ok(IOCResult {
             ioc,
+            detection_result,
+            intelligence,
+            correlations: vec![],
             analysis,
             processing_timestamp: Utc::now(),
         })
     }
+}
+
+// NAPI exports for the new business modules
+#[napi]
+pub async fn create_threat_hunting_engine() -> Result<String> {
+    match ThreatHuntingEngine::new().await {
+        Ok(_) => Ok("Threat Hunting Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Threat Hunting Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_incident_response_engine() -> Result<String> {
+    match IncidentResponseEngine::new().await {
+        Ok(_) => Ok("Incident Response Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Incident Response Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_risk_assessment_engine() -> Result<String> {
+    match RiskAssessmentEngine::new().await {
+        Ok(_) => Ok("Risk Assessment Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Risk Assessment Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_compliance_engine() -> Result<String> {
+    match ComplianceEngine::new().await {
+        Ok(_) => Ok("Compliance Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Compliance Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_analytics_engine() -> Result<String> {
+    match AnalyticsEngine::new().await {
+        Ok(_) => Ok("Analytics Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Analytics Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_integration_engine() -> Result<String> {
+    match IntegrationEngine::new().await {
+        Ok(_) => Ok("Integration Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Integration Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_workflow_automation_engine() -> Result<String> {
+    match WorkflowAutomationEngine::new().await {
+        Ok(_) => Ok("Workflow Automation Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Workflow Automation Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_reporting_engine() -> Result<String> {
+    match ReportingEngine::new().await {
+        Ok(_) => Ok("Reporting Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Reporting Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_notification_engine() -> Result<String> {
+    match NotificationEngine::new().await {
+        Ok(_) => Ok("Notification Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Notification Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_audit_engine() -> Result<String> {
+    match AuditEngine::new().await {
+        Ok(_) => Ok("Audit Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Audit Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_performance_monitoring_engine() -> Result<String> {
+    match PerformanceMonitoringEngine::new().await {
+        Ok(_) => Ok("Performance Monitoring Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create Performance Monitoring Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn create_user_management_engine() -> Result<String> {
+    match UserManagementEngine::new().await {
+        Ok(_) => Ok("User Management Engine initialized successfully".to_string()),
+        Err(e) => Err(napi::Error::from_reason(format!("Failed to create User Management Engine: {}", e))),
+    }
+}
+
+#[napi]
+pub async fn get_all_engines_status() -> Result<String> {
+    Ok(serde_json::json!({
+        "phantom_ioc_core": {
+            "version": "0.1.0",
+            "modules": [
+                "threat_hunting",
+                "incident_response", 
+                "risk_assessment",
+                "compliance",
+                "analytics",
+                "integration",
+                "workflow_automation",
+                "reporting",
+                "notification",
+                "audit",
+                "performance_monitoring",
+                "user_management"
+            ],
+            "status": "operational",
+            "total_modules": 12,
+            "initialized_at": chrono::Utc::now().to_rfc3339()
+        }
+    }).to_string())
 }
 
 // Simple random number generator for mock data
@@ -181,9 +306,15 @@ mod tests {
             timestamp: Utc::now(),
             tags: vec!["malware".to_string(), "c2".to_string()],
             context: IOCContext {
-                description: Some("Test IOC".to_string()),
+                geolocation: Some("US".to_string()),
+                asn: Some("AS12345".to_string()),
+                category: Some("test".to_string()),
+                first_seen: Some(Utc::now()),
+                last_seen: Some(Utc::now()),
+                related_indicators: vec![],
                 metadata: HashMap::new(),
             },
+            raw_data: None,
         };
 
         let result = core.process_ioc_internal(test_ioc);

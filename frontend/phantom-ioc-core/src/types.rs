@@ -146,3 +146,24 @@ pub struct ComponentHealth {
     pub last_check: DateTime<Utc>,
     pub metrics: HashMap<String, f64>,
 }
+
+/// Custom error type for IOC operations
+#[derive(Debug, thiserror::Error)]
+pub enum IOCError {
+    #[error("Validation error: {0}")]
+    Validation(String),
+    #[error("Processing error: {0}")]
+    Processing(String),
+    #[error("Network error: {0}")]
+    Network(String),
+    #[error("Database error: {0}")]
+    Database(String),
+    #[error("Authentication error: {0}")]
+    Authentication(String),
+    #[error("Authorization error: {0}")]
+    Authorization(String),
+    #[error("Configuration error: {0}")]
+    Configuration(String),
+    #[error("Internal error: {0}")]
+    Internal(String),
+}
