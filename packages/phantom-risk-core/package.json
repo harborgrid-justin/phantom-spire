@@ -1,7 +1,7 @@
 {
   "name": "phantom-risk-core",
   "version": "1.0.0",
-  "description": "Risk assessment and scoring engine core",
+  "description": "Risk assessment and vulnerability prioritization core with business impact analysis",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -44,7 +44,17 @@
     "lint": "cargo clippy",
     "fmt": "cargo fmt"
   },
-  "keywords": ["risk", "assessment", "scoring", "analysis", "phantom-spire", "napi", "rust", "security"],
+  "keywords": [
+    "risk-assessment",
+    "vulnerability-prioritization",
+    "business-impact",
+    "security-metrics",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "engines": {
@@ -54,10 +64,6 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
-  },
-  "dependencies": {
-    "semver": "^7.5.0",
-    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "access": "public"

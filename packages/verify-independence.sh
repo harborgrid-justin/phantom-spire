@@ -13,13 +13,24 @@ cd "$(dirname "$0")"
 
 # Test each package
 PACKAGES=(
+    "phantom-attribution-core"
+    "phantom-compliance-core"
+    "phantom-crypto-core"
     "phantom-cve-core"
+    "phantom-feeds-core"
+    "phantom-forensics-core"
+    "phantom-hunting-core"
     "phantom-incident-response-core"
     "phantom-intel-core"
     "phantom-ioc-core"
+    "phantom-malware-core"
     "phantom-mitre-core"
+    "phantom-reputation-core"
+    "phantom-risk-core"
+    "phantom-sandbox-core"
     "phantom-secop-core"
     "phantom-threat-actor-core"
+    "phantom-vulnerability-core"
     "phantom-xdr-core"
 )
 

@@ -1,7 +1,7 @@
 {
   "name": "phantom-forensics-core",
   "version": "1.0.0",
-  "description": "Digital forensics and incident investigation core with timeline analysis",
+  "description": "Digital forensics and incident analysis core with evidence collection and timeline reconstruction",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -45,10 +45,11 @@
     "fmt": "cargo fmt"
   },
   "keywords": [
-    "forensics",
-    "incident-response",
-    "timeline-analysis",
-    "digital-evidence",
+    "digital-forensics",
+    "incident-analysis",
+    "evidence-collection",
+    "timeline-reconstruction",
+    "cybersecurity",
     "phantom-spire",
     "napi",
     "rust",
@@ -63,10 +64,6 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
-  },
-  "dependencies": {
-    "semver": "^7.5.0",
-    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "access": "public"

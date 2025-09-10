@@ -1,7 +1,7 @@
 {
   "name": "phantom-reputation-core",
   "version": "1.0.0",
-  "description": "IP, domain, and URL reputation analysis core",
+  "description": "IP and domain reputation analysis core with threat scoring and blacklist management",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -44,7 +44,18 @@
     "lint": "cargo clippy",
     "fmt": "cargo fmt"
   },
-  "keywords": ["reputation", "ip", "domain", "url", "phantom-spire", "napi", "rust", "security"],
+  "keywords": [
+    "reputation-analysis",
+    "threat-scoring",
+    "blacklist",
+    "ip-reputation",
+    "domain-reputation",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "engines": {
@@ -54,10 +65,6 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
-  },
-  "dependencies": {
-    "semver": "^7.5.0",
-    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "access": "public"
