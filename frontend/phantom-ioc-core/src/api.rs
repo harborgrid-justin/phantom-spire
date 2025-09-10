@@ -1,7 +1,8 @@
 // phantom-ioc-core/src/api.rs
-// REST API interface for IOC processing
+// REST API interface for IOC processing and business modules
 
 use crate::types::*;
+use crate::modules::*;
 use async_trait::async_trait;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -38,6 +39,19 @@ pub struct SearchRequest {
 
 pub struct APIEngine {
     ioc_processor: Arc<crate::IOCProcessor>,
+    // Business module managers
+    alert_manager: Arc<RwLock<AlertManager>>,
+    compliance_manager: Arc<RwLock<ComplianceManager>>,
+    dashboard_analytics: Arc<RwLock<DashboardAnalytics>>,
+    incident_manager: Arc<RwLock<IncidentResponseManager>>,
+    threat_hunter: Arc<RwLock<ThreatHunter>>,
+    asset_manager: Arc<RwLock<AssetManager>>,
+    user_activity_monitor: Arc<RwLock<UserActivityMonitor>>,
+    network_security: Arc<RwLock<NetworkSecurityMonitor>>,
+    forensics_manager: Arc<RwLock<ForensicsManager>>,
+    risk_assessor: Arc<RwLock<RiskAssessor>>,
+    report_generator: Arc<RwLock<ReportGenerator>>,
+    integration_manager: Arc<RwLock<IntegrationManager>>,
     server_handle: Option<tokio::task::JoinHandle<()>>,
 }
 
@@ -45,6 +59,18 @@ impl APIEngine {
     pub async fn new(ioc_processor: Arc<crate::IOCProcessor>) -> Result<Self, IOCError> {
         Ok(Self {
             ioc_processor,
+            alert_manager: Arc::new(RwLock::new(AlertManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create alert manager: {}", e)))?)),
+            compliance_manager: Arc::new(RwLock::new(ComplianceManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create compliance manager: {}", e)))?)),
+            dashboard_analytics: Arc::new(RwLock::new(DashboardAnalytics::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create dashboard analytics: {}", e)))?)),
+            incident_manager: Arc::new(RwLock::new(IncidentResponseManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create incident manager: {}", e)))?)),
+            threat_hunter: Arc::new(RwLock::new(ThreatHunter::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create threat hunter: {}", e)))?)),
+            asset_manager: Arc::new(RwLock::new(AssetManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create asset manager: {}", e)))?)),
+            user_activity_monitor: Arc::new(RwLock::new(UserActivityMonitor::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create user activity monitor: {}", e)))?)),
+            network_security: Arc::new(RwLock::new(NetworkSecurityMonitor::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create network security monitor: {}", e)))?)),
+            forensics_manager: Arc::new(RwLock::new(ForensicsManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create forensics manager: {}", e)))?)),
+            risk_assessor: Arc::new(RwLock::new(RiskAssessor::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create risk assessor: {}", e)))?)),
+            report_generator: Arc::new(RwLock::new(ReportGenerator::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create report generator: {}", e)))?)),
+            integration_manager: Arc::new(RwLock::new(IntegrationManager::new().map_err(|e| IOCError::ProcessingError(format!("Failed to create integration manager: {}", e)))?)),
             server_handle: None,
         })
     }
@@ -393,7 +419,126 @@ impl APIEngine {
         }
     }
 
-    pub async fn get_health(&self) -> ComponentHealth {
+    // Business Module API Endpoints
+    
+    // Alert Management
+    async fn handle_create_alert(
+        request: serde_json::Value,
+        alert_manager: Arc<RwLock<AlertManager>>
+    ) -> Result<impl warp::Reply, warp::Rejection> {
+        let mut manager = alert_manager.write().await;
+        match manager.create_alert(request.to_string()) {
+            Ok(alert_id) => {
+                let response = APIResponse {
+                    success: true,
+                    data: Some(alert_id),
+                    error: None,
+                    timestamp: Utc::now().to_rfc3339(),
+                };
+                Ok(warp::reply::json(&response))
+            }
+            Err(e) => {
+                let response = APIResponse::<()> {
+                    success: false,
+                    data: None,
+                    error: Some(format!("Failed to create alert: {}", e)),
+                    timestamp: Utc::now().to_rfc3339(),
+                };
+                Ok(warp::reply::json(&response))
+            }
+        }
+    }
+
+    async fn handle_get_alert_metrics(
+        alert_manager: Arc<RwLock<AlertManager>>
+    ) -> Result<impl warp::Reply, warp::Rejection> {
+        let manager = alert_manager.read().await;
+        match manager.get_alert_metrics() {
+            Ok(metrics_json) => {
+                let response = APIResponse {
+                    success: true,
+                    data: Some(serde_json::from_str::<serde_json::Value>(&metrics_json).unwrap()),
+                    error: None,
+                    timestamp: Utc::now().to_rfc3339(),
+                };
+                Ok(warp::reply::json(&response))
+            }
+            Err(e) => {
+                let response = APIResponse::<()> {
+                    success: false,
+                    data: None,
+                    error: Some(format!("Failed to get alert metrics: {}", e)),
+                    timestamp: Utc::now().to_rfc3339(),
+                };
+                Ok(warp::reply::json(&response))
+            }
+        }
+    }
+
+    // Comprehensive Health Check for All Business Modules
+    async fn handle_comprehensive_health(
+        alert_manager: Arc<RwLock<AlertManager>>,
+        compliance_manager: Arc<RwLock<ComplianceManager>>,
+        dashboard_analytics: Arc<RwLock<DashboardAnalytics>>,
+        incident_manager: Arc<RwLock<IncidentResponseManager>>,
+        threat_hunter: Arc<RwLock<ThreatHunter>>,
+        asset_manager: Arc<RwLock<AssetManager>>,
+        user_activity_monitor: Arc<RwLock<UserActivityMonitor>>,
+        network_security: Arc<RwLock<NetworkSecurityMonitor>>,
+        forensics_manager: Arc<RwLock<ForensicsManager>>,
+        risk_assessor: Arc<RwLock<RiskAssessor>>,
+        report_generator: Arc<RwLock<ReportGenerator>>,
+        integration_manager: Arc<RwLock<IntegrationManager>>
+    ) -> Result<impl warp::Reply, warp::Rejection> {
+        let mut health_status = HashMap::new();
+        
+        // Check all 12 business modules
+        if let Ok(result) = alert_manager.read().await.health_check() {
+            health_status.insert("alert_management".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = compliance_manager.read().await.health_check() {
+            health_status.insert("compliance".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = dashboard_analytics.read().await.health_check() {
+            health_status.insert("dashboard_analytics".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = incident_manager.read().await.health_check() {
+            health_status.insert("incident_response".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = threat_hunter.read().await.health_check() {
+            health_status.insert("threat_hunting".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = asset_manager.read().await.health_check() {
+            health_status.insert("asset_management".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = user_activity_monitor.read().await.health_check() {
+            health_status.insert("user_activity".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = network_security.read().await.health_check() {
+            health_status.insert("network_security".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = forensics_manager.read().await.health_check() {
+            health_status.insert("forensics".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = risk_assessor.read().await.health_check() {
+            health_status.insert("risk_assessment".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = report_generator.read().await.health_check() {
+            health_status.insert("reporting".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        if let Ok(result) = integration_manager.read().await.health_check() {
+            health_status.insert("integration".to_string(), serde_json::from_str::<serde_json::Value>(&result).unwrap());
+        }
+        
+        let response = APIResponse {
+            success: true,
+            data: Some(health_status),
+            error: None,
+            timestamp: Utc::now().to_rfc3339(),
+        };
+        
+        Ok(warp::reply::json(&response))
+    }
         ComponentHealth {
             status: HealthStatus::Healthy,
             message: "API engine operational".to_string(),

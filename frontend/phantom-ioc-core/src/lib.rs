@@ -8,6 +8,10 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
+// Import all business modules
+pub mod modules;
+pub use modules::*;
+
 // Core IOC types
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum IOCType {
