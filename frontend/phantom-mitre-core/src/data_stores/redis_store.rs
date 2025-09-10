@@ -206,7 +206,7 @@ impl MitreDataStore for RedisDataStore {
         
         let mut conn = self.get_connection().await?.clone();
         
-        match conn.ping().await {
+        match redis::cmd("PING").query_async::<_, String>(&mut conn).await {
             Ok(_) => Ok(true),
             Err(e) => {
                 warn!("Redis health check failed: {}", e);
@@ -225,7 +225,7 @@ impl MitreDataStore for RedisDataStore {
         
         // Get Redis memory info
         let mut conn = self.get_connection().await?.clone();
-        let info: String = conn.info("memory")
+        let info: String = redis::cmd("INFO").arg("memory").query_async(&mut conn)
             .await
             .map_err(|e| DataStoreError::Database(e.to_string()))?;
         
