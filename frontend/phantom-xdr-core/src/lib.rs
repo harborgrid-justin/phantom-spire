@@ -17,6 +17,10 @@ mod network_analysis;
 mod asset_discovery;
 mod compliance_audit;
 mod data_loss_prevention;
+mod email_security;
+mod endpoint_protection;
+mod forensics_investigation;
+mod identity_access_management;
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -40,6 +44,10 @@ use crate::network_analysis::{NetworkAnalyzer, NetworkAnalyzerTrait};
 use crate::asset_discovery::{AssetDiscoveryEngine, AssetDiscoveryTrait};
 use crate::compliance_audit::{ComplianceAuditEngine, ComplianceAuditTrait};
 use crate::data_loss_prevention::{DataLossPreventionEngine, DataLossPreventionTrait};
+use crate::email_security::{EmailSecurityGateway, EmailSecurityTrait};
+use crate::endpoint_protection::{EndpointProtectionPlatform, EndpointProtectionTrait};
+use crate::forensics_investigation::{ForensicsInvestigationEngine, ForensicsInvestigationTrait};
+use crate::identity_access_management::{IdentityAccessManagementEngine, IdentityAccessManagementTrait};
 
 // Global XDR Engine instance
 static XDR_ENGINE: Lazy<Arc<RwLock<XdrEngine>>> = Lazy::new(|| {
@@ -62,6 +70,10 @@ pub struct XdrEngine {
     asset_discovery_engine: asset_discovery::AssetDiscoveryEngine,
     compliance_audit_engine: compliance_audit::ComplianceAuditEngine,
     data_loss_prevention_engine: data_loss_prevention::DataLossPreventionEngine,
+    email_security_gateway: email_security::EmailSecurityGateway,
+    endpoint_protection_platform: endpoint_protection::EndpointProtectionPlatform,
+    forensics_investigation_engine: forensics_investigation::ForensicsInvestigationEngine,
+    identity_access_management_engine: identity_access_management::IdentityAccessManagementEngine,
 }
 
 impl XdrEngine {
@@ -81,6 +93,10 @@ impl XdrEngine {
             asset_discovery_engine: asset_discovery::AssetDiscoveryEngine::new(),
             compliance_audit_engine: compliance_audit::ComplianceAuditEngine::new(),
             data_loss_prevention_engine: data_loss_prevention::DataLossPreventionEngine::new(),
+            email_security_gateway: email_security::EmailSecurityGateway::new(),
+            endpoint_protection_platform: endpoint_protection::EndpointProtectionPlatform::new(),
+            forensics_investigation_engine: forensics_investigation::ForensicsInvestigationEngine::new(),
+            identity_access_management_engine: identity_access_management::IdentityAccessManagementEngine::new(),
         }
     }
 }
@@ -173,6 +189,10 @@ pub async fn get_engine_status() -> Result<EngineStatus> {
         asset_discovery_engine: engine.asset_discovery_engine.get_status().await,
         compliance_audit_engine: engine.compliance_audit_engine.get_status().await,
         data_loss_prevention_engine: engine.data_loss_prevention_engine.get_status().await,
+        email_security_gateway: engine.email_security_gateway.get_status().await,
+        endpoint_protection_platform: engine.endpoint_protection_platform.get_status().await,
+        forensics_investigation_engine: engine.forensics_investigation_engine.get_status().await,
+        identity_access_management_engine: engine.identity_access_management_engine.get_status().await,
         
         last_updated: chrono::Utc::now().timestamp(),
     };

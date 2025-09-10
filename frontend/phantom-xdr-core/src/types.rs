@@ -512,6 +512,10 @@ pub struct EngineStatus {
     pub asset_discovery_engine: ComponentStatus,
     pub compliance_audit_engine: ComponentStatus,
     pub data_loss_prevention_engine: ComponentStatus,
+    pub email_security_gateway: ComponentStatus,
+    pub endpoint_protection_platform: ComponentStatus,
+    pub forensics_investigation_engine: ComponentStatus,
+    pub identity_access_management_engine: ComponentStatus,
     
     pub last_updated: i64,
 }
