@@ -92,111 +92,183 @@ The SecOp engine consists of specialized modules for comprehensive security oper
 
 ## API Reference
 
-### Core Functions
+### Comprehensive NAPI Methods (22 Total)
 
-#### SecOp Core Initialization
+The Phantom SecOp Core provides 22 business-ready NAPI methods organized into 6 functional categories:
+
+#### Core Incident Management (4 methods)
 ```javascript
 import { SecOpCore } from 'phantom-secop-core';
 
-// Initialize SecOp core
 const secOpCore = new SecOpCore();
 
-// Get SOC status overview
-const status = secOpCore.getSOCStatus();
-console.log(status);
-// {
-//   active_incidents: 15,
-//   open_alerts: 247,
-//   active_hunts: 3,
-//   running_playbooks: 8,
-//   analyst_workload: {
-//     "analyst1": 12,
-//     "analyst2": 8,
-//     "analyst3": 15
-//   },
-//   system_health: "healthy",
-//   last_updated: "2024-01-01T12:00:00Z"
-// }
+// 1. Create a new security incident
+const incidentId = secOpCore.createIncident(
+  'Suspicious Network Activity', 
+  'Unusual outbound traffic detected',
+  'NetworkIntrusion',  // category
+  'High'              // severity
+);
+
+// 2. Get incident details by ID
+const incident = secOpCore.getIncident(incidentId);
+const incidentData = JSON.parse(incident);
+
+// 3. Update incident status with timeline tracking
+const updated = secOpCore.updateIncidentStatus(
+  incidentId, 
+  'InProgress', 
+  'analyst.john'
+);
+
+// 4. Generate comprehensive security metrics
+const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+const endDate = new Date().toISOString();
+const metrics = secOpCore.generateSecurityMetrics(startDate, endDate);
+const metricsData = JSON.parse(metrics);
 ```
 
-#### Event Management
+#### Alert Management (3 methods)
 ```javascript
-// Process security event
-const securityEvent = {
-  id: "event-001",
-  timestamp: new Date().toISOString(),
-  source: "firewall",
-  event_type: "network_connection_blocked",
-  severity: "medium",
-  source_ip: "192.168.1.100",
-  destination_ip: "10.0.0.1",
-  port: 443,
-  protocol: "TCP",
-  action: "blocked",
-  metadata: {
-    rule_id: "FW-001",
-    rule_name: "Block Suspicious Traffic",
-    bytes_transferred: 1024
-  }
-};
+// 5. Create a new security alert
+const alertId = secOpCore.createAlert(
+  'Malware Detection',
+  'Potential malware on endpoint',
+  'Critical',        // priority
+  'Endpoint Agent'   // source
+);
 
-const processedEvent = secOpCore.processEvent(securityEvent);
-console.log(processedEvent);
-// {
-//   event_id: "event-001",
-//   normalized_event: {...},
-//   enrichment: {
-//     geolocation: {...},
-//     threat_intelligence: {...},
-//     asset_context: {...}
-//   },
-//   correlations: ["event-002", "event-003"],
-//   alert_generated: true,
-//   alert_id: "alert-001"
-// }
+// 6. Get alert details by ID
+const alert = secOpCore.getAlert(alertId);
+const alertData = JSON.parse(alert);
 
-// Query events
-const eventQuery = {
-  time_range: {
-    start: "2024-01-01T00:00:00Z",
-    end: "2024-01-01T23:59:59Z"
-  },
-  filters: {
-    source: "firewall",
-    severity: ["medium", "high", "critical"],
-    event_type: "network_connection_blocked"
-  },
-  limit: 100
-};
-
-const events = secOpCore.queryEvents(eventQuery);
+// 7. Update alert status and assignment
+const alertUpdated = secOpCore.updateAlertStatus(
+  alertId,
+  'Acknowledged',
+  'analyst.smith'    // assigned to
+);
 ```
 
-#### Alert Management
+#### Playbook Management (4 methods)
 ```javascript
-// Create alert
-const alert = {
-  id: "alert-001",
-  title: "Suspicious Network Activity Detected",
-  description: "Multiple blocked connections from suspicious IP",
-  severity: "high",
-  priority: 1,
-  source_events: ["event-001", "event-002", "event-003"],
-  assigned_to: null,
-  status: "open",
-  created_at: new Date().toISOString(),
-  sla_deadline: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(), // 4 hours
-  tags: ["network", "suspicious_activity", "firewall"],
-  metadata: {
-    affected_assets: ["firewall-01"],
-    threat_indicators: ["192.168.1.100"],
-    mitre_techniques: ["T1071.001"]
-  }
+// 8. Create a new response playbook
+const playbookId = secOpCore.createPlaybook(
+  'Malware Response',
+  'Automated malware containment and investigation',
+  'Incident Response'  // category
+);
+
+// 9. Get playbook details by ID
+const playbook = secOpCore.getPlaybook(playbookId);
+const playbookData = JSON.parse(playbook);
+
+// 10. Execute a playbook
+const executionId = secOpCore.executePlaybook(
+  playbookId,
+  'security.system',   // triggered by
+  'malware_detected'   // trigger event
+);
+
+// 11. Monitor playbook execution progress
+const execution = secOpCore.getPlaybookExecutionStatus(executionId);
+const executionData = JSON.parse(execution);
+```
+
+#### Task Management (3 methods)
+```javascript
+// 12. Create security investigation/response tasks
+const taskId = secOpCore.createTask(
+  'Investigate Malware Alert',
+  'Analyze the detected malware and determine scope',
+  'Investigation',  // task type
+  'High'           // priority
+);
+
+// 13. Get task details by ID
+const task = secOpCore.getTask(taskId);
+const taskData = JSON.parse(task);
+
+// 14. Update task status and progress
+const taskUpdated = secOpCore.updateTaskStatus(
+  taskId,
+  'InProgress',
+  'analyst.jones'
+);
+```
+
+#### Evidence Management (3 methods)
+```javascript
+// 15. Add evidence with metadata
+const evidenceId = secOpCore.addEvidence(
+  'Suspicious File Sample',
+  'Quarantined file from infected endpoint',
+  'FileSystem',      // evidence type
+  'endpoint-001',    // source
+  'security.analyst' // collected by
+);
+
+// 16. Get evidence details by ID
+const evidence = secOpCore.getEvidence(evidenceId);
+const evidenceData = JSON.parse(evidence);
+
+// 17. Track evidence handling history
+const chainOfCustody = secOpCore.getEvidenceChainOfCustody(evidenceId);
+const custodyData = JSON.parse(chainOfCustody);
+```
+
+#### Search & Analytics (3 methods)
+```javascript
+// 18. Advanced incident search with filters
+const incidents = secOpCore.searchIncidents(
+  'malware',     // query
+  'InProgress',  // status filter (optional)
+  'Critical'     // severity filter (optional)
+);
+const incidentResults = JSON.parse(incidents);
+
+// 19. Advanced alert search with filters
+const alerts = secOpCore.searchAlerts(
+  'suspicious',  // query
+  'High',        // priority filter (optional)
+  'Open'         // status filter (optional)
+);
+const alertResults = JSON.parse(alerts);
+
+// 20. Get all active alerts (open/acknowledged/in-progress)
+const activeAlerts = secOpCore.getActiveAlerts();
+const activeData = JSON.parse(activeAlerts);
+```
+
+#### Workflow Management (2 methods)
+```javascript
+// 21. Create automation workflows
+const workflowId = secOpCore.createWorkflow(
+  'Incident Response Automation',
+  'Automated incident response and escalation workflow',
+  'incident_created'  // trigger type
+);
+
+// 22. Execute workflows with context data
+const workflowContext = JSON.stringify({
+  incident_id: incidentId,
+  severity: 'High',
+  auto_escalate: true
+});
+const workflowExecutionId = secOpCore.executeWorkflow(workflowId, workflowContext);
+```
+
+### Status and Health Monitoring
+```javascript
+// Get comprehensive SOC status
+const socStatus = {
+  total_incidents: incidentResults.length,
+  total_alerts: alertResults.length,
+  active_alerts: activeData.length,
+  system_health: "operational",
+  last_updated: new Date().toISOString()
 };
-
-const createdAlert = secOpCore.createAlert(alert);
-
-// Update alert
+```
 const alertUpdate = {
   alert_id: "alert-001",
   assigned_to: "analyst1",

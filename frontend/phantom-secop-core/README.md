@@ -53,139 +53,138 @@ import SecOpCore from 'phantom-secop-core';
 const secOp = new SecOpCore();
 
 // Create a security incident
-const incident = secOp.createIncident({
-  title: 'Suspicious Network Activity',
-  description: 'Unusual outbound traffic detected',
-  category: IncidentCategory.NetworkIntrusion,
-  severity: IncidentSeverity.High,
-  status: IncidentStatus.New,
-  // ... other incident properties
-});
+const incidentId = secOp.createIncident(
+  'Suspicious Network Activity',
+  'Unusual outbound traffic detected',
+  'NetworkIntrusion',
+  'High'
+);
 
-// Create and correlate alerts
-const alert = secOp.createAlert({
-  title: 'Malware Detection',
-  description: 'Potential malware on endpoint',
-  priority: AlertPriority.Critical,
-  status: AlertStatus.Open,
-  // ... other alert properties
-});
+// Create and manage alerts
+const alertId = secOp.createAlert(
+  'Malware Detection',
+  'Potential malware on endpoint',
+  'Critical',
+  'Endpoint Detection'
+);
+
+// Update alert status
+secOp.updateAlertStatus(alertId, 'Acknowledged', 'john.doe');
 
 // Execute automated response playbook
-const execution = secOp.executePlaybook('malware-response-pb', incident.id);
+const playbookId = secOp.createPlaybook(
+  'Malware Response',
+  'Automated malware containment and investigation',
+  'Incident Response'
+);
+const executionId = secOp.executePlaybook(playbookId, 'system', 'malware_detected');
 
-// Generate security metrics
-const metrics = secOp.generateSecurityMetrics();
+// Create investigation tasks
+const taskId = secOp.createTask(
+  'Investigate Malware Alert',
+  'Analyze the detected malware and determine scope',
+  'Investigation',
+  'High'
+);
 
-// Create security dashboard
-const dashboard = secOp.generateSecurityDashboard();
+// Add evidence to investigation
+const evidenceId = secOp.addEvidence(
+  'Suspicious File Sample',
+  'Quarantined file from infected endpoint',
+  'FileSystem',
+  'endpoint-001',
+  'security.analyst'
+);
+
+// Generate comprehensive security metrics
+const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+const endDate = new Date().toISOString();
+const metrics = secOp.generateSecurityMetrics(startDate, endDate);
 ```
 
 ### Advanced Features
 
 ```typescript
-// Search incidents with filters
-const incidents = secOp.searchIncidents({
-  severity: IncidentSeverity.Critical,
-  status: IncidentStatus.Open,
-  category: IncidentCategory.DataBreach,
-  date_range: {
-    start: '2024-01-01',
-    end: '2024-12-31'
-  }
+// Search incidents with advanced filters
+const criticalIncidents = secOp.searchIncidents(
+  'malware', 
+  'InProgress', 
+  'Critical'
+);
+
+// Search alerts by criteria
+const highPriorityAlerts = secOp.searchAlerts(
+  'suspicious',
+  'High',
+  'Open'
+);
+
+// Get all active alerts (open, acknowledged, in progress)
+const activeAlerts = secOp.getActiveAlerts();
+
+// Create and execute workflows
+const workflowId = secOp.createWorkflow(
+  'Incident Response Automation',
+  'Automated incident response and escalation workflow',
+  'incident_created'
+);
+
+const workflowContext = JSON.stringify({
+  incident_id: incidentId,
+  severity: 'High',
+  auto_escalate: true
 });
+const workflowExecutionId = secOp.executeWorkflow(workflowId, workflowContext);
 
-// Correlate multiple alerts
-const correlation = secOp.correlateAlerts(['alert-1', 'alert-2', 'alert-3']);
+// Monitor playbook execution
+const executionStatus = secOp.getPlaybookExecutionStatus(executionId);
 
-// Create evidence chain
-const evidenceChain = secOp.createEvidenceChain(['evidence-1', 'evidence-2']);
+// Track evidence chain of custody
+const chainOfCustody = secOp.getEvidenceChainOfCustody(evidenceId);
 
-// Generate incident report
-const report = secOp.generateIncidentReport(incident.id);
-
-// Create automation rules
-const rule = secOp.createAutomationRule({
-  name: 'Auto-Escalate Critical Incidents',
-  description: 'Automatically escalate critical incidents',
-  enabled: true,
-  trigger_conditions: [
-    {
-      condition_type: 'severity',
-      field: 'severity',
-      operator: 'equals',
-      value: 'Critical',
-      case_sensitive: false
-    }
-  ],
-  actions: [
-    {
-      id: 'escalate-action',
-      name: 'Escalate Incident',
-      action_type: ActionType.Escalation,
-      description: 'Escalate to senior analyst',
-      order: 1,
-      required: true,
-      timeout_seconds: 300,
-      retry_count: 3,
-      parameters: {
-        escalation_level: '2',
-        notify_manager: 'true'
-      },
-      conditions: [],
-      on_success: [],
-      on_failure: []
-    }
-  ]
-});
+// Update task progress
+secOp.updateTaskStatus(taskId, 'InProgress', 'analyst.smith');
 ```
 
 ## API Reference
 
-### Core Methods
+The Phantom SecOp Core now provides **22 comprehensive NAPI methods** (4 original + 18 new business-ready modules):
 
-#### Incident Management
-- `createIncident(incident)` - Create a new security incident
-- `updateIncident(id, updates)` - Update an existing incident
-- `getIncident(id)` - Retrieve incident by ID
-- `getAllIncidents()` - Get all incidents
-- `searchIncidents(filters)` - Search incidents with filters
+### Core Incident Management (4 methods)
+- `createIncident(title, description, category, severity)` - Create a new security incident
+- `getIncident(id)` - Retrieve incident details by ID  
+- `updateIncidentStatus(id, status, actor)` - Update incident status with timeline tracking
+- `generateSecurityMetrics(startDate, endDate)` - Generate comprehensive security metrics
 
-#### Alert Management
-- `createAlert(alert)` - Create a new security alert
-- `updateAlert(id, updates)` - Update an existing alert
-- `getAlert(id)` - Retrieve alert by ID
-- `getAllAlerts()` - Get all alerts
-- `correlateAlerts(alertIds)` - Correlate multiple alerts
+### Alert Management (3 methods)
+- `createAlert(title, description, priority, source)` - Create a new security alert
+- `getAlert(id)` - Retrieve alert details by ID
+- `updateAlertStatus(id, status, assignedTo)` - Update alert status and assignment
 
-#### Playbook Management
-- `createPlaybook(playbook)` - Create a new response playbook
-- `executePlaybook(playbookId, incidentId)` - Execute a playbook
-- `getPlaybook(id)` - Retrieve playbook by ID
-- `getAllPlaybooks()` - Get all playbooks
+### Playbook Management (4 methods) 
+- `createPlaybook(name, description, category)` - Create a new response playbook
+- `getPlaybook(id)` - Retrieve playbook details by ID
+- `executePlaybook(playbookId, triggeredBy, triggerEvent)` - Execute a playbook
+- `getPlaybookExecutionStatus(executionId)` - Monitor playbook execution progress
 
-#### Task Management
-- `createTask(task)` - Create a new security task
-- `assignTask(taskId, assigneeId)` - Assign task to analyst
-- `updateTask(id, updates)` - Update task status
-- `getTask(id)` - Retrieve task by ID
-- `getAllTasks()` - Get all tasks
+### Task Management (3 methods)
+- `createTask(title, description, taskType, priority)` - Create security investigation/response tasks
+- `getTask(id)` - Retrieve task details by ID
+- `updateTaskStatus(id, status, actor)` - Update task status and progress
 
-#### Evidence Management
-- `addEvidence(evidence)` - Add new evidence
-- `createEvidenceChain(evidenceIds)` - Create evidence chain
-- `getEvidence(id)` - Retrieve evidence by ID
-- `getAllEvidence()` - Get all evidence
+### Evidence Management (3 methods)
+- `addEvidence(name, description, evidenceType, source, collectedBy)` - Add evidence with metadata
+- `getEvidence(id)` - Retrieve evidence details by ID
+- `getEvidenceChainOfCustody(id)` - Track evidence handling history
 
-#### Analytics & Reporting
-- `generateSecurityMetrics()` - Generate comprehensive security metrics
-- `generateIncidentReport(incidentId)` - Create detailed incident report
-- `generateSecurityDashboard()` - Create real-time security dashboard
+### Search & Analytics (3 methods)
+- `searchIncidents(query, status?, severity?)` - Advanced incident search with filters
+- `searchAlerts(query, priority?, status?)` - Advanced alert search with filters
+- `getActiveAlerts()` - Retrieve all open/acknowledged/in-progress alerts
 
-#### Automation & Integration
-- `createAutomationRule(rule)` - Create automation rule
-- `executeAutomationRule(ruleId, context)` - Execute automation rule
-- `createIntegration(integration)` - Create system integration
+### Workflow Management (2 methods)
+- `createWorkflow(name, description, triggerType)` - Create automation workflows
+- `executeWorkflow(workflowId, context)` - Execute workflows with context data
 
 ## Types and Enums
 
