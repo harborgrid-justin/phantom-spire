@@ -1,0 +1,18 @@
+{
+  "name": "workspace-4",
+  "version": "1.0.0",
+  "description": "CVE processing and vulnerability management workspace",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": ["cve", "vulnerability", "security", "threat-intelligence"],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "phantom-cve-core": "file:./phantom-cve-core",
+    "sqlite3": "^5.1.6"
+  }
+}

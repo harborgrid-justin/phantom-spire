@@ -1,0 +1,24 @@
+{
+  "name": "sandbox",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test --workspaces",
+    "lint": "eslint .",
+    "start:workspace-2": "node packages/workspace-2/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  },
+  "dependencies": {
+    "phantom-cve-core": "file:packages/workspace-4/phantom-cve-core"
+  }
+}

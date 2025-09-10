@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --target x86_64-pc-windows-msvc",
+    "build": "napi build --platform --release",
     "build:debug": "napi build --platform",
     "clean": "rimraf dist",
     "prepublishOnly": "napi prepublish -t npm",
