@@ -48,6 +48,66 @@ export class ThreatActorCore {
   ];
 
   /**
+   * Static constructor to align with API usage
+   */
+  static async new(): Promise<ThreatActorCore> {
+    return new ThreatActorCore();
+  }
+
+  /**
+   * Analyze threat actor from indicators (API-compatible method)
+   */
+  async analyze_threat_actor(indicators: string[]): Promise<ThreatActor> {
+    return this.analyzeThreatActor(indicators);
+  }
+
+  /**
+   * Perform attribution analysis (API-compatible method)
+   */
+  async perform_attribution(indicators: string[]): Promise<AttributionAnalysis> {
+    return this.performAttribution(indicators);
+  }
+
+  /**
+   * Track campaign activities (API-compatible method)
+   */
+  async track_campaign(campaignIndicators: string[]): Promise<Campaign> {
+    return this.trackCampaign(campaignIndicators);
+  }
+
+  /**
+   * Analyze behavioral patterns (API-compatible method)
+   */
+  async analyze_behavior(actorId: string, activities: string[]): Promise<BehavioralAnalysis> {
+    return this.analyzeBehavior(actorId, activities);
+  }
+
+  /**
+   * Get threat actor reputation (API-compatible method)
+   */
+  async get_reputation(actorId: string): Promise<number> {
+    return this.getReputation(actorId);
+  }
+
+  /**
+   * Search threat actors by criteria (API-compatible method)
+   */
+  async search_actors(criteria: ThreatActorSearchCriteria): Promise<ThreatActor[]> {
+    return this.searchActors(criteria);
+  }
+
+  /**
+   * Get health status (API-compatible method)
+   */
+  async get_health_status(): Promise<{ status: string; timestamp: Date; version: string }> {
+    return {
+      status: 'operational',
+      timestamp: new Date(),
+      version: '2.1.0'
+    };
+  }
+
+  /**
    * Analyze threat actor from indicators
    */
   async analyzeThreatActor(indicators: string[]): Promise<ThreatActor> {
