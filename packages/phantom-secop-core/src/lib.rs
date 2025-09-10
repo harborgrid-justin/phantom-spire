@@ -21,6 +21,14 @@ use indexmap::IndexMap;
 pub mod datastore;
 pub mod stores;
 
+// Unified data layer interface and implementation
+pub mod unified;
+pub mod secop_unified_store;
+
+// Re-export unified data layer interface
+pub use unified::*;
+pub use secop_unified_store::SecOpUnifiedDataStore;
+
 // Test module
 #[cfg(test)]
 mod tests;
