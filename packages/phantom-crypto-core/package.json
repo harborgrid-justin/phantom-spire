@@ -1,7 +1,7 @@
 {
   "name": "phantom-crypto-core",
   "version": "1.0.0",
-  "description": "Advanced cryptographic core with secure authentication, JWT processing, and high-performance random generation",
+  "description": "Cryptographic analysis and security assessment core with algorithm validation and key management",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -14,21 +14,23 @@
     "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
   },
   "napi": {
-    "binaryName": "phantom-crypto-core",
-    "targets": [
-      "x86_64-pc-windows-msvc",
-      "x86_64-apple-darwin",
-      "x86_64-unknown-linux-gnu",
-      "aarch64-apple-darwin",
-      "aarch64-unknown-linux-gnu"
-    ]
+    "name": "phantom-crypto-core",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
   },
   "files": [
     "index.js",
     "index.d.ts",
     "*.node",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "artifacts": "napi artifacts",
@@ -44,10 +46,11 @@
   },
   "keywords": [
     "cryptography",
-    "authentication",
-    "jwt",
-    "argon2",
-    "chacha",
+    "encryption",
+    "security-assessment",
+    "key-management",
+    "algorithms",
+    "cybersecurity",
     "phantom-spire",
     "napi",
     "rust",

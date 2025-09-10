@@ -69,13 +69,24 @@ src/
 ### Packages Structure (`/packages`)
 ```
 packages/
+├── phantom-attribution-core/    # Threat attribution and actor profiling
+├── phantom-compliance-core/     # Compliance and regulatory framework analysis  
+├── phantom-crypto-core/         # Cryptographic analysis and security assessment
 ├── phantom-cve-core/           # CVE processing and vulnerability intelligence
+├── phantom-feeds-core/         # Threat intelligence feeds processing and aggregation
+├── phantom-forensics-core/     # Digital forensics and incident analysis
+├── phantom-hunting-core/       # Threat hunting and proactive defense
 ├── phantom-incident-response-core/ # Incident response and forensic analysis
 ├── phantom-intel-core/         # Threat intelligence gathering and correlation
 ├── phantom-ioc-core/           # IOC processing and indicator analysis
+├── phantom-malware-core/       # Malware analysis and classification
 ├── phantom-mitre-core/         # MITRE ATT&CK framework integration
+├── phantom-reputation-core/    # IP and domain reputation analysis
+├── phantom-risk-core/          # Risk assessment and vulnerability prioritization
+├── phantom-sandbox-core/       # Automated malware sandboxing and behavioral analysis
 ├── phantom-secop-core/         # Security operations and automation
 ├── phantom-threat-actor-core/  # Threat actor attribution and analysis
+├── phantom-vulnerability-core/ # Vulnerability assessment and management
 └── phantom-xdr-core/           # Extended detection and response
 ```
 
@@ -311,9 +322,12 @@ Each package can be installed independently via npm:
 npm install phantom-cve-core
 npm install phantom-intel-core
 npm install phantom-xdr-core
+npm install phantom-malware-core
+npm install phantom-forensics-core
 
 # Or install multiple packages
 npm install phantom-cve-core phantom-intel-core phantom-mitre-core
+npm install phantom-attribution-core phantom-hunting-core phantom-sandbox-core
 ```
 
 ### Package Usage
@@ -322,11 +336,17 @@ npm install phantom-cve-core phantom-intel-core phantom-mitre-core
 const cveCore = require('phantom-cve-core');
 const intelCore = require('phantom-intel-core');
 const xdrCore = require('phantom-xdr-core');
+const malwareCore = require('phantom-malware-core');
+const forensicsCore = require('phantom-forensics-core');
+const sandboxCore = require('phantom-sandbox-core');
 
 // Each package provides its own API
 const cveResults = cveCore.searchCVEs({ severity: 'critical' });
 const threatIntel = intelCore.correlateIndicators(indicators);
 const xdrAnalysis = xdrCore.detectThreats(logs);
+const malwareAnalysis = malwareCore.analyzeSample(fileBuffer);
+const forensicsReport = forensicsCore.investigateIncident(evidence);
+const sandboxResults = sandboxCore.executeSample(malwareFile);
 ```
 
 ### Monorepo Management

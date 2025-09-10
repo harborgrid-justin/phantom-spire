@@ -1,7 +1,7 @@
 {
   "name": "phantom-hunting-core",
   "version": "1.0.0",
-  "description": "Threat hunting and proactive detection core",
+  "description": "Threat hunting and proactive defense core with behavioral analytics and anomaly detection",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -44,7 +44,17 @@
     "lint": "cargo clippy",
     "fmt": "cargo fmt"
   },
-  "keywords": ["threat-hunting", "detection", "proactive", "monitoring", "phantom-spire", "napi", "rust", "security"],
+  "keywords": [
+    "threat-hunting",
+    "proactive-defense",
+    "behavioral-analytics",
+    "anomaly-detection",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "engines": {
@@ -54,10 +64,6 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0",
     "rimraf": "^5.0.0"
-  },
-  "dependencies": {
-    "semver": "^7.5.0",
-    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "access": "public"

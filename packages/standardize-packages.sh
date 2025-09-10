@@ -4,6 +4,7 @@
 
 # Plugin configurations: name, description, extra_keywords
 declare -A PLUGINS=(
+    # Already standardized packages (keeping for consistency)
     ["phantom-incident-response-core"]="Advanced incident response management system with comprehensive forensic analysis, response automation, and recovery coordination capabilities|incident-response,forensics,security-automation,incident-management"
     ["phantom-intel-core"]="Advanced threat intelligence core with comprehensive intelligence gathering, analysis, and correlation engine|threat-intelligence,indicators,threat-actors,campaigns,intelligence-feeds"
     ["phantom-ioc-core"]="Advanced IOC processing core with threat intelligence and indicator correlation|ioc,indicators,threat-intelligence"
@@ -11,6 +12,20 @@ declare -A PLUGINS=(
     ["phantom-secop-core"]="Advanced Security Operations (SecOps) engine for comprehensive incident response, automation, and security orchestration|secops,incident-response,security-automation,security-orchestration"
     ["phantom-threat-actor-core"]="Advanced threat actor intelligence and analysis system with comprehensive attribution capabilities|threat-actor,attribution,apt,behavioral-analysis,campaign-tracking"
     ["phantom-xdr-core"]="Advanced XDR (Extended Detection and Response) core with threat detection, behavioral analytics, and automated response capabilities|xdr,threat-detection,behavioral-analytics,automated-response"
+    ["phantom-cve-core"]="Advanced CVE processing core with vulnerability intelligence and threat analysis|cve,vulnerability,threat-intelligence,security-advisories"
+    
+    # New packages requiring standardization
+    ["phantom-attribution-core"]="Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking|attribution,threat-actors,profiling,intelligence,behavioral-analysis"
+    ["phantom-compliance-core"]="Compliance and regulatory framework analysis core with automated audit and reporting capabilities|compliance,regulatory,frameworks,audit,reporting"
+    ["phantom-crypto-core"]="Cryptographic analysis and security assessment core with algorithm validation and key management|cryptography,encryption,security-assessment,key-management,algorithms"
+    ["phantom-feeds-core"]="Threat intelligence feeds processing and aggregation core with real-time data correlation|threat-feeds,intelligence-feeds,data-aggregation,real-time,correlation"
+    ["phantom-forensics-core"]="Digital forensics and incident analysis core with evidence collection and timeline reconstruction|digital-forensics,incident-analysis,evidence-collection,timeline-reconstruction"
+    ["phantom-hunting-core"]="Threat hunting and proactive defense core with behavioral analytics and anomaly detection|threat-hunting,proactive-defense,behavioral-analytics,anomaly-detection"
+    ["phantom-malware-core"]="Malware analysis and classification core with dynamic and static analysis capabilities|malware-analysis,classification,dynamic-analysis,static-analysis,reverse-engineering"
+    ["phantom-reputation-core"]="IP and domain reputation analysis core with threat scoring and blacklist management|reputation-analysis,threat-scoring,blacklist,ip-reputation,domain-reputation"
+    ["phantom-risk-core"]="Risk assessment and vulnerability prioritization core with business impact analysis|risk-assessment,vulnerability-prioritization,business-impact,security-metrics"
+    ["phantom-sandbox-core"]="Automated malware sandboxing and behavioral analysis core with dynamic execution environments|sandboxing,malware-sandbox,behavioral-analysis,dynamic-execution,automation"
+    ["phantom-vulnerability-core"]="Vulnerability assessment and management core with automated scanning and remediation guidance|vulnerability-assessment,vulnerability-management,scanning,remediation,patch-management"
 )
 
 cd "$(dirname "$0")"

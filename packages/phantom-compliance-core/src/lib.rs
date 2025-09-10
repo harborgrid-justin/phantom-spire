@@ -1,12 +1,11 @@
 // phantom-compliance-core/src/lib.rs
 // Compliance and regulatory framework analysis library
 
-use napi::bindgen_prelude::*;
+use napi::bindgen_prelude::Result as NapiResult;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ComplianceFramework {
@@ -103,7 +102,7 @@ impl ComplianceCore {
 
         let mut findings = Vec::new();
         for requirement in &framework.requirements {
-            let status = if controls.get(&requirement.id).unwrap_or(&false) {
+            let status = if *controls.get(&requirement.id).unwrap_or(&false) {
                 ComplianceStatus::Compliant
             } else {
                 ComplianceStatus::NonCompliant
@@ -137,14 +136,14 @@ pub struct ComplianceCoreNapi {
 #[napi]
 impl ComplianceCoreNapi {
     #[napi(constructor)]
-    pub fn new() -> Result<Self> {
+    pub fn new() -> NapiResult<Self> {
         let core = ComplianceCore::new()
             .map_err(|e| napi::Error::from_reason(format!("Failed to create Compliance Core: {}", e)))?;
         Ok(ComplianceCoreNapi { inner: core })
     }
 
     #[napi]
-    pub fn assess_compliance(&self, framework_id: String, controls_json: String) -> Result<String> {
+    pub fn assess_compliance(&self, framework_id: String, controls_json: String) -> NapiResult<String> {
         let controls: HashMap<String, bool> = serde_json::from_str(&controls_json)
             .map_err(|e| napi::Error::from_reason(format!("Failed to parse controls: {}", e)))?;
 
@@ -156,7 +155,7 @@ impl ComplianceCoreNapi {
     }
 
     #[napi]
-    pub fn get_health_status(&self) -> Result<String> {
+    pub fn get_health_status(&self) -> NapiResult<String> {
         let status = serde_json::json!({
             "status": "healthy",
             "timestamp": chrono::Utc::now().to_rfc3339(),
