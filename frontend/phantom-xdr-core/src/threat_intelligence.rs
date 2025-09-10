@@ -492,7 +492,7 @@ impl ThreatIntelligenceTrait for ThreatIntelligence {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0, // Would need to track actual uptime
-            processed_events: processed_indicators,
+            processed_events: processed_indicators as i64,
             active_alerts: feed_update_errors,
             last_error,
         }

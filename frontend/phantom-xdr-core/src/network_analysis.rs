@@ -54,7 +54,7 @@ impl NetworkAnalyzerTrait for NetworkAnalyzer {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events: processed_packets,
+            processed_events: processed_packets as i64,
             active_alerts: suspicious_traffic,
             last_error,
         }

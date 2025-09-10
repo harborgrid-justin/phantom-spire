@@ -54,7 +54,7 @@ impl MLEngineTrait for MLEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events: processed_predictions,
+            processed_events: processed_predictions as i64,
             active_alerts: false_positives,
             last_error,
         }

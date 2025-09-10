@@ -48,7 +48,7 @@ impl CorrelationEngineTrait for CorrelationEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events,
+            processed_events: processed_events as i64,
             active_alerts: active_correlations,
             last_error,
         }

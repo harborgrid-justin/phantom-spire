@@ -47,7 +47,7 @@ impl RiskAssessmentEngineTrait for RiskAssessmentEngine {
             risk_factors,
             recommendations,
             confidence: 0.8,
-            timestamp: Utc::now(),
+            timestamp: Utc::now().timestamp(),
         }
     }
 
@@ -59,7 +59,7 @@ impl RiskAssessmentEngineTrait for RiskAssessmentEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events: processed_assessments,
+            processed_events: processed_assessments as i64,
             active_alerts: high_risk_entities,
             last_error,
         }

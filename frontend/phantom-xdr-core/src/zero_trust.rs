@@ -299,7 +299,8 @@ impl ZeroTrustEngine {
         }
 
         // Time-based risk (unusual hours)
-        let hour = request.timestamp.hour();
+        let datetime = DateTime::from_timestamp(request.timestamp, 0).unwrap_or_else(|| Utc::now());
+        let hour = datetime.hour();
         if hour < 6 || hour > 22 {
             risk_score += 1.0;
         }
@@ -518,9 +519,10 @@ impl ZeroTrustEngine {
         // Risk factors
         data.insert("risk_factors".to_string(), serde_json::to_value(&request.context.risk_factors).unwrap());
 
-        // Derived fields
-        data.insert("is_business_hours".to_string(), serde_json::Value::Bool((9..=17).contains(&request.timestamp.hour())));
-        data.insert("is_weekend".to_string(), serde_json::Value::Bool(request.timestamp.weekday().number_from_monday() >= 6));
+        // Derived fields - convert timestamp to DateTime for analysis
+        let datetime = DateTime::from_timestamp(request.timestamp, 0).unwrap_or_else(|| Utc::now());
+        data.insert("is_business_hours".to_string(), serde_json::Value::Bool((9..=17).contains(&datetime.hour())));
+        data.insert("is_weekend".to_string(), serde_json::Value::Bool(datetime.weekday().number_from_monday() >= 6));
 
         data
     }
@@ -578,7 +580,7 @@ impl ZeroTrustEngineTrait for ZeroTrustEngine {
             confidence: (10.0 - risk_score) / 10.0, // Higher confidence for lower risk
             reason,
             additional_checks: matched_policies,
-            timestamp: Utc::now(),
+            timestamp: Utc::now().timestamp(),
         }
     }
 
@@ -596,7 +598,7 @@ impl ZeroTrustEngineTrait for ZeroTrustEngine {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0, // Would need to track actual uptime
-            processed_events: processed_requests,
+            processed_events: processed_requests as i64,
             active_alerts: active_challenges,
             last_error,
         }

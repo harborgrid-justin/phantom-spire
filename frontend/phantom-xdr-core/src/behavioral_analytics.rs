@@ -75,7 +75,7 @@ impl BehavioralAnalyticsTrait for BehavioralAnalytics {
         ComponentStatus {
             status: "operational".to_string(),
             uptime: 0,
-            processed_events: processed_activities,
+            processed_events: processed_activities as i64,
             active_alerts: anomalies_detected,
             last_error,
         }
