@@ -48,6 +48,9 @@ import {
   SharingGroup
 } from './types';
 
+// Export Business SaaS Extension
+export * from './business-saas/index.js';
+
 /**
  * Core Threat Intelligence engine for comprehensive intelligence gathering,
  * analysis, and correlation

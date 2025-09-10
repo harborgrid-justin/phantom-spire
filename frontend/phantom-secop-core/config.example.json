@@ -1,0 +1,9 @@
+{
+  "redis_url": "redis://localhost:6379",
+  "postgres_url": "postgresql://postgres:phantom_secure_pass@localhost:5432/phantom_spire",
+  "mongodb_url": "mongodb://admin:phantom_secure_pass@localhost:27017/phantom-spire?authSource=admin",
+  "elasticsearch_url": "http://localhost:9200",
+  "default_store": "Hybrid",
+  "cache_enabled": true,
+  "connection_pool_size": 10
+}

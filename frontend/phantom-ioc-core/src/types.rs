@@ -147,6 +147,200 @@ pub struct ComponentHealth {
     pub metrics: HashMap<String, f64>,
 }
 
+/// IOC Processor for analysis and processing
+#[derive(Debug, Clone)]
+pub struct IOCProcessor {
+    pub id: String,
+    pub name: String,
+    pub version: String,
+}
+
+impl IOCProcessor {
+    pub fn new(name: String) -> Self {
+        Self {
+            id: Uuid::new_v4().to_string(),
+            name,
+            version: "1.0.0".to_string(),
+        }
+    }
+}
+
+/// IOC Context Relationship for linking related indicators
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IOCContextRelationship {
+    pub source_ioc: String,
+    pub target_ioc: String,
+    pub relationship_type: String,
+    pub strength: f64,
+    pub timestamp: DateTime<Utc>,
+}
+
+/// Temporal Context for time-based analysis
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TemporalContext {
+    pub first_seen: DateTime<Utc>,
+    pub last_seen: DateTime<Utc>,
+    pub frequency: u32,
+    pub time_patterns: Vec<String>,
+}
+
+/// Behavioral Context for behavior analysis
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BehavioralContext {
+    pub behaviors: Vec<String>,
+    pub anomaly_score: f64,
+    pub baseline_deviation: f64,
+    pub patterns: Vec<String>,
+}
+
+/// Network Context for network-related indicators
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkContext {
+    pub connections: Vec<NetworkConnection>,
+    pub protocols: Vec<String>,
+    pub geolocation: Option<String>,
+    pub asn_info: Option<String>,
+}
+
+/// Network Connection details
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NetworkConnection {
+    pub source_ip: String,
+    pub dest_ip: String,
+    pub port: u16,
+    pub protocol: String,
+    pub timestamp: DateTime<Utc>,
+}
+
+/// Threat Actor Context for attribution
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ThreatActorContext {
+    pub actors: Vec<String>,
+    pub campaigns: Vec<String>,
+    pub techniques: Vec<String>,
+    pub confidence: f64,
+}
+
+/// Enrichment Source for data enrichment
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EnrichmentSource {
+    pub name: String,
+    pub url: String,
+    pub api_key: Option<String>,
+    pub priority: u8,
+}
+
+/// Enriched IOC with additional data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EnrichedIOC {
+    pub base_ioc: IOC,
+    pub enrichment_data: HashMap<String, serde_json::Value>,
+    pub sources: Vec<String>,
+    pub enrichment_timestamp: DateTime<Utc>,
+}
+
+/// Export formats for data export
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ExportFormat {
+    Json,
+    Csv,
+    Xml,
+    Stix,
+    Misp,
+    Yara,
+    Sigma,
+}
+
+/// Export Template for customizing exports
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExportTemplate {
+    pub name: String,
+    pub format: ExportFormat,
+    pub fields: Vec<String>,
+    pub filters: HashMap<String, String>,
+}
+
+/// Export Record for individual export items
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExportRecord {
+    pub id: String,
+    pub data: HashMap<String, serde_json::Value>,
+    pub timestamp: DateTime<Utc>,
+}
+
+/// Export Result containing export information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExportResult {
+    pub export_id: String,
+    pub format: ExportFormat,
+    pub record_count: usize,
+    pub file_path: Option<String>,
+    pub timestamp: DateTime<Utc>,
+}
+
+/// Priority levels for operations
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Priority {
+    Info,
+    Low,
+    Medium,
+    High,
+    Critical,
+}
+
+/// Reputation categories for indicators
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ReputationCategory {
+    Trusted,
+    Good,
+    Neutral,
+    Suspicious,
+    Malicious,
+}
+
+/// Alias for IOCType to maintain compatibility
+pub type IndicatorType = IOCType;
+
+/// Processing status for operations
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum ProcessingStatus {
+    Pending,
+    InProgress,
+    Completed,
+    Failed,
+    Cancelled,
+}
+
+/// Alert status for incidents
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum AlertStatus {
+    New,
+    InProgress,
+    Resolved,
+    Closed,
+    Suppressed,
+}
+
+/// Incident status tracking
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum IncidentStatus {
+    Open,
+    InProgress,
+    Resolved,
+    Closed,
+    Escalated,
+}
+
+/// Task status for workflow management
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum TaskStatus {
+    Created,
+    Assigned,
+    InProgress,
+    Completed,
+    Cancelled,
+}
+
 /// Custom error type for IOC operations
 #[derive(Debug, thiserror::Error)]
 pub enum IOCError {
