@@ -36,5 +36,11 @@ elasticsearch = { version = "8.5.0-alpha.1", features = ["rustls-tls"] }
 async-trait = "0.1"
 futures = "0.3"
 
+# High-performance serialization and precision math for financial calculations
+rust_decimal = { version = "1.33", features = ["serde"] }
+bincode = "1.3"
+rmp-serde = "1.1"
+time = { version = "0.3", features = ["macros", "serde", "parsing", "formatting"] }
+
 [build-dependencies]
 napi-build = "2.1.0"

@@ -30,5 +30,10 @@ aes-gcm = "0.10"
 x25519-dalek = "2.0"
 ed25519-dalek = "2.1"
 
+# Additional high-performance crates
+ring = "0.17"
+time = { version = "0.3", features = ["macros", "serde", "parsing", "formatting"] }
+hex = "0.4"
+
 [build-dependencies]
 napi-build = "2.1.0"
