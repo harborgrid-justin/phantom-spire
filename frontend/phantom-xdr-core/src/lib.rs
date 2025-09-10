@@ -21,6 +21,11 @@ mod email_security;
 mod endpoint_protection;
 mod forensics_investigation;
 mod identity_access_management;
+mod incident_response;
+mod malware_analysis;
+mod network_segmentation;
+mod security_orchestration;
+mod vulnerability_scanning;
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
@@ -48,6 +53,11 @@ use crate::email_security::{EmailSecurityGateway, EmailSecurityTrait};
 use crate::endpoint_protection::{EndpointProtectionPlatform, EndpointProtectionTrait};
 use crate::forensics_investigation::{ForensicsInvestigationEngine, ForensicsInvestigationTrait};
 use crate::identity_access_management::{IdentityAccessManagementEngine, IdentityAccessManagementTrait};
+use crate::incident_response::{IncidentResponseOrchestrator, IncidentResponseTrait};
+use crate::malware_analysis::{MalwareAnalysisSandbox, MalwareAnalysisTrait};
+use crate::network_segmentation::{NetworkSegmentationController, NetworkSegmentationTrait};
+use crate::security_orchestration::{SecurityOrchestrationEngine, SecurityOrchestrationTrait};
+use crate::vulnerability_scanning::{VulnerabilityScanningEngine, VulnerabilityScanningTrait};
 
 // Global XDR Engine instance
 static XDR_ENGINE: Lazy<Arc<RwLock<XdrEngine>>> = Lazy::new(|| {
@@ -74,6 +84,11 @@ pub struct XdrEngine {
     endpoint_protection_platform: endpoint_protection::EndpointProtectionPlatform,
     forensics_investigation_engine: forensics_investigation::ForensicsInvestigationEngine,
     identity_access_management_engine: identity_access_management::IdentityAccessManagementEngine,
+    incident_response_orchestrator: incident_response::IncidentResponseOrchestrator,
+    malware_analysis_sandbox: malware_analysis::MalwareAnalysisSandbox,
+    network_segmentation_controller: network_segmentation::NetworkSegmentationController,
+    security_orchestration_engine: security_orchestration::SecurityOrchestrationEngine,
+    vulnerability_scanning_engine: vulnerability_scanning::VulnerabilityScanningEngine,
 }
 
 impl XdrEngine {
@@ -97,6 +112,11 @@ impl XdrEngine {
             endpoint_protection_platform: endpoint_protection::EndpointProtectionPlatform::new(),
             forensics_investigation_engine: forensics_investigation::ForensicsInvestigationEngine::new(),
             identity_access_management_engine: identity_access_management::IdentityAccessManagementEngine::new(),
+            incident_response_orchestrator: incident_response::IncidentResponseOrchestrator::new(),
+            malware_analysis_sandbox: malware_analysis::MalwareAnalysisSandbox::new(),
+            network_segmentation_controller: network_segmentation::NetworkSegmentationController::new(),
+            security_orchestration_engine: security_orchestration::SecurityOrchestrationEngine::new(),
+            vulnerability_scanning_engine: vulnerability_scanning::VulnerabilityScanningEngine::new(),
         }
     }
 }
