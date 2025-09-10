@@ -1,3 +1,3 @@
 fn main() {
-  napi_build::setup();
+    println!("cargo:rustc-link-search=C:\\Program Files\\nodejs");
 }

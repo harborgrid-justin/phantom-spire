@@ -21,22 +21,34 @@ Phantom Risk Core is a production-ready, comprehensive risk assessment and manag
 - **Asset Risk Scoring** - Business asset risk evaluation
 - **Operational Risk** - Process and operational risk analysis
 - **Compliance Risk** - Regulatory compliance risk assessment
+- **Third-Party / Vendor Risk Management (VRM)** - End-to-end supply chain risk management.
 
 ### 📊 Advanced Risk Modeling
 
 - **Monte Carlo Simulation** - Statistical risk modeling
 - **Scenario Analysis** - What-if risk scenarios
 - **Attack Path Modeling** - Multi-stage attack risk
-- **Business Impact Analysis** - Quantitative impact assessment
-- **Risk Aggregation** - Portfolio-level risk calculation
+- **Business Impact Analysis (BIA)** - Quantitative impact assessment
+- **Risk Aggregation & Portfolio Analysis** - Enterprise-wide risk portfolio management.
+- **Bowtie Risk Analysis** - Intuitive visualization of risk causes, events, and consequences.
 
-### 🔗 Risk Intelligence
+### 🔗 Risk Intelligence & Automation
 
+- **AI-Powered Risk Forecasting** - Predictive analytics for future risk trends.
 - **Predictive Risk Analytics** - AI-powered risk prediction
 - **Risk Correlation** - Cross-functional risk relationships
 - **Threat Landscape Analysis** - Industry threat risk trends
 - **Risk Benchmarking** - Peer comparison risk metrics
 - **Dynamic Risk Adjustment** - Real-time risk recalculation
+- **Loss Event Data Integration** - Calibrate models with historical loss data.
+- **Geopolitical Risk Integration** - Factor country-level risks into assessments.
+
+### 🛡️ Governance & Compliance
+
+- **Continuous Controls Monitoring (CCM)** - Real-time security control effectiveness tracking.
+- **Risk Treatment Workflow Automation** - Automated lifecycle management for risk mitigation tasks.
+- **Key Risk Indicator (KRI) Framework** - Define, monitor, and alert on KRIs against risk appetite.
+- **Control Gap Analysis Engine** - Automatically identify gaps in the control environment.
 
 ## API Reference
 
@@ -199,6 +211,90 @@ const mitigationRequest = {
 
 const mitigationResult = riskCore.planMitigation(JSON.stringify(mitigationRequest));
 const mitigationPlan = JSON.parse(mitigationResult);
+```
+
+### New Competitive Features API
+
+#### AI-Powered Risk Forecasting
+```javascript
+// Forecast future risk scores and trends
+const forecastRequest = {
+  forecast_id: "forecast-q1-2025",
+  time_horizon_months: 6,
+  risk_categories: ["cyber_threats", "operational"],
+  historical_data_points: 24, // months
+  external_factors: ["threat_intel_trends", "market_volatility"]
+};
+const forecastResult = riskCore.forecastRisk(JSON.stringify(forecastRequest));
+const forecast = JSON.parse(forecastResult);
+```
+
+#### Continuous Controls Monitoring
+```javascript
+// Configure and check continuous controls monitoring
+const ccmRequest = {
+  control_id: "CCM-VULN-SCAN-01",
+  control_name: "Daily Vulnerability Scanning",
+  data_source: {
+    type: "api",
+    endpoint: "https://api.scanner.com/v1/results",
+    auth_token: "..."
+  },
+  assessment_criteria: {
+    metric: "critical_vulnerabilities",
+    operator: "less_than",
+    threshold: 10
+  }
+};
+const ccmStatus = riskCore.monitorControl(JSON.stringify(ccmRequest));
+const status = JSON.parse(ccmStatus);
+```
+
+#### Vendor Risk Management
+```javascript
+// Assess a third-party vendor
+const vrmRequest = {
+  vendor_id: "vendor-123",
+  vendor_name: "Example Cloud Services Inc.",
+  assessment_type: "onboarding",
+  questionnaire_id: "SIG-LITE-2024",
+  scope: "PaaS for customer data processing"
+};
+const vrmResult = riskCore.assessVendorRisk(JSON.stringify(vrmRequest));
+const vendorRisk = JSON.parse(vrmResult);
+```
+
+#### Key Risk Indicators (KRI)
+```javascript
+// Define and monitor a Key Risk Indicator
+const kriRequest = {
+  kri_id: "KRI-PHISHING-01",
+  name: "Successful Phishing Attempts per Month",
+  risk_category: "cyber_threats",
+  metric_source: "siem_api",
+  thresholds: {
+    green: 5,
+    amber: 10,
+    red: 15
+  }
+};
+const kriStatus = riskCore.monitorKRI(JSON.stringify(kriRequest));
+const kri = JSON.parse(kriStatus);
+```
+
+#### Bowtie Analysis
+```javascript
+// Create a Bowtie risk model
+const bowtieRequest = {
+  bowtie_id: "BOWTIE-RANSOMWARE-01",
+  risk_event: "Ransomware encrypts critical servers",
+  threats_causes: ["Phishing email", "Unpatched vulnerability"],
+  preventive_controls: ["Email filtering", "Vulnerability management"],
+  consequences: ["Data loss", "Financial impact", "Reputational damage"],
+  recovery_controls: ["Backup and restore", "Incident response plan"]
+};
+const bowtieModel = riskCore.createBowtieModel(JSON.stringify(bowtieRequest));
+const model = JSON.parse(bowtieModel);
 ```
 
 ## Data Models
