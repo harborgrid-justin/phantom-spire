@@ -382,15 +382,15 @@ impl IncidentStore for ElasticsearchDataStoreManager {
         if let Ok(client) = self.get_client() {
             let mut filters = Vec::new();
             
-            if let Some(status) = status {
-                let status_str = serde_json::to_string(&status).unwrap_or_default().trim_matches('"').to_string();
+            if let Some(ref status) = status {
+                let status_str = serde_json::to_string(status).unwrap_or_default().trim_matches('"').to_string();
                 filters.push(json!({
                     "term": { "status": status_str }
                 }));
             }
             
-            if let Some(severity) = severity {
-                let severity_str = serde_json::to_string(&severity).unwrap_or_default().trim_matches('"').to_string();
+            if let Some(ref severity) = severity {
+                let severity_str = serde_json::to_string(severity).unwrap_or_default().trim_matches('"').to_string();
                 filters.push(json!({
                     "term": { "severity": severity_str }
                 }));

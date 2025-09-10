@@ -6,7 +6,7 @@
 use crate::datastore::*;
 use crate::*;
 use async_trait::async_trait;
-use redis::{Client, Connection, Commands, AsyncCommands};
+use redis::{Client, AsyncCommands};
 use redis::aio::ConnectionManager;
 use std::sync::Arc;
 use tokio::sync::RwLock;

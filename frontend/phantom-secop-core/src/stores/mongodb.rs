@@ -257,12 +257,12 @@ impl IncidentStore for MongoDBDataStoreManager {
             
             let mut filter = doc! {};
             
-            if let Some(status) = status {
-                filter.insert("status", serde_json::to_string(&status).unwrap_or_default());
+            if let Some(ref status) = status {
+                filter.insert("status", serde_json::to_string(status).unwrap_or_default());
             }
             
-            if let Some(severity) = severity {
-                filter.insert("severity", serde_json::to_string(&severity).unwrap_or_default());
+            if let Some(ref severity) = severity {
+                filter.insert("severity", serde_json::to_string(severity).unwrap_or_default());
             }
             
             match collection.find(filter, None).await {

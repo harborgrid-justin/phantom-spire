@@ -31,7 +31,7 @@ impl PostgreSQLDataStoreManager {
         })
     }
     
-    async fn get_pool(&self) -> Result<&Pool> {
+    fn get_pool(&self) -> Result<&Pool> {
         self.pool.as_ref().ok_or_else(|| anyhow!("PostgreSQL pool not initialized"))
     }
     

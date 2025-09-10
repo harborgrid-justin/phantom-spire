@@ -21,6 +21,10 @@ use indexmap::IndexMap;
 pub mod datastore;
 pub mod stores;
 
+// Test module
+#[cfg(test)]
+mod tests;
+
 /// Incident severity levels
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum IncidentSeverity {
@@ -605,8 +609,11 @@ impl SecOpCore {
     }
     
     /// Create a new SecOp Core instance with configurable data store
-    pub async fn new_with_config(config: datastore::DataStoreConfig) -> Result<Self, Box<dyn std::error::Error + Send + Sync>> {
-        let data_store = datastore::DataStoreFactory::create_hybrid_manager(config.clone()).await?;
+    pub async fn new_with_config(config: datastore::DataStoreConfig) -> Result<Self, String> {
+        let data_store = match datastore::DataStoreFactory::create_hybrid_manager(config.clone()).await {
+            Ok(store) => store,
+            Err(e) => return Err(format!("Failed to create data store: {}", e)),
+        };
         
         Ok(Self {
             incidents: IndexMap::new(),
@@ -623,9 +630,9 @@ impl SecOpCore {
     }
     
     /// Initialize the data store
-    pub async fn initialize_data_store(&mut self) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn initialize_data_store(&mut self) -> Result<(), String> {
         if let Some(data_store) = &mut self.data_store {
-            data_store.initialize().await?;
+            data_store.initialize().await.map_err(|e| format!("Data store initialization failed: {}", e))?;
             log::info!("Data store initialized successfully");
         }
         Ok(())
@@ -655,7 +662,7 @@ impl SecOpCore {
     }
 
     /// Create a new security incident
-    pub async fn create_incident(&mut self, title: String, description: String, category: IncidentCategory, severity: IncidentSeverity) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    pub async fn create_incident(&mut self, title: String, description: String, category: IncidentCategory, severity: IncidentSeverity) -> Result<String, String> {
         let incident_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
