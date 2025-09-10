@@ -310,11 +310,16 @@ impl NetworkSegmentationController {
 #[async_trait]
 impl NetworkSegmentationTrait for NetworkSegmentationController {
     async fn create_segment(&self, segment_config: SegmentConfig) -> SegmentResult {
+        let segment_id = segment_config.segment_id.clone();
+        let segment_name = segment_config.name.clone();
+        let segment_type = segment_config.segment_type.clone();
+        let ip_ranges = segment_config.ip_ranges.clone();
+        
         let segment = NetworkSegment {
-            id: segment_config.segment_id.clone(),
-            name: segment_config.name,
-            segment_type: segment_config.segment_type,
-            ip_ranges: segment_config.ip_ranges,
+            id: segment_id.clone(),
+            name: segment_name,
+            segment_type: segment_type.clone(),
+            ip_ranges: ip_ranges.clone(),
             vlan_ids: segment_config.vlan_ids,
             security_zone_id: segment_config.security_zone,
             status: "configuring".to_string(),
@@ -325,16 +330,16 @@ impl NetworkSegmentationTrait for NetworkSegmentationController {
             last_modified: Utc::now().timestamp(),
         };
 
-        self.network_segments.insert(segment_config.segment_id.clone(), segment);
+        self.network_segments.insert(segment_id.clone(), segment);
 
         // Simulate configuration process
         let mut warnings = vec![];
-        let mut devices_migrated = 0;
+        let devices_migrated;
 
         // Check for IP range conflicts
         for existing_segment in self.network_segments.iter() {
-            if existing_segment.key() != &segment_config.segment_id {
-                for ip_range in &segment_config.ip_ranges {
+            if existing_segment.key() != &segment_id {
+                for ip_range in &ip_ranges {
                     if existing_segment.value().ip_ranges.contains(ip_range) {
                         warnings.push(format!("IP range {} conflicts with segment {}", 
                             ip_range, existing_segment.value().name));
@@ -344,7 +349,7 @@ impl NetworkSegmentationTrait for NetworkSegmentationController {
         }
 
         // Simulate device migration based on segment type
-        devices_migrated = match segment_config.segment_type.as_str() {
+        devices_migrated = match segment_type.as_str() {
             "microsegment" => 10,
             "vlan" => 25,
             "subnet" => 50,
@@ -429,7 +434,7 @@ impl NetworkSegmentationTrait for NetworkSegmentationController {
         // Simulate traffic monitoring
         let mut total_flows = 0;
         let mut blocked_flows = 0;
-        let mut bandwidth_utilization = 0.0;
+        let mut bandwidth_utilization: f64 = 0.0;
         let mut anomalies = vec![];
         let mut violations = vec![];
 
