@@ -82,7 +82,7 @@ impl BusinessReadyThreatAnalyzer {
 
   /// Analyze threat indicators in parallel for enterprise-scale processing
   #[napi]
-  pub fn analyze_threats_parallel(&self, indicators: Vec<String>) -> Result<Object> {
+  pub fn analyze_threats_parallel(&self, indicators: Vec<String>) -> Result<serde_json::Value> {
     let start_time = std::time::Instant::now();
     
     let results: Vec<_> = indicators
@@ -138,7 +138,7 @@ impl BusinessReadyThreatAnalyzer {
 
   /// Generate compliance report for business stakeholders
   #[napi]
-  pub fn generate_compliance_report(&self, framework: String) -> Result<Object> {
+  pub fn generate_compliance_report(&self, framework: String) -> Result<serde_json::Value> {
     let mut report = Object::new();
     
     // Generate comprehensive compliance metrics
@@ -172,7 +172,7 @@ impl BusinessReadyThreatAnalyzer {
 
   /// Real-time threat hunting with business context
   #[napi]
-  pub fn execute_business_threat_hunt(&self, hunt_query: String, business_context: String) -> Result<Object> {
+  pub fn execute_business_threat_hunt(&self, hunt_query: String, business_context: String) -> Result<serde_json::Value> {
     let hunt_id = uuid::Uuid::new_v4().to_string();
     let start_time = std::time::Instant::now();
     
@@ -239,7 +239,7 @@ impl BusinessReadyThreatAnalyzer {
 
 /// Business-ready metrics and KPI calculator
 #[napi]
-pub fn calculate_business_security_metrics(incidents_data: String) -> Result<Object> {
+pub fn calculate_business_security_metrics(incidents_data: String) -> Result<serde_json::Value> {
   let mut metrics = Object::new();
   
   // Enterprise security KPIs
@@ -257,7 +257,7 @@ pub fn calculate_business_security_metrics(incidents_data: String) -> Result<Obj
 
 /// Generate executive-level security dashboard data
 #[napi]
-pub fn generate_executive_security_dashboard() -> Result<Object> {
+pub fn generate_executive_security_dashboard() -> Result<serde_json::Value> {
   let mut dashboard = Object::new();
   
   // Executive-level metrics

@@ -87,7 +87,7 @@ impl CustomerReadyIntelligencePlatform {
 
   /// Generate personalized security dashboard for customers
   #[napi]
-  pub fn generate_customer_dashboard(&self, customer_id: String) -> Result<Object> {
+  pub fn generate_customer_dashboard(&self, customer_id: String) -> Result<serde_json::Value> {
     let mut dashboard = Object::new();
     
     // Customer-specific security metrics
@@ -244,7 +244,7 @@ impl CustomerReadyIntelligencePlatform {
 
   /// Customer self-service security health check
   #[napi]
-  pub fn run_customer_health_check(&self, customer_id: String) -> Result<Object> {
+  pub fn run_customer_health_check(&self, customer_id: String) -> Result<serde_json::Value> {
     let mut health_check = Object::new();
     
     // Overall health score
@@ -282,7 +282,7 @@ impl CustomerReadyIntelligencePlatform {
 
   /// Generate customer-friendly security report
   #[napi]
-  pub fn generate_customer_security_report(&self, customer_id: String, report_type: String) -> Result<Object> {
+  pub fn generate_customer_security_report(&self, customer_id: String, report_type: String) -> Result<serde_json::Value> {
     let mut report = Object::new();
     
     match report_type.as_str() {
@@ -361,7 +361,7 @@ impl CustomerReadyIntelligencePlatform {
     timeline: &str,
     roi: f64,
     resources: Vec<&str>,
-  ) -> Result<Object> {
+  ) -> Result<serde_json::Value> {
     let mut obj = Object::new();
     obj.set("id", id.to_string())?;
     obj.set("priority", priority.to_string())?;
@@ -401,7 +401,7 @@ pub fn get_customer_threat_feed(customer_id: String, threat_types: Vec<String>) 
 
 /// Calculate customer security ROI
 #[napi]
-pub fn calculate_customer_security_roi(investment: f64, prevented_losses: f64, operational_savings: f64) -> Result<Object> {
+pub fn calculate_customer_security_roi(investment: f64, prevented_losses: f64, operational_savings: f64) -> Result<serde_json::Value> {
   let mut roi_analysis = Object::new();
   
   let total_benefits = prevented_losses + operational_savings;

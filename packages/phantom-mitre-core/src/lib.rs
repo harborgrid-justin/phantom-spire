@@ -17,6 +17,14 @@ pub mod modules;
 // Data store modules for enterprise SaaS readiness
 pub mod data_stores;
 
+// Unified data layer interface and implementation
+pub mod unified;
+pub mod mitre_unified_store;
+
+// Re-export unified data layer interface
+pub use unified::*;
+pub use mitre_unified_store::MitreUnifiedDataStore;
+
 /// MITRE ATT&CK Tactic categories
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum MitreTactic {
