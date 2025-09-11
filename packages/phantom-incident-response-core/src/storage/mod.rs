@@ -14,6 +14,7 @@ pub use elasticsearch::ElasticsearchStorage;
 pub use mongodb::MongoDbStorage;
 
 use crate::config::Config;
+use crate::central_config::CentralConfig;
 use std::sync::Arc;
 
 /// Storage configuration
@@ -179,6 +180,12 @@ pub async fn create_storage_from_env() -> StorageResult<Arc<dyn ComprehensiveSto
     create_storage(&config).await
 }
 
+/// Create storage from CentralConfig
+pub async fn create_storage_from_central_config(central_config: &CentralConfig) -> StorageResult<Arc<dyn ComprehensiveStorage>> {
+    let config = StorageConfig::from_central_config(central_config);
+    create_storage(&config).await
+}
+
 impl StorageConfig {
     /// Create configuration from environment variables
     pub fn from_env() -> Self {
@@ -278,6 +285,78 @@ impl StorageConfig {
                         .unwrap_or_else(|_| "30000".to_string())
                         .parse().unwrap_or(30000),
                 });
+            },
+        }
+        
+        config
+    }
+    
+    /// Create configuration from CentralConfig
+    pub fn from_central_config(central_config: &CentralConfig) -> Self {
+        let storage_type = match central_config.storage.storage_type.to_lowercase().as_str() {
+            "postgres" | "postgresql" => StorageType::Postgres,
+            "elasticsearch" | "es" => StorageType::Elasticsearch,
+            "mongodb" | "mongo" => StorageType::MongoDB,
+            _ => StorageType::Local,
+        };
+        
+        let mut config = Self {
+            storage_type,
+            local: None,
+            postgres: None,
+            elasticsearch: None,
+            mongodb: None,
+        };
+        
+        // Configure based on selected storage type
+        match config.storage_type {
+            StorageType::Local => {
+                if let Some(ref local_config) = central_config.storage.local {
+                    config.local = Some(LocalStorageConfig {
+                        data_dir: local_config.data_dir.clone(),
+                        max_file_size_mb: local_config.max_file_size_mb,
+                        compression_enabled: local_config.compression_enabled,
+                        backup_interval_hours: local_config.backup_interval_hours,
+                    });
+                }
+            },
+            StorageType::Postgres => {
+                if let Some(ref postgres_config) = central_config.storage.postgres {
+                    config.postgres = Some(PostgresStorageConfig {
+                        host: postgres_config.host.clone(),
+                        port: postgres_config.port,
+                        database: postgres_config.database.clone(),
+                        username: postgres_config.username.clone(),
+                        password: postgres_config.password.clone(),
+                        pool_size: postgres_config.pool_size,
+                        connection_timeout_seconds: postgres_config.connection_timeout_seconds,
+                        ssl_mode: postgres_config.ssl_mode.clone(),
+                    });
+                }
+            },
+            StorageType::Elasticsearch => {
+                if let Some(ref es_config) = central_config.storage.elasticsearch {
+                    config.elasticsearch = Some(ElasticsearchStorageConfig {
+                        nodes: es_config.nodes.clone(),
+                        username: es_config.username.clone(),
+                        password: es_config.password.clone(),
+                        index_prefix: es_config.index_prefix.clone(),
+                        number_of_shards: es_config.number_of_shards,
+                        number_of_replicas: es_config.number_of_replicas,
+                        refresh_interval: es_config.refresh_interval.clone(),
+                    });
+                }
+            },
+            StorageType::MongoDB => {
+                if let Some(ref mongo_config) = central_config.storage.mongodb {
+                    config.mongodb = Some(MongoDbStorageConfig {
+                        connection_string: mongo_config.connection_string.clone(),
+                        database: mongo_config.database.clone(),
+                        collection_prefix: mongo_config.collection_prefix.clone(),
+                        pool_size: mongo_config.pool_size,
+                        connection_timeout_ms: mongo_config.connection_timeout_ms,
+                    });
+                }
             },
         }
         

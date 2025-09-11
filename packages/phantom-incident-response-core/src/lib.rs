@@ -10,6 +10,7 @@ mod models;
 mod data_stores;
 mod storage;
 mod config;
+mod central_config;
 mod core;
 mod playbook_engine;
 mod evidence_manager;
@@ -38,6 +39,7 @@ pub mod notifications;
 // Re-export public types and components from modules
 pub use models::*;
 pub use config::Config;
+pub use central_config::CentralConfig;
 pub use core::IncidentResponseCore;
 pub use playbook_engine::*;
 pub use evidence_manager::*;

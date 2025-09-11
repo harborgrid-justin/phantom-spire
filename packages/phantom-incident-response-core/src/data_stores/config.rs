@@ -273,6 +273,56 @@ impl DataStoreConfig {
         config
     }
     
+    /// Load configuration from CentralConfig
+    pub fn from_central_config(central_config: &crate::central_config::CentralConfig) -> Self {
+        let mut config = Self::default();
+        
+        // Redis configuration from CentralConfig
+        if let Some(redis_url) = &central_config.data_stores.redis_url {
+            if let Some(ref mut redis_config) = config.redis {
+                redis_config.url = redis_url.clone();
+            }
+        }
+        
+        // PostgreSQL configuration from CentralConfig
+        if let Some(postgres_url) = &central_config.data_stores.postgres_url {
+            if let Some(ref mut postgres_config) = config.postgres {
+                postgres_config.url = postgres_url.clone();
+            }
+        }
+        
+        // MongoDB configuration from CentralConfig
+        if let Some(mongodb_url) = &central_config.data_stores.mongodb_url {
+            if let Some(ref mut mongodb_config) = config.mongodb {
+                mongodb_config.url = mongodb_url.clone();
+            }
+        }
+        
+        // Elasticsearch configuration from CentralConfig
+        if let Some(elasticsearch_urls) = &central_config.data_stores.elasticsearch_urls {
+            if let Some(ref mut es_config) = config.elasticsearch {
+                es_config.urls = elasticsearch_urls.clone();
+            }
+        }
+        
+        // Default store type from CentralConfig
+        match central_config.data_stores.default_store.to_lowercase().as_str() {
+            "redis" => config.default_store = DataStoreType::Redis,
+            "postgresql" | "postgres" => config.default_store = DataStoreType::PostgreSQL,
+            "mongodb" | "mongo" => config.default_store = DataStoreType::MongoDB,
+            "elasticsearch" | "es" => config.default_store = DataStoreType::Elasticsearch,
+            _ => {}
+        }
+        
+        // Multi-tenancy setting from CentralConfig
+        config.multi_tenant = central_config.data_stores.multi_tenant;
+        
+        // Cache TTL from CentralConfig
+        config.cache_ttl_seconds = central_config.data_stores.cache_ttl_seconds;
+        
+        config
+    }
+    
     /// Validate configuration
     pub fn validate(&self) -> Result<(), String> {
         match self.default_store {
