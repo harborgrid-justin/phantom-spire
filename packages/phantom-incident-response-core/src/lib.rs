@@ -8,6 +8,7 @@
 
 mod models;
 mod data_stores;
+mod storage;
 mod config;
 mod core;
 mod playbook_engine;
@@ -42,6 +43,7 @@ pub use playbook_engine::*;
 pub use evidence_manager::*;
 pub use analysis::*;
 pub use data_stores::*;
+pub use storage::*;
 pub use incident_models::*;
 pub use evidence_models::*;
 pub use response_actions::*;
