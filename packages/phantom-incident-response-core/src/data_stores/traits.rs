@@ -3,7 +3,9 @@
 //! Common interface definitions for all incident response data store implementations
 
 use async_trait::async_trait;
-use crate::models::{Incident, Evidence, ResponsePlaybook, ForensicInvestigation, Responder, Task};
+use crate::incident_models::{Incident, Responder, Task};
+use crate::evidence_models::{Evidence, ForensicInvestigation};
+use crate::playbook_models::ResponsePlaybook;
 use super::{DataStoreResult, TenantContext, SearchResults, DataStoreMetrics, BulkOperationResult};
 
 /// Core incident response data store operations trait
@@ -158,6 +160,12 @@ pub trait ComprehensiveIncidentResponseStore:
     
     /// Check if transactions are supported
     fn supports_transactions(&self) -> bool;
+    
+    /// Store a playbook execution
+    async fn store_playbook_execution(&self, execution: &crate::playbook_models::PlaybookExecution, context: &TenantContext) -> DataStoreResult<String>;
+    
+    /// Update a playbook execution
+    async fn update_playbook_execution(&self, execution: &crate::playbook_models::PlaybookExecution, context: &TenantContext) -> DataStoreResult<()>;
 }
 
 /// Search criteria for incidents

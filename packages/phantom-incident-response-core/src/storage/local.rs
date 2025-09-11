@@ -113,7 +113,8 @@ impl LocalStorage {
     where
         T: serde::Serialize,
     {
-        let json = DataSerializer::to_json(data)?;
+        let json = DataSerializer::to_json(data)
+            .map_err(|e| StorageError::SerializationError(e.to_string()))?;
         
         // Compress if enabled
         let content = if self.config.compression_enabled {
@@ -170,7 +171,8 @@ impl LocalStorage {
                 .map_err(|e| StorageError::SerializationError(format!("Invalid UTF-8: {}", e)))?
         };
         
-        let data = DataSerializer::from_json(&json_str)?;
+        let data = DataSerializer::from_json(&json_str)
+            .map_err(|e| StorageError::SerializationError(e.to_string()))?;
         Ok(Some(data))
     }
     

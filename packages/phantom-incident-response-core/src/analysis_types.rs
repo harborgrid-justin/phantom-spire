@@ -1,10 +1,8 @@
-//! Analysis Supporting Types
-//! 
-//! Supporting data structures for the analysis module
-//! These types support comprehensive incident analysis and threat assessment
+// Analysis Supporting Types
+// 
+// Supporting data structures for the analysis module
+// These types support comprehensive incident analysis and threat assessment
 
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 /// Identified threat actor in analysis
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -12,13 +12,11 @@ use chrono::{DateTime, Utc};
 pub mod config;
 pub mod traits;
 pub mod serialization;
-pub mod redis_store;
 
 // Re-export commonly used types
 pub use config::*;
 pub use traits::*;
 pub use serialization::{TenantData, DataSerializer, DataTransformer};
-pub use redis_store::RedisDataStore;
 
 /// Result type for data store operations
 pub type DataStoreResult<T> = Result<T, DataStoreError>;
@@ -147,9 +145,7 @@ impl DataStoreFactory {
     pub fn create_store(config: &DataStoreConfig) -> DataStoreResult<Box<dyn ComprehensiveIncidentResponseStore + Send + Sync>> {
         match config.default_store {
             DataStoreType::Redis => {
-                let redis_config = config.redis.as_ref()
-                    .ok_or_else(|| DataStoreError::Configuration("Redis configuration not found".to_string()))?;
-                Ok(Box::new(RedisDataStore::new(redis_config.clone())))
+                Err(DataStoreError::Configuration("Redis store not implemented yet".to_string()))
             }
             DataStoreType::PostgreSQL => {
                 Err(DataStoreError::Configuration("PostgreSQL store not implemented yet".to_string()))

@@ -200,7 +200,7 @@ impl EvidenceManager {
 
         Ok(EvidenceCollectionResult {
             evidence_id,
-            collection_status: collection_result.status,
+            collection_status: collection_result.collection_status,
             collected_at: now,
             collected_by: collected_by.to_string(),
             file_path: evidence.file_path,
@@ -665,12 +665,6 @@ impl EvidenceProcessor for DefaultEvidenceProcessor {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct EvidenceCollectionResult {
-    evidence_id: String,
-    status: CollectionStatus,
-    errors: Vec<String>,
-}
 
 #[cfg(test)]
 mod tests {

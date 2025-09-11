@@ -3,15 +3,9 @@
 
 pub mod traits;
 pub mod local;
-pub mod postgres;
-pub mod elasticsearch;
-pub mod mongodb;
 
 pub use traits::*;
 pub use local::LocalStorage;
-pub use postgres::PostgresStorage;
-pub use elasticsearch::ElasticsearchStorage;
-pub use mongodb::MongoDbStorage;
 
 use crate::config::Config;
 use crate::central_config::CentralConfig;
@@ -154,22 +148,13 @@ pub async fn create_storage(config: &StorageConfig) -> StorageResult<Arc<dyn Com
             Ok(Arc::new(storage))
         },
         StorageType::Postgres => {
-            let postgres_config = config.postgres.as_ref()
-                .ok_or_else(|| StorageError::ConfigurationError("PostgreSQL storage configuration not found".to_string()))?;
-            let storage = PostgresStorage::new(postgres_config.clone()).await?;
-            Ok(Arc::new(storage))
+            Err(StorageError::ConfigurationError("PostgreSQL storage not implemented yet".to_string()))
         },
         StorageType::Elasticsearch => {
-            let es_config = config.elasticsearch.as_ref()
-                .ok_or_else(|| StorageError::ConfigurationError("Elasticsearch storage configuration not found".to_string()))?;
-            let storage = ElasticsearchStorage::new(es_config.clone()).await?;
-            Ok(Arc::new(storage))
+            Err(StorageError::ConfigurationError("Elasticsearch storage not implemented yet".to_string()))
         },
         StorageType::MongoDB => {
-            let mongo_config = config.mongodb.as_ref()
-                .ok_or_else(|| StorageError::ConfigurationError("MongoDB storage configuration not found".to_string()))?;
-            let storage = MongoDbStorage::new(mongo_config.clone()).await?;
-            Ok(Arc::new(storage))
+            Err(StorageError::ConfigurationError("MongoDB storage not implemented yet".to_string()))
         },
     }
 }
