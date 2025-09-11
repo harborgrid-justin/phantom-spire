@@ -19,6 +19,6 @@
     "eslint": "^8.0.0"
   },
   "dependencies": {
-    "phantom-cve-core": "file:packages/workspace-4/phantom-cve-core"
+    "phantom-cve-core": "file:../packages/phantom-cve-core"
   }
 }

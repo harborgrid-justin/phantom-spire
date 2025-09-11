@@ -1,0 +1,52 @@
+{
+  "cves": [
+    {
+      "id": "CVE-2024-BATCH-001",
+      "description": "First batch test CVE",
+      "published_date": "2024-09-11T00:00:00Z",
+      "last_modified_date": "2024-09-11T00:00:00Z",
+      "status": "published",
+      "assigner": "cve@mitre.org",
+      "cvss_metrics": {
+        "version": "3.1",
+        "base_score": 7.2,
+        "severity": "High",
+        "attack_vector": "Network",
+        "attack_complexity": "Low",
+        "privileges_required": "None",
+        "user_interaction": "Required",
+        "scope": "Unchanged",
+        "confidentiality_impact": "High",
+        "integrity_impact": "Low",
+        "availability_impact": "None"
+      },
+      "affected_products": [{"vendor": "TestCorp", "product": "TestApp", "version": "1.0.0"}],
+      "references": [{"url": "https://example.com", "source": "MITRE", "tags": []}],
+      "tags": ["xss", "web"]
+    },
+    {
+      "id": "CVE-2024-BATCH-002",
+      "description": "Second batch test CVE",
+      "published_date": "2024-09-11T00:00:00Z",
+      "last_modified_date": "2024-09-11T00:00:00Z",
+      "status": "published",
+      "assigner": "cve@mitre.org",
+      "cvss_metrics": {
+        "version": "3.1",
+        "base_score": 9.8,
+        "severity": "Critical",
+        "attack_vector": "Network",
+        "attack_complexity": "Low",
+        "privileges_required": "None",
+        "user_interaction": "None",
+        "scope": "Unchanged",
+        "confidentiality_impact": "High",
+        "integrity_impact": "High",
+        "availability_impact": "High"
+      },
+      "affected_products": [{"vendor": "TestCorp", "product": "TestApp", "version": "2.0.0"}],
+      "references": [{"url": "https://example.com", "source": "MITRE", "tags": []}],
+      "tags": ["rce", "critical"]
+    }
+  ]
+}

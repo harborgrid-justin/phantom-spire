@@ -1,0 +1,38 @@
+{
+  "cve": {
+    "id": "CVE-2024-POSTGRES-TEST",
+    "description": "UPDATED: PostgreSQL backend test with enhanced native analysis and threat intelligence",
+    "published_date": "2024-09-11T00:00:00Z",
+    "last_modified_date": "2024-09-11T00:00:00Z",
+    "status": "published",
+    "assigner": "cve@mitre.org",
+    "cvss_metrics": {
+      "version": "3.1",
+      "base_score": 9.8,
+      "severity": "Critical",
+      "attack_vector": "Network",
+      "attack_complexity": "Low",
+      "privileges_required": "None",
+      "user_interaction": "None",
+      "scope": "Unchanged",
+      "confidentiality_impact": "High",
+      "integrity_impact": "High",
+      "availability_impact": "High"
+    },
+    "affected_products": [
+      {
+        "vendor": "PostgreSQL-Test-Corp",
+        "product": "TestApp-PG-Updated",
+        "version": "2.1.0"
+      }
+    ],
+    "references": [
+      {
+        "url": "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2024-POSTGRES-TEST",
+        "source": "MITRE",
+        "tags": []
+      }
+    ],
+    "tags": ["database", "postgresql", "critical", "updated", "rce"]
+  }
+}

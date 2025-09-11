@@ -7,12 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "keywords": ["cve", "vulnerability", "security", "threat-intelligence"],
+  "keywords": [
+    "cve",
+    "vulnerability",
+    "security",
+    "threat-intelligence"
+  ],
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "phantom-cve-core": "file:./phantom-cve-core",
+    "pg": "^8.16.3",
+    "phantom-cve-core": "file:../../../packages/phantom-cve-core",
     "sqlite3": "^5.1.6"
   }
 }

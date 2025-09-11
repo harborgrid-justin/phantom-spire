@@ -1,0 +1,76 @@
+{
+  "cves": [
+    {
+      "id": "CVE-2024-POSTGRES-BATCH-001",
+      "description": "First PostgreSQL batch test CVE",
+      "published_date": "2024-09-11T00:00:00Z",
+      "last_modified_date": "2024-09-11T00:00:00Z",
+      "cvss_metrics": {
+        "version": "3.1",
+        "base_score": 8.8,
+        "severity": "High",
+        "attack_vector": "Network",
+        "attack_complexity": "Low",
+        "privileges_required": "None",
+        "user_interaction": "Required",
+        "scope": "Unchanged",
+        "confidentiality_impact": "High",
+        "integrity_impact": "High",
+        "availability_impact": "None"
+      },
+      "affected_products": [
+        {
+          "vendor": "PostgreSQL-Test-Corp",
+          "product": "BatchApp-PG",
+          "version": "2.0.0"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://example.com/pg-batch",
+          "source": "MITRE",
+          "tags": []
+        }
+      ],
+      "status": "published",
+      "assigner": "cve@mitre.org",
+      "tags": ["postgres", "batch-test", "xss"]
+    },
+    {
+      "id": "CVE-2024-POSTGRES-BATCH-002",
+      "description": "Second PostgreSQL batch test CVE",
+      "published_date": "2024-09-11T00:00:00Z",
+      "last_modified_date": "2024-09-11T00:00:00Z",
+      "cvss_metrics": {
+        "version": "3.1",
+        "base_score": 9.5,
+        "severity": "Critical",
+        "attack_vector": "Network",
+        "attack_complexity": "Low",
+        "privileges_required": "None",
+        "user_interaction": "None",
+        "scope": "Unchanged",
+        "confidentiality_impact": "High",
+        "integrity_impact": "High",
+        "availability_impact": "High"
+      },
+      "affected_products": [
+        {
+          "vendor": "PostgreSQL-Test-Corp",
+          "product": "BatchApp-PG",
+          "version": "3.0.0"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://example.com/pg-batch-2",
+          "source": "MITRE",
+          "tags": []
+        }
+      ],
+      "status": "published",
+      "assigner": "cve@mitre.org",
+      "tags": ["postgres", "batch-test", "rce", "critical"]
+    }
+  ]
+}
