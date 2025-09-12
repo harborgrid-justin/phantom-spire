@@ -1,18 +1,18 @@
 [package]
-name = "phantom-attribution-core"
+name = "phantom-{PACKAGE_NAME}-core"
 version = "1.0.1"
-description = "Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking"
+description = "{DESCRIPTION}"
 edition = "2021"
 license = "MIT"
 authors = ["Phantom Spire Security Team"]
 homepage = "https://github.com/harborgrid-justin/phantom-spire"
 repository = "https://github.com/harborgrid-justin/phantom-spire"
-documentation = "https://docs.rs/phantom-attribution-core"
-keywords = ["cybersecurity", "phantom-spire", "security", "attribution"]
+documentation = "https://docs.rs/phantom-{PACKAGE_NAME}-core"
+keywords = ["cybersecurity", "phantom-spire", "security", "{DOMAIN_KEYWORD}"]
 categories = ["web-programming", "api-bindings"]
 
 [lib]
-name = "phantom_attribution_core"
+name = "phantom_{PACKAGE_NAME}_core"
 crate-type = ["cdylib"]
 
 [dependencies]
