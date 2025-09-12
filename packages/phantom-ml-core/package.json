@@ -52,7 +52,10 @@
     "prepublishOnly": "napi prepublish -t npm",
     "test": "ava",
     "universal": "napi universal",
-    "version": "napi version"
+    "version": "napi version",
+    "demo:database": "node database-integration-demo.js",
+    "demo:basic": "node test-examples.js",
+    "verify": "node verify-examples.js"
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.18.0",

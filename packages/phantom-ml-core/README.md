@@ -1,53 +1,117 @@
 # Phantom ML Core
 
-Enterprise machine learning services for threat detection and security analytics.
+Enterprise machine learning services for threat detection and security analytics with **complete database integration**.
 
 ## Overview
 
-`phantom-ml-core` is a high-performance NAPI-rs package that provides comprehensive ML capabilities for the Phantom Spire security platform. It offers enterprise-grade machine learning services including model management, training, inference, feature engineering, and anomaly detection.
+`phantom-ml-core` is a high-performance NAPI-rs package that provides comprehensive ML capabilities for the Phantom Spire security platform. It offers enterprise-grade machine learning services including model management, training, inference, feature engineering, and anomaly detection **with full database persistence across PostgreSQL, MongoDB, Redis, and Elasticsearch**.
+
+## 🆕 Database Integration Features
+
+### Multi-Database Architecture
+- **PostgreSQL**: Structured model metadata, training results, and ACID-compliant operations
+- **MongoDB**: Document-based ML experiments, flexible inference data, and complex analytics  
+- **Redis**: High-performance caching, real-time data streams, and session management
+- **Elasticsearch**: Full-text search, advanced analytics, and model discovery
+
+### Unified Data Operations
+- **Automatic Persistence**: Models, inferences, and training results automatically saved across databases
+- **Smart Caching**: Redis-first operations with database fallbacks for optimal performance
+- **Search Integration**: Elasticsearch indexing for model discovery and analytics
+- **Flexible Storage**: Choose different databases for different ML data types
+
+### Database Configuration
+```javascript
+const mlCore = new PhantomMLCore();
+
+// Initialize with all database backends
+await mlCore.initialize_databases(JSON.stringify({
+    postgresql_uri: 'postgresql://user:pass@localhost:5432/phantom_ml',
+    mongodb_uri: 'mongodb://localhost:27017/phantom_ml', 
+    redis_url: 'redis://localhost:6379',
+    elasticsearch_url: 'http://localhost:9200',
+    
+    // Configure storage preferences
+    model_storage: 'postgresql',        // Structured model metadata
+    inference_storage: 'mongodb',       // Document-based inference data  
+    cache_storage: 'redis',             // High-performance caching
+    search_storage: 'elasticsearch'     // Search and analytics
+}));
+```
 
 ## Features
 
 ### 🤖 Model Management
-- Create, train, and manage ML models
-- Version control and model lifecycle management
-- Performance monitoring and metrics tracking
-- Model serialization and persistence
+- Create, train, and manage ML models **with automatic database persistence**
+- Version control and model lifecycle management **across multiple storage backends**
+- Performance monitoring and metrics tracking **with real-time analytics**
+- Model serialization and persistence **in PostgreSQL with Redis caching**
 
-### 🔍 Advanced Analytics
-- Real-time threat classification
-- Behavioral anomaly detection
-- Statistical analysis and pattern recognition
-- Batch processing for high-throughput scenarios
+### 🔍 Advanced Analytics  
+- Real-time threat classification **with MongoDB document storage**
+- Behavioral anomaly detection **with Elasticsearch search integration**
+- Statistical analysis and pattern recognition **across all data sources**
+- Batch processing for high-throughput scenarios **with automatic data distribution**
 
 ### ⚡ High Performance
 - NAPI-rs bindings for maximum performance
-- Parallel processing with Rayon
-- Memory-efficient implementations
-- Asynchronous operations with Tokio
+- **Redis caching layer** for sub-millisecond model access
+- **Database connection pooling** for optimal resource utilization
+- **Asynchronous operations** with Tokio across all database backends
 
 ### 🛡️ Enterprise Ready
-- Multi-tenant support
-- Comprehensive logging and monitoring
-- Configurable storage backends
-- Production-grade error handling
+- Multi-tenant support **with database-level isolation**
+- Comprehensive logging and monitoring **with Elasticsearch analytics**
+- **Multiple storage backend options** for different compliance requirements
+- Production-grade error handling **with automatic failover**
 
 ## API Reference
 
-### Core Services
+### Database Initialization
 
-#### `PhantomMLCore`
-The main service class providing all ML functionality.
+#### `initialize_databases(config_json: string): Promise<string>`
+Initialize database connections for persistent ML operations.
 
 ```javascript
 const { PhantomMLCore } = require('@phantom-spire/ml-core');
 const mlCore = new PhantomMLCore();
+
+// Complete database setup
+const dbConfig = {
+    postgresql_uri: 'postgresql://postgres:pass@localhost:5432/phantom_ml',
+    mongodb_uri: 'mongodb://localhost:27017/phantom_ml',
+    redis_url: 'redis://localhost:6379', 
+    elasticsearch_url: 'http://localhost:9200',
+    
+    // Storage preferences (optional)
+    model_storage: 'postgresql',        // Models in PostgreSQL
+    inference_storage: 'mongodb',       // Inferences in MongoDB  
+    training_storage: 'mongodb',        // Training data in MongoDB
+    cache_storage: 'redis',             // Caching in Redis
+    search_storage: 'elasticsearch'     // Search in Elasticsearch
+};
+
+const result = await mlCore.initialize_databases(JSON.stringify(dbConfig));
+console.log('Database initialization:', JSON.parse(result));
+```
+
+### Core Services
+
+#### `PhantomMLCore`
+The main service class providing all ML functionality **with integrated database persistence**.
+
+```javascript
+const { PhantomMLCore } = require('@phantom-spire/ml-core');
+const mlCore = new PhantomMLCore();
+
+// Initialize databases (optional - can work without databases)
+await mlCore.initialize_databases(JSON.stringify(dbConfig));
 ```
 
 ### Model Management
 
 #### `create_model(config_json: string): Promise<string>`
-Creates a new ML model with specified configuration.
+Creates a new ML model with specified configuration **and automatic database persistence**.
 
 ```javascript
 const config = {
@@ -68,12 +132,21 @@ const config = {
     validation_split: 0.2,
     early_stopping: false,
     cross_validation: false
+  },
+  // NEW: Database persistence configuration
+  database_config: {
+    enabled: true,
+    persistence_backend: "all",  // "postgresql", "mongodb", "redis", "elasticsearch", or "all"
+    cache_enabled: true,
+    search_enabled: true,
+    analytics_enabled: true
   }
 };
 
 const result = await mlCore.create_model(JSON.stringify(config));
 const response = JSON.parse(result);
 console.log("Model created:", response.model_id);
+console.log("Database persisted:", response.database_persisted);
 ```
 
 #### `train_model(model_id: string, training_data_json: string): Promise<string>`
@@ -225,6 +298,8 @@ console.log("Models loaded:", health.models_loaded);
 
 ## 📚 Complete Documentation
 
+> **🎯 NEW: [Database Integration Guide](#database-integration)** - Complete multi-database support with PostgreSQL, MongoDB, Redis, and Elasticsearch!
+
 > **🎯 NEW: [Comprehensive How-To Guide](./COMPREHENSIVE_GUIDE.md)** - 100% verified examples for all 44 endpoints!
 
 This package now includes the most comprehensive documentation for any ML library:
@@ -232,8 +307,10 @@ This package now includes the most comprehensive documentation for any ML librar
 ### 🚀 What's Included
 
 - **[COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md)** - Complete guide with 150+ verified examples
+- **[Database Integration Examples](#database-integration)** - Multi-database persistence and analytics
 - **[verify-examples.js](./verify-examples.js)** - Automated verification of all examples
 - **[test-examples.js](./test-examples.js)** - Practical test suite for real-world scenarios
+- **[database-integration-demo.js](./database-integration-demo.js)** - Complete database integration demo
 
 ### ✅ 100% Verified Coverage
 
@@ -241,7 +318,7 @@ This package now includes the most comprehensive documentation for any ML librar
 
 🤖 **Model Management (13)** | 🎯 **Inference (3)** | ⚙️ **Feature Engineering (1)** | 📊 **Analytics (7)**
 🌊 **Streaming (2)** | 📈 **Monitoring (3)** | 🚨 **Alerting (3)** | 🛡️ **Security (3)** 
-🔧 **Operations (2)** | 💼 **Business Intelligence (5)** | 🔗 **Integration Examples**
+🔧 **Operations (2)** | 💼 **Business Intelligence (5)** | 🗄️ **Database Integration** | 🔗 **Multi-Database Operations**
 
 ### 🚀 Quick Start Example
 
@@ -280,14 +357,167 @@ async function quickThreatDetection() {
 }
 ```
 
-### 📖 Documentation Features
+## Database Integration
 
-- ✅ **Real cybersecurity examples** for every endpoint
-- ✅ **Production-ready error handling** patterns
-- ✅ **Complete integration workflows** 
-- ✅ **Performance optimization** guidelines
-- ✅ **Automated verification** of all examples
-- ✅ **Copy-paste ready code** that just works
+### Multi-Database Architecture
+
+Phantom ML Core now supports complete integration with multiple database backends, allowing you to choose the optimal storage for different types of ML data:
+
+#### Supported Databases
+- **PostgreSQL**: Structured model metadata, training results, ACID-compliant operations
+- **MongoDB**: Document-based ML experiments, flexible inference data, complex analytics
+- **Redis**: High-performance caching, real-time data streams, session management
+- **Elasticsearch**: Full-text search, advanced analytics, model discovery
+
+#### Quick Database Setup
+
+```bash
+# Start all databases using Docker Compose
+docker-compose up -d postgres mongo redis elasticsearch kibana
+
+# Verify services are running
+curl http://localhost:9200/_cluster/health  # Elasticsearch
+redis-cli ping                              # Redis
+mongosh --eval "db.adminCommand('ping')"   # MongoDB
+psql postgresql://postgres:phantom_secure_pass@localhost:5432/phantom_spire -c "SELECT version();"  # PostgreSQL
+```
+
+#### Complete Database Integration Example
+
+```javascript
+const { PhantomMLCore } = require('@phantom-spire/ml-core');
+
+async function setupMLWithDatabases() {
+  const mlCore = new PhantomMLCore();
+  
+  // 1. Initialize all database connections
+  const dbConfig = {
+    postgresql_uri: 'postgresql://postgres:phantom_secure_pass@localhost:5432/phantom_spire',
+    mongodb_uri: 'mongodb://localhost:27017/phantom_spire',
+    redis_url: 'redis://:phantom_redis_pass@localhost:6379',
+    elasticsearch_url: 'http://localhost:9200',
+    
+    // Configure optimal storage preferences
+    model_storage: 'postgresql',        // Structured model metadata
+    inference_storage: 'mongodb',       // Document-based inference data
+    training_storage: 'mongodb',        // Training experiments & datasets
+    cache_storage: 'redis',             // High-performance caching
+    search_storage: 'elasticsearch'     // Search & analytics
+  };
+
+  const result = await mlCore.initialize_databases(JSON.stringify(dbConfig));
+  console.log('✅ Databases initialized:', JSON.parse(result).message);
+
+  // 2. Create model with automatic database persistence
+  const model = await mlCore.create_model(JSON.stringify({
+    model_type: 'classification',
+    algorithm: 'gradient_boosting',
+    feature_config: {
+      input_features: ['ip_reputation', 'domain_age', 'request_frequency'],
+      normalization: true,
+      scaling_method: 'robust'
+    },
+    database_config: {
+      enabled: true,
+      persistence_backend: 'all',
+      cache_enabled: true,
+      search_enabled: true,
+      analytics_enabled: true
+    }
+  }));
+
+  const modelData = JSON.parse(model);
+  console.log('🤖 Model created with database persistence:', modelData.database_persisted);
+  
+  return { mlCore, modelId: modelData.model_id };
+}
+```
+
+#### Database-Specific Operations
+
+**PostgreSQL - Structured Queries**
+```javascript
+// Models automatically stored in PostgreSQL with structured metadata
+// Supports complex queries, ACID transactions, and referential integrity
+const models = await mlCore.list_models(); // Fetched from PostgreSQL
+```
+
+**MongoDB - Document Storage**
+```javascript  
+// Inferences stored as flexible documents in MongoDB
+// Supports complex nested data and schema evolution
+const inferences = await mlCore.get_inference_history(modelId, 100); // From MongoDB
+```
+
+**Redis - Real-time Caching**
+```javascript
+// Automatic caching layer for high-performance access
+// Model weights, predictions, and session data cached in Redis
+const prediction = await mlCore.predict(modelId, features); // Cache-first with Redis
+```
+
+**Elasticsearch - Search & Analytics**
+```javascript
+// Models automatically indexed for full-text search
+// Advanced analytics and aggregations available
+const insights = await mlCore.generate_insights(JSON.stringify({
+  type: 'comprehensive',
+  include_models: [modelId]
+})); // Analytics powered by Elasticsearch
+```
+
+### Database Configuration Options
+
+| Storage Type | Recommended Database | Use Case | Performance |
+|-------------|---------------------|----------|-------------|
+| Model Metadata | PostgreSQL | Structured data, ACID compliance | High consistency |
+| Inference Data | MongoDB | Flexible documents, complex data | High throughput |
+| Training Data | MongoDB | Experiments, datasets, metrics | Schema flexibility |
+| Caching | Redis | Real-time access, sessions | Ultra-fast |
+| Search & Analytics | Elasticsearch | Discovery, insights, aggregation | Advanced queries |
+
+### Environment Variables
+
+Set these environment variables for automatic database configuration:
+
+```bash
+# Database connection strings
+export POSTGRESQL_URI="postgresql://postgres:phantom_secure_pass@localhost:5432/phantom_spire"
+export MONGODB_URI="mongodb://localhost:27017/phantom_spire"
+export REDIS_URL="redis://:phantom_redis_pass@localhost:6379"
+export ELASTICSEARCH_URL="http://localhost:9200"
+
+# Optional: Database preferences
+export ML_MODEL_STORAGE="postgresql"
+export ML_INFERENCE_STORAGE="mongodb"
+export ML_CACHE_STORAGE="redis"
+export ML_SEARCH_STORAGE="elasticsearch"
+```
+
+### Running the Database Demo
+
+```bash
+# Install dependencies
+npm install
+
+# Start databases
+docker-compose up -d
+
+# Run complete database integration demo
+npm run demo:database
+
+# Verify all examples work
+npm run verify
+```
+
+The database integration demo shows:
+- ✅ Multi-database initialization and health checks
+- ✅ Model creation with automatic persistence across databases
+- ✅ Training with database storage and analytics
+- ✅ Real-time inference with Redis caching
+- ✅ Batch processing with data distribution
+- ✅ Advanced analytics with Elasticsearch
+- ✅ System monitoring and performance metrics
 
 ## Integration Examples
 

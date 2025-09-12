@@ -1,0 +1,35 @@
+# Elasticsearch configuration for Phantom ML Core
+
+cluster.name: phantom-ml-cluster
+node.name: phantom-ml-node-1
+
+# Network settings
+network.host: 0.0.0.0
+http.port: 9200
+transport.tcp.port: 9300
+
+# Discovery settings for single node
+discovery.type: single-node
+
+# Security settings (disabled for development)
+xpack.security.enabled: false
+xpack.ml.enabled: false
+
+# Memory settings
+bootstrap.memory_lock: false
+
+# Path settings
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# ML Core specific index settings
+index.max_result_window: 50000
+index.max_rescore_window: 50000
+
+# Performance tuning
+indices.memory.index_buffer_size: 20%
+indices.queries.cache.size: 20%
+
+# Logging
+logger.level: INFO
+rootLogger.level: INFO
