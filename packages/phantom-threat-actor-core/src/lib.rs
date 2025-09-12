@@ -54,7 +54,7 @@ use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use uuid::Uuid;
 
 // Re-export public types and components from new modular structure
@@ -379,7 +379,7 @@ pub async fn get_all_engines_status() -> Result<String> {
 /// Create threat actor
 #[cfg(feature = "napi")]
 #[napi]
-pub fn create_threat_actor(name: String, actor_type: String) -> Result<String> {
+pub fn create_threat_actor(_name: String, _actor_type: String) -> Result<String> {
     let id = Uuid::new_v4().to_string();
     Ok(id)
 }
