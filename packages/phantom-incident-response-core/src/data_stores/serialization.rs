@@ -70,14 +70,17 @@ impl DataSerializer {
     where
         T: Serialize,
     {
-        bincode::serialize(data).map_err(|e| DataStoreError::Serialization(e.to_string()))
+        let json_str = Self::to_json(data)?;
+        Ok(json_str.into_bytes())
     }
 
     pub fn from_binary<T>(bytes: &[u8]) -> DataStoreResult<T>
     where
         T: for<'de> Deserialize<'de>,
     {
-        bincode::deserialize(bytes).map_err(|e| DataStoreError::Serialization(e.to_string()))
+        let json_str = String::from_utf8(bytes.to_vec())
+            .map_err(|e| DataStoreError::Serialization(format!("Invalid UTF-8: {}", e)))?;
+        Self::from_json(&json_str)
     }
 
     pub fn to_redis_value<T>(data: &T) -> DataStoreResult<Vec<u8>>
@@ -190,7 +193,7 @@ impl DataSerializer {
         if context.tenant_id == "default" {
             base_table.to_string()
         } else {
-            format!("{}_tenant_{}", base_table, context.tenant_id.replace('-', '_'))
+            format!("{}_tenant_{}", base_table, context.tenant_id.replace("-", "_"))
         }
     }
 

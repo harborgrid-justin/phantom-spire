@@ -156,7 +156,7 @@ impl EvidenceManager {
             tags: collection_parameters.get("tags")
                 .map(|t| t.split(',').map(|s| s.trim().to_string()).collect())
                 .unwrap_or_default(),
-            metadata: collection_parameters,
+            metadata: collection_parameters.clone(),
         };
 
         // Perform actual evidence collection
@@ -184,7 +184,7 @@ impl EvidenceManager {
                 collected_at: now,
                 collected_by: collected_by.to_string(),
                 file_path: evidence.file_path,
-                file_size: evidence.file_size,
+                file_size: evidence.file_size.max(0) as u64,
                 hash_md5: evidence.hash_md5,
                 hash_sha256: evidence.hash_sha256,
                 metadata: evidence.metadata,
@@ -204,7 +204,7 @@ impl EvidenceManager {
             collected_at: now,
             collected_by: collected_by.to_string(),
             file_path: evidence.file_path,
-            file_size: evidence.file_size,
+            file_size: evidence.file_size.max(0) as u64,
             hash_md5: evidence.hash_md5,
             hash_sha256: evidence.hash_sha256,
             metadata: evidence.metadata,
@@ -421,7 +421,14 @@ impl EvidenceManager {
 
         Ok(EvidenceCollectionResult {
             evidence_id: evidence.id.clone(),
-            status: CollectionStatus::Success,
+            collection_status: CollectionStatus::Success,
+            collected_at: evidence.collected_at,
+            collected_by: evidence.collected_by.clone(),
+            file_path: evidence.file_path.clone(),
+            file_size: evidence.file_size.max(0) as u64,
+            hash_md5: evidence.hash_md5.clone(),
+            hash_sha256: evidence.hash_sha256.clone(),
+            metadata: evidence.metadata.clone(),
             errors: vec![],
         })
     }
@@ -488,7 +495,10 @@ impl EvidenceManager {
         let mut incident = self.data_store.get_incident(incident_id, tenant_context).await?
             .ok_or("Incident not found")?;
             
-        incident.evidence.push(evidence_id.to_string());
+        let evidence = self.data_store.get_evidence(evidence_id, tenant_context).await?
+            .ok_or("Evidence not found")?;
+            
+        incident.evidence.push(evidence);
         self.data_store.update_incident(&incident, tenant_context).await?;
         
         Ok(())

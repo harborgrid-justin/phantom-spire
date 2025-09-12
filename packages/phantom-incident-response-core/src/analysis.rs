@@ -269,7 +269,7 @@ impl AnalysisEngine {
         };
 
         // Store analysis result
-        self.data_store.store_analysis_result(&analysis_result, &context.tenant_context).await?;
+        self.data_store.store_incident_analysis_result(&analysis_result, &context.tenant_context).await?;
 
         Ok(analysis_result)
     }
@@ -484,8 +484,20 @@ impl AnalysisEngine {
         context: &AnalysisContext,
     ) -> Result<Vec<Incident>, Box<dyn std::error::Error + Send + Sync>> {
         // Load similar historical incidents for pattern analysis
+        let search_criteria = IncidentSearchCriteria {
+            status: None,
+            severity: None,
+            category: Some(format!("{:?}", incident.category)),
+            assigned_to: None,
+            created_after: None,
+            created_before: None,
+            tags: vec![],
+            title_contains: None,
+            limit: Some(50),
+            offset: None,
+        };
         let incidents = self.data_store.search_incidents(
-            &format!("category:{:?}", incident.category),
+            &search_criteria,
             &context.tenant_context,
         ).await?;
 

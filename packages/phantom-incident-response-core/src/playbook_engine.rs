@@ -480,7 +480,7 @@ impl PlaybookEngine {
         // Check category match
         if playbook.category != incident.category {
             return Err(format!("Playbook category {} does not match incident category {:?}", 
-                             playbook.category as u8, incident.category).into());
+                             playbook.category.clone() as u8, incident.category).into());
         }
 
         // Check severity threshold

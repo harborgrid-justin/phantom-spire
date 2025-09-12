@@ -726,7 +726,7 @@ impl LocalStorage {
                 fs::copy(&src_path, &dst_path)
                     .map_err(|e| StorageError::IoError(format!("Failed to copy {} to {}: {}", src_path.display(), dst_path.display(), e)))?;
             } else if src_path.is_dir() {
-                self.copy_directory(&src_path, &dst_path).await?;
+                Box::pin(self.copy_directory(&src_path, &dst_path)).await?;
             }
         }
         

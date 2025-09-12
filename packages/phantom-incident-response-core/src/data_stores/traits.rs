@@ -66,6 +66,9 @@ pub trait EvidenceStore: Send + Sync {
     
     /// Get evidence by incident ID
     async fn get_evidence_by_incident(&self, incident_id: &str, context: &TenantContext) -> DataStoreResult<Vec<Evidence>>;
+    
+    /// Update evidence
+    async fn update_evidence(&self, evidence: &Evidence, context: &TenantContext) -> DataStoreResult<()>;
 }
 
 /// Playbook storage operations
@@ -98,6 +101,14 @@ pub trait InvestigationStore: Send + Sync {
     
     /// Search investigations
     async fn search_investigations(&self, criteria: &InvestigationSearchCriteria, context: &TenantContext) -> DataStoreResult<SearchResults<ForensicInvestigation>>;
+    
+    /// Store a forensic investigation (alias for store_investigation)
+    async fn store_forensic_investigation(&self, investigation: &ForensicInvestigation, context: &TenantContext) -> DataStoreResult<String> {
+        self.store_investigation(investigation, context).await
+    }
+    
+    /// Update a forensic investigation
+    async fn update_forensic_investigation(&self, investigation: &ForensicInvestigation, context: &TenantContext) -> DataStoreResult<()>;
 }
 
 /// Responder storage operations
@@ -166,6 +177,12 @@ pub trait ComprehensiveIncidentResponseStore:
     
     /// Update a playbook execution
     async fn update_playbook_execution(&self, execution: &crate::playbook_models::PlaybookExecution, context: &TenantContext) -> DataStoreResult<()>;
+    
+    /// Store an analysis result
+    async fn store_analysis_result(&self, result: &crate::evidence_models::AnalysisResult, context: &TenantContext) -> DataStoreResult<String>;
+    
+    /// Store an incident analysis result
+    async fn store_incident_analysis_result(&self, result: &crate::analysis::IncidentAnalysisResult, context: &TenantContext) -> DataStoreResult<String>;
 }
 
 /// Search criteria for incidents

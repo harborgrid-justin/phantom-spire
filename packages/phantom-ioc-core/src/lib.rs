@@ -10,11 +10,14 @@ mod threat_intelligence;
 mod analytics_engine;
 mod correlation_engine;
 mod enrichment_engine;
+#[cfg(feature = "napi")]
 mod napi_bindings;
+
+// Enhanced data store architecture (phantom-cve-core inspired)
+pub mod data_stores;
 
 // Existing modules for backward compatibility
 mod types;
-mod data_stores;
 mod unified;
 
 use napi::bindgen_prelude::*;
@@ -31,7 +34,32 @@ pub use threat_intelligence::ThreatIntelligenceEngine;
 pub use analytics_engine::AnalyticsEngine;
 pub use correlation_engine::CorrelationEngine;
 pub use enrichment_engine::EnrichmentEngine;
+#[cfg(feature = "napi")]
 pub use napi_bindings::IOCCoreNapi;
+
+// Re-export enhanced data store components (phantom-cve-core inspired)
+pub use data_stores::{
+    ComprehensiveIOCStore,
+    IOCDataStore,
+    IOCStore,
+    IOCResultStore,
+    EnrichedIOCStore,
+    CorrelationStore,
+    IOCDataStoreFactory,
+    TenantContext,
+    DataStoreResult,
+    DataStoreError,
+    DataStoreConfig,
+    DataStoreType,
+    DataStoreMetrics,
+    BulkOperationResult,
+    SearchResults,
+    DataStoreRegistry,
+    MultiTenantDataStoreManager,
+    IOCSerializer,
+    SerializationFormat,
+    SerializationConfig,
+};
 
 // Re-export types for backward compatibility
 pub use types::*;

@@ -299,7 +299,7 @@ impl StorageConfig {
                 if let Some(ref local_config) = central_config.storage.local {
                     config.local = Some(LocalStorageConfig {
                         data_dir: local_config.data_dir.clone(),
-                        max_file_size_mb: local_config.max_file_size_mb,
+                        max_file_size_mb: local_config.max_file_size_mb as usize,
                         compression_enabled: local_config.compression_enabled,
                         backup_interval_hours: local_config.backup_interval_hours,
                     });
@@ -314,7 +314,7 @@ impl StorageConfig {
                         username: postgres_config.username.clone(),
                         password: postgres_config.password.clone(),
                         pool_size: postgres_config.pool_size,
-                        connection_timeout_seconds: postgres_config.connection_timeout_seconds,
+                        connection_timeout_seconds: postgres_config.connection_timeout_seconds as u64,
                         ssl_mode: postgres_config.ssl_mode.clone(),
                     });
                 }
@@ -339,7 +339,7 @@ impl StorageConfig {
                         database: mongo_config.database.clone(),
                         collection_prefix: mongo_config.collection_prefix.clone(),
                         pool_size: mongo_config.pool_size,
-                        connection_timeout_ms: mongo_config.connection_timeout_ms,
+                        connection_timeout_ms: mongo_config.connection_timeout_ms as u64,
                     });
                 }
             },
