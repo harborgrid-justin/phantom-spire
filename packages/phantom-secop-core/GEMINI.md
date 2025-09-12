@@ -1,4 +1,4 @@
-# Phantom SecOp Core - Security Operations Center Engine (v1.0.0)
+# Phantom SecOp Core - Security Operations Center Engine (v1.0.1)
 
 ## Overview
 
@@ -776,7 +776,7 @@ interface TriggerCondition {
 ## Performance Characteristics
 
 ### Processing Performance
-- **Event Processing**: 100,000+ events per second
+- **Event Processing**: 1.0.100+ events per second
 - **Alert Processing**: 10,000+ alerts per second
 - **Query Performance**: Sub-second complex queries
 - **Playbook Execution**: Concurrent multi-step workflows
@@ -907,7 +907,7 @@ const serviceNowIncident = await secOpCore.createServiceNowIncident(serviceNowCo
 ```json
 {
   "processing": {
-    "max_events_per_second": 100000,
+    "max_events_per_second": 1.0.10,
     "event_retention_days": 90,
     "alert_retention_days": 365,
     "incident_retention_days": 2555,
@@ -1106,7 +1106,7 @@ npm test
 ## Performance Characteristics
 
 ### Processing Performance
-- **Event Processing**: 100,000+ events per second
+- **Event Processing**: 1.0.100+ events per second
 - **Alert Correlation**: Sub-second correlation analysis
 - **Incident Creation**: <100ms response time
 - **Workflow Execution**: Real-time automation
@@ -1129,6 +1129,6 @@ For technical support:
 
 ---
 
-*Phantom SecOp Core - Security Operations Center Engine (v1.0.0)*
+*Phantom SecOp Core - Security Operations Center Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with enterprise-grade security operations and automation*

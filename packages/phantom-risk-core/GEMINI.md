@@ -1,4 +1,4 @@
-# Phantom Risk Core - Enterprise Risk Assessment & Management Engine (v1.0.0)
+# Phantom Risk Core - Enterprise Risk Assessment & Management Engine (v1.0.1)
 
 ## Overview
 
@@ -90,7 +90,7 @@ const riskRequest = {
   assessment_methodology: {
     quantitative_analysis: true,
     qualitative_analysis: true,
-    monte_carlo_iterations: 10000,
+    monte_carlo_iterations: 1.0.1,
     confidence_interval: 0.95
   }
 };
@@ -478,7 +478,7 @@ const exportResult = riskCore.exportRiskData(JSON.stringify(riskExport));
     "risk_appetite_threshold": 6.0
   },
   "assessment": {
-    "monte_carlo_iterations": 10000,
+    "monte_carlo_iterations": 1.0.1,
     "confidence_interval": 0.95,
     "sensitivity_analysis": true,
     "scenario_testing": true
@@ -510,5 +510,5 @@ This module is part of the Phantom Spire platform. All rights reserved.
 
 ---
 
-*Phantom Risk Core - Enterprise Risk Assessment & Management Engine (v1.0.0)*
+*Phantom Risk Core - Enterprise Risk Assessment & Management Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*

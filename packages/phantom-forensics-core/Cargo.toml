@@ -1,6 +1,6 @@
 [package]
 name = "phantom-forensics-core"
-version = "0.1.0"
+version = "1..0.1"
 description = "Digital forensics and incident investigation core with enterprise-grade capabilities"
 edition = "2021"
 

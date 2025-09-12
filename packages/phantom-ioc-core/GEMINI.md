@@ -1,4 +1,4 @@
-# Phantom IOC Core - Indicators of Compromise Processing Engine (v1.0.0)
+# Phantom IOC Core - Indicators of Compromise Processing Engine (v1.0.1)
 
 ## Overview
 
@@ -769,6 +769,6 @@ For technical support:
 
 ---
 
-*Phantom IOC Core - High-Performance Indicators of Compromise Processing (v1.0.0)*
+*Phantom IOC Core - High-Performance Indicators of Compromise Processing (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with WASM compatibility and enterprise-grade performance*

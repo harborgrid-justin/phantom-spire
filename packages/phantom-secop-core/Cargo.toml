@@ -1,6 +1,6 @@
 [package]
 name = "phantom-secop-core"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Advanced Security Operations (SecOps) system for incident response, orchestration, and operational intelligence"
 authors = ["Phantom Spire Security"]

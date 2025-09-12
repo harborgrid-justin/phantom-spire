@@ -1,4 +1,4 @@
-# Phantom Incident Response Core (v1.0.0)
+# Phantom Incident Response Core (v1.0.1)
 
 ## Overview
 
@@ -395,8 +395,8 @@ pub struct Evidence {
 - **Concurrent Incidents**: 10,000+ active incidents
 - **Response Team Size**: 500+ responders
 - **Evidence Storage**: 1TB+ per incident
-- **Playbook Library**: 1,000+ response playbooks
-- **Timeline Events**: 100,000+ events per incident
+- **Playbook Library**: 1.0.1+ response playbooks
+- **Timeline Events**: 1.0.100+ events per incident
 - **Memory Usage**: < 1GB for full operation
 
 ### Availability Metrics
@@ -495,7 +495,7 @@ for notification in &incident.external_notifications {
 
 ```toml
 [incident_response]
-max_concurrent_incidents = 10000
+max_concurrent_incidents = 1.0.1
 default_sla_hours = 24
 auto_escalation_enabled = true
 evidence_retention_days = 2555  # 7 years
@@ -993,6 +993,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Phantom Incident Response Core - Comprehensive incident response management (v1.0.0)*
+*Phantom Incident Response Core - Comprehensive incident response management (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready for modern cybersecurity operations with enterprise scalability*

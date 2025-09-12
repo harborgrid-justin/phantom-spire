@@ -1,6 +1,6 @@
 {
   "name": "phantom-hunting-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Threat hunting and proactive defense core with behavioral analytics and anomaly detection",
   "main": "index.js",
   "types": "index.d.ts",

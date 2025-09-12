@@ -1,5 +1,5 @@
 ````markdown
-# Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.0)
+# Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.1)
 
 ## Overview
 
@@ -278,7 +278,7 @@ console.log(status);
 // {
 //   status: "healthy",
 //   timestamp: "2024-01-01T12:00:00Z",
-//   version: "1.0.0",
+//   version: "1.0.1",
 //   components: {
 //     profiling_engine: "healthy",
 //     behavior_analysis: "healthy",
@@ -919,7 +919,7 @@ For technical support:
 
 ---
 
-*Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.0)*
+*Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with enterprise-grade reliability and performance*
 ````

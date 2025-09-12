@@ -1,6 +1,6 @@
 {
   "name": "phantom-compliance-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Compliance and regulatory framework analysis core with automated audit and reporting capabilities",
   "main": "index.js",
   "types": "index.d.ts",

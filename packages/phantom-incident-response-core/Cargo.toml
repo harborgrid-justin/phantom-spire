@@ -1,6 +1,6 @@
 [package]
 name = "phantom-incident-response-core"
-version = "0.1.0"
+version = "1.0.1"
 description = "Enterprise incident response core with comprehensive capabilities"
 edition = "2021"
 

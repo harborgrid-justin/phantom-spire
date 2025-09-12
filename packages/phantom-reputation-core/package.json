@@ -1,6 +1,6 @@
 {
   "name": "phantom-reputation-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "IP and domain reputation analysis core with threat scoring and blacklist management",
   "main": "index.js",
   "types": "index.d.ts",

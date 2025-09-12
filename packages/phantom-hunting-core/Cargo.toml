@@ -1,6 +1,6 @@
 [package]
 name = "phantom-hunting-core"
-version = "0.1.0"
+version = "1.0.1"
 description = "Threat hunting and proactive detection core"
 edition = "2021"
 

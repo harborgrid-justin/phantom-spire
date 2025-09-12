@@ -1,4 +1,4 @@
-# Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.0)
+# Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.1)
 
 ## Overview
 
@@ -322,7 +322,7 @@ const edrResults = huntingCore.executeEDRHunt(JSON.stringify(edrHunt));
     "max_concurrent_hunts": 50,
     "default_time_window": "24h",
     "query_timeout": 300,
-    "result_limit": 10000,
+    "result_limit": 1.0.1,
     "enable_ml_models": true
   },
   "behavioral_analysis": {
@@ -353,5 +353,5 @@ This module is part of the Phantom Spire platform. All rights reserved.
 
 ---
 
-*Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.0)*
+*Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*

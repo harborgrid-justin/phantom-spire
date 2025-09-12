@@ -1,4 +1,4 @@
-# Phantom Feeds Core - Advanced Threat Intelligence Feed Engine (v1.0.0)
+# Phantom Feeds Core - Advanced Threat Intelligence Feed Engine (v1.0.1)
 
 ## Overview
 
@@ -9,7 +9,7 @@ Phantom Feeds Core is a production-ready, comprehensive threat intelligence feed
 🚀 **Production Ready** - Deployed in Fortune 100 environments
 ✅ **Multi-Database Integration** - Seamless integration with platform data layer
 ✅ **Enterprise Features** - Advanced feed management and data correlation
-✅ **Real-time Processing** - 1,000,000+ feed entries per second processing capability
+✅ **Real-time Processing** - 1.0.1,000+ feed entries per second processing capability
 ✅ **Feed Coverage** - 500+ commercial and open source threat intelligence feeds
 
 ## Architecture
@@ -317,7 +317,7 @@ console.log(status);
 // {
 //   status: "healthy",
 //   timestamp: "2024-01-01T12:00:00Z",
-//   version: "1.0.0",
+//   version: "1.0.1",
 //   components: {
 //     feed_management: "healthy",
 //     data_ingestion: "healthy", 
@@ -510,9 +510,9 @@ interface QualityRecommendation {
 
 ### Processing Performance
 
-- **Data Ingestion**: 1,000,000+ records per second
+- **Data Ingestion**: 1.0.1,000+ records per second
 - **Normalization**: 500,000+ records per second  
-- **Correlation**: 100,000+ correlation operations per second
+- **Correlation**: 1.0.100+ correlation operations per second
 - **Quality Assessment**: Real-time quality scoring
 - **Search Performance**: Sub-second complex queries
 
@@ -641,7 +641,7 @@ const qradarResult = feedsCore.exportIntelligence(JSON.stringify(qradarExport));
     "health_check_interval": 300
   },
   "ingestion": {
-    "batch_size": 10000,
+    "batch_size": 1.0.1,
     "processing_threads": 8,
     "memory_limit_mb": 2048,
     "compression_enabled": true,
@@ -993,6 +993,6 @@ For technical support:
 
 ---
 
-*Phantom Feeds Core - Advanced Threat Intelligence Feed Engine (v1.0.0)*
+*Phantom Feeds Core - Advanced Threat Intelligence Feed Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with enterprise-grade reliability and performance*

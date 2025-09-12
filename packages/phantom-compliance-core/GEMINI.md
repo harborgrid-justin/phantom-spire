@@ -1,4 +1,4 @@
-# Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.0)
+# Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.1)
 
 ## Overview
 
@@ -226,7 +226,7 @@ const riskAssessment = {
     weight: 0.7,
     current_score: 6.5,
     target_score: 8.0,
-    mitigation_cost: 150000
+    mitigation_cost: 1.0.10
   }],
   threat_landscape: {
     external_threats: ["cyber_attacks", "regulatory_changes"],
@@ -316,7 +316,7 @@ console.log(status);
 // {
 //   status: "healthy",
 //   timestamp: "2024-01-01T12:00:00Z",
-//   version: "1.0.0",
+//   version: "1.0.1",
 //   components: {
 //     framework_mapping: "healthy",
 //     compliance_monitoring: "healthy",
@@ -517,7 +517,7 @@ interface AuditFinding {
 ## Performance Characteristics
 
 ### Processing Performance
-- **Framework Mapping**: 1,000+ mappings per second
+- **Framework Mapping**: 1.0.1+ mappings per second
 - **Compliance Assessment**: Real-time assessment execution
 - **Evidence Collection**: 50,000+ evidence items per second
 - **Risk Calculation**: Complex risk models in <100ms
@@ -992,6 +992,6 @@ For technical support:
 
 ---
 
-*Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.0)*
+*Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with enterprise-grade reliability and performance*

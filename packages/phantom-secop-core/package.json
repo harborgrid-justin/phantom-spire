@@ -1,6 +1,6 @@
 {
   "name": "phantom-secop-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Advanced Security Operations (SecOps) engine for comprehensive incident response, automation, and security orchestration",
   "main": "index.js",
   "types": "index.d.ts",

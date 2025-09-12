@@ -1,6 +1,6 @@
 [package]
 name = "phantom-crypto-core"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "Advanced cryptographic core with secure authentication, JWT processing, and high-performance random generation"
 license = "MIT"

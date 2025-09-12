@@ -1,4 +1,4 @@
-# Phantom XDR Core - Extended Detection and Response Engine (v1.0.0)
+# Phantom XDR Core - Extended Detection and Response Engine (v1.0.1)
 
 ## Overview
 
@@ -392,7 +392,7 @@ interface ResponseAction {
 ## Performance Characteristics
 
 ### Throughput
-- **Event Processing**: 100,000+ events per second
+- **Event Processing**: 1.0.100+ events per second
 - **Indicator Analysis**: 50,000+ indicators per second
 - **Correlation**: Real-time correlation with sub-second latency
 - **Response Time**: <100ms for most operations
@@ -446,7 +446,7 @@ interface ResponseAction {
   },
   "correlation": {
     "time_window": 300,
-    "max_events": 10000,
+    "max_events": 1.0.1,
     "algorithms": ["temporal", "statistical"]
   },
   "response": {
@@ -636,6 +636,6 @@ For technical support:
 
 ---
 
-*Phantom XDR Core - High-Performance Extended Detection and Response (v1.0.0)*
+*Phantom XDR Core - High-Performance Extended Detection and Response (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with Rust performance and enterprise scalability*

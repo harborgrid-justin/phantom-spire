@@ -1,4 +1,4 @@
-# Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.0)
+# Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.1)
 
 ## Overview
 
@@ -379,5 +379,5 @@ This module is part of the Phantom Spire platform. All rights reserved.
 
 ---
 
-*Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.0)*
+*Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*

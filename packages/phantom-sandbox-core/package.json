@@ -1,6 +1,6 @@
 {
   "name": "phantom-sandbox-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automated malware sandboxing and behavioral analysis core with dynamic execution environments",
   "main": "index.js",
   "types": "index.d.ts",

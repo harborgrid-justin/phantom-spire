@@ -1,6 +1,6 @@
 [package]
 name = "phantom-feeds-core"
-version = "0.1.0"
+version = "1.0.1"
 description = "Threat intelligence feed aggregation and processing core"
 edition = "2021"
 

@@ -1,4 +1,4 @@
-# Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.0)
+# Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.1)
 
 ## Overview
 
@@ -260,7 +260,7 @@ const caseLink = forensicsCore.linkToCase(JSON.stringify(caseData));
     "hash_verification": true
   },
   "timeline": {
-    "max_events": 1000000,
+    "max_events": 1.0.100,
     "correlation_window_seconds": 300,
     "deduplication": true,
     "time_zone": "UTC"
@@ -287,5 +287,5 @@ This module is part of the Phantom Spire platform. All rights reserved.
 
 ---
 
-*Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.0)*
+*Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*

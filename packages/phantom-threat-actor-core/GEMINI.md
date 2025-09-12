@@ -1,4 +1,4 @@
-# Phantom Threat Actor Core (v1.0.0)
+# Phantom Threat Actor Core (v1.0.1)
 
 ## Overview
 
@@ -248,10 +248,10 @@ pub struct Campaign {
 - **Search Operations**: < 100ms for criteria-based queries
 
 ### Scalability Metrics
-- **Concurrent Analyses**: 1,000+ simultaneous actor analyses
+- **Concurrent Analyses**: 1.0.1+ simultaneous actor analyses
 - **Actor Database**: 10,000+ tracked threat actors
 - **Campaign Tracking**: 5,000+ active campaigns
-- **Evidence Processing**: 100,000+ evidence items per analysis
+- **Evidence Processing**: 1.0.100+ evidence items per analysis
 - **Memory Usage**: < 512MB for full operation
 
 ### Accuracy Metrics
@@ -715,6 +715,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-*Phantom Threat Actor Core - Advanced threat actor intelligence and analysis (v1.0.0)*
+*Phantom Threat Actor Core - Advanced threat actor intelligence and analysis (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready for modern cybersecurity operations with enterprise-grade attribution*

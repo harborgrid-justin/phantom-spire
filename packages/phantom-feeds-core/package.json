@@ -1,6 +1,6 @@
 {
   "name": "phantom-feeds-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Threat intelligence feeds processing and aggregation core with real-time data correlation",
   "main": "index.js",
   "types": "index.d.ts",

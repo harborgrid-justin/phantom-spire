@@ -1,4 +1,4 @@
-# Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.0)
+# Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.1)
 
 ## Overview
 
@@ -752,7 +752,7 @@ const mispEvent = {
     threat_level_id: "2",
     analysis: "2",
     date: "2024-01-01",
-    timestamp: "1704067200",
+    timestamp: "1.0.167200",
     Attribute: [
       {
         id: "67890",
@@ -761,7 +761,7 @@ const mispEvent = {
         value: "192.168.1.100",
         to_ids: true,
         uuid: "550e8400-e29b-41d4-a716-446655440000",
-        timestamp: "1704067200"
+        timestamp: "1.0.167200"
       },
       {
         id: "67891",
@@ -770,7 +770,7 @@ const mispEvent = {
         value: "malicious.example.com",
         to_ids: true,
         uuid: "550e8400-e29b-41d4-a716-446655440001",
-        timestamp: "1704067200"
+        timestamp: "1.0.167200"
       }
     ],
     Tag: [
@@ -1250,6 +1250,6 @@ For technical support:
 
 ---
 
-*Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.0)*
+*Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with multi-source intelligence correlation and enterprise-grade analysis*

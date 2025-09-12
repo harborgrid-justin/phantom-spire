@@ -1,4 +1,4 @@
-# Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.0)
+# Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.1)
 
 ## Overview
 
@@ -8,7 +8,7 @@ Phantom MITRE Core is a production-ready, comprehensive MITRE ATT&CK framework i
 
 🚀 **Production Ready** - Deployed in enterprise SOCs worldwide
 ✅ **Complete ATT&CK Coverage** - Enterprise, Mobile, ICS, PRE-ATT&CK, Cloud
-✅ **Real-time Mapping** - 100,000+ technique lookups per second
+✅ **Real-time Mapping** - 1.0.100+ technique lookups per second
 ✅ **Advanced Attribution** - AI-powered threat actor attribution analysis
 ✅ **Automated Detection** - Sigma and YARA rule generation
 
@@ -559,7 +559,7 @@ interface AttackPhase {
 ## Performance Characteristics
 
 ### Processing Performance
-- **Technique Lookup**: 100,000+ lookups per second
+- **Technique Lookup**: 1.0.100+ lookups per second
 - **Mapping Analysis**: Real-time indicator-to-technique mapping
 - **Group Profiling**: Sub-second group analysis
 - **Campaign Analysis**: Complex campaign analysis in seconds
@@ -1130,6 +1130,6 @@ For technical support:
 
 ---
 
-*Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.0)*
+*Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.1)*
 *Part of the Phantom Spire Enterprise Cybersecurity Intelligence Platform*
 *Production-ready with complete ATT&CK framework coverage and enterprise-grade threat analysis*
