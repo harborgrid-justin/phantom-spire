@@ -27,6 +27,10 @@ use parking_lot::RwLock;
 use std::sync::Arc;
 use base64::{Engine as _, engine::general_purpose};
 
+// Database support
+pub mod database;
+use database::{DatabaseManager, DatabaseManagerBuilder, DatabaseType};
+
 /// Configuration for ML models
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MLModelConfig {
@@ -35,6 +39,7 @@ pub struct MLModelConfig {
     pub hyperparameters: HashMap<String, serde_json::Value>,
     pub feature_config: FeatureConfig,
     pub training_config: TrainingConfig,
+    pub database_config: Option<MLDatabaseConfig>,
 }
 
 /// Feature extraction and engineering configuration
@@ -56,6 +61,16 @@ pub struct TrainingConfig {
     pub validation_split: f64,
     pub early_stopping: bool,
     pub cross_validation: bool,
+}
+
+/// Database configuration for ML operations
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MLDatabaseConfig {
+    pub enabled: bool,
+    pub persistence_backend: String, // "postgresql", "mongodb", "redis", "elasticsearch", "all"
+    pub cache_enabled: bool,
+    pub search_enabled: bool,
+    pub analytics_enabled: bool,
 }
 
 /// ML Model metadata and state
@@ -111,6 +126,7 @@ pub struct PhantomMLCore {
     model_cache: Arc<DashMap<String, Arc<RwLock<Vec<f64>>>>>, // Simplified model weights storage
     performance_stats: Arc<RwLock<PerformanceStats>>,
     config: MLCoreConfig,
+    database_manager: Option<Arc<RwLock<DatabaseManager>>>,
 }
 
 /// Performance statistics for monitoring
@@ -135,6 +151,8 @@ pub struct MLCoreConfig {
     pub enable_auto_retrain: bool,
     pub cache_predictions: bool,
     pub max_cache_size: usize,
+    pub enable_database_persistence: bool,
+    pub database_auto_init: bool,
 }
 
 impl Default for MLCoreConfig {
@@ -146,6 +164,8 @@ impl Default for MLCoreConfig {
             enable_auto_retrain: false,
             cache_predictions: true,
             max_cache_size: 10000,
+            enable_database_persistence: false,
+            database_auto_init: true,
         }
     }
 }
@@ -172,7 +192,77 @@ impl PhantomMLCore {
             model_cache: Arc::new(DashMap::new()),
             performance_stats: Arc::new(RwLock::new(performance_stats)),
             config,
+            database_manager: None,
         })
+    }
+
+    /// Initialize database connections
+    #[napi]
+    pub async fn initialize_databases(&mut self, database_config_json: String) -> Result<String> {
+        let db_config: serde_json::Value = serde_json::from_str(&database_config_json)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to parse database config: {}", e)))?;
+
+        let mut builder = DatabaseManagerBuilder::new();
+        
+        // Add database configurations based on provided config
+        if let Some(postgres_uri) = db_config.get("postgresql_uri").and_then(|v| v.as_str()) {
+            builder = builder.with_postgresql(postgres_uri.to_string());
+        }
+        
+        if let Some(mongodb_uri) = db_config.get("mongodb_uri").and_then(|v| v.as_str()) {
+            builder = builder.with_mongodb(mongodb_uri.to_string());
+        }
+        
+        if let Some(redis_url) = db_config.get("redis_url").and_then(|v| v.as_str()) {
+            builder = builder.with_redis(redis_url.to_string());
+        }
+        
+        if let Some(elasticsearch_url) = db_config.get("elasticsearch_url").and_then(|v| v.as_str()) {
+            builder = builder.with_elasticsearch(elasticsearch_url.to_string());
+        }
+
+        // Configure storage preferences
+        let model_storage = db_config.get("model_storage")
+            .and_then(|v| v.as_str())
+            .and_then(|s| match s {
+                "postgresql" => Some(DatabaseType::PostgreSQL),
+                "mongodb" => Some(DatabaseType::MongoDB),
+                "redis" => Some(DatabaseType::Redis),
+                "elasticsearch" => Some(DatabaseType::Elasticsearch),
+                _ => None,
+            })
+            .unwrap_or(DatabaseType::PostgreSQL);
+
+        let inference_storage = db_config.get("inference_storage")
+            .and_then(|v| v.as_str())
+            .and_then(|s| match s {
+                "postgresql" => Some(DatabaseType::PostgreSQL),
+                "mongodb" => Some(DatabaseType::MongoDB),
+                "redis" => Some(DatabaseType::Redis),
+                "elasticsearch" => Some(DatabaseType::Elasticsearch),
+                _ => None,
+            })
+            .unwrap_or(DatabaseType::MongoDB);
+
+        builder = builder.with_storage_preferences(
+            model_storage,
+            inference_storage,
+            DatabaseType::MongoDB,       // Training storage
+            DatabaseType::Redis,         // Cache storage
+            DatabaseType::Elasticsearch, // Search storage
+        );
+
+        let db_manager = builder.build().await
+            .map_err(|e| napi::Error::from_reason(format!("Failed to initialize databases: {}", e)))?;
+
+        self.database_manager = Some(Arc::new(RwLock::new(db_manager)));
+        self.config.enable_database_persistence = true;
+
+        Ok(serde_json::json!({
+            "status": "success",
+            "message": "Database connections initialized successfully",
+            "timestamp": Utc::now().to_rfc3339()
+        }).to_string())
     }
 
     /// Create a new ML model with specified configuration
@@ -209,6 +299,17 @@ impl PhantomMLCore {
         self.model_cache.insert(model_id.clone(), Arc::new(RwLock::new(weights)));
         self.models.insert(model_id.clone(), model.clone());
 
+        // Save to database if enabled
+        if self.config.enable_database_persistence {
+            if let Some(db_manager) = &self.database_manager {
+                let db_guard = db_manager.read();
+                if let Err(e) = db_guard.save_model(&model).await {
+                    // Log error but don't fail the operation
+                    eprintln!("Failed to persist model to database: {}", e);
+                }
+            }
+        }
+
         // Update stats
         {
             let mut stats = self.performance_stats.write();
@@ -224,7 +325,8 @@ impl PhantomMLCore {
             "algorithm": model.algorithm,
             "feature_count": model.feature_count,
             "status": model.status,
-            "created_at": model.created_at.to_rfc3339()
+            "created_at": model.created_at.to_rfc3339(),
+            "database_persisted": self.config.enable_database_persistence
         }).to_string())
     }
 
