@@ -54,6 +54,7 @@ use napi::bindgen_prelude::*;
 #[cfg(feature = "napi")]
 use napi_derive::napi;
 use std::collections::HashMap;
+use chrono::Utc;
 use uuid::Uuid;
 
 // Re-export public types and components from new modular structure
