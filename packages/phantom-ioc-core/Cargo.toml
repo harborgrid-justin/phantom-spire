@@ -36,11 +36,12 @@ redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], o
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
 elasticsearch = { version = "8.15.0-alpha.1", optional = true }
 mongodb = { version = "3.3.0", optional = true }
+bson = { version = "2.0", features = ["chrono-0_4"] }
 flate2 = { version = "1.0", optional = true }
 sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
 
 [features]
-default = ["napi", "local-storage"]
+default = ["napi", "local-storage", "redis-store", "postgres-store", "mongodb-store", "elasticsearch-store"]
 napi = ["dep:napi", "dep:napi-derive"]
 redis-store = ["dep:redis"]
 postgres-store = ["dep:tokio-postgres", "dep:sqlx"]

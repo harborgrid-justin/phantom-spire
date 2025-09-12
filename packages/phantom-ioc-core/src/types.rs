@@ -24,6 +24,26 @@ pub enum IOCType {
     Custom(String),
 }
 
+impl std::fmt::Display for IOCType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            IOCType::IPAddress => write!(f, "ip"),
+            IOCType::Domain => write!(f, "domain"),
+            IOCType::URL => write!(f, "url"),
+            IOCType::Hash => write!(f, "hash"),
+            IOCType::Email => write!(f, "email"),
+            IOCType::FilePath => write!(f, "file"),
+            IOCType::RegistryKey => write!(f, "registry"),
+            IOCType::Mutex => write!(f, "mutex"),
+            IOCType::UserAgent => write!(f, "user_agent"),
+            IOCType::Certificate => write!(f, "certificate"),
+            IOCType::ASN => write!(f, "asn"),
+            IOCType::CVE => write!(f, "cve"),
+            IOCType::Custom(s) => write!(f, "custom:{}", s),
+        }
+    }
+}
+
 /// Severity levels for IOCs
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Severity {
@@ -57,8 +77,31 @@ pub struct IOC {
     pub raw_data: Option<String>,
 }
 
+impl std::fmt::Display for IOC {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}:{}", self.indicator_type, self.value)
+    }
+}
+
+impl Default for IOC {
+    fn default() -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            indicator_type: IOCType::Domain,
+            value: String::new(),
+            confidence: 0.0,
+            severity: Severity::Low,
+            source: String::new(),
+            timestamp: Utc::now(),
+            tags: Vec::new(),
+            context: IOCContext::default(),
+            raw_data: None,
+        }
+    }
+}
+
 /// IOC context information
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct IOCContext {
     pub geolocation: Option<String>,
     pub asn: Option<String>,
@@ -70,7 +113,7 @@ pub struct IOCContext {
 }
 
 /// Detection result
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct DetectionResult {
     pub matched_rules: Vec<String>,
     pub detection_methods: Vec<String>,
@@ -79,7 +122,7 @@ pub struct DetectionResult {
 }
 
 /// Intelligence data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Intelligence {
     pub sources: Vec<String>,
     pub confidence: f64,
@@ -88,7 +131,7 @@ pub struct Intelligence {
 }
 
 /// Correlation between IOCs
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Correlation {
     pub id: Uuid,
     pub correlated_iocs: Vec<Uuid>,
@@ -99,7 +142,7 @@ pub struct Correlation {
 }
 
 /// Analysis result
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct AnalysisResult {
     pub threat_actors: Vec<String>,
     pub campaigns: Vec<String>,
@@ -110,7 +153,7 @@ pub struct AnalysisResult {
 }
 
 /// Impact assessment
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ImpactAssessment {
     pub business_impact: f64,
     pub technical_impact: f64,
@@ -119,7 +162,7 @@ pub struct ImpactAssessment {
 }
 
 /// IOC processing result
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct IOCResult {
     pub ioc: IOC,
     pub detection_result: DetectionResult,
@@ -231,7 +274,7 @@ pub struct EnrichmentSource {
 }
 
 /// Enriched IOC with additional data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct EnrichedIOC {
     pub base_ioc: IOC,
     pub enrichment_data: HashMap<String, serde_json::Value>,
