@@ -20,7 +20,7 @@ pub struct DatabaseConfig {
 }
 
 /// Supported database types
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum DatabaseType {
     InMemory,      // Default fallback
     PostgreSQL,    // Structured model metadata and analytics
