@@ -1,6 +1,6 @@
 {
   "name": "phantom-forensics-core",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Digital forensics and incident analysis core with evidence collection and timeline reconstruction",
   "main": "index.js",
   "types": "index.d.ts",

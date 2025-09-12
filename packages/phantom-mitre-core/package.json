@@ -1,6 +1,6 @@
 {
   "name": "phantom-mitre-core",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Advanced MITRE ATT&CK framework integration and threat analysis system with comprehensive technique mapping",
   "main": "index.js",
   "types": "index.d.ts",

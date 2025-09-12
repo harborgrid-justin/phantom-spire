@@ -1,6 +1,6 @@
 {
   "name": "phantom-ioc-core",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Advanced IOC processing core with threat intelligence and indicator correlation",
   "main": "index.js",
   "types": "index.d.ts",

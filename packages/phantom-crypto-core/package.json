@@ -1,6 +1,6 @@
 {
   "name": "phantom-crypto-core",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Cryptographic analysis and security assessment core with algorithm validation and key management",
   "main": "index.js",
   "types": "index.d.ts",

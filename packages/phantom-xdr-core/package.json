@@ -1,6 +1,6 @@
 {
   "name": "phantom-xdr-core",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Advanced XDR (Extended Detection and Response) core with threat detection, behavioral analytics, and automated response capabilities",
   "main": "index.js",
   "types": "index.d.ts",
