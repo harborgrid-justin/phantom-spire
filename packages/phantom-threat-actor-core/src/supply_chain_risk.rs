@@ -8,8 +8,9 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
+use crate::risk_assessment::AssessmentStatus;
 
 /// Supply chain risk management engine
 #[derive(Debug)]
@@ -225,6 +226,7 @@ impl SupplyChainRiskModule {
                 VulnerabilitySeverity::High => AlertSeverity::High,
                 VulnerabilitySeverity::Medium => AlertSeverity::Medium,
                 VulnerabilitySeverity::Low => AlertSeverity::Low,
+                VulnerabilitySeverity::Info => AlertSeverity::Low,
             },
             title: format!("Critical vulnerability in {}", dependency.name),
             description: vulnerability.description.clone(),
@@ -692,7 +694,7 @@ pub struct Vulnerability {
 }
 
 /// Vulnerability severity
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum VulnerabilitySeverity {
     Critical,
     High,
@@ -1104,7 +1106,7 @@ impl VendorAssessmentEngine {
 
     async fn assess_security_posture(&self, vendor: &Vendor) -> Result<f64> {
         // Assess vendor's security posture
-        let mut score = 5.0; // Base score
+        let mut score: f64 = 5.0; // Base score
 
         if vendor.compliance_status.soc2_compliant {
             score += 2.0;

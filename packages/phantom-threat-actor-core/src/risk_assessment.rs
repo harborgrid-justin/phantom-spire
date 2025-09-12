@@ -8,7 +8,7 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Risk assessment engine
@@ -64,7 +64,7 @@ impl RiskAssessmentModule {
                 // Process assessment request
             }
             RiskEvent::RiskThresholdExceeded(risk) => {
-                println!("Processing risk threshold exceeded: {}", risk.risk_id);
+                println!("Processing risk threshold exceeded: {}", risk.alert_id);
                 // Process risk threshold
             }
             RiskEvent::MitigationApplied(mitigation) => {
@@ -685,7 +685,7 @@ pub enum RiskLevel {
 }
 
 /// Assessment status
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum AssessmentStatus {
     Pending,
     InProgress,
@@ -714,7 +714,7 @@ pub struct PotentialImpact {
 }
 
 /// Impact severity
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ImpactSeverity {
     Low,
     Medium,

@@ -4,11 +4,11 @@
 //! risk visualizations, and strategic insights for decision makers.
 
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Executive dashboard engine

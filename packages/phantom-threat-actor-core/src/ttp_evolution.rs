@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::RwLock;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// TTP Evolution Analysis Engine
@@ -2154,5 +2154,6 @@ struct CorrelationRule {
     rule_id: String,
     conditions: Vec<String>,
     correlation_type: String,
-}! ttp_evolution module stub
+}
+
 pub struct TtpEvolutionModule;

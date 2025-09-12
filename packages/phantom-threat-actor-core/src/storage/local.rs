@@ -107,7 +107,7 @@ impl ThreatActorStorage for LocalStorage {
             StorageError::Internal(format!("Failed to acquire read lock: {}", e))
         })?;
         
-        let mut results: Vec<ThreatActor> = actors
+        let results: Vec<ThreatActor> = actors
             .values()
             .filter(|actor| self.matches_criteria(actor, criteria))
             .cloned()

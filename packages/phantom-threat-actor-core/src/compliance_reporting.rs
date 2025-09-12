@@ -8,7 +8,7 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Compliance reporting and monitoring engine
@@ -533,7 +533,6 @@ pub struct ComplianceControl {
 }
 
 /// Compliance status
-#[derive(Debug, Clone, Serialize, Deserialize)]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ComplianceStatusEnum {
     Compliant,

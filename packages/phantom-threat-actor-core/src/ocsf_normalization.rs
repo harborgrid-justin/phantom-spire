@@ -534,36 +534,37 @@ impl EventNormalizer {
             return;
         }
 
-        // Navigate to the parent object where we need to set the value
-        let mut current_obj = match event {
-            Value::Object(ref mut obj) => obj,
-            _ => return, // Cannot set field on non-object
-        };
+        // Ensure the root is an object
+        if !event.is_object() {
+            *event = json!({});
+        }
 
+        // Navigate to the target location and set the value
+        let mut current = event;
+        
         for (i, part) in parts.iter().enumerate() {
             if i == parts.len() - 1 {
                 // Last part - set the value
-                current_obj.insert(part.to_string(), value);
+                if let Value::Object(ref mut obj) = current {
+                    obj.insert(part.to_string(), value);
+                }
+                return;
             } else {
                 // Intermediate part - ensure object exists and navigate deeper
-                if !current_obj.contains_key(*part) {
-                    current_obj.insert(part.to_string(), json!({}));
-                }
-
-                // Get the next object to navigate to
-                match current_obj.get_mut(*part) {
-                    Some(Value::Object(ref mut next_obj)) => {
-                        current_obj = next_obj;
-                    },
-                    _ => {
-                        // If we can't navigate further, create a new object
-                        current_obj.insert(part.to_string(), json!({}));
-                        if let Some(Value::Object(ref mut next_obj)) = current_obj.get_mut(*part) {
-                            current_obj = next_obj;
-                        } else {
-                            return; // Should not happen
-                        }
+                if let Value::Object(ref mut obj) = current {
+                    if !obj.contains_key(*part) {
+                        obj.insert(part.to_string(), json!({}));
                     }
+                    
+                    // Move to the next level
+                    current = obj.get_mut(*part).unwrap();
+                    
+                    // Ensure it's an object
+                    if !current.is_object() {
+                        *current = json!({});
+                    }
+                } else {
+                    return; // Cannot navigate further
                 }
             }
         }

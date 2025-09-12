@@ -8,7 +8,7 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Real-time alerts engine

@@ -231,7 +231,7 @@ impl ThreatActorCore {
     }
 
     /// Helper methods for analysis
-    fn generate_actor_name(&self, indicators: &[String]) -> String {
+    pub fn generate_actor_name(&self, _indicators: &[String]) -> String {
         let prefixes = ["APT", "Group", "Team", "Actor"];
         let numbers = [28, 29, 30, 31, 32, 33, 34, 35];
         
@@ -380,7 +380,7 @@ impl ThreatActorCore {
         ]
     }
 
-    fn collect_evidence(&self, indicators: &[String]) -> Vec<Evidence> {
+    fn collect_evidence(&self, _indicators: &[String]) -> Vec<Evidence> {
         let now = Utc::now();
         
         vec![

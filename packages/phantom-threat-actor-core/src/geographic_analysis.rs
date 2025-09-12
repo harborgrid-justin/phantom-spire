@@ -8,7 +8,7 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Geographic analysis engine
@@ -299,7 +299,7 @@ impl GeographicAnalysisModule {
         // Check for regular intervals
         let avg_interval = intervals.iter().sum::<Duration>() / intervals.len() as i32;
         let regular_pattern = intervals.iter()
-            .all(|interval| (interval - avg_interval).abs() < Duration::hours(1));
+            .all(|interval| (*interval - avg_interval).abs() < Duration::hours(1));
 
         if regular_pattern {
             Ok(Some(LocationPattern {
@@ -670,7 +670,7 @@ pub struct ThreatActivity {
 }
 
 /// Threat activity type
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum ThreatActivityType {
     C2Server,
     MalwareDistribution,
@@ -861,7 +861,7 @@ pub enum RiskLevel {
 }
 
 /// Monitoring status
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum MonitoringStatus {
     Active,
     Suspended,

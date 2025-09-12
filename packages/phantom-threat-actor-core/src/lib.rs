@@ -38,6 +38,16 @@ pub mod ocsf_integration;
 pub mod ocsf_enrichment;
 pub mod ocsf_validation;
 
+// Web API and Database modules (optional features)
+#[cfg(feature = "web-api")]
+pub mod web_api;
+#[cfg(feature = "diesel-orm")]
+pub mod database;
+
+// Integration tests module
+#[cfg(test)]
+mod integration_tests;
+
 #[cfg(feature = "napi")]
 use napi::bindgen_prelude::*;
 #[cfg(feature = "napi")]

@@ -8,7 +8,7 @@ use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::{Stream, StreamExt};
+use futures::stream::Stream;
 use anyhow::Result;
 
 /// Incident response coordina/// Incident severity levels
@@ -29,7 +29,8 @@ impl std::fmt::Display for IncidentSeverity {
             IncidentSeverity::Critical => write!(f, "critical"),
         }
     }
-}ine
+}
+
 #[derive(Debug)]
 pub struct IncidentResponseModule {
     active_incidents: HashMap<String, Incident>,
@@ -309,7 +310,7 @@ impl IncidentResponseModule {
             title: incident.title.clone(),
             status: incident.status.clone(),
             severity: incident.severity.clone(),
-            priority: incident.priority,
+            priority: incident.priority.clone(),
             assigned_to: incident.assigned_to.clone(),
             created_at: incident.created_at,
             last_updated: incident.last_updated,
@@ -474,14 +475,6 @@ pub struct Incident {
     pub sla_breach_time: Option<DateTime<Utc>>,
 }
 
-/// Incident severity
-#[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
-pub enum IncidentSeverity {
-    Low,
-    Medium,
-    High,
-    Critical,
-}
 
 /// Incident status
 #[derive(Debug, Clone, Serialize, Deserialize)]

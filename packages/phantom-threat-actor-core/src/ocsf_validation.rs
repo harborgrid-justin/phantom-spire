@@ -2,6 +2,7 @@ use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use regex::Regex;
+use chrono::Utc;
 
 /// OCSF Validation Module
 /// Validates OCSF events against schema requirements
@@ -488,7 +489,7 @@ impl OcsfValidator {
     /// Validate against a specific rule
     fn validate_rule(&self, event: &BaseEvent, rule: &ValidationRule) -> ValidationResult {
         let mut errors = Vec::new();
-        let mut warnings = Vec::new();
+        let warnings = Vec::new();
 
         match rule.validation_type {
             ValidationType::Required => {
@@ -564,7 +565,7 @@ impl OcsfValidator {
 
         ValidationResult {
             is_valid: errors.is_empty(),
-            errors,
+            errors: errors.clone(),
             warnings,
             score: if errors.is_empty() { 1.0 } else { 0.0 },
         }

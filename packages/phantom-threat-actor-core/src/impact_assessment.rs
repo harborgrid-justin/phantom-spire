@@ -998,7 +998,7 @@ pub enum AssessmentEvent {
 // Enums
 
 /// System criticality
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum SystemCriticality {
     Critical,
     High,
@@ -1051,7 +1051,7 @@ pub enum EncryptionStatus {
 }
 
 /// Process criticality
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ProcessCriticality {
     MissionCritical,
     High,
@@ -1087,7 +1087,7 @@ pub enum BreachType {
 }
 
 /// Breach severity
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum BreachSeverity {
     Critical,
     High,

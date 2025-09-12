@@ -278,7 +278,7 @@ impl BehavioralPatternsModule {
         clusters.into_iter()
             .map(|(cluster_type, cluster_patterns)| PatternCluster {
                 cluster_type,
-                patterns: cluster_patterns,
+                patterns: cluster_patterns.clone(),
                 cluster_size: cluster_patterns.len(),
                 average_confidence: cluster_patterns.iter()
                     .map(|p| p.confidence)

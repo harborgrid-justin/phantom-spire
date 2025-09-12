@@ -241,7 +241,7 @@ impl IndustryTargetingModule {
                 ],
                 evidence: vec![
                     format!("{} observed attacks in last 30 days", patterns.len()),
-                    format!("Average success rate: {}%", (patterns.iter().map(|p| p.success_rate).sum::<f64>() / patterns.len() as f64() * 100.0) as u32),
+                    format!("Average success rate: {}%", (patterns.iter().map(|p| p.success_rate).sum::<f64>() / patterns.len() as f64 * 100.0) as u32),
                 ],
                 generated_at: Utc::now(),
                 expires_at: Some(Utc::now() + Duration::days(30)),

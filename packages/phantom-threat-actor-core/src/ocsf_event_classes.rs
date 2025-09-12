@@ -287,7 +287,7 @@ pub mod network_activity_class {
                 path: Some("/malware".to_string()),
                 query: Some("param=evil".to_string()),
             }),
-            user_agent: Some(user_agent),
+            user_agent: Some(user_agent.clone()),
             headers: vec![
                 network_activity::HttpHeader {
                     name: "User-Agent".to_string(),
@@ -462,7 +462,7 @@ pub mod network_activity_class {
         // Add observables
         let c2_observable = Observable {
             name: "c2_server".to_string(),
-            value: dst_ip,
+            value: dst_ip.clone(),
             observable_type: "ipv4".to_string(),
             type_id: 2,
             reputation: Some(0.95),
@@ -531,7 +531,7 @@ pub mod system_activity_class {
             uid: Some(format!("user_{}", user)),
             actor_type: Some("user".to_string()),
             user: Some(system_activity::User {
-                name: Some(user),
+                name: Some(user.clone()),
                 uid: Some(format!("user_{}", user)),
                 user_type: Some("local".to_string()),
                 groups: vec![],
@@ -586,7 +586,7 @@ pub mod system_activity_class {
 
         let parent_proc = system_activity::Process {
             pid: Some(1),
-            name: Some(parent_process),
+            name: Some(parent_process.clone()),
             path: Some("/bin/init".to_string()),
             uid: Some("proc_parent_1".to_string()),
             cmd_line: Some("/bin/init".to_string()),
@@ -598,7 +598,7 @@ pub mod system_activity_class {
             uid: Some(format!("user_{}", user)),
             actor_type: Some("user".to_string()),
             user: Some(system_activity::User {
-                name: Some(user),
+                name: Some(user.clone()),
                 uid: Some(format!("user_{}", user)),
                 user_type: Some("local".to_string()),
                 groups: vec![],
