@@ -1,0 +1,68 @@
+{
+  "name": "@phantom-spire/ml-core",
+  "version": "1.0.1",
+  "description": "Enterprise machine learning services for threat detection and security analytics",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-ml-core"
+  },
+  "keywords": [
+    "machine-learning",
+    "cybersecurity",
+    "threat-detection",
+    "anomaly-detection",
+    "napi-rs",
+    "rust",
+    "enterprise",
+    "security-analytics"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "*.node"
+  ],
+  "napi": {
+    "name": "phantom-ml-core",
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-gnu",
+        "i686-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf",
+        "aarch64-apple-darwin",
+        "aarch64-pc-windows-msvc",
+        "aarch64-unknown-linux-musl",
+        "aarch64-linux-android",
+        "arm-linux-androideabi"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">= 14"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "bench": "node -r @swc-node/register benchmark/bench.ts",
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "ava",
+    "universal": "napi universal",
+    "version": "napi version"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0",
+    "ava": "^6.0.0"
+  },
+  "ava": {
+    "timeout": "3m"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}
