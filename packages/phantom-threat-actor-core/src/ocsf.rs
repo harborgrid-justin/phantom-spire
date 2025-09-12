@@ -242,6 +242,12 @@ pub struct Observable {
     pub attributes: Option<serde_json::Value>,
 }
 
+impl Observable {
+    pub fn file_hash(p0: String, p1: String) -> Observable {
+        todo!()
+    }
+}
+
 /// Fingerprint object for hashing
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Fingerprint {

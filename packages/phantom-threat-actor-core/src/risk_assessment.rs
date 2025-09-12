@@ -663,6 +663,15 @@ pub struct RiskAssessment {
     pub assessed_by: String,
     pub review_required: bool,
     pub context_data: HashMap<String, serde_json::Value>,
+    pub assessed_at: DateTime<Utc>,
+    pub mitigation_steps: Vec<String>,
+    pub risk_description: String,
+    pub risk_level: String,
+    pub overall_risk_score: f64,
+    pub asset_value: f64,
+    pub asset_type: String,
+    pub asset_name: String,
+    pub id: String,
 }
 
 /// Risk scores

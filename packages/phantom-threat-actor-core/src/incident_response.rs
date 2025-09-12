@@ -488,6 +488,10 @@ pub struct Incident {
     pub communication_log: Vec<CommunicationEntry>,
     pub tags: Vec<String>,
     pub sla_breach_time: Option<DateTime<Utc>>,
+    pub mitigation_steps: Vec<String>,
+    pub indicators: Vec<String>,
+    pub updated_at: DateTime<Utc>,
+    pub id: String,
 }
 
 

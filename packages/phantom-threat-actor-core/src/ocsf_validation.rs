@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use regex::Regex;
 use chrono::Utc;
+use crate::ocsf_categories::security_finding::SecurityFindingEvent;
 
 /// OCSF Validation Module
 /// Validates OCSF events against schema requirements
@@ -450,7 +451,7 @@ impl OcsfValidator {
     }
 
     /// Validate an OCSF event
-    pub fn validate_event(&self, event: &BaseEvent) -> ValidationResult {
+    pub fn validate_event(&self, event: &SecurityFindingEvent) -> ValidationResult {
         let mut errors = Vec::new();
         let mut warnings = Vec::new();
 

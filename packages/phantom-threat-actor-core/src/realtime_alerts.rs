@@ -213,6 +213,11 @@ impl RealtimeAlertsModule {
             tags: vec!["automated".to_string()],
             escalation_level: 1,
             response_actions: Vec::new(),
+            alert_type: (),
+            confidence: (),
+            acknowledged: false,
+            source: "".to_string(),
+            id: "".to_string(),
         };
 
         // Store as active alert
@@ -461,7 +466,10 @@ pub struct Alert {
     pub escalation_level: u32,
     pub response_actions: Vec<ResponseAction>,
     pub alert_type: (),
-    pub confidence: ()
+    pub confidence: (),
+    pub acknowledged: bool,
+    pub source: String,
+    pub id: String,
 }
 
 /// Alert status

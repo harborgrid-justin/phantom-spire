@@ -42,8 +42,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create sample behavioral patterns
     let behavioral_patterns = vec![
         behavioral_patterns::BehavioralPattern {
+            pattern_id: "".to_string(),
             id: "pattern_001".to_string(),
             pattern_type: "suspicious_login".to_string(),
+            pattern_name: "".to_string(),
             description: "Multiple failed login attempts followed by successful login".to_string(),
             indicators: vec![
                 "5 failed logins".to_string(),
@@ -54,14 +56,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             first_seen: Utc::now() - chrono::Duration::days(7),
             last_seen: Utc::now(),
             frequency: 12,
+            first_observed: Default::default(),
             affected_users: vec!["user123".to_string(), "admin".to_string()],
             source_ips: vec!["192.168.1.100".to_string()],
             user_agents: vec!["Suspicious Browser/1.0".to_string()],
             metadata: HashMap::new(),
+            last_observed: Default::default(),
+            related_activities: vec![],
         },
         behavioral_patterns::BehavioralPattern {
+            pattern_id: "".to_string(),
             id: "pattern_002".to_string(),
             pattern_type: "data_exfiltration".to_string(),
+            pattern_name: "".to_string(),
             description: "Large data transfer to external IP".to_string(),
             indicators: vec![
                 "10GB data transfer".to_string(),
@@ -72,10 +79,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             first_seen: Utc::now() - chrono::Duration::hours(2),
             last_seen: Utc::now(),
             frequency: 1,
+            first_observed: Default::default(),
             affected_users: vec!["user456".to_string()],
             source_ips: vec!["10.0.0.50".to_string()],
             user_agents: vec![],
             metadata: HashMap::new(),
+            last_observed: Default::default(),
+            related_activities: vec![],
         },
     ];
 
@@ -126,12 +136,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create sample incidents
     let incidents = vec![
         incident_response::Incident {
+            incident_id: "".to_string(),
             id: "incident_001".to_string(),
             title: "Ransomware Attack Detected".to_string(),
             description: "Ransomware encryption detected on file server".to_string(),
             severity: "critical".to_string(),
             status: "active".to_string(),
             priority: "high".to_string(),
+            timeline: vec![],
+            evidence: vec![],
+            remediation_actions: vec![],
+            communication_log: vec![],
+            tags: vec![],
             assigned_to: Some("security_team".to_string()),
             created_at: Utc::now() - chrono::Duration::hours(4),
             updated_at: Utc::now(),
@@ -148,6 +164,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "Backup verification".to_string(),
             ],
             metadata: HashMap::new(),
+            incident_type: "".to_string(),
+            threat_actors: vec![],
+            last_updated: Default::default(),
+            sla_breach_time: None,
         },
     ];
 
@@ -193,6 +213,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create sample alerts
     let alerts = vec![
         realtime_alerts::Alert {
+            alert_id: "".to_string(),
             id: "alert_001".to_string(),
             title: "Suspicious Network Traffic Detected".to_string(),
             description: "High volume of outbound traffic to known malicious IP".to_string(),
@@ -201,10 +222,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             source: "network_monitor".to_string(),
             confidence: 0.91,
             triggered_at: Utc::now() - chrono::Duration::minutes(30),
+            last_updated: Default::default(),
+            event_details: SecurityEvent {
+                event_id: "".to_string(),
+                event_type: "".to_string(),
+                timestamp: Default::default(),
+                source_ip: None,
+                user_agent: None,
+                severity: AlertSeverity::Low,
+                indicators: vec![],
+                raw_data: Default::default(),
+                business_impact: BusinessImpact::Low,
+            },
+            assigned_to: None,
+            tags: vec![],
+            escalation_level: 0,
             acknowledged: false,
             acknowledged_by: None,
             acknowledged_at: None,
             metadata: HashMap::new(),
+            rule_id: "".to_string(),
+            status: AlertStatus::New,
+            response_actions: vec![],
         },
     ];
 
@@ -219,6 +258,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create sample risk assessments
     let risk_assessments = vec![
         risk_assessment::RiskAssessment {
+            assessment_id: "".to_string(),
+            model_id: "".to_string(),
+            target_entity: TargetEntity {
+                entity_id: "".to_string(),
+                entity_type: "".to_string(),
+                name: "".to_string(),
+                attributes: Default::default(),
+            },
+            assessment_type: AssessmentType::Initial,
+            risk_scores: RiskScores {
+                overall_score: 0.0,
+                category_scores: Default::default(),
+                factor_scores: Default::default(),
+                confidence_level: 0.0,
+            },
+            impact_analysis: ImpactAnalysis {
+                potential_impacts: vec![],
+                business_impact_score: 0.0,
+                operational_impact_score: 0.0,
+                financial_impact_estimate: 0.0,
+                recovery_time_estimate: Default::default(),
+            },
+            mitigation_plan: MitigationPlan {
+                recommendations: vec![],
+                priority_actions: vec![],
+                timeline: vec![],
+                resource_requirements: vec![],
+                expected_risk_reduction: 0.0,
+            },
+            overall_risk_level: RiskLevel::Minimal,
+            status: AssessmentStatus::Pending,
+            created_at: Default::default(),
             id: "risk_001".to_string(),
             asset_name: "customer_database".to_string(),
             asset_type: "database".to_string(),
@@ -249,7 +320,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ],
             assessed_at: Utc::now(),
             assessed_by: "security_team".to_string(),
+            review_required: false,
             metadata: HashMap::new(),
+            completed_at: None,
+            context_data: Default::default(),
         },
     ];
 
