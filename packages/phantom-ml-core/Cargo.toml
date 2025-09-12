@@ -1,0 +1,113 @@
+[package]
+name = "phantom-ml-core"
+version = "1.0.1"
+description = "Enterprise machine learning services for threat detection and security analytics"
+edition = "2021"
+license = "MIT"
+authors = ["Phantom Spire Security Team"]
+homepage = "https://github.com/harborgrid-justin/phantom-spire"
+repository = "https://github.com/harborgrid-justin/phantom-spire"
+documentation = "https://docs.rs/phantom-ml-core"
+keywords = ["cybersecurity", "phantom-spire", "security", "machine-learning", "ml"]
+categories = ["web-programming", "api-bindings", "science"]
+
+[lib]
+name = "phantom_ml_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Core NAPI dependencies - standardized versions
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+napi-derive = { version = "3.2.5", optional = true }
+
+# Core serialization and data handling - required for all packages
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+regex = "1.10"
+thiserror = "2.0.16"
+
+# Async runtime - standardized across platform
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Common utilities for all packages
+base64 = "0.22.1"
+sha2 = "0.10"
+url = "2.5"
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.11.8"
+
+# High-performance collections and concurrency
+dashmap = "6.1.0"
+parking_lot = "0.12"
+rayon = "1.7"
+
+# Machine learning specific dependencies
+ndarray = "0.16.1"
+ndarray-rand = "0.15.0"
+rand = "0.8"
+statrs = "0.17.1"
+
+# Numeric computations
+num-traits = "0.2"
+nalgebra = "0.33.2"
+
+# HTTP client - optional but standardized when needed
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
+
+# Web framework support - optional
+warp = { version = "0.4.2", optional = true }
+
+# Database backends - optional, standardized versions
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
+redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
+mongodb = { version = "3.3.0", optional = true }
+
+# Monitoring and observability - optional
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+
+# Compression support - optional
+flate2 = { version = "1.0", optional = true }
+
+[features]
+default = ["napi", "local-storage"]
+
+# Core features
+napi = ["dep:napi", "dep:napi-derive"]
+local-storage = []
+
+# Storage backends
+postgres-store = ["tokio-postgres", "sqlx"]
+redis-store = ["redis"]
+mongodb-store = ["mongodb"]
+all-storage = ["postgres-store", "redis-store", "mongodb-store"]
+
+# Web features
+web-server = ["warp", "reqwest"]
+web-client = ["reqwest"]
+
+# Monitoring features
+monitoring = ["tracing", "tracing-subscriber"]
+
+# Utility features
+compression = ["flate2"]
+
+# Platform integration features
+multi-tenant = []
+audit-logging = ["monitoring"]
+analytics = []
+
+# Enterprise bundle
+enterprise = ["all-storage", "monitoring", "compression", "multi-tenant", "audit-logging", "analytics"]
+
+# Full feature set
+full = ["enterprise", "web-server", "web-client"]
+
+[build-dependencies]
+napi-build = "2.1.0"
