@@ -27,7 +27,20 @@ pub mod threat_hunting;
 pub mod intelligence_sharing;
 pub mod realtime_alerts;
 
+// OCSF (Open Cybersecurity Schema Framework) modules
+pub mod ocsf;
+pub mod ocsf_categories;
+pub mod ocsf_event_classes;
+pub mod ocsf_objects;
+pub mod ocsf_observables;
+pub mod ocsf_normalization;
+pub mod ocsf_integration;
+pub mod ocsf_enrichment;
+pub mod ocsf_validation;
+
+#[cfg(feature = "napi")]
 use napi::bindgen_prelude::*;
+#[cfg(feature = "napi")]
 use napi_derive::napi;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -41,16 +54,19 @@ pub use storage::{ThreatActorStorage, StorageFactory};
 pub use core::ThreatActorCore;
 
 // Helper function to convert anyhow errors to napi errors
+#[cfg(feature = "napi")]
 fn anyhow_to_napi(err: anyhow::Error) -> napi::Error {
     napi::Error::from_reason(err.to_string())
 }
 
 // N-API wrapper for JavaScript bindings
+#[cfg(feature = "napi")]
 #[napi]
 pub struct ThreatActorCoreNapi {
     inner: tokio::sync::Mutex<ThreatActorCore>,
 }
 
+#[cfg(feature = "napi")]
 #[napi]
 impl ThreatActorCoreNapi {
     #[napi(constructor)]
@@ -200,10 +216,10 @@ impl ThreatActorCoreNapi {
     pub fn get_intelligence_summary(&self) -> Result<String> {
         let summary = serde_json::json!({
             "status": "operational",
-            "message": "Threat Actor Core with 18 advanced modules initialized successfully",
-            "version": "2.1.0",
+            "message": "Threat Actor Core with 18 advanced modules and OCSF integration initialized successfully",
+            "version": "2.2.0",
             "architecture": "modular",
-            "modules_count": 18,
+            "modules_count": 27,
             "capabilities": [
                 "Advanced Attribution Analysis",
                 "Campaign Lifecycle Tracking", 
@@ -222,7 +238,16 @@ impl ThreatActorCoreNapi {
                 "Incident Response Coordination",
                 "Threat Hunting Assistant",
                 "Intelligence Sharing Gateway",
-                "Real-time Alert System"
+                "Real-time Alert System",
+                "OCSF Base Event Structure",
+                "OCSF Categories (Security/Network/System)",
+                "OCSF Event Classes",
+                "OCSF Objects Library",
+                "OCSF Observables Management",
+                "OCSF Normalization",
+                "OCSF Integration",
+                "OCSF Enrichment",
+                "OCSF Validation"
             ]
         });
         Ok(summary.to_string())
@@ -251,6 +276,15 @@ impl ThreatActorCoreNapi {
         status.insert("threat_hunting".to_string(), "Active".to_string());
         status.insert("intelligence_sharing".to_string(), "Active".to_string());
         status.insert("realtime_alerts".to_string(), "Active".to_string());
+        status.insert("ocsf".to_string(), "Active".to_string());
+        status.insert("ocsf_categories".to_string(), "Active".to_string());
+        status.insert("ocsf_event_classes".to_string(), "Active".to_string());
+        status.insert("ocsf_objects".to_string(), "Active".to_string());
+        status.insert("ocsf_observables".to_string(), "Active".to_string());
+        status.insert("ocsf_normalization".to_string(), "Active".to_string());
+        status.insert("ocsf_integration".to_string(), "Active".to_string());
+        status.insert("ocsf_enrichment".to_string(), "Active".to_string());
+        status.insert("ocsf_validation".to_string(), "Active".to_string());
         
         Ok(serde_json::to_string(&status).unwrap_or_else(|_| "{}".to_string()))
     }
@@ -259,10 +293,10 @@ impl ThreatActorCoreNapi {
     #[napi]
     pub fn get_version_info(&self) -> Result<String> {
         let info = serde_json::json!({
-            "version": "2.1.0",
+            "version": "2.2.0",
             "name": "Phantom Threat Actor Core",
             "architecture": "modular",
-            "modules": 18,
+            "modules": 27,
             "build_date": "2024-01-01",
             "api_version": "v2",
             "rust_version": "1.70+",
@@ -272,7 +306,12 @@ impl ThreatActorCoreNapi {
                 "real-time-analysis",
                 "comprehensive-reporting",
                 "enterprise-integration",
-                "multi-database-storage"
+                "multi-database-storage",
+                "ocsf-schema-framework",
+                "standardized-event-generation",
+                "threat-intelligence-enrichment",
+                "event-normalization",
+                "schema-validation"
             ]
         });
         Ok(info.to_string())
@@ -280,11 +319,12 @@ impl ThreatActorCoreNapi {
 }
 
 /// Legacy compatibility functions
+#[cfg(feature = "napi")]
 #[napi]
 pub async fn get_all_engines_status() -> Result<String> {
     Ok(serde_json::json!({
         "phantom_threat_actor_core_enterprise": {
-            "version": "2.1.0-enterprise",
+            "version": "2.2.0-enterprise",
             "architecture": "modular",
             "modules": [
                 "advanced_attribution",
@@ -304,18 +344,30 @@ pub async fn get_all_engines_status() -> Result<String> {
                 "incident_response",
                 "threat_hunting",
                 "intelligence_sharing",
-                "realtime_alerts"
+                "realtime_alerts",
+                "ocsf",
+                "ocsf_categories",
+                "ocsf_event_classes",
+                "ocsf_objects",
+                "ocsf_observables",
+                "ocsf_normalization",
+                "ocsf_integration",
+                "ocsf_enrichment",
+                "ocsf_validation"
             ],
             "status": "operational",
-            "total_modules": 18,
+            "total_modules": 27,
             "enterprise_features": true,
             "multi_database_ready": true,
+            "ocsf_enabled": true,
+            "standardized_event_generation": true,
             "initialized_at": chrono::Utc::now().to_rfc3339()
         }
     }).to_string())
 }
 
 /// Create threat actor
+#[cfg(feature = "napi")]
 #[napi]
 pub fn create_threat_actor(name: String, actor_type: String) -> Result<String> {
     let id = Uuid::new_v4().to_string();
