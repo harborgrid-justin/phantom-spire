@@ -1,11 +1,10 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId, Observable, Enrichment};
+use crate::ocsf::{ClassUid, SeverityId, Observable, Enrichment};
 use crate::ocsf_categories::*;
 use crate::ocsf_event_classes::*;
-use crate::ocsf_objects::*;
 use crate::ocsf_observables::*;
 use crate::ocsf_normalization::*;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
+use chrono::{Utc};
 use std::collections::HashMap;
 
 /// OCSF Integration with Threat Actor Analysis Modules
@@ -69,7 +68,7 @@ pub mod behavioral_ocsf {
 
             let mut event = security_finding_class::create_malware_finding(
                 format!("Suspicious behavioral pattern detected: {}", pattern.pattern_type),
-                pattern.pattern_type.clone(),
+                pattern.pattern_type.clone().to_string(),
                 "unknown".to_string(),
                 pattern.confidence,
                 severity,
@@ -98,7 +97,7 @@ pub mod behavioral_ocsf {
             // Add enrichment with threat intelligence
             let enrichment = Enrichment {
                 name: "threat_intelligence".to_string(),
-                value: pattern.pattern_type.clone(),
+                value: pattern.pattern_type.clone().to_string(),
                 enrichment_type: "behavioral_analysis".to_string(),
                 data: Some(serde_json::json!({
                     "analysis_type": "behavioral_pattern",
@@ -232,7 +231,7 @@ pub mod intelligence_sharing_ocsf {
 
     /// Generate OCSF events from intelligence sharing
     pub fn generate_intelligence_events(
-        intelligence: &[crate::intelligence_sharing::IntelligenceReport],
+        intelligence: &[crate::reputation_system::UpdateEventType],
         integration: &mut ThreatActorOcsfIntegration,
     ) -> Vec<security_finding::SecurityFindingEvent> {
         let mut events = Vec::new();
@@ -247,7 +246,7 @@ pub mod intelligence_sharing_ocsf {
 
             let mut event = security_finding_class::create_malware_finding(
                 format!("Intelligence report: {}", report.title),
-                report.threat_actor.clone().unwrap_or_else(|| "Unknown".to_string()),
+                "Unknown Threat Actor".to_string(),
                 "intelligence_feed".to_string(),
                 report.confidence,
                 severity,
@@ -262,10 +261,8 @@ pub mod intelligence_sharing_ocsf {
                 reputation: Some(report.confidence),
                 data: Some(serde_json::json!({
                     "report_id": report.report_id,
-                    "threat_actor": report.threat_actor,
                     "indicators": report.indicators,
                     "recommendations": report.recommendations,
-                    "source": report.source,
                     "published_at": report.published_at
                 })),
                 attributes: None,
@@ -282,6 +279,7 @@ pub mod intelligence_sharing_ocsf {
 
 /// Real-time Alerts OCSF Events
 pub mod realtime_alerts_ocsf {
+    use std::error::Error;
     use super::*;
 
     /// Generate OCSF events from real-time alerts
@@ -303,7 +301,7 @@ pub mod realtime_alerts_ocsf {
             let mut event = security_finding_class::create_malware_finding(
                 format!("Real-time alert: {}", alert.title),
                 alert.alert_type.clone(),
-                alert.source.clone(),
+                alert.source().clone(),
                 alert.confidence,
                 severity,
             );
@@ -355,7 +353,7 @@ pub mod risk_assessment_ocsf {
             };
 
             let mut event = security_finding_class::create_unauthorized_access_finding(
-                format!("Risk assessment: {}", assessment.target_entity),
+                format!("Risk assessment: {:?}", assessment.target_entity),
                 "system".to_string(),
                 format!("Risk assessment completed with score {:.1} and level {:?}", assessment.risk_scores.overall_score, assessment.overall_risk_level),
                 "risk_assessment".to_string(),
@@ -611,7 +609,7 @@ impl ThreatIntelEventGenerator {
     }
 
     /// Generate events from intelligence reports
-    pub fn generate_from_intelligence(&mut self, reports: &[crate::intelligence_sharing::IntelligenceReport]) {
+    pub fn generate_from_intelligence(&mut self, reports: &[crate::reputation_system::UpdateEventType]) {
         let events = intelligence_sharing_ocsf::generate_intelligence_events(reports, &mut self.integration);
         self.generated_events.extend(events);
     }
@@ -700,7 +698,7 @@ mod tests {
 
     #[test]
     fn test_threat_intel_event_generator() {
-        let mut generator = ThreatIntelEventGenerator::new();
+        let generator = ThreatIntelEventGenerator::new();
 
         // Test empty generator
         assert_eq!(generator.get_events().len(), 0);

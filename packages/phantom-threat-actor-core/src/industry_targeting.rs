@@ -3,6 +3,7 @@
 //! Analysis and tracking of threat actor targeting patterns across different industries,
 //! including sector-specific vulnerabilities, attack motivations, and industry risk profiles.
 
+use std::cmp::PartialEq;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc, Duration};
@@ -23,6 +24,18 @@ pub struct IndustryTargetingModule {
     targeting_stream: tokio::sync::mpsc::Receiver<TargetingEvent>,
     targeting_sender: tokio::sync::mpsc::Sender<TargetingEvent>,
     analysis_cache: RwLock<HashMap<String, CachedAnalysis>>,
+}
+
+impl PartialEq for MotivationType {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for TargetPriority {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
 }
 
 impl IndustryTargetingModule {
@@ -81,7 +94,7 @@ impl IndustryTargetingModule {
             industry: industry.to_string(),
             time_range,
             industry_profile,
-            targeting_patterns,
+            targeting_patterns: targeting_patterns.clone(),
             vulnerabilities,
             motivations,
             risk_scores,
@@ -224,9 +237,9 @@ impl IndustryTargetingModule {
             insights.push(TargetingInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::RiskAlert,
-                title: format!("Critical Targeting Pattern Detected: {}", high_risk_pattern.attack_vector),
+                title: format!("Critical Targeting Pattern Detected: {:?}", high_risk_pattern.attack_vector),
                 description: format!(
-                    "High-priority threat actors are actively targeting {} industry using {} attacks with {}% success rate",
+                    "High-priority threat actors are actively targeting {} industry using {:?} attacks with {}% success rate",
                     high_risk_pattern.industry,
                     high_risk_pattern.attack_vector,
                     (high_risk_pattern.success_rate * 100.0) as u32
@@ -257,7 +270,7 @@ impl IndustryTargetingModule {
                 description: format!(
                     "Financial motivation driving {}% of attacks against {} industry, with average revenue impact of ${}",
                     (financial_motivation.prevalence * 100.0) as u32,
-                    patterns.first().map(|p| p.industry).unwrap_or("target"),
+                    patterns.first().map(|p| p.industry.clone()).unwrap_or(String::from("target")),
                     financial_motivation.average_impact
                 ),
                 confidence: 0.78,
@@ -425,7 +438,7 @@ impl IndustryTargetingModule {
     }
 
     /// Analyze attack surface
-    fn analyze_attack_surface(&self, industry: &str) -> AttackSurface {
+    fn analyze_attack_surface(&self, _industry: &str) -> AttackSurface {
         AttackSurface {
             digital_exposure: 0.8,
             physical_exposure: 0.3,
@@ -461,7 +474,7 @@ impl IndustryTargetingModule {
     }
 
     /// Analyze temporal patterns
-    fn analyze_temporal_patterns(&self, industry: &str) -> TemporalPattern {
+    fn analyze_temporal_patterns(&self, _industry: &str) -> TemporalPattern {
         TemporalPattern {
             peak_hours: vec![9, 10, 11, 14, 15, 16], // Business hours
             peak_days: vec![1, 2, 3, 4, 5], // Weekdays
@@ -1005,7 +1018,7 @@ impl IndustryRiskAssessor {
 
     async fn calculate_industry_risk_scores(
         &self,
-        profile: &IndustryProfile,
+        _profile: &IndustryProfile,
         patterns: &[TargetingPattern],
         vulnerabilities: &IndustryVulnerabilities,
     ) -> Result<IndustryRiskScores> {

@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::RwLock;
-use futures::future::join_all;
 use anyhow::Result;
 
 /// Impact assessment engine
@@ -308,7 +307,7 @@ impl ImpactAssessmentModule {
     }
 
     /// Assess data compromise
-    async fn assess_data_compromise(&self, incident: &ThreatIncident) -> Result<DataCompromise> {
+    async fn assess_data_compromise(&self, _incident: &ThreatIncident) -> DataCompromise {
         // Analyze what data was compromised
         DataCompromise {
             data_types_compromised: vec![DataType::PersonalInformation, DataType::FinancialData],
@@ -385,12 +384,12 @@ impl ImpactAssessmentModule {
     }
 
     /// Calculate operational downtime
-    async fn calculate_operational_downtime(&self, incident: &ThreatIncident) -> Result<f64> {
+    async fn calculate_operational_downtime(&self, _incident: &ThreatIncident) -> Result<f64> {
         Ok(16.0) // 16 hours
     }
 
     /// Assess resource impact
-    async fn assess_resource_impact(&self, incident: &ThreatIncident) -> Result<ResourceImpact> {
+    async fn assess_resource_impact(&self, _incident: &ThreatIncident) -> ResourceImpact {
         ResourceImpact {
             personnel_required: 15,
             additional_costs: 50000.0,
@@ -431,7 +430,7 @@ impl ImpactAssessmentModule {
     }
 
     /// Assess media coverage
-    async fn assess_media_coverage(&self, incident: &ThreatIncident) -> Result<MediaCoverage> {
+    async fn assess_media_coverage(&self, incident: &ThreatIncident) -> MediaCoverage {
         // Analyze potential media coverage based on incident characteristics
         MediaCoverage {
             level: MediaCoverageLevel::Moderate,
@@ -442,7 +441,7 @@ impl ImpactAssessmentModule {
     }
 
     /// Assess customer trust impact
-    async fn assess_customer_trust_impact(&self, incident: &ThreatIncident) -> Result<CustomerTrustImpact> {
+    async fn assess_customer_trust_impact(&self, _incident: &ThreatIncident) -> CustomerTrustImpact {
         CustomerTrustImpact {
             trust_impact_score: 6.5,
             affected_customer_segments: vec!["Retail Customers".to_string(), "Enterprise Clients".to_string()],
@@ -452,7 +451,7 @@ impl ImpactAssessmentModule {
     }
 
     /// Assess stakeholder confidence
-    async fn assess_stakeholder_confidence(&self, incident: &ThreatIncident) -> Result<StakeholderConfidenceImpact> {
+    async fn assess_stakeholder_confidence(&self, _incident: &ThreatIncident) -> StakeholderConfidenceImpact {
         StakeholderConfidenceImpact {
             confidence_impact_score: 7.0,
             affected_stakeholders: vec!["Investors".to_string(), "Board Members".to_string(), "Partners".to_string()],
@@ -1130,7 +1129,7 @@ impl QuantificationEngine {
         }
     }
 
-    async fn quantify_financial_impact(&self, incident: &ThreatIncident) -> Result<FinancialImpact> {
+    async fn quantify_financial_impact(&self, _incident: &ThreatIncident) -> Result<FinancialImpact> {
         // Calculate various cost components
         let direct_costs = 100000.0; // Investigation, forensics, etc.
         let indirect_costs = 250000.0; // Lost productivity, etc.
@@ -1212,7 +1211,7 @@ impl RecoveryPlanner {
         }
     }
 
-    async fn generate_recovery_plan(&self, incident: &ThreatIncident, impact_score: &ImpactScore) -> Result<RecoveryPlan> {
+    async fn generate_recovery_plan(&self, _incident: &ThreatIncident, impact_score: &ImpactScore) -> Result<RecoveryPlan> {
         let phases = match impact_score.level {
             ImpactLevel::Critical => vec![
                 RecoveryPhase {

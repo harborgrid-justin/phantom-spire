@@ -65,8 +65,8 @@ impl BehavioralPatternsModule {
 
         Ok(BehavioralAnalysisResult {
             actor_id: actor_id.to_string(),
-            detected_patterns: patterns,
-            anomalies,
+            detected_patterns: patterns.clone(),
+            anomalies: anomalies.clone(),
             predictions,
             confidence_score: self.calculate_confidence_score(&patterns, &anomalies),
             analysis_timestamp: Utc::now(),
@@ -108,7 +108,7 @@ impl BehavioralPatternsModule {
 
         // Check for unusual timing patterns
         let is_business_hours = hour >= 9 && hour <= 17;
-        let is_weekend = day_of_week >= 5;
+        let _is_weekend = day_of_week >= 5;
 
         if !is_business_hours && activity.activity_type == ActivityType::InitialAccess {
             return Some(BehavioralPattern {
@@ -422,7 +422,7 @@ impl AnomalyDetector {
         }
     }
 
-    async fn detect_anomaly(&self, activity: &Activity, context: &AnalysisContext) -> Result<Option<Anomaly>> {
+    async fn detect_anomaly(&self, activity: &Activity, _context: &AnalysisContext) -> Result<Option<Anomaly>> {
         // Check for deviations from baseline
         let baseline = self.baseline_behaviors.get(&activity.actor_id);
 
@@ -461,7 +461,7 @@ impl TemporalAnalyzer {
     async fn predict_future_behavior(
         &self,
         profile: &ActorBehavioralProfile,
-        context: &AnalysisContext,
+        _context: &AnalysisContext,
     ) -> Result<Vec<BehaviorPrediction>> {
         let mut predictions = Vec::new();
 

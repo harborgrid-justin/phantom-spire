@@ -1,8 +1,4 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, StatusId, Observable, Enrichment, Metadata, Product, Extension};
-use crate::ocsf_categories::*;
-use crate::ocsf_event_classes::*;
-use crate::ocsf_objects::*;
-use crate::ocsf_observables::*;
+use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use chrono::{DateTime, Utc};

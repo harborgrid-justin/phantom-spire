@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 use std::collections::HashMap;
 
 /// OCSF Base Event Structure
@@ -436,6 +435,8 @@ mod tests {
             observable_type: "ipv4".to_string(),
             type_id: 1,
             data: None,
+            reputation: None,
+            attributes: None,
         };
 
         event.add_enrichment(enrichment);

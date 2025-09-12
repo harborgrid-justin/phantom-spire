@@ -4,7 +4,7 @@
 //! including risk scoring, impact analysis, and mitigation strategies.
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
@@ -129,7 +129,7 @@ impl RiskAssessmentModule {
             model_id: assessment_config.model_id.clone(),
             target_entity: assessment_config.target_entity,
             assessment_type: assessment_config.assessment_type,
-            risk_scores,
+            risk_scores: risk_scores.clone(),
             impact_analysis,
             mitigation_plan,
             overall_risk_level: self.calculate_overall_risk(&risk_scores),
@@ -176,7 +176,7 @@ impl RiskAssessmentModule {
 
         // Apply updates
         if let Some(new_scores) = updates.risk_scores {
-            assessment.risk_scores = new_scores;
+            assessment.risk_scores = new_scores.clone();
             assessment.overall_risk_level = self.calculate_overall_risk(&new_scores);
         }
 
@@ -189,7 +189,7 @@ impl RiskAssessmentModule {
         }
 
         if let Some(new_status) = updates.status {
-            assessment.status = new_status;
+            assessment.status = new_status.clone();
             if new_status == AssessmentStatus::Completed {
                 assessment.completed_at = Some(Utc::now());
             }
@@ -1079,7 +1079,7 @@ impl ImpactAnalyzer {
             });
         }
 
-        if risk_scores.category_scores.get("operational").unwrap_or(&0.0) > 6.0 {
+        if *risk_scores.category_scores.get("operational").unwrap_or(&0.0) > 6.0 {
             impacts.push(PotentialImpact {
                 impact_type: "service_disruption".to_string(),
                 severity: ImpactSeverity::High,

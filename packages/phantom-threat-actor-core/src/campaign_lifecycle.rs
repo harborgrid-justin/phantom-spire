@@ -657,7 +657,7 @@ impl CampaignLifecycleTracker {
     }
 
     /// Predict campaign evolution
-    pub async fn predict_campaign_evolution(&self, campaign_id: &str) -> Result<Vec<String>> {
+    pub async fn predict_campaign_evolution(&self, _campaign_id: &str) -> Result<Vec<String>> {
         // Simulate predictive analysis
         Ok(vec![
             "Likely to move to lateral movement phase within 7 days".to_string(),

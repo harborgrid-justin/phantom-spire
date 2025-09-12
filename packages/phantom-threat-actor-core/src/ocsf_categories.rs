@@ -1,7 +1,6 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId, Observable, Enrichment};
+use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId};
 use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
-use std::collections::HashMap;
 
 /// Security Finding Category (Category UID: 2)
 /// Events related to security findings and detections

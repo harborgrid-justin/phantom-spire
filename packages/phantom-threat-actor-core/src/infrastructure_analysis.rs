@@ -83,9 +83,9 @@ impl InfrastructureAnalysisModule {
             analysis_id,
             threat_actor_id: threat_actor_id.to_string(),
             time_range,
-            c2_servers,
+            c2_servers: c2_servers.clone(),
             malware_infrastructure,
-            domain_infrastructure,
+            domain_infrastructure: domain_infrastructure.clone(),
             ip_infrastructure,
             certificate_infrastructure,
             network_topology: topology,
@@ -160,9 +160,9 @@ impl InfrastructureAnalysisModule {
         Ok(InfrastructureChanges {
             threat_actor_id: threat_actor_id.to_string(),
             time_range,
-            new_infrastructure: new_servers,
-            decommissioned_infrastructure: decommissioned_servers,
-            pattern_changes: changed_patterns,
+            new_infrastructure: new_servers.clone(),
+            decommissioned_infrastructure: decommissioned_servers.clone(),
+            pattern_changes: changed_patterns.clone(),
             change_summary: self.summarize_changes(&new_servers, &decommissioned_servers, &changed_patterns),
             change_impact: self.assess_change_impact(&new_servers, &decommissioned_servers),
         })
@@ -173,7 +173,7 @@ impl InfrastructureAnalysisModule {
         &self,
         c2_servers: &[C2Server],
         malware_infrastructure: &MalwareDistributionInfrastructure,
-        domain_infrastructure: &DomainInfrastructure,
+        _domain_infrastructure: &DomainInfrastructure,
     ) -> Result<NetworkTopology> {
         let mut topology = NetworkTopology::new();
 
@@ -207,7 +207,7 @@ impl InfrastructureAnalysisModule {
                 asn: distributor.asn,
                 hosting_provider: distributor.hosting_provider.clone(),
                 first_seen: distributor.first_seen,
-                last_seen: distributor.last_seen,
+                last_seen: Option::from(distributor.last_seen),
                 status: NodeStatus::Active,
                 connections: Vec::new(),
                 metadata: HashMap::new(),
@@ -229,8 +229,8 @@ impl InfrastructureAnalysisModule {
         let resilience_patterns = self.analyze_resilience_patterns(topology).await?;
 
         Ok(InfrastructurePatterns {
-            hosting_patterns,
-            geographic_distribution,
+            hosting_patterns: hosting_patterns.clone(),
+            geographic_distribution: geographic_distribution.clone(),
             temporal_patterns,
             resilience_patterns,
             pattern_confidence: self.calculate_pattern_confidence(&hosting_patterns, &geographic_distribution),
@@ -407,7 +407,7 @@ impl InfrastructureAnalysisModule {
         let mut distribution = Vec::new();
         for (country, count) in country_counts {
             distribution.push(GeographicDistribution {
-                country,
+                country: country.clone(),
                 count,
                 percentage: count as f64 / total_nodes,
                 risk_assessment: self.assess_geographic_risk(&country),
@@ -1248,7 +1248,7 @@ impl C2Analyzer {
         ])
     }
 
-    async fn analyze_c2_patterns(&self, servers: &[C2Server]) -> Result<C2CommunicationPatterns> {
+    async fn analyze_c2_patterns(&self, _servers: &[C2Server]) -> Result<C2CommunicationPatterns> {
         Ok(C2CommunicationPatterns {
             protocols: vec!["HTTPS".to_string(), "DNS".to_string()],
             ports: vec![443, 80, 53],
@@ -1258,7 +1258,7 @@ impl C2Analyzer {
         })
     }
 
-    async fn assess_c2_resilience(&self, servers: &[C2Server]) -> Result<C2ResilienceAssessment> {
+    async fn assess_c2_resilience(&self, _servers: &[C2Server]) -> Result<C2ResilienceAssessment> {
         Ok(C2ResilienceAssessment {
             resilience_score: 7.5,
             redundancy_level: 6.0,

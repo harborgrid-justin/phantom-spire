@@ -3,6 +3,7 @@
 //! Comprehensive supply chain risk analysis and management system,
 //! including vendor assessments, dependency analysis, and third-party risk monitoring.
 
+use std::cmp::PartialEq;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
@@ -1034,7 +1035,7 @@ impl SupplyChainMap {
         // Identify vendors/suppliers that are single points of failure
         let mut single_points = Vec::new();
 
-        for (vendor_id, vendor) in &self.vendors {
+        for (_vendor_id, vendor) in &self.vendors {
             if vendor.criticality_level == CriticalityLevel::Critical {
                 // Check if this vendor has unique dependencies
                 let has_unique_deps = self.dependencies.values()
@@ -1072,6 +1073,12 @@ impl SupplyChainMap {
 #[derive(Debug, Clone)]
 struct VendorAssessmentEngine {
     assessment_templates: HashMap<String, AssessmentTemplate>,
+}
+
+impl PartialEq for FindingSeverity {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
 }
 
 impl VendorAssessmentEngine {

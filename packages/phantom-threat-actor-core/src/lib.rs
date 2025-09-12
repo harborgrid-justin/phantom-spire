@@ -47,14 +47,13 @@ pub mod database;
 // Integration tests module
 #[cfg(test)]
 mod integration_tests;
+mod lib_old_backup;
 
 #[cfg(feature = "napi")]
 use napi::bindgen_prelude::*;
 #[cfg(feature = "napi")]
 use napi_derive::napi;
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::Utc;
 use uuid::Uuid;
 
 // Re-export public types and components from new modular structure

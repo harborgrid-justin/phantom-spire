@@ -3,6 +3,7 @@
 //! High-level executive dashboard for threat actor intelligence with key metrics,
 //! risk visualizations, and strategic insights for decision makers.
 
+use std::cmp::PartialEq;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 use chrono::{DateTime, Utc, Duration};
@@ -25,6 +26,24 @@ pub struct ExecutiveDashboardModule {
     metric_aggregator: MetricAggregator,
     insight_generator: InsightGenerator,
     alert_manager: AlertManager,
+}
+
+impl PartialEq for MetricTrend {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for IndicatorStatus {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for IndicatorStatus {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
 }
 
 impl ExecutiveDashboardModule {

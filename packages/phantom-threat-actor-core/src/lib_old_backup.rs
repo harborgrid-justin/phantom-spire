@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 use anyhow::Result as AnyhowResult;
+use crate::{advanced_attribution, behavioral_patterns, campaign_lifecycle, compliance_reporting, executive_dashboard, geographic_analysis, impact_assessment, incident_response, industry_targeting, infrastructure_analysis, intelligence_sharing, realtime_alerts, reputation_system, risk_assessment, supply_chain_risk, threat_hunting, threat_landscape, ttp_evolution};
 
 // Helper function to convert anyhow errors to napi errors
 fn anyhow_to_napi(err: anyhow::Error) -> napi::Error {

@@ -3,6 +3,7 @@
 //! Comprehensive analysis of the evolving threat landscape including emerging threats,
 //! threat actor trends, attack pattern evolution, and strategic threat intelligence.
 
+use std::cmp::PartialEq;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc, Duration};
@@ -25,6 +26,36 @@ pub struct ThreatLandscapeModule {
     landscape_stream: tokio::sync::mpsc::Receiver<LandscapeEvent>,
     landscape_sender: tokio::sync::mpsc::Sender<LandscapeEvent>,
     analysis_cache: RwLock<HashMap<String, CachedLandscapeAnalysis>>,
+}
+
+impl PartialEq for TrendType {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for InsightType {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for TrendType {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for ThreatLikelihood {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for ThreatImpact {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
 }
 
 impl ThreatLandscapeModule {
@@ -52,7 +83,7 @@ impl ThreatLandscapeModule {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
-        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope).unwrap());
+        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope)?);
         if let Some(cached) = self.analysis_cache.read().await.get(&cache_key) {
             if Utc::now().signed_duration_since(cached.created_at) < Duration::hours(2) {
                 return Ok(cached.analysis.clone());
@@ -271,7 +302,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify emerging threats
-    async fn identify_emerging_threats(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<EmergingThreatAnalysis>> {
+    async fn identify_emerging_threats(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<EmergingThreatAnalysis>> {
         let mut emerging_threats = Vec::new();
 
         // AI-powered attacks
@@ -376,7 +407,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate landscape trends
-    async fn generate_landscape_trends(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<LandscapeTrend>> {
+    async fn generate_landscape_trends(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<LandscapeTrend>> {
         let mut trends = Vec::new();
 
         // Ransomware trend
@@ -429,7 +460,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Assess landscape evolution
-    async fn assess_landscape_evolution(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<LandscapeEvolution> {
+    async fn assess_landscape_evolution(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<LandscapeEvolution> {
         let evolution_patterns = self.identify_evolution_patterns(time_range).await?;
         let technology_adoption = self.analyze_technology_adoption(time_range).await?;
         let threat_actor_adaptation = self.analyze_threat_adaptation(time_range).await?;
@@ -602,7 +633,7 @@ impl ThreatLandscapeModule {
 
     /// Generate risk assessment
     async fn generate_risk_assessment(&self, landscape_score: &LandscapeScore, insights: &[StrategicInsight]) -> Result<RiskAssessment> {
-        let critical_insights = insights.iter()
+        let _critical_insights = insights.iter()
             .filter(|i| i.insight_type == InsightType::CriticalRisk)
             .count();
 
@@ -610,7 +641,7 @@ impl ThreatLandscapeModule {
         let mitigation_priorities = self.calculate_mitigation_priorities(&risk_factors).await?;
 
         Ok(RiskAssessment {
-            overall_risk_level: landscape_score.risk_level,
+            overall_risk_level: landscape_score.risk_level.clone(),
             risk_factors,
             mitigation_priorities,
             risk_trends: self.analyze_risk_trends().await?,
@@ -630,7 +661,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate prediction confidence
-    fn calculate_prediction_confidence(&self, evolution: &ThreatEvolution, risks: &[EmergingRisk]) -> f64 {
+    fn calculate_prediction_confidence(&self, evolution: &ThreatEvolution, _risks: &[EmergingRisk]) -> f64 {
         let historical_accuracy = 0.75; // Placeholder
         let data_quality = 0.8; // Placeholder
         let model_robustness = 0.7; // Placeholder
@@ -639,7 +670,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate mitigation recommendations
-    async fn generate_mitigation_recommendations(&self, evolution: &ThreatEvolution, risks: &[EmergingRisk]) -> Result<Vec<MitigationRecommendation>> {
+    async fn generate_mitigation_recommendations(&self, evolution: &ThreatEvolution, _risks: &[EmergingRisk]) -> Result<Vec<MitigationRecommendation>> {
         let mut recommendations = Vec::new();
 
         recommendations.push(MitigationRecommendation {
@@ -684,7 +715,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify active threat actors
-    async fn identify_active_threat_actors(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<ActiveThreatActor>> {
+    async fn identify_active_threat_actors(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<ActiveThreatActor>> {
         // Mock active threat actors
         Ok(vec![
             ActiveThreatActor {
@@ -713,7 +744,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze prevalent attack vectors
-    async fn analyze_prevalent_vectors(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<PrevalentAttackVector>> {
+    async fn analyze_prevalent_vectors(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<PrevalentAttackVector>> {
         Ok(vec![
             PrevalentAttackVector {
                 vector_name: "Ransomware".to_string(),
@@ -773,7 +804,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze geographic distribution
-    async fn analyze_geographic_distribution(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<GeographicThreatDistribution>> {
+    async fn analyze_geographic_distribution(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<GeographicThreatDistribution>> {
         Ok(vec![
             GeographicThreatDistribution {
                 country: "Russia".to_string(),
@@ -793,7 +824,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify common patterns
-    async fn identify_common_patterns(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<Vec<CommonAttackPattern>> {
+    async fn identify_common_patterns(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<CommonAttackPattern>> {
         Ok(vec![
             CommonAttackPattern {
                 pattern_name: "Initial Access via Phishing".to_string(),
@@ -948,7 +979,7 @@ impl ThreatLandscapeModule {
     /// Generate executive summary
     async fn generate_executive_summary(&self, analysis: &ThreatLandscapeAnalysis) -> Result<String> {
         Ok(format!(
-            "The current threat landscape shows {} active threat actors with {} emerging threats requiring attention. Overall risk level is {} with primary concerns in {} and {}. Key recommendations include {} and {}.",
+            "The current threat landscape shows {} active threat actors with {} emerging threats requiring attention. Overall risk level is {:?} with primary concerns in {} and {}. Key recommendations include {} and {}.",
             analysis.current_threats.active_threat_actors.len(),
             analysis.emerging_threats.len(),
             analysis.landscape_score.risk_level,
@@ -975,7 +1006,7 @@ impl ThreatLandscapeModule {
     /// Generate risk assessment section
     async fn generate_risk_assessment_section(&self, analysis: &ThreatLandscapeAnalysis) -> Result<String> {
         Ok(format!(
-            "Risk assessment indicates {} overall risk level with landscape score of {:.1}. Critical risk factors include {} and {}. Mitigation priorities focus on {} and {}.",
+            "Risk assessment indicates {:?} overall risk level with landscape score of {:.1}. Critical risk factors include {} and {}. Mitigation priorities focus on {} and {}.",
             analysis.risk_assessment.overall_risk_level,
             analysis.landscape_score.overall_score,
             "emerging threats",
@@ -1094,7 +1125,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify risk factors
-    async fn identify_risk_factors(&self, landscape_score: &LandscapeScore, insights: &[StrategicInsight]) -> Result<Vec<RiskFactor>> {
+    async fn identify_risk_factors(&self, _landscape_score: &LandscapeScore, _insights: &[StrategicInsight]) -> Result<Vec<RiskFactor>> {
         Ok(vec![
             RiskFactor {
                 factor_id: Uuid::new_v4().to_string(),
@@ -1118,7 +1149,7 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate mitigation priorities
-    async fn calculate_mitigation_priorities(&self, risk_factors: &[RiskFactor]) -> Result<Vec<MitigationPriority>> {
+    async fn calculate_mitigation_priorities(&self, _risk_factors: &[RiskFactor]) -> Result<Vec<MitigationPriority>> {
         Ok(vec![
             MitigationPriority {
                 priority_id: Uuid::new_v4().to_string(),
@@ -1969,7 +2000,7 @@ impl ThreatIntelligenceAggregator {
         }
     }
 
-    async fn aggregate_intelligence(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<ThreatIntelligence> {
+    async fn aggregate_intelligence(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<ThreatIntelligence> {
         Ok(ThreatIntelligence {
             sources: self.intelligence_sources.clone(),
             indicators: vec![
@@ -2010,7 +2041,7 @@ impl PredictiveThreatAnalyzer {
         }
     }
 
-    async fn predict_threat_evolution(&self, current_analysis: &ThreatLandscapeAnalysis, horizon: Duration) -> Result<ThreatEvolution> {
+    async fn predict_threat_evolution(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<ThreatEvolution> {
         Ok(ThreatEvolution {
             evolution_id: Uuid::new_v4().to_string(),
             predicted_changes: vec![
@@ -2041,7 +2072,7 @@ impl PredictiveThreatAnalyzer {
         })
     }
 
-    async fn predict_emerging_risks(&self, current_analysis: &ThreatLandscapeAnalysis, horizon: Duration) -> Result<Vec<EmergingRisk>> {
+    async fn predict_emerging_risks(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<Vec<EmergingRisk>> {
         Ok(vec![
             EmergingRisk {
                 risk_id: Uuid::new_v4().to_string(),
@@ -2062,7 +2093,7 @@ impl PredictiveThreatAnalyzer {
         ])
     }
 
-    async fn project_attack_trends(&self, current_analysis: &ThreatLandscapeAnalysis, horizon: Duration) -> Result<Vec<AttackTrendProjection>> {
+    async fn project_attack_trends(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<Vec<AttackTrendProjection>> {
         Ok(vec![
             AttackTrendProjection {
                 attack_type: "Ransomware".to_string(),

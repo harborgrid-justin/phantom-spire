@@ -659,7 +659,7 @@ mod tests {
     #[test]
     fn test_base_event_validator() {
         let validator = BaseEventValidator;
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding);
+        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
 
         // Valid event
         let errors = validator.validate(&event);
@@ -669,7 +669,7 @@ mod tests {
     #[test]
     fn test_observable_validator() {
         let validator = ObservableValidator;
-        let mut event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding);
+        let mut event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
 
         // Add invalid observable
         let invalid_observable = crate::ocsf::Observable {
@@ -678,6 +678,8 @@ mod tests {
             observable_type: "".to_string(),
             type_id: 0,
             data: Some(serde_json::json!({"reputation": 1.5})), // Invalid reputation
+            reputation: None,
+            attributes: None,
         };
 
         event.add_observable(invalid_observable);
@@ -705,7 +707,7 @@ mod tests {
     fn test_schema_validator() {
         let validator = SchemaValidator::new();
 
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding);
+        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
         let errors = validator.validate_schema(&event, "base_event");
 
         // Should have no errors for valid event
@@ -730,7 +732,7 @@ mod tests {
     #[test]
     fn test_validate_event() {
         let validator = OcsfValidator::new();
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding);
+        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
 
         let result = validator.validate_event(&event);
         assert!(result.is_valid);

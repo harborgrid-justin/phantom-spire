@@ -10,20 +10,20 @@ authors = ["Phantom Spire Team"]
 crate-type = ["cdylib"]
 
 [dependencies]
-napi = { version = "2.16.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
-napi-derive = { version = "2.16.0", optional = true }
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+napi-derive = { version = "3.2.5", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 uuid = { version = "1.0", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 regex = "1.0"
-thiserror = "1.0"
+thiserror = "2.0.16"
 anyhow = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 reqwest = { version = "0.11", features = ["json"] }
 base64 = "0.21"
 sha2 = "0.10"
-rand = "0.8"
+rand = "0.9.2"
 async-trait = "0.1"
 
 # Database backends - optional, standardized versions
@@ -36,7 +36,7 @@ deadpool-postgres = { version = "0.14.1", optional = true }
 
 # Web framework and ORM
 actix-web = { version = "4.0", optional = true }
-actix-cors = { version = "0.6", optional = true }
+actix-cors = { version = "0.7.1", optional = true }
 diesel = { version = "2.2", features = ["postgres", "chrono", "uuid", "serde_json", "r2d2"], optional = true }
 diesel_migrations = { version = "2.2", optional = true }
 
@@ -66,4 +66,4 @@ diesel-orm = ["diesel", "diesel_migrations"]
 full = ["all-storage", "web-api", "diesel-orm"]
 
 [build-dependencies]
-napi-build = "2.1.0"
+napi-build = { version = "2.1.0" }

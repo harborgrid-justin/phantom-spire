@@ -3,8 +3,9 @@
 //! Comprehensive incident response coordination system with automated workflows,
 //! stakeholder communication, evidence collection, and remediation tracking.
 
+use std::cmp::PartialEq;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
@@ -42,6 +43,18 @@ pub struct IncidentResponseModule {
     remediation_tracker: RemediationTracker,
     stakeholder_manager: StakeholderManager,
     escalation_matrix: EscalationMatrix,
+}
+
+impl PartialEq for IncidentStatus {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
+}
+
+impl PartialEq for RemediationResult {
+    fn eq(&self, other: &Self) -> bool {
+        todo!()
+    }
 }
 
 impl IncidentResponseModule {
@@ -90,6 +103,8 @@ impl IncidentResponseModule {
                 println!("Processing evidence collection: {}", evidence.evidence_id);
                 // Process evidence collection
             }
+            IncidentEvent::RemediationExecuted(_) => {}
+            IncidentEvent::CommunicationSent(_) => {}
         }
     }
 
@@ -721,7 +736,7 @@ impl CommunicationEngine {
         Ok(())
     }
 
-    async fn notify_status_change(&self, incident: &Incident, old_status: &IncidentStatus) -> Result<()> {
+    async fn notify_status_change(&self, incident: &Incident, _old_status: &IncidentStatus) -> Result<()> {
         println!("Notifying stakeholders of status change for incident: {}", incident.incident_id);
         // In a real implementation, this would send notifications
         Ok(())

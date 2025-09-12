@@ -4,7 +4,7 @@
 //! and investigation using machine learning and behavioral analysis.
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use anyhow::Result;
@@ -225,6 +225,8 @@ impl ThreatHuntingModule {
                     });
                 }
             }
+            DetectionLogic::CorrelationBased => {}
+            DetectionLogic::MLBased => {}
         }
 
         Ok(findings)
@@ -321,7 +323,7 @@ impl ThreatHuntingModule {
     }
 
     /// End a hunting campaign
-    pub async fn end_hunting_campaign(&mut self, campaign_id: &str, conclusion: CampaignConclusion) -> Result<()> {
+    pub async fn end_hunting_campaign(&mut self, campaign_id: &str, _conclusion: CampaignConclusion) -> Result<()> {
         if let Some(campaign) = self.hunting_campaigns.get_mut(campaign_id) {
             campaign.status = CampaignStatus::Completed;
             campaign.end_time = Some(Utc::now());

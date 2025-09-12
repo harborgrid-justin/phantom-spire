@@ -443,7 +443,7 @@ impl ThreatActorReputationSystem {
     }
 
     /// Calculate reputation trend
-    fn calculate_reputation_trend(&self, actor_id: &str, current_score: f64) -> Result<ReputationTrend> {
+    fn calculate_reputation_trend(&self, actor_id: &str, _current_score: f64) -> Result<ReputationTrend> {
         if let Some(history) = self.reputation_history.get(actor_id) {
             if history.len() >= 2 {
                 let recent_scores: Vec<f64> = history.iter()
@@ -457,7 +457,7 @@ impl ThreatActorReputationSystem {
                     let volatility = self.calculate_volatility(&recent_scores);
                     
                     return Ok(match (trend_slope, volatility) {
-                        (slope, vol) if vol > 0.15 => ReputationTrend::Volatile,
+                        (_slope, vol) if vol > 0.15 => ReputationTrend::Volatile,
                         (slope, _) if slope > 0.05 => ReputationTrend::Increasing,
                         (slope, _) if slope < -0.05 => ReputationTrend::Decreasing,
                         _ => ReputationTrend::Stable,

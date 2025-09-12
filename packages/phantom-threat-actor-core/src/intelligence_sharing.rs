@@ -4,7 +4,7 @@
 //! with privacy protection, trust scoring, and automated dissemination.
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use anyhow::Result;
@@ -188,7 +188,7 @@ impl IntelligenceSharingModule {
         criteria: &SharingCriteria,
     ) -> Result<()> {
         // Apply privacy measures
-        let sanitized_intelligence = self.privacy_engine.sanitize_intelligence(intelligence, &partner.capabilities)?;
+        let _sanitized_intelligence = self.privacy_engine.sanitize_intelligence(intelligence, &partner.capabilities)?;
 
         // Determine dissemination channel
         let channel = self.dissemination_engine.select_channel(&partner.capabilities)?;
@@ -221,7 +221,7 @@ impl IntelligenceSharingModule {
         self.update_trust_score(source_partner_id, &intelligence)?;
 
         // Store the intelligence (in real implementation, this would integrate with storage)
-        let receive_record = ReceivedIntelligence {
+        let _receive_record = ReceivedIntelligence {
             intelligence_id: intelligence.intelligence_id.clone(),
             received_from: source_partner_id.to_string(),
             received_at: Utc::now(),

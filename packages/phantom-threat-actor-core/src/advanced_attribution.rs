@@ -187,7 +187,7 @@ impl AdvancedAttributionEngine {
     }
 
     /// Generate primary attribution candidate
-    async fn generate_primary_candidate(&self, indicators: &[String], context: &HashMap<String, String>) -> Result<AttributionCandidate> {
+    async fn generate_primary_candidate(&self, indicators: &[String], _context: &HashMap<String, String>) -> Result<AttributionCandidate> {
         // Simulate sophisticated attribution logic
         let actor_id = Uuid::new_v4().to_string();
         let base_confidence = 0.75 + (rand::random::<f64>() * 0.2);
@@ -367,7 +367,7 @@ impl AdvancedAttributionEngine {
     }
 
     /// Generate actionable recommendation
-    async fn generate_recommendation(&self, candidate: &AttributionCandidate, confidence: &ConfidenceBreakdown) -> Result<AttributionRecommendation> {
+    async fn generate_recommendation(&self, _candidate: &AttributionCandidate, confidence: &ConfidenceBreakdown) -> Result<AttributionRecommendation> {
         let recommended_action = if confidence.overall_confidence > 0.8 {
             "High confidence attribution - proceed with defensive measures"
         } else if confidence.overall_confidence > 0.6 {

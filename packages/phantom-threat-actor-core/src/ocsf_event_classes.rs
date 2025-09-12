@@ -1,8 +1,6 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId, Observable, Enrichment};
+use crate::ocsf::{SeverityId, ActivityId, Observable, Enrichment};
 use crate::ocsf_categories::*;
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
-use std::collections::HashMap;
 
 /// OCSF Event Classes Implementation
 /// Provides specific event class implementations for threat actor analysis
@@ -86,7 +84,7 @@ pub mod security_finding_class {
         src_ip: String,
         dst_ip: String,
         dst_port: i32,
-        anomaly_type: String,
+        _anomaly_type: String,
         severity: SeverityId,
     ) -> security_finding::SecurityFindingEvent {
         let mut event = security_finding::SecurityFindingEvent::new(title, severity)

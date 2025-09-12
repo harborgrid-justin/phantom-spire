@@ -53,7 +53,7 @@ impl TTPEvolutionModule {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
-        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope).unwrap());
+        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope)?);
         if let Some(cached) = self.analysis_cache.read().await.get(&cache_key) {
             if Utc::now().signed_duration_since(cached.created_at) < Duration::hours(2) {
                 return Ok(cached.analysis.clone());
@@ -535,7 +535,7 @@ impl TTPEvolutionModule {
     }
 
     /// Generate mitigation strategies
-    async fn generate_mitigation_strategies(&self, predicted_techniques: &[PredictedTechnique], predicted_adaptations: &[PredictedAdaptation]) -> Result<Vec<MitigationStrategy>> {
+    async fn generate_mitigation_strategies(&self, _predicted_techniques: &[PredictedTechnique], _predicted_adaptations: &[PredictedAdaptation]) -> Result<Vec<MitigationStrategy>> {
         let mut strategies = Vec::new();
 
         strategies.push(MitigationStrategy {
@@ -578,7 +578,7 @@ impl TTPEvolutionModule {
     }
 
     /// Gather techniques
-    async fn gather_techniques(&self, time_range: &DateRange, scope: &EvolutionScope) -> Result<Vec<Technique>> {
+    async fn gather_techniques(&self, time_range: &DateRange, _scope: &EvolutionScope) -> Result<Vec<Technique>> {
         // Mock techniques data
         Ok(vec![
             Technique {
@@ -780,7 +780,7 @@ impl TTPEvolutionModule {
     }
 
     /// Identify adaptation patterns
-    async fn identify_adaptation_patterns(&self, adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationPattern>> {
+    async fn identify_adaptation_patterns(&self, _adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationPattern>> {
         Ok(vec![
             AdaptationPattern {
                 pattern_id: Uuid::new_v4().to_string(),
@@ -828,7 +828,7 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze adaptation trends
-    async fn analyze_adaptation_trends(&self, adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationTrend>> {
+    async fn analyze_adaptation_trends(&self, _adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationTrend>> {
         Ok(vec![
             AdaptationTrend {
                 trend_name: "Adaptation Frequency".to_string(),
@@ -851,7 +851,7 @@ impl TTPEvolutionModule {
     }
 
     /// Predict new techniques
-    async fn predict_new_techniques(&self, current_patterns: &[EvolutionPattern], horizon: Duration) -> Result<Vec<PredictedTechnique>> {
+    async fn predict_new_techniques(&self, _current_patterns: &[EvolutionPattern], _horizon: Duration) -> Result<Vec<PredictedTechnique>> {
         Ok(vec![
             PredictedTechnique {
                 technique_id: Uuid::new_v4().to_string(),
@@ -875,7 +875,7 @@ impl TTPEvolutionModule {
     }
 
     /// Predict adaptation strategies
-    async fn predict_adaptation_strategies(&self, current_patterns: &[EvolutionPattern], horizon: Duration) -> Result<Vec<PredictedAdaptation>> {
+    async fn predict_adaptation_strategies(&self, _current_patterns: &[EvolutionPattern], _horizon: Duration) -> Result<Vec<PredictedAdaptation>> {
         Ok(vec![
             PredictedAdaptation {
                 adaptation_id: Uuid::new_v4().to_string(),
@@ -889,7 +889,7 @@ impl TTPEvolutionModule {
     }
 
     /// Predict technique effectiveness
-    async fn predict_technique_effectiveness(&self, current_patterns: &[EvolutionPattern], horizon: Duration) -> Result<Vec<PredictedEffectiveness>> {
+    async fn predict_technique_effectiveness(&self, _current_patterns: &[EvolutionPattern], horizon: Duration) -> Result<Vec<PredictedEffectiveness>> {
         Ok(vec![
             PredictedEffectiveness {
                 technique_type: "AI-Enhanced".to_string(),
@@ -914,7 +914,7 @@ impl TTPEvolutionModule {
     }
 
     /// Get technique history
-    async fn get_technique_history(&self, technique_id: &str, time_range: &DateRange) -> Result<Vec<TechniqueSnapshot>> {
+    async fn get_technique_history(&self, _technique_id: &str, time_range: &DateRange) -> Result<Vec<TechniqueSnapshot>> {
         Ok(vec![
             TechniqueSnapshot {
                 timestamp: time_range.start,
@@ -941,7 +941,7 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze adaptation patterns
-    async fn analyze_adaptation_patterns(&self, history: &[TechniqueSnapshot]) -> Result<Vec<AdaptationPattern>> {
+    async fn analyze_adaptation_patterns(&self, _history: &[TechniqueSnapshot]) -> Result<Vec<AdaptationPattern>> {
         Ok(vec![
             AdaptationPattern {
                 pattern_id: Uuid::new_v4().to_string(),
@@ -1021,7 +1021,7 @@ impl TTPEvolutionModule {
     }
 
     /// Identify attack chains
-    async fn identify_attack_chains(&self, correlation_patterns: &[CorrelationPattern]) -> Result<Vec<AttackChain>> {
+    async fn identify_attack_chains(&self, _correlation_patterns: &[CorrelationPattern]) -> Result<Vec<AttackChain>> {
         Ok(vec![
             AttackChain {
                 chain_id: Uuid::new_v4().to_string(),
@@ -1121,7 +1121,7 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze effectiveness trends
-    async fn analyze_effectiveness_trends(&self, adaptations: &[SuccessfulAdaptation]) -> Result<Vec<EffectivenessTrend>> {
+    async fn analyze_effectiveness_trends(&self, _adaptations: &[SuccessfulAdaptation]) -> Result<Vec<EffectivenessTrend>> {
         Ok(vec![
             EffectivenessTrend {
                 trend_name: "Adaptation Success Rate".to_string(),
@@ -1148,7 +1148,7 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze chain trends
-    async fn analyze_chain_trends(&self, chains: &[AttackChain]) -> Result<Vec<ChainTrend>> {
+    async fn analyze_chain_trends(&self, _chains: &[AttackChain]) -> Result<Vec<ChainTrend>> {
         Ok(vec![
             ChainTrend {
                 trend_name: "Chain Complexity".to_string(),
@@ -1968,7 +1968,7 @@ impl TTPCorrelationEngine {
         }
     }
 
-    async fn analyze_correlations(&self, combinations: &[TTPCombination]) -> Result<Vec<CorrelationPattern>> {
+    async fn analyze_correlations(&self, _combinations: &[TTPCombination]) -> Result<Vec<CorrelationPattern>> {
         Ok(vec![
             CorrelationPattern {
                 pattern_id: Uuid::new_v4().to_string(),

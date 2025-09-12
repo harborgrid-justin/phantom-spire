@@ -3,7 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::models::{EvidenceType, ThreatActorConfig};
+use crate::models::{EvidenceType};
 
 /// Main configuration for Threat Actor Core
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -4,7 +4,7 @@
 //! instant notifications, and automated response capabilities.
 
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, VecDeque};
+use std::collections::{HashMap};
 use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
 use tokio::sync::mpsc;
@@ -460,6 +460,8 @@ pub struct Alert {
     pub tags: Vec<String>,
     pub escalation_level: u32,
     pub response_actions: Vec<ResponseAction>,
+    pub alert_type: (),
+    pub confidence: ()
 }
 
 /// Alert status
