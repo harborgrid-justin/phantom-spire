@@ -1,4 +1,4 @@
-# Phantom IOC Core - Indicators of Compromise Processing Engine (v1.0.1)
+# Phantom IOC Core - Indicators of Compromise Processing Engine (v1.0.0)
 
 ## Overview
 

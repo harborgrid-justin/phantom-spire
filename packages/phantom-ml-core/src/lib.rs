@@ -40,6 +40,7 @@ pub mod config;
 pub mod core;
 pub mod types;
 pub mod models;
+pub mod dataframe;
 
 // Database modules
 pub mod database;
@@ -85,3 +86,4 @@ pub use utils::UtilityOperations;
 
 // JavaScript/TypeScript bindings
 pub use napi_bindings::*;
+pub use dataframe::*;

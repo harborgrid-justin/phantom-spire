@@ -1,4 +1,4 @@
-# Phantom Threat Actor Core (v1.0.1)
+# Phantom Threat Actor Core (v1.0.0)
 
 ## Overview
 

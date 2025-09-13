@@ -1,4 +1,4 @@
-# Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.1)
+# Phantom Sandbox Core - Advanced Malware Sandboxing Engine (v1.0.0)
 
 ## Overview
 

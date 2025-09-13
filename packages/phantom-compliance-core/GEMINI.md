@@ -1,4 +1,4 @@
-# Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.1)
+# Phantom Compliance Core - Advanced Regulatory Compliance Engine (v1.0.0)
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.1)
+# Phantom MITRE Core - MITRE ATT&CK Framework Integration Engine (v1.0.0)
 
 ## Overview
 

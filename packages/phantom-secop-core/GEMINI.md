@@ -1,4 +1,4 @@
-# Phantom SecOp Core - Security Operations Center Engine (v1.0.1)
+# Phantom SecOp Core - Security Operations Center Engine (v1.0.0)
 
 ## Overview
 

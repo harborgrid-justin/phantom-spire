@@ -1,4 +1,4 @@
-# Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.1)
+# Phantom Hunting Core - Advanced Threat Hunting Engine (v1.0.0)
 
 ## Overview
 

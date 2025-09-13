@@ -1,4 +1,4 @@
-# Phantom Reputation Core - Advanced Reputation Analysis Engine (v1.0.1)
+# Phantom Reputation Core - Advanced Reputation Analysis Engine (v1.0.0)
 
 ## Overview
 

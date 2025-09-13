@@ -1,4 +1,4 @@
-# Phantom Crypto Core - Advanced Cryptographic Security Engine (v1.0.1)
+# Phantom Crypto Core - Advanced Cryptographic Security Engine (v1.0.0)
 
 ## Overview
 

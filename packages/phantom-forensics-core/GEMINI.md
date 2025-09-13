@@ -1,4 +1,4 @@
-# Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.1)
+# Phantom Forensics Core - Advanced Digital Forensics Engine (v1.0.0)
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.1)
+# Phantom Intel Core - Advanced Threat Intelligence Platform (v1.0.0)
 
 ## Overview
 

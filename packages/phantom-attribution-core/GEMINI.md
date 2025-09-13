@@ -1,5 +1,5 @@
 ````markdown
-# Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.1)
+# Phantom Attribution Core - Advanced Threat Attribution Engine (v1.0.0)
 
 ## Overview
 
