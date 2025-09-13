@@ -23,6 +23,7 @@ import {
   Science as ExperimentIcon,
   ModelTraining as ModelIcon,
   CompareArrows as CompareIcon,
+  Analytics as AnalyticsIcon,
   Rocket as DeployIcon,
   Settings as SettingsIcon,
   Menu as MenuIcon,
@@ -54,6 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: 'Experiments', icon: <ExperimentIcon />, path: '/experiments' },
     { text: 'Models', icon: <ModelIcon />, path: '/models' },
     { text: 'Model Compare', icon: <CompareIcon />, path: '/compare' },
+    { text: 'H2O.ai Analysis', icon: <AnalyticsIcon />, path: '/h2o-comparison' },
     { text: 'Deployments', icon: <DeployIcon />, path: '/deploy' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];
