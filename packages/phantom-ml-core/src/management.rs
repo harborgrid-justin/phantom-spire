@@ -75,12 +75,7 @@ impl ManagementOperations for PhantomMLCore {
             performance_metrics: HashMap::new(),
         };
 
-        // Initialize model weights (simplified)
-        let weights: Vec<f64> = (0..model.feature_count)
-            .map(|_| rand::random::<f64>() - 0.5)
-            .collect();
-
-        self.model_cache.insert(model_id.clone(), Arc::new(RwLock::new(weights)));
+        self.model_cache.insert(model_id.clone(), Arc::new(RwLock::new(Vec::new())));
         self.models.insert(model_id.clone(), model.clone());
 
         // Save to a database if enabled
@@ -161,17 +156,11 @@ impl ManagementOperations for PhantomMLCore {
             .ok_or_else(|| "Model not found".to_string())?;
 
         // Check model weights exist and are valid
-        let weights = self.model_cache.get(&model_id)
-            .ok_or_else(|| "Model weights not found".to_string())?;
-        let weights_guard = weights.read();
+        let serialized_model = self.model_cache.get(&model_id)
+            .ok_or_else(|| "Model not found in cache".to_string())?;
+        let serialized_model_guard = serialized_model.read();
 
-        // Validate weights are finite and reasonable
-        let weights_valid = weights_guard.iter().all(|w| w.is_finite() && w.abs() < 100.0);
-        let weights_count = weights_guard.len();
-        let weights_mean = weights_guard.iter().sum::<f64>() / weights_count as f64;
-        let weights_variance = weights_guard.iter()
-            .map(|w| (w - weights_mean).powi(2))
-            .sum::<f64>() / weights_count as f64;
+        let model_valid = !serialized_model_guard.is_empty();
 
         // Model metadata validation
         let metadata_valid = !model.name.is_empty() &&
@@ -184,7 +173,7 @@ impl ManagementOperations for PhantomMLCore {
                               model.recall >= 0.0 && model.recall <= 1.0;
 
         let validation_time = start_time.elapsed().as_millis() as u64;
-        let overall_valid = weights_valid && metadata_valid && performance_valid;
+        let overall_valid = model_valid && metadata_valid && performance_valid;
 
         let validation_score = if overall_valid {
             if model.accuracy > 0.9 { 100.0 }
@@ -200,15 +189,9 @@ impl ManagementOperations for PhantomMLCore {
             "overall_valid": overall_valid,
             "validation_score": validation_score,
             "checks": {
-                "weights_valid": weights_valid,
+                "model_valid": model_valid,
                 "metadata_valid": metadata_valid,
                 "performance_valid": performance_valid
-            },
-            "weights_analysis": {
-                "count": weights_count,
-                "mean": weights_mean,
-                "variance": weights_variance,
-                "all_finite": weights_valid
             },
             "model_metrics": {
                 "accuracy": model.accuracy,
@@ -229,54 +212,26 @@ impl ManagementOperations for PhantomMLCore {
         let model = self.models.get(&model_id)
             .ok_or_else(|| "Model not found".to_string())?;
 
-        let weights = self.model_cache.get(&model_id)
-            .ok_or_else(|| "Model weights not found".to_string())?;
-        let weights_guard = weights.read();
+        let serialized_model = self.model_cache.get(&model_id)
+            .ok_or_else(|| "Model not found in cache".to_string())?;
+        let serialized_model_guard = serialized_model.read();
 
         let export_format = format.to_lowercase();
         let export_data = match export_format.as_str() {
             "json" => {
-                serde_json::json!({
-                    "model_metadata": &*model,
-                    "weights": &*weights_guard,
-                    "export_format": "json",
-                    "version": "1.0"
-                })
+                return Err("JSON export is not supported for trained models".to_string());
             },
             "binary" => {
-                // Simulate binary export with base64 encoded weights
-                let weights_bytes: Vec<u8> = weights_guard.iter()
-                    .flat_map(|w| w.to_le_bytes().to_vec())
-                    .collect();
-                let encoded_weights = STANDARD.encode(weights_bytes);
+                let encoded_model = STANDARD.encode(&*serialized_model_guard);
 
                 serde_json::json!({
                     "model_metadata": &*model,
-                    "weights_binary": encoded_weights,
+                    "model_binary": encoded_model,
                     "export_format": "binary",
                     "version": "1.0"
                 })
             },
-            "portable" => {
-                serde_json::json!({
-                    "model_id": model.id,
-                    "name": model.name,
-                    "algorithm": model.algorithm,
-                    "model_type": model.model_type,
-                    "feature_count": model.feature_count,
-                    "weights": &*weights_guard,
-                    "performance": {
-                        "accuracy": model.accuracy,
-                        "precision": model.precision,
-                        "recall": model.recall,
-                        "f1_score": model.f1_score
-                    },
-                    "export_format": "portable",
-                    "version": "1.0",
-                    "platform": "phantom-ml-core"
-                })
-            },
-            _ => return Err("Unsupported export format. Use: json, binary, or portable".to_string())
+            _ => return Err("Unsupported export format. Use: binary".to_string())
         };
 
         let export_time = start_time.elapsed().as_millis() as u64;
@@ -305,39 +260,19 @@ impl ManagementOperations for PhantomMLCore {
             .and_then(|f| f.as_str())
             .unwrap_or("json");
 
-        let (model_metadata, weights) = match format {
-            "json" | "portable" => {
-                let metadata = import_data.get("model_metadata")
-                    .or_else(|| Some(&import_data))
-                    .ok_or_else(|| "Model metadata not found".to_string())?;
-
-                let weights: Vec<f64> = import_data.get("weights")
-                    .and_then(|w| w.as_array())
-                    .and_then(|arr| arr.iter().map(|v| v.as_f64()).collect::<Option<Vec<_>>>())
-                    .ok_or_else(|| "Invalid weights format".to_string())?;
-
-                (metadata.clone(), weights)
-            },
+        let (model_metadata, serialized_model) = match format {
             "binary" => {
                 let metadata = import_data.get("model_metadata")
                     .ok_or_else(|| "Model metadata not found".to_string())?;
 
-                let encoded_weights = import_data.get("weights_binary")
+                let encoded_model = import_data.get("model_binary")
                     .and_then(|w| w.as_str())
-                    .ok_or_else(|| "Binary weights not found".to_string())?;
+                    .ok_or_else(|| "Binary model not found".to_string())?;
 
-                let weights_bytes = STANDARD.decode(encoded_weights)
-                    .map_err(|e| format!("Failed to decode weights: {}", e))?;
+                let serialized_model = STANDARD.decode(encoded_model)
+                    .map_err(|e| format!("Failed to decode model: {}", e))?;
 
-                let weights: Vec<f64> = weights_bytes.chunks(8)
-                    .map(|chunk| {
-                        let mut bytes = [0u8; 8];
-                        bytes.copy_from_slice(chunk);
-                        f64::from_le_bytes(bytes)
-                    })
-                    .collect();
-
-                (metadata.clone(), weights)
+                (metadata.clone(), serialized_model)
             },
             _ => return Err("Unsupported import format".to_string())
         };
@@ -376,13 +311,13 @@ impl ManagementOperations for PhantomMLCore {
             training_samples: model_metadata.get("training_samples")
                 .and_then(|s| s.as_u64())
                 .unwrap_or(0),
-            feature_count: weights.len() as u32,
+            feature_count: 0, // TODO: Get feature count from imported model
             status: "imported".to_string(),
             performance_metrics: HashMap::new(),
         };
 
         // Store model and weights
-        self.model_cache.insert(new_model_id.clone(), Arc::new(RwLock::new(weights)));
+        self.model_cache.insert(new_model_id.clone(), Arc::new(RwLock::new(serialized_model)));
         self.models.insert(new_model_id.clone(), imported_model.clone());
 
         // Update stats
@@ -413,16 +348,12 @@ impl ManagementOperations for PhantomMLCore {
         let original_model = self.models.get(&model_id)
             .ok_or_else(|| "Model not found".to_string())?;
 
-        let original_weights = self.model_cache.get(&model_id)
-            .ok_or_else(|| "Model weights not found".to_string())?;
-        let original_weights_guard = original_weights.read();
+        let original_serialized_model = self.model_cache.get(&model_id)
+            .ok_or_else(|| "Model not found in cache".to_string())?;
+        let original_serialized_model_guard = original_serialized_model.read();
 
         let clone_config: serde_json::Value = serde_json::from_str(&clone_config_json)
             .map_err(|e| format!("Failed to parse clone config: {}", e))?;
-
-        let clone_type = clone_config.get("clone_type")
-            .and_then(|t| t.as_str())
-            .unwrap_or("exact");
 
         let new_model_id = Uuid::new_v4().to_string();
         let default_clone_name = format!("{}_clone", original_model.name);
@@ -430,61 +361,27 @@ impl ManagementOperations for PhantomMLCore {
             .and_then(|n| n.as_str())
             .unwrap_or(&default_clone_name);
 
-        // Apply cloning strategy
-        let cloned_weights: Vec<f64> = match clone_type {
-            "exact" => original_weights_guard.clone(),
-            "noisy" => {
-                let noise_factor = clone_config.get("noise_factor")
-                    .and_then(|f| f.as_f64())
-                    .unwrap_or(0.01);
-                original_weights_guard.iter()
-                    .map(|&w| w + (rand::random::<f64>() - 0.5) * noise_factor)
-                    .collect()
-            },
-            "scaled" => {
-                let scale_factor = clone_config.get("scale_factor")
-                    .and_then(|f| f.as_f64())
-                    .unwrap_or(1.0);
-                original_weights_guard.iter()
-                    .map(|&w| w * scale_factor)
-                    .collect()
-            },
-            "randomized" => {
-                let randomization = clone_config.get("randomization")
-                    .and_then(|r| r.as_f64())
-                    .unwrap_or(0.1);
-                original_weights_guard.iter()
-                    .map(|&w| if rand::random::<f64>() < randomization {
-                        rand::random::<f64>() - 0.5
-                    } else {
-                        w
-                    })
-                    .collect()
-            },
-            _ => return Err("Invalid clone type. Use: exact, noisy, scaled, or randomized".to_string())
-        };
-
         let cloned_model = MLModel {
             id: new_model_id.clone(),
             name: clone_name.to_string(),
             model_type: original_model.model_type.clone(),
             algorithm: format!("{}_clone", original_model.algorithm),
             version: "1.0.0".to_string(),
-            accuracy: if clone_type == "exact" { original_model.accuracy } else { 0.0 },
-            precision: if clone_type == "exact" { original_model.precision } else { 0.0 },
-            recall: if clone_type == "exact" { original_model.recall } else { 0.0 },
-            f1_score: if clone_type == "exact" { original_model.f1_score } else { 0.0 },
+            accuracy: original_model.accuracy,
+            precision: original_model.precision,
+            recall: original_model.recall,
+            f1_score: original_model.f1_score,
             created_at: Utc::now(),
-            last_trained: if clone_type == "exact" { original_model.last_trained } else { Utc::now() },
+            last_trained: original_model.last_trained,
             last_used: Utc::now(),
             training_samples: original_model.training_samples,
-            feature_count: cloned_weights.len() as u32,
-            status: if clone_type == "exact" { "cloned".to_string() } else { "cloned_modified".to_string() },
+            feature_count: original_model.feature_count,
+            status: "cloned".to_string(),
             performance_metrics: HashMap::new(),
         };
 
         // Store cloned model
-        self.model_cache.insert(new_model_id.clone(), Arc::new(RwLock::new(cloned_weights)));
+        self.model_cache.insert(new_model_id.clone(), Arc::new(RwLock::new(original_serialized_model_guard.clone())));
         self.models.insert(new_model_id.clone(), cloned_model.clone());
 
         // Update stats
@@ -502,9 +399,9 @@ impl ManagementOperations for PhantomMLCore {
             "original_model_id": model_id,
             "cloned_model_id": new_model_id,
             "clone_name": cloned_model.name,
-            "clone_type": clone_type,
+            "clone_type": "exact",
             "feature_count": cloned_model.feature_count,
-            "performance_inherited": clone_type == "exact",
+            "performance_inherited": true,
             "clone_time_ms": clone_time,
             "timestamp": Utc::now().to_rfc3339()
         }).to_string())
@@ -524,45 +421,20 @@ impl ManagementOperations for PhantomMLCore {
             .and_then(|r| r.as_str())
             .unwrap_or("user_request");
 
-        let compress_weights = archive_config.get("compress_weights")
-            .and_then(|c| c.as_bool())
-            .unwrap_or(true);
-
-        let include_metadata = archive_config.get("include_metadata")
-            .and_then(|m| m.as_bool())
-            .unwrap_or(true);
-
         // Create archive data
         let archive_id = Uuid::new_v4().to_string();
-        let weights = self.model_cache.get(&model_id)
-            .ok_or_else(|| "Model weights not found".to_string())?;
-        let weights_guard = weights.read();
+        let serialized_model = self.model_cache.get(&model_id)
+            .ok_or_else(|| "Model not found in cache".to_string())?;
+        let serialized_model_guard = serialized_model.read();
 
         let archived_data = serde_json::json!({
             "archive_id": archive_id,
             "original_model_id": model_id,
-            "model_data": if include_metadata { Some(&model) } else { None },
-            "weights": if compress_weights {
-                // Simulate compression by storing summary statistics
-                serde_json::json!({
-                    "compressed": true,
-                    "original_size": weights_guard.len(),
-                    "mean": weights_guard.iter().sum::<f64>() / weights_guard.len() as f64,
-                    "min": weights_guard.iter().fold(f64::INFINITY, |a, &b| a.min(b)),
-                    "max": weights_guard.iter().fold(f64::NEG_INFINITY, |a, &b| a.max(b)),
-                    "checksum": weights_guard.iter().map(|w| w.to_bits()).sum::<u64>()
-                })
-            } else {
-                serde_json::json!({
-                    "compressed": false,
-                    "weights": &*weights_guard
-                })
-            },
+            "model_data": &*model,
+            "model_binary": STANDARD.encode(&*serialized_model_guard),
             "archive_metadata": {
                 "reason": archive_reason,
                 "archived_at": Utc::now().to_rfc3339(),
-                "compressed": compress_weights,
-                "includes_metadata": include_metadata,
                 "original_status": model.status.clone()
             }
         });
@@ -584,7 +456,6 @@ impl ManagementOperations for PhantomMLCore {
             "model_id": model_id,
             "status": "archived",
             "archive_size_bytes": archive_size,
-            "compression_enabled": compress_weights,
             "archive_data": archived_data,
             "archive_time_ms": archive_time,
             "timestamp": Utc::now().to_rfc3339()
@@ -613,23 +484,12 @@ impl ManagementOperations for PhantomMLCore {
             .map_err(|e| format!("Failed to deserialize model: {}", e))?;
 
         // Extract weights
-        let weights_data = archive_data.get("weights")
-            .ok_or_else(|| "Weights data not found in archive".to_string())?;
+        let encoded_model = archive_data.get("model_binary")
+            .and_then(|w| w.as_str())
+            .ok_or_else(|| "Binary model not found".to_string())?;
 
-        let weights: Vec<f64> = if weights_data.get("compressed").and_then(|c| c.as_bool()).unwrap_or(false) {
-            // For compressed data, we would need to decompress - for now, create dummy weights
-            let original_size = weights_data.get("original_size")
-                .and_then(|s| s.as_u64())
-                .unwrap_or(10) as usize;
-            let mean = weights_data.get("mean").and_then(|m| m.as_f64()).unwrap_or(0.0);
-
-            (0..original_size).map(|_| mean + (rand::random::<f64>() - 0.5) * 0.1).collect()
-        } else {
-            weights_data.get("weights")
-                .and_then(|w| w.as_array())
-                .and_then(|arr| arr.iter().map(|v| v.as_f64()).collect::<Option<Vec<_>>>())
-                .ok_or_else(|| "Invalid weights format".to_string())?
-        };
+        let serialized_model = STANDARD.decode(encoded_model)
+            .map_err(|e| format!("Failed to decode model: {}", e))?;
 
         // Create restored model with new ID
         let restored_model_id = Uuid::new_v4().to_string();
@@ -640,7 +500,7 @@ impl ManagementOperations for PhantomMLCore {
         restored.last_used = Utc::now();
 
         // Store restored model
-        self.model_cache.insert(restored_model_id.clone(), Arc::new(RwLock::new(weights)));
+        self.model_cache.insert(restored_model_id.clone(), Arc::new(RwLock::new(serialized_model)));
         self.models.insert(restored_model_id.clone(), restored.clone());
 
         // Update stats

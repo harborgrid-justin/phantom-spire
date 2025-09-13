@@ -3,6 +3,9 @@ use std::time::Instant;
 use chrono::Utc;
 use uuid::Uuid;
 use serde_json;
+use ndarray::{Array1, Array2};
+use linfa::prelude::*;
+use linfa_trees::RandomForest;
 
 use crate::models::{MLModel, InferenceResult};
 use crate::types::FeatureConfig;
@@ -43,28 +46,19 @@ impl InferenceOperations for PhantomMLCore {
             .ok_or_else(|| "Model not found".to_string())?
             .clone();
 
-        // Get model weights
-        let weights = self.model_cache.get(&model_id)
-            .ok_or_else(|| "Model weights not found".to_string())?;
-        let weights_guard = weights.read();
+        let serialized_model = self.model_cache.get(&model_id)
+            .ok_or_else(|| "Model not found in cache".to_string())?;
+        let serialized_model_guard = serialized_model.read();
 
-        // Perform inference (simplified dot product + sigmoid)
-        let linear_output: f64 = features.iter()
-            .zip(weights_guard.iter())
-            .map(|(f, w)| f * w)
-            .sum();
+        let trained_model: RandomForest<f64, u64> = bincode::deserialize(&serialized_model_guard)
+            .map_err(|e| format!("Failed to deserialize model: {}", e))?;
 
-        let confidence = 1.0 / (1.0 + (-linear_output).exp()); // Sigmoid activation
-        let prediction = if confidence > 0.5 { "malicious" } else { "benign" };
+        let n_features = features.len();
+        let features_arr = Array2::from_shape_vec((1, n_features), features)
+            .map_err(|e| format!("Failed to create feature array: {}", e))?;
 
-        // Create probability distribution
-        let prob_malicious = confidence;
-        let prob_benign = 1.0 - confidence;
-
-        // Simulate feature importance
-        let feature_importance: HashMap<String, f64> = (0..features.len())
-            .map(|i| (format!("feature_{}", i), rand::random::<f64>()))
-            .collect();
+        let prediction = trained_model.predict(&features_arr);
+        let prediction_value = prediction[0];
 
         model.last_used = Utc::now();
         self.models.insert(model_id.clone(), model);
@@ -83,10 +77,10 @@ impl InferenceOperations for PhantomMLCore {
 
         let result = InferenceResult {
             model_id: model_id.clone(),
-            prediction: serde_json::json!(prediction),
-            confidence,
-            probability_distribution: vec![prob_benign, prob_malicious],
-            feature_importance,
+            prediction: serde_json::json!(prediction_value),
+            confidence: 0.0, // TODO: Get confidence from model
+            probability_distribution: vec![], // TODO: Get probabilities from model
+            feature_importance: HashMap::new(), // TODO: Get feature importance from model
             inference_time_ms: inference_time,
             timestamp: Utc::now(),
         };
@@ -95,6 +89,7 @@ impl InferenceOperations for PhantomMLCore {
             .map_err(|e| format!("Failed to serialize inference result: {}", e))?)
     }
 
+    // ... (the rest of the functions remain the same for now)
     /// Perform batch inference for high-throughput processing
     async fn predict_batch(&self, model_id: String, batch_features_json: String) -> Result<String, String> {
         let start_time = Instant::now();

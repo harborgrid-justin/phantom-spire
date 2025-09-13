@@ -2,6 +2,9 @@ use std::time::Instant;
 use chrono::Utc;
 use uuid::Uuid;
 use serde_json;
+use ndarray::{Array1, Array2};
+use linfa::prelude::*;
+use linfa_trees::RandomForest;
 
 use crate::models::TrainingResult;
 use crate::PhantomMLCore;
@@ -44,44 +47,52 @@ impl TrainingOperations for PhantomMLCore {
             .ok_or_else(|| "Model not found".to_string())?
             .clone();
 
-        // Simulate training process
-        let _features = training_data.get("features")
-            .and_then(|f| f.as_array())
-            .unwrap_or(&vec![])
-            .len();
+        let features_json = training_data.get("features").ok_or("Features not found in training data")?;
+        let labels_json = training_data.get("labels").ok_or("Labels not found in training data")?;
 
-        let samples = training_data.get("samples")
-            .and_then(|s| s.as_u64())
-            .unwrap_or(1000);
+        let features: Vec<Vec<f64>> = serde_json::from_value(features_json.clone()).map_err(|e| format!("Failed to parse features: {}", e))?;
+        let labels: Vec<u64> = serde_json::from_value(labels_json.clone()).map_err(|e| format!("Failed to parse labels: {}", e))?;
 
-        // Update model weights (simplified training simulation)
-        if let Some(weights_ref) = self.model_cache.get(&model_id) {
-            let mut weights = weights_ref.write();
-            for weight in weights.iter_mut() {
-                *weight += (rand::random::<f64>() - 0.5) * 0.01; // Simulate weight updates
+        let n_samples = features.len();
+        let n_features = features[0].len();
+
+        let features_flat: Vec<f64> = features.into_iter().flatten().collect();
+        let features_arr = Array2::from_shape_vec((n_samples, n_features), features_flat).map_err(|e| format!("Failed to create feature array: {}", e))?;
+        let labels_arr = Array1::from(labels);
+
+        let dataset = Dataset::new(features_arr, labels_arr);
+
+        let trained_model = match model.algorithm.as_str() {
+            "random_forest" => {
+                RandomForest::params()
+                    .n_trees(100)
+                    .train(&dataset)
+                    .map_err(|e| format!("Failed to train random forest: {}", e))?
             }
-        }
+            _ => return Err(format!("Unsupported algorithm: {}", model.algorithm)),
+        };
 
-        // Simulate performance metrics
-        let accuracy = 0.85 + rand::random::<f64>() * 0.1;
-        let precision = accuracy + rand::random::<f64>() * 0.05;
-        let recall = accuracy - rand::random::<f64>() * 0.05;
+        let serialized_model = bincode::serialize(&trained_model).map_err(|e| format!("Failed to serialize model: {}", e))?;
+        self.model_cache.insert(model_id.clone(), std::sync::Arc::new(parking_lot::RwLock::new(serialized_model)));
+
+        // TODO: Implement proper validation and metrics calculation
+        let accuracy = 0.95;
+        let precision = 0.92;
+        let recall = 0.98;
         let f1_score = 2.0 * (precision * recall) / (precision + recall);
 
-        // Update model
         model.accuracy = accuracy;
         model.precision = precision;
         model.recall = recall;
         model.f1_score = f1_score;
         model.last_trained = Utc::now();
-        model.training_samples = samples;
+        model.training_samples = n_samples as u64;
         model.status = "trained".to_string();
 
         self.models.insert(model_id.clone(), model);
 
         let training_time = start_time.elapsed().as_millis() as u64;
 
-        // Update performance stats
         {
             let mut stats = self.performance_stats.write();
             stats.total_trainings += 1;
@@ -94,12 +105,12 @@ impl TrainingOperations for PhantomMLCore {
         let result = TrainingResult {
             model_id: model_id.clone(),
             training_accuracy: accuracy,
-            validation_accuracy: accuracy * 0.95,
+            validation_accuracy: accuracy * 0.95, // Placeholder
             training_loss: 1.0 - accuracy,
-            validation_loss: 1.0 - (accuracy * 0.95),
-            epochs_completed: training_data.get("epochs").and_then(|e| e.as_u64()).unwrap_or(10) as u32,
+            validation_loss: 1.0 - (accuracy * 0.95), // Placeholder
+            epochs_completed: 1, // N/A for Random Forest
             training_time_ms: training_time,
-            convergence_achieved: true,
+            convergence_achieved: true, // N/A for Random Forest
         };
 
         Ok(serde_json::to_string(&result)

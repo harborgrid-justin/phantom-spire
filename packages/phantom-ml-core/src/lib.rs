@@ -40,6 +40,8 @@ pub mod config;
 pub mod core;
 pub mod types;
 pub mod models;
+pub mod enhanced_models;
+pub mod enterprise;
 pub mod dataframe;
 
 // Database modules
@@ -51,6 +53,9 @@ pub mod training;
 pub mod inference;
 pub mod management;
 pub mod analytics;
+pub mod automl;
+pub mod automl_operations;
+pub mod enterprise_operations;
 
 // Utility modules
 pub mod utils;
@@ -63,6 +68,8 @@ pub mod napi_bindings;
 // Configuration and core types
 pub use config::*;
 pub use models::*;
+pub use enhanced_models::*;
+pub use enterprise::*;
 pub use types::*;
 
 // Main ML Core
@@ -79,6 +86,9 @@ pub use inference::InferenceOperations;
 pub use management::ManagementOperations;
 pub use training::TrainingOperations;
 pub use utils::UtilityOperations;
+pub use automl::*;
+pub use automl_operations::AutoMLOperations;
+pub use enterprise_operations::EnterpriseOperations;
 
 // ============================================================================
 // NAPI Bindings

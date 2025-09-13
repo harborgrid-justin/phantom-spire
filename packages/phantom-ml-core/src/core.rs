@@ -13,6 +13,7 @@ use crate::config::MLCoreConfig;
 use crate::models::PerformanceStats;
 use crate::types::{ModelCache, ModelStorage, PerformanceStatsStorage, DatabaseManagerRef};
 use crate::database::{DatabaseManagerBuilder, DatabaseType};
+use crate::automl_operations::AutoMLOperations;
 
 /// Main ML Core service providing enterprise ML capabilities
 pub struct PhantomMLCore {

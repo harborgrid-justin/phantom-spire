@@ -1,5 +1,7 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
+use crate::core::PhantomMLCore;
+use crate::{TrainingOperations, InferenceOperations, ManagementOperations};
 
 /// Simple test function to verify NAPI is working
 #[napi]
@@ -17,312 +19,116 @@ pub fn get_version() -> String {
 
 /// Create a new ML model with specified configuration
 #[napi]
-pub async fn create_model(_config_json: String) -> Result<String> {
-    // Implementation would call the actual ML core functions
-    // For now, return mock data that matches the guide examples
-    let model_id = format!("model_{}", chrono::Utc::now().timestamp_millis());
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "name": format!("classification_{}", &model_id[6..19]),
-        "type": "classification", 
-        "algorithm": "random_forest",
-        "feature_count": 4,
-        "status": "created",
-        "created_at": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn create_model(config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.create_model(config_json)
 }
 
 /// Train a model with provided training data
 #[napi]
-pub async fn train_model(model_id: String, _training_data_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "training_accuracy": 0.8500 + rand::random::<f64>() * 0.1,
-        "validation_accuracy": 0.8200 + rand::random::<f64>() * 0.08,
-        "training_loss": 0.3 - rand::random::<f64>() * 0.1,
-        "validation_loss": 0.35 - rand::random::<f64>() * 0.1,
-        "epochs_completed": 10,
-        "training_time_ms": 1000 + (rand::random::<u64>() % 4000),
-        "samples_processed": 1000,
-        "precision": 0.80 + rand::random::<f64>() * 0.15,
-        "recall": 0.75 + rand::random::<f64>() * 0.20,
-        "f1_score": 0.78 + rand::random::<f64>() * 0.17
-    });
-    Ok(response.to_string())
+pub async fn train_model(model_id: String, training_data_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.train_model(model_id, training_data_json).await
 }
 
 /// Get detailed information about a specific model
 #[napi]
-pub async fn get_model_info(model_id: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "name": format!("model_{}", &model_id[6..19]),
-        "model_type": "classification",
-        "algorithm": "random_forest", 
-        "version": "1.0.0",
-        "status": "trained",
-        "feature_count": 4,
-        "training_samples": 1000,
-        "created_at": chrono::Utc::now().to_rfc3339(),
-        "last_trained": chrono::Utc::now().to_rfc3339(),
-        "last_used": chrono::Utc::now().to_rfc3339(),
-        "accuracy": 0.85 + rand::random::<f64>() * 0.1,
-        "precision": 0.80 + rand::random::<f64>() * 0.15,
-        "recall": 0.75 + rand::random::<f64>() * 0.20,
-        "f1_score": 0.78 + rand::random::<f64>() * 0.17
-    });
-    Ok(response.to_string())
+pub fn get_model_info(model_id: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.get_model_info(model_id)
 }
 
 /// List all models with optional filtering
 #[napi]
-pub async fn list_models() -> Result<String> {
-    let models = vec![
-        serde_json::json!({
-            "model_id": format!("model_{}", chrono::Utc::now().timestamp_millis()),
-            "name": "threat_detector_v1",
-            "model_type": "classification",
-            "algorithm": "random_forest",
-            "status": "trained",
-            "accuracy": 0.891,
-            "created_at": chrono::Utc::now().to_rfc3339()
-        }),
-        serde_json::json!({
-            "model_id": format!("model_{}", chrono::Utc::now().timestamp_millis() - 1000),
-            "name": "anomaly_detector_v2", 
-            "model_type": "anomaly_detection",
-            "algorithm": "isolation_forest",
-            "status": "trained",
-            "accuracy": 0.876,
-            "created_at": chrono::Utc::now().to_rfc3339()
-        })
-    ];
-    
-    let response = serde_json::json!({
-        "total_models": models.len(),
-        "models": models
-    });
-    Ok(response.to_string())
+pub fn list_models() -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.list_models()
 }
 
 /// Safely delete a model from the system
 #[napi]
-pub async fn delete_model(model_id: String) -> Result<String> {
-    let response = serde_json::json!({
-        "success": true,
-        "deleted_model": {
-            "model_id": model_id,
-            "name": format!("deleted_model_{}", chrono::Utc::now().timestamp_millis())
-        },
-        "deletion_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn delete_model(model_id: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.delete_model(model_id)
 }
 
 /// Validate model integrity and performance
 #[napi]
-pub async fn validate_model(model_id: String, _validation_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "validation_results": {
-            "integrity_check": "passed",
-            "performance_check": "passed", 
-            "data_compatibility": "passed"
-        },
-        "validation_score": 0.95,
-        "recommendations": []
-    });
-    Ok(response.to_string())
+pub fn validate_model(model_id: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.validate_model(model_id)
 }
 
 /// Export models in multiple formats
 #[napi]
-pub async fn export_model(model_id: String, _export_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "export_path": format!("/exports/{}.pkl", model_id),
-        "export_format": "pickle",
-        "file_size_bytes": 1024000,
-        "export_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn export_model(model_id: String, format: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.export_model(model_id, format)
 }
 
 /// Import models with validation
 #[napi]
-pub async fn import_model(_import_config_json: String) -> Result<String> {
-    let model_id = format!("imported_model_{}", chrono::Utc::now().timestamp_millis());
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "import_status": "success",
-        "validation_results": {
-            "format_check": "passed",
-            "integrity_check": "passed"
-        }
-    });
-    Ok(response.to_string())
+pub fn import_model(import_data_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.import_model(import_data_json)
 }
 
 /// Clone models for versioning
 #[napi]
-pub async fn clone_model(model_id: String, _clone_config_json: String) -> Result<String> {
-    let new_model_id = format!("cloned_{}", model_id);
-    let response = serde_json::json!({
-        "original_model_id": model_id,
-        "cloned_model_id": new_model_id,
-        "clone_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn clone_model(model_id: String, clone_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.clone_model(model_id, clone_config_json)
 }
 
 /// Archive models for lifecycle management
 #[napi]
-pub async fn archive_model(model_id: String, _archive_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "archive_status": "success",
-        "archive_location": format!("/archives/{}.tar.gz", model_id),
-        "archive_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn archive_model(model_id: String, archive_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.archive_model(model_id, archive_config_json)
 }
 
 /// Restore models from archives
 #[napi]
-pub async fn restore_model(_archive_path: String, _restore_config_json: String) -> Result<String> {
-    let model_id = format!("restored_model_{}", chrono::Utc::now().timestamp_millis());
-    let response = serde_json::json!({
-        "restored_model_id": model_id,
-        "restore_status": "success",
-        "restore_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn restore_model(archive_data_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.restore_model(archive_data_json)
 }
 
 /// Compare multiple models
 #[napi]
-pub async fn compare_models(_model_ids_json: String, _comparison_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "comparison_results": [
-            {
-                "model_id": "model_1",
-                "accuracy": 0.89,
-                "precision": 0.87,
-                "recall": 0.82
-            },
-            {
-                "model_id": "model_2", 
-                "accuracy": 0.91,
-                "precision": 0.88,
-                "recall": 0.85
-            }
-        ],
-        "best_model": "model_2",
-        "comparison_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn compare_models(model_ids_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.compare_models(model_ids_json)
 }
 
 /// Optimize model performance
 #[napi]
-pub async fn optimize_model(model_id: String, _optimization_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "optimization_results": {
-            "original_accuracy": 0.85,
-            "optimized_accuracy": 0.91,
-            "performance_improvement": "7.1%"
-        },
-        "optimization_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub fn optimize_model(model_id: String, optimization_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.optimize_model(model_id, optimization_config_json)
 }
 
 // ==================== INFERENCE & PREDICTION (3 endpoints) ====================
 
 /// Performs single inference using a trained model
 #[napi]
-pub async fn predict(model_id: String, _features_json: String) -> Result<String> {
-    let prediction = if rand::random::<f64>() > 0.5 { 1 } else { 0 };
-    let confidence = 0.6 + rand::random::<f64>() * 0.35;
-    
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "prediction": prediction,
-        "confidence": confidence,
-        "probability_distribution": [1.0 - confidence, confidence],
-        "feature_importance": {
-            "feature1": rand::random::<f64>(),
-            "feature2": rand::random::<f64>(),
-            "feature3": rand::random::<f64>()
-        },
-        "inference_time_ms": 10 + (rand::random::<u64>() % 40),
-        "timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+pub async fn predict(model_id: String, features_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.predict(model_id, features_json).await
 }
 
 /// Performs batch inference for high-throughput processing
 #[napi]
 pub async fn predict_batch(model_id: String, batch_features_json: String) -> Result<String> {
-    // Parse batch data to get sample count
-    let batch_data: serde_json::Value = serde_json::from_str(&batch_features_json)?;
-    let samples = batch_data["samples"].as_array().unwrap_or(&vec![]).len();
-    
-    let mut predictions = Vec::new();
-    for i in 0..samples {
-        let prediction = if rand::random::<f64>() > 0.5 { 1 } else { 0 };
-        let confidence = 0.6 + rand::random::<f64>() * 0.35;
-        
-        predictions.push(serde_json::json!({
-            "sample_id": format!("sample_{}", i),
-            "prediction": prediction,
-            "confidence": confidence,
-            "probability_distribution": [1.0 - confidence, confidence]
-        }));
-    }
-    
-    let response = serde_json::json!({
-        "predictions": predictions,
-        "batch_processing_time_ms": 200 + (rand::random::<u64>() % 800),
-        "samples_processed": samples
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.predict_batch(model_id, batch_features_json).await
 }
 
 /// Detects anomalies in data with configurable sensitivity
 #[napi]
 pub async fn detect_anomalies(data_json: String, sensitivity: f64) -> Result<String> {
-    let data: serde_json::Value = serde_json::from_str(&data_json)?;
-    let points = data["data_points"].as_array().unwrap_or(&vec![]).len();
-    
-    let anomaly_rate = 0.05 + sensitivity * 0.05;
-    let anomalies_count = (points as f64 * anomaly_rate) as usize;
-    
-    let mut anomalies = Vec::new();
-    for i in 0..anomalies_count.min(10) {
-        anomalies.push(serde_json::json!({
-            "index": i,
-            "anomaly_score": 0.5 + rand::random::<f64>() * 0.5,
-            "confidence": 0.7 + rand::random::<f64>() * 0.3,
-            "explanation": "Statistical deviation detected"
-        }));
-    }
-    
-    let response = serde_json::json!({
-        "total_points": points,
-        "anomalies_count": anomalies_count,
-        "anomaly_rate": anomaly_rate,
-        "overall_confidence": 0.8,
-        "anomalies": anomalies,
-        "feature_contributions": {
-            "metric1": rand::random::<f64>(),
-            "metric2": rand::random::<f64>(),
-            "metric3": rand::random::<f64>()
-        }
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.detect_anomalies(data_json, sensitivity).await
 }
 
 // ==================== FEATURE ENGINEERING (1 endpoint) ====================
@@ -330,264 +136,59 @@ pub async fn detect_anomalies(data_json: String, sensitivity: f64) -> Result<Str
 /// Performs advanced feature engineering on raw data
 #[napi]
 pub async fn engineer_features(raw_data_json: String, feature_config_json: String) -> Result<String> {
-    let raw_data: serde_json::Value = serde_json::from_str(&raw_data_json)?;
-    let feature_config: serde_json::Value = serde_json::from_str(&feature_config_json)?;
-    
-    let original_count = feature_config["input_features"].as_array().unwrap_or(&vec![]).len();
-    let engineered_count = 15;
-    let total_count = original_count + engineered_count;
-    let samples_processed = raw_data["samples"].as_array().unwrap_or(&vec![]).len();
-    
-    let response = serde_json::json!({
-        "original_feature_count": original_count,
-        "engineered_feature_count": engineered_count,
-        "total_feature_count": total_count,
-        "samples_processed": samples_processed,
-        "processing_time_ms": 500 + (rand::random::<u64>() % 1500),
-        "feature_statistics": {
-            "feature1": { "mean": rand::random::<f64>() * 100.0, "std": rand::random::<f64>() * 20.0, "missing_count": 0 },
-            "feature2": { "mean": rand::random::<f64>() * 100.0, "std": rand::random::<f64>() * 20.0, "missing_count": 0 }
-        },
-        "quality_metrics": {
-            "completeness": 0.95 + rand::random::<f64>() * 0.05,
-            "consistency": 0.90 + rand::random::<f64>() * 0.08,
-            "validity": 0.92 + rand::random::<f64>() * 0.06
-        }
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.engineer_features(raw_data_json, feature_config_json).await
 }
 
 // ==================== ANALYTICS & INSIGHTS (7 endpoints) ====================
 
 /// Generates comprehensive analytics and insights from data
 #[napi]
-pub async fn generate_insights(_analysis_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "threat_trends": {
-            "current_level": "moderate",
-            "change_24h": (rand::random::<f64>() - 0.5) * 20.0,
-            "peak_hour": rand::random::<u8>() % 24,
-            "trend_direction": if rand::random::<bool>() { "increasing" } else { "decreasing" }
-        },
-        "attack_patterns": [
-            {
-                "name": "Brute Force Login",
-                "frequency": rand::random::<u32>() % 100,
-                "confidence": 0.7 + rand::random::<f64>() * 0.3,
-                "risk_level": "high"
-            }
-        ],
-        "risk_assessment": {
-            "overall_score": 7.0 + rand::random::<f64>() * 3.0,
-            "risk_level": "medium",
-            "top_factors": [
-                { "name": "Unusual Traffic Patterns", "score": 7.0 + rand::random::<f64>() * 3.0 },
-                { "name": "Failed Authentication Attempts", "score": 6.0 + rand::random::<f64>() * 3.0 }
-            ]
-        },
-        "recommendations": [
-            {
-                "title": "Enhance Authentication Monitoring",
-                "priority": "high",
-                "expected_impact": "Reduce brute force success rate by 60%",
-                "description": "Implement real-time login attempt monitoring with progressive delays"
-            }
-        ],
-        "processing_time_ms": 1000 + (rand::random::<u64>() % 2000)
-    });
-    Ok(response.to_string())
+pub async fn generate_insights(analysis_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.generate_insights(analysis_config_json).await
 }
 
 /// Performs time series and trend analysis on data
 #[napi]
-pub async fn trend_analysis(_data_json: String, _trend_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "trend_summary": {
-            "threat_count": {
-                "trend_direction": "increasing",
-                "trend_strength": 0.3 + rand::random::<f64>() * 0.5,
-                "has_seasonality": true,
-                "volatility": 0.1 + rand::random::<f64>() * 0.3
-            }
-        },
-        "change_points": [
-            {
-                "timestamp": chrono::Utc::now().to_rfc3339(),
-                "metric": "threat_count",
-                "magnitude": 1.0 + rand::random::<f64>() * 2.0,
-                "confidence": 0.8 + rand::random::<f64>() * 0.2
-            }
-        ],
-        "forecasts": {
-            "threat_count": {
-                "next_24h_avg": 25.0 + rand::random::<f64>() * 50.0,
-                "next_48h_avg": 30.0 + rand::random::<f64>() * 55.0,
-                "confidence": 0.7 + rand::random::<f64>() * 0.2,
-                "lower_bound": 15.0,
-                "upper_bound": 85.0
-            }
-        },
-        "anomalies": [
-            {
-                "timestamp": chrono::Utc::now().to_rfc3339(),
-                "metric": "threat_count",
-                "score": 0.7 + rand::random::<f64>() * 0.3,
-                "expected": 35.0,
-                "actual": 78.0
-            }
-        ],
-        "processing_time_ms": 800 + (rand::random::<u64>() % 1200)
-    });
-    Ok(response.to_string())
+pub async fn trend_analysis(data_json: String, trend_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.trend_analysis(data_json, trend_config_json).await
 }
 
 /// Performs feature correlation analysis
 #[napi]
-pub async fn correlation_analysis(_data_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "strong_correlations": [
-            {
-                "feature1": "failed_login_attempts",
-                "feature2": "suspicious_network_activity",
-                "pearson": 0.6 + rand::random::<f64>() * 0.4,
-                "spearman": 0.6 + rand::random::<f64>() * 0.4,
-                "p_value": rand::random::<f64>() * 0.01,
-                "significant": true
-            }
-        ],
-        "insights": [
-            {
-                "title": "Strong correlation between login failures and network anomalies",
-                "description": "Failed login attempts are highly correlated with suspicious network patterns",
-                "impact_level": "high"
-            }
-        ],
-        "feature_clusters": [
-            {
-                "features": ["failed_login_attempts", "brute_force_indicators"],
-                "avg_correlation": 0.7 + rand::random::<f64>() * 0.3
-            }
-        ]
-    });
-    Ok(response.to_string())
+pub async fn correlation_analysis(data_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.correlation_analysis(data_json).await
 }
 
 /// Generates comprehensive statistical summaries of data
 #[napi]
 pub async fn statistical_summary(data_json: String) -> Result<String> {
-    let data: serde_json::Value = serde_json::from_str(&data_json)?;
-    let empty_datasets = vec![];
-    let datasets = data["datasets"].as_array().unwrap_or(&empty_datasets);
-    
-    let mut dataset_summaries = Vec::new();
-    for dataset in datasets {
-        dataset_summaries.push(serde_json::json!({
-            "name": dataset["name"],
-            "descriptive_stats": {
-                "count": 100 + (rand::random::<u32>() % 900),
-                "mean": rand::random::<f64>() * 100.0,
-                "median": rand::random::<f64>() * 100.0,
-                "std_dev": rand::random::<f64>() * 25.0,
-                "min": rand::random::<f64>() * 10.0,
-                "max": 150.0 + rand::random::<f64>() * 50.0,
-                "skewness": (rand::random::<f64>() - 0.5) * 2.0,
-                "kurtosis": (rand::random::<f64>() - 0.5) * 4.0
-            },
-            "percentiles": {
-                "p25": rand::random::<f64>() * 40.0,
-                "p75": 60.0 + rand::random::<f64>() * 40.0,
-                "p95": 80.0 + rand::random::<f64>() * 20.0,
-                "p99": 90.0 + rand::random::<f64>() * 10.0
-            },
-            "outliers": {
-                "count": rand::random::<u32>() % 20,
-                "rate": rand::random::<f64>() * 0.05
-            },
-            "distribution_analysis": {
-                "best_fit": "normal",
-                "normality_p_value": rand::random::<f64>() * 0.1,
-                "is_normal": rand::random::<bool>()
-            }
-        }));
-    }
-    
-    let response = serde_json::json!({
-        "datasets": dataset_summaries
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.statistical_summary(data_json).await
 }
 
 /// Data quality assessment and scoring
 #[napi]
-pub async fn data_quality_assessment(_data_json: String, _quality_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "overall_quality_score": 0.85 + rand::random::<f64>() * 0.10,
-        "quality_dimensions": {
-            "completeness": 0.95 + rand::random::<f64>() * 0.05,
-            "accuracy": 0.90 + rand::random::<f64>() * 0.08,
-            "consistency": 0.88 + rand::random::<f64>() * 0.10,
-            "validity": 0.92 + rand::random::<f64>() * 0.06,
-            "uniqueness": 0.94 + rand::random::<f64>() * 0.05
-        },
-        "issues_detected": [
-            {
-                "type": "missing_values",
-                "severity": "low",
-                "count": rand::random::<u32>() % 10,
-                "fields_affected": ["field1", "field2"]
-            }
-        ],
-        "recommendations": [
-            {
-                "priority": "medium",
-                "description": "Address missing values in critical fields",
-                "expected_improvement": "0.03"
-            }
-        ]
-    });
-    Ok(response.to_string())
+pub async fn data_quality_assessment(data_json: String, quality_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.data_quality_assessment(data_json, quality_config_json).await
 }
 
 /// Feature importance ranking and analysis
 #[napi]
-pub async fn feature_importance_analysis(model_id: String, _analysis_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "feature_importance": [
-            { "feature": "ip_reputation", "importance": 0.25, "rank": 1 },
-            { "feature": "request_frequency", "importance": 0.20, "rank": 2 },
-            { "feature": "payload_size", "importance": 0.18, "rank": 3 },
-            { "feature": "domain_age", "importance": 0.15, "rank": 4 }
-        ],
-        "importance_method": "permutation",
-        "stability_score": 0.87,
-        "top_features": ["ip_reputation", "request_frequency", "payload_size"]
-    });
-    Ok(response.to_string())
+pub async fn feature_importance_analysis(model_id: String, analysis_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.feature_importance_analysis(model_id, analysis_config_json).await
 }
 
 /// Model decision explanations and interpretability
 #[napi]
-pub async fn model_explainability(model_id: String, prediction_id: String, _explain_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "model_id": model_id,
-        "prediction_id": prediction_id,
-        "explanation": {
-            "prediction": 1,
-            "confidence": 0.84,
-            "feature_contributions": [
-                { "feature": "ip_reputation", "contribution": -0.15, "value": 0.2 },
-                { "feature": "request_frequency", "contribution": 0.22, "value": 500 },
-                { "feature": "payload_size", "contribution": 0.18, "value": 8192 }
-            ],
-            "decision_path": ["root", "high_frequency_branch", "large_payload_leaf"],
-            "similar_cases": [
-                { "case_id": "case_123", "similarity": 0.89, "outcome": 1 }
-            ]
-        },
-        "explanation_method": "SHAP"
-    });
-    Ok(response.to_string())
+pub async fn model_explainability(model_id: String, prediction_id: String, explain_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.model_explainability(model_id, prediction_id, explain_config_json).await
 }
 
 // ==================== STREAMING & BATCH PROCESSING (2 endpoints) ====================
@@ -595,28 +196,15 @@ pub async fn model_explainability(model_id: String, prediction_id: String, _expl
 /// Real-time streaming predictions
 #[napi]
 pub async fn stream_predict(model_id: String, stream_config_json: String) -> Result<String> {
-    let config: serde_json::Value = serde_json::from_str(&stream_config_json)?;
-    
-    let response = serde_json::json!({
-        "stream_id": format!("stream_{}", chrono::Utc::now().timestamp_millis()),
-        "status": "active",
-        "expected_throughput": 200 + (rand::random::<u32>() % 300),
-        "buffer_capacity": config["buffer_size"].as_u64().unwrap_or(1000),
-        "latency_target_ms": config["max_latency_ms"].as_u64().unwrap_or(100)
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.stream_predict(model_id, stream_config_json).await
 }
 
 /// Asynchronous batch processing
 #[napi]
 pub async fn batch_process_async(model_id: String, batch_data_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "job_id": format!("job_{}", chrono::Utc::now().timestamp_millis()),
-        "status": "initiated",
-        "estimated_completion": chrono::Utc::now().checked_add_signed(chrono::Duration::minutes(15)).unwrap().to_rfc3339(),
-        "progress_url": "/api/jobs/progress"
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.batch_process_async(model_id, batch_data_json).await
 }
 
 // ==================== MONITORING & HEALTH (3 endpoints) ====================
@@ -624,49 +212,22 @@ pub async fn batch_process_async(model_id: String, batch_data_json: String) -> R
 /// Real-time performance monitoring
 #[napi]
 pub async fn real_time_monitor(monitor_config_json: String) -> Result<String> {
-    let config: serde_json::Value = serde_json::from_str(&monitor_config_json)?;
-    
-    let response = serde_json::json!({
-        "monitor_id": format!("monitor_{}", chrono::Utc::now().timestamp_millis()),
-        "status": "active",
-        "targets_count": config["monitoring_targets"].as_array().unwrap_or(&vec![]).len(),
-        "monitoring_frequency": config["monitoring_frequency"].as_str().unwrap_or("60s"),
-        "alert_channels": config["alert_config"]["alert_channels"].as_array().unwrap_or(&vec![serde_json::Value::String("console".to_string())])
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.real_time_monitor(monitor_config_json).await
 }
 
 /// System performance metrics
 #[napi]
 pub async fn get_performance_stats() -> Result<String> {
-    let response = serde_json::json!({
-        "system_stats": {
-            "total_predictions": 5000 + (rand::random::<u32>() % 5000),
-            "avg_prediction_latency_ms": 20.0 + rand::random::<f64>() * 80.0,
-            "memory_usage_mb": 500.0 + rand::random::<f64>() * 500.0,
-            "cpu_usage_percent": 25.0 + rand::random::<f64>() * 25.0
-        },
-        "model_stats": {
-            "models_created": 10 + (rand::random::<u32>() % 20),
-            "models_active": 3 + (rand::random::<u32>() % 7),
-            "total_training_time_ms": rand::random::<u64>() % 100000,
-            "last_updated": chrono::Utc::now().to_rfc3339()
-        }
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.get_performance_stats().await
 }
 
 /// System health diagnostics
 #[napi]
 pub async fn get_system_health() -> Result<String> {
-    let response = serde_json::json!({
-        "status": "healthy",
-        "memory_available": "8.2 GB",
-        "cpu_usage": 25.0 + rand::random::<f64>() * 50.0,
-        "uptime_seconds": 86400 + (rand::random::<u64>() % 86400),
-        "models_loaded": 3 + (rand::random::<u32>() % 7)
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.get_system_health().await
 }
 
 // ==================== ALERTING & EVENTS (3 endpoints) ====================
@@ -674,38 +235,22 @@ pub async fn get_system_health() -> Result<String> {
 /// Automated alert generation
 #[napi]
 pub async fn alert_engine(alert_rules_json: String) -> Result<String> {
-    let rules: serde_json::Value = serde_json::from_str(&alert_rules_json)?;
-    
-    let response = serde_json::json!({
-        "engine_id": format!("alert_engine_{}", chrono::Utc::now().timestamp_millis()),
-        "rules_loaded": rules["alert_rules"].as_array().unwrap_or(&vec![]).len(),
-        "status": "active"
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.alert_engine(alert_rules_json).await
 }
 
 /// Dynamic threshold management
 #[napi]
 pub async fn threshold_management(threshold_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "threshold_id": format!("threshold_{}", chrono::Utc::now().timestamp_millis()),
-        "thresholds_updated": 5,
-        "adaptive_thresholds": true,
-        "last_update": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.threshold_management(threshold_config_json).await
 }
 
 /// Event-driven processing
 #[napi]
 pub async fn event_processor(event_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "processor_id": format!("processor_{}", chrono::Utc::now().timestamp_millis()),
-        "events_processed": rand::random::<u32>() % 1000,
-        "processing_rate": 150.0 + rand::random::<f64>() * 100.0,
-        "status": "running"
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.event_processor(event_config_json).await
 }
 
 // ==================== COMPLIANCE & SECURITY (3 endpoints) ====================
@@ -713,42 +258,22 @@ pub async fn event_processor(event_config_json: String) -> Result<String> {
 /// Comprehensive audit logging
 #[napi]
 pub async fn audit_trail(audit_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "audit_session_id": format!("audit_{}", chrono::Utc::now().timestamp_millis()),
-        "events_logged": rand::random::<u32>() % 500,
-        "compliance_status": "compliant",
-        "retention_days": 90
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.audit_trail(audit_config_json).await
 }
 
 /// Regulatory compliance reports
 #[napi]
 pub async fn compliance_report(report_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "report_id": format!("report_{}", chrono::Utc::now().timestamp_millis()),
-        "compliance_score": 0.92 + rand::random::<f64>() * 0.07,
-        "standards_checked": ["SOC2", "GDPR", "HIPAA"],
-        "violations": 0,
-        "report_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.compliance_report(report_config_json).await
 }
 
 /// Security assessment and scanning
 #[napi]
 pub async fn security_scan(scan_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "scan_id": format!("scan_{}", chrono::Utc::now().timestamp_millis()),
-        "vulnerabilities_found": rand::random::<u32>() % 5,
-        "security_score": 0.88 + rand::random::<f64>() * 0.10,
-        "scan_duration_ms": 30000 + (rand::random::<u64>() % 20000),
-        "recommendations": [
-            "Update dependencies to latest versions",
-            "Enable additional security headers"
-        ]
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.security_scan(scan_config_json).await
 }
 
 // ==================== OPERATIONS & BACKUP (2 endpoints) ====================
@@ -756,27 +281,15 @@ pub async fn security_scan(scan_config_json: String) -> Result<String> {
 /// System backup and data protection
 #[napi]
 pub async fn backup_system(backup_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "backup_id": format!("backup_{}", chrono::Utc::now().timestamp_millis()),
-        "backup_size_mb": 1024 + (rand::random::<u32>() % 2048),
-        "backup_location": "/backups/system_backup.tar.gz",
-        "backup_timestamp": chrono::Utc::now().to_rfc3339(),
-        "status": "completed"
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.backup_system(backup_config_json).await
 }
 
 /// Disaster recovery procedures
 #[napi]
 pub async fn disaster_recovery(recovery_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "recovery_id": format!("recovery_{}", chrono::Utc::now().timestamp_millis()),
-        "recovery_status": "ready",
-        "rpo_hours": 1,
-        "rto_hours": 4,
-        "last_test": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.disaster_recovery(recovery_config_json).await
 }
 
 // ==================== BUSINESS INTELLIGENCE (5 endpoints) ====================
@@ -784,74 +297,106 @@ pub async fn disaster_recovery(recovery_config_json: String) -> Result<String> {
 /// ROI calculation and business metrics
 #[napi]
 pub async fn roi_calculator(roi_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "roi_percentage": 150.0 + rand::random::<f64>() * 100.0,
-        "cost_savings": 50000.0 + rand::random::<f64>() * 50000.0,
-        "payback_period_months": 6 + (rand::random::<u32>() % 12),
-        "calculation_timestamp": chrono::Utc::now().to_rfc3339()
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.roi_calculator(roi_config_json).await
 }
 
 /// Cost-benefit analysis
 #[napi]
-pub async fn cost_benefit_analysis(_analysis_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "total_benefits": 200000.0 + rand::random::<f64>() * 100000.0,
-        "total_costs": 80000.0 + rand::random::<f64>() * 40000.0,
-        "benefit_cost_ratio": 2.5 + rand::random::<f64>() * 1.0,
-        "net_present_value": 120000.0 + rand::random::<f64>() * 60000.0
-    });
-    Ok(response.to_string())
+pub async fn cost_benefit_analysis(analysis_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.cost_benefit_analysis(analysis_config_json).await
 }
 
 /// Performance forecasting
 #[napi]
 pub async fn performance_forecasting(forecast_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "forecast_horizon": "90_days",
-        "predicted_metrics": {
-            "threat_detection_rate": 0.92 + rand::random::<f64>() * 0.06,
-            "false_positive_rate": 0.02 + rand::random::<f64>() * 0.03,
-            "system_capacity": 0.75 + rand::random::<f64>() * 0.15
-        },
-        "confidence_interval": 0.95,
-        "forecast_accuracy": 0.89 + rand::random::<f64>() * 0.08
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.performance_forecasting(forecast_config_json).await
 }
 
 /// Resource optimization analytics
 #[napi]
 pub async fn resource_optimization(optimization_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "current_utilization": 0.65 + rand::random::<f64>() * 0.20,
-        "optimal_utilization": 0.80 + rand::random::<f64>() * 0.10,
-        "potential_savings": 15000.0 + rand::random::<f64>() * 10000.0,
-        "recommendations": [
-            "Increase batch size for better throughput",
-            "Schedule maintenance during low-traffic periods"
-        ]
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.resource_optimization(optimization_config_json).await
 }
 
 /// Business KPI tracking
 #[napi]
 pub async fn business_metrics(metrics_config_json: String) -> Result<String> {
-    let response = serde_json::json!({
-        "kpis": {
-            "threat_detection_accuracy": 0.89 + rand::random::<f64>() * 0.10,
-            "incident_response_time": 15.0 + rand::random::<f64>() * 10.0,
-            "customer_satisfaction": 4.2 + rand::random::<f64>() * 0.6,
-            "system_uptime": 0.998 + rand::random::<f64>() * 0.002
-        },
-        "trends": {
-            "threat_detection_accuracy": "improving",
-            "incident_response_time": "stable",
-            "system_uptime": "excellent"
-        },
-        "reporting_period": "monthly"
-    });
-    Ok(response.to_string())
+    let core = PhantomMLCore::new()?;
+    core.business_metrics(metrics_config_json).await
+}
+
+// ==================== AUTOML ENDPOINTS (NEW) ====================
+
+/// Automatically train and optimize ML models using AutoML
+#[napi]
+pub async fn auto_train_model(config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.auto_train_model(config_json).await
+}
+
+/// Get model leaderboard for AutoML experiments
+#[napi]
+pub async fn get_model_leaderboard(experiment_id: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.get_model_leaderboard(experiment_id).await
+}
+
+/// Automatic feature engineering for datasets
+#[napi]
+pub async fn auto_feature_engineering(data_json: String, config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.auto_feature_engineering(data_json, config_json).await
+}
+
+/// Explain model predictions with feature importance
+#[napi]
+pub async fn explain_model(model_id: String, instance_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.explain_model(model_id, instance_json).await
+}
+
+/// Optimize hyperparameters for a specific model
+#[napi]
+pub async fn optimize_hyperparameters(model_id: String, optimization_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.optimize_hyperparameters(model_id, optimization_config_json).await
+}
+
+/// Automated model selection based on data characteristics
+#[napi]
+pub async fn select_best_algorithm(data_json: String, task_type: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.select_best_algorithm(data_json, task_type).await
+}
+
+/// Generate automated insights from data
+#[napi]
+pub async fn auto_generate_insights(data_json: String, config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.auto_generate_insights(data_json, config_json).await
+}
+
+/// Cross-validate model performance
+#[napi]
+pub async fn cross_validate_model(model_id: String, data_json: String, folds: u32) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.cross_validate_model(model_id, data_json, folds).await
+}
+
+/// Ensemble multiple models for improved performance
+#[napi]
+pub async fn create_ensemble(model_ids: Vec<String>, ensemble_config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.create_ensemble(model_ids, ensemble_config_json).await
+}
+
+/// Security-specific feature extraction
+#[napi]
+pub async fn extract_security_features(data_json: String, config_json: String) -> Result<String> {
+    let core = PhantomMLCore::new()?;
+    core.extract_security_features(data_json, config_json).await
 }
