@@ -3,11 +3,11 @@
  * Provides multi-tenant, scalable data persistence with multiple backend support
  */
 
-import { MongoDataSource } from '../../../data-layer/core/MongoDataSource.js';
-import { PostgreSQLDataSource } from '../../../data-layer/core/PostgreSQLDataSource.js';
-import { RedisDataSource } from '../../../data-layer/core/RedisDataSource.js';
-import { ElasticsearchDataSource } from '../../../data-layer/core/ElasticsearchDataSource.js';
-import { DataFederationEngine } from '../../../data-layer/core/DataFederationEngine.js';
+import { MongoDataSource } from '../../../src/data-layer/core/MongoDataSource';
+import { PostgreSQLDataSource } from '../../../src/data-layer/core/PostgreSQLDataSource';
+import { RedisDataSource } from '../../../src/data-layer/core/RedisDataSource';
+import { ElasticsearchDataSource } from '../../../src/data-layer/core/ElasticsearchDataSource';
+import { DataFederationEngine } from '../../../src/data-layer/core/DataFederationEngine';
 import {
   IDataSource,
   IDataRecord,
@@ -15,8 +15,8 @@ import {
   IQueryContext,
   IQueryResult,
   IHealthStatus,
-} from '../../../data-layer/interfaces/IDataSource.js';
-import { logger } from '../../../utils/logger.js';
+} from '../../../src/data-layer/interfaces/IDataSource';
+import { logger } from '../../../src/utils/logger';
 
 export interface SaaSTenantConfig {
   tenantId: string;

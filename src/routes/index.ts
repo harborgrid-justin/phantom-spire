@@ -25,6 +25,7 @@ import { createNetworkManagementRoutes } from './networkManagementRoutes.js';
 import etlRoutes from './etl/index.js';
 import modernizationRoutes from './modernization/index.js';
 import windmillRoutes from './windmill/index.js';
+import { phantomMLCoreRoutes } from './phantomMLCoreRoutes.js';
 import { DataLayerOrchestrator } from '../data-layer/DataLayerOrchestrator.js';
 
 // Import new comprehensive reporting routes
@@ -61,6 +62,7 @@ export function createApiRoutes(orchestrator?: DataLayerOrchestrator): Router {
   router.use('/modernization', modernizationRoutes);
   router.use('/windmill', windmillRoutes);
   router.use('/etl', etlRoutes);
+  router.use('/ml', phantomMLCoreRoutes);  // 32 additional ML business-ready features
 
   // New comprehensive reporting routes
   router.use('/advanced-analytics', createAdvancedAnalyticsRoutes());
