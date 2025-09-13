@@ -73,6 +73,15 @@ redis = { version = "0.26.0", features = ["tokio-comp", "connection-manager"], o
 mongodb = { version = "3.3.0", optional = true }
 elasticsearch = { version = "8.5.0-alpha.1", optional = true }
 
+# Diesel ORM - optional alternative to tokio-postgres
+diesel = { version = "2.1", features = ["postgres", "chrono", "uuid", "serde_json"], optional = true }
+diesel-async = { version = "0.4", features = ["postgres"], optional = true }
+
+# Web frameworks - optional
+actix-web = { version = "4.4", optional = true }
+actix-cors = { version = "0.6", optional = true }
+rocket = { version = "0.5.0", features = ["json"], optional = true }
+
 # Monitoring and observability - optional
 tracing = { version = "0.1", optional = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
@@ -94,8 +103,13 @@ mongodb-store = ["mongodb"]
 elasticsearch-store = ["elasticsearch"]
 all-storage = ["postgres-store", "redis-store", "mongodb-store", "elasticsearch-store"]
 
+# Diesel ORM backend
+diesel-postgres = ["diesel", "diesel-async"]
+
 # Web features
 web-server = ["warp", "reqwest"]
+actix-web-server = ["actix-web", "actix-cors", "reqwest"]
+rocket-server = ["rocket", "reqwest"]
 web-client = ["reqwest"]
 
 # Monitoring features
@@ -113,7 +127,7 @@ analytics = []
 enterprise = ["all-storage", "monitoring", "compression", "multi-tenant", "audit-logging", "analytics"]
 
 # Full feature set
-full = ["enterprise", "web-server", "web-client"]
+full = ["enterprise", "web-server", "web-client", "actix-web-server", "rocket-server"]
 
 [build-dependencies]
 napi-build = "2.1.0"

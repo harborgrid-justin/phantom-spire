@@ -25,21 +25,20 @@
     "*.node"
   ],
   "napi": {
-    "name": "phantom-ml-core",
-    "triples": {
-      "defaults": true,
-      "additional": [
-        "x86_64-unknown-linux-musl",
-        "aarch64-unknown-linux-gnu",
-        "i686-pc-windows-msvc",
-        "armv7-unknown-linux-gnueabihf",
-        "aarch64-apple-darwin",
-        "aarch64-pc-windows-msvc",
-        "aarch64-unknown-linux-musl",
-        "aarch64-linux-android",
-        "arm-linux-androideabi"
-      ]
-    }
+    "binaryName": "phantom-ml-core",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "i686-pc-windows-msvc",
+      "armv7-unknown-linux-gnueabihf",
+      "aarch64-apple-darwin",
+      "aarch64-pc-windows-msvc",
+      "aarch64-unknown-linux-musl",
+      "aarch64-linux-android",
+      "arm-linux-androideabi"
+    ]
   },
   "engines": {
     "node": ">= 14"
@@ -58,7 +57,7 @@
     "verify": "node verify-examples.js"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.18.0",
+    "@napi-rs/cli": "^3.2.0",
     "ava": "^6.0.0"
   },
   "ava": {

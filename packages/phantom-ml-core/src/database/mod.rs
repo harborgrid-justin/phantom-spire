@@ -69,6 +69,9 @@ pub mod manager;
 #[cfg(feature = "postgres-store")]
 pub mod postgresql;
 
+#[cfg(feature = "diesel-postgres")]
+pub mod diesel_postgresql;
+
 #[cfg(feature = "mongodb-store")]
 pub mod mongodb;
 
@@ -92,6 +95,9 @@ pub use manager::{DatabaseManager, DatabaseManagerBuilder};
 
 #[cfg(feature = "postgres-store")]
 pub use postgresql::PostgreSQLAdapter;
+
+#[cfg(feature = "diesel-postgres")]
+pub use diesel_postgresql::DieselPostgreSQLAdapter;
 
 #[cfg(feature = "mongodb-store")]
 pub use mongodb::MongoDBAdapter;

@@ -8,11 +8,10 @@ use serde_json;
 
 use super::interfaces::{
     DatabaseConfig, DatabaseType, DatabaseError, DatabaseResult,
-    ModelStorage, InferenceStorage, TrainingStorage, CacheStorage, SearchStorage,
-    MLModel, InferenceResult, TrainingResult, TrainingDataset, MLExperiment,
-    ModelFilters, AnalyticsFilters, SearchCriteria, ExperimentFilters,
-    InferenceAnalytics
+    ModelStorage, InferenceStorage, TrainingStorage, SearchStorage,
+    ModelFilters, AnalyticsFilters, InferenceAnalytics,
 };
+use crate::{MLModel, InferenceResult, TrainingResult};
 
 #[cfg(feature = "postgres-store")]
 use super::postgresql::PostgreSQLAdapter;
@@ -221,21 +220,6 @@ impl DatabaseManager {
         }
     }
 
-    /// Get the cache storage adapter
-    fn get_cache_storage(&self) -> DatabaseResult<&dyn CacheStorage> {
-        match self.cache_storage {
-            #[cfg(feature = "redis-store")]
-            DatabaseType::Redis => {
-                self.redis_adapter.as_ref()
-                    .map(|a| a.as_ref() as &dyn CacheStorage)
-                    .ok_or_else(|| DatabaseError::ConfigurationError("Redis adapter not initialized".to_string()))
-            },
-            _ => Err(DatabaseError::ConfigurationError(
-                format!("Cache storage adapter for {:?} not available", self.cache_storage)
-            ))
-        }
-    }
-
     /// Get the search storage adapter
     fn get_search_storage(&self) -> DatabaseResult<&dyn SearchStorage> {
         match self.search_storage {
@@ -336,7 +320,7 @@ impl DatabaseManager {
     /// Get inference analytics from multiple sources
     pub async fn get_inference_analytics(&self, model_id: &str, filters: Option<AnalyticsFilters>) -> DatabaseResult<InferenceAnalytics> {
         // Try to get analytics from primary storage
-        let mut analytics = self.get_inference_storage()?.get_inference_analytics(model_id, filters).await?;
+        let analytics = self.get_inference_storage()?.get_inference_analytics(model_id, filters).await?;
 
         // Enhance with real-time data from Redis if available
         #[cfg(feature = "redis-store")]
@@ -375,7 +359,7 @@ impl DatabaseManager {
     }
 
     /// Search models using Elasticsearch with fallback
-    pub async fn search_models(&self, search_text: Option<&str>, filters: Option<ModelFilters>) -> DatabaseResult<Vec<MLModel>> {
+    pub async fn search_models(&self, _search_text: Option<&str>, filters: Option<ModelFilters>) -> DatabaseResult<Vec<MLModel>> {
         // Try Elasticsearch first if available
         #[cfg(feature = "elasticsearch-store")]
         if let Some(es_adapter) = &self.elasticsearch_adapter {
@@ -416,8 +400,8 @@ impl DatabaseManager {
 
     /// Get comprehensive system health from all databases
     pub async fn get_system_health(&self) -> DatabaseResult<serde_json::Value> {
-        let mut health_status = serde_json::Map::new();
-        let mut overall_healthy = true;
+        let health_status = serde_json::Map::new();
+        let overall_healthy = true;
 
         // Check PostgreSQL health
         #[cfg(feature = "postgres-store")]
@@ -494,7 +478,7 @@ impl DatabaseManager {
 
     /// Get storage statistics from all databases
     pub async fn get_storage_statistics(&self) -> DatabaseResult<serde_json::Value> {
-        let mut stats = serde_json::Map::new();
+        let stats = serde_json::Map::new();
 
         // Get MongoDB collection stats
         #[cfg(feature = "mongodb-store")]
@@ -516,7 +500,7 @@ impl DatabaseManager {
     }
 
     /// Cache model weights with TTL
-    pub async fn cache_model_weights(&self, model_id: &str, weights: &[f64], ttl_seconds: Option<u64>) -> DatabaseResult<()> {
+    pub async fn cache_model_weights(&self, _model_id: &str, _weights: &[f64], _ttl_seconds: Option<u64>) -> DatabaseResult<()> {
         #[cfg(feature = "redis-store")]
         if let Some(redis_adapter) = &self.redis_adapter {
             return redis_adapter.cache_model_weights(model_id, weights, ttl_seconds).await;
@@ -526,7 +510,7 @@ impl DatabaseManager {
     }
 
     /// Get cached model weights
-    pub async fn get_cached_model_weights(&self, model_id: &str) -> DatabaseResult<Option<Vec<f64>>> {
+    pub async fn get_cached_model_weights(&self, _model_id: &str) -> DatabaseResult<Option<Vec<f64>>> {
         #[cfg(feature = "redis-store")]
         if let Some(redis_adapter) = &self.redis_adapter {
             return redis_adapter.get_cached_model_weights(model_id).await;
@@ -536,7 +520,7 @@ impl DatabaseManager {
     }
 
     /// Set model training status
-    pub async fn set_training_status(&self, model_id: &str, status: &str, progress: Option<f64>) -> DatabaseResult<()> {
+    pub async fn set_training_status(&self, _model_id: &str, _status: &str, _progress: Option<f64>) -> DatabaseResult<()> {
         #[cfg(feature = "redis-store")]
         if let Some(redis_adapter) = &self.redis_adapter {
             return redis_adapter.set_training_status(model_id, status, progress).await;
@@ -546,7 +530,7 @@ impl DatabaseManager {
     }
 
     /// Get model training status
-    pub async fn get_training_status(&self, model_id: &str) -> DatabaseResult<Option<serde_json::Value>> {
+    pub async fn get_training_status(&self, _model_id: &str) -> DatabaseResult<Option<serde_json::Value>> {
         #[cfg(feature = "redis-store")]
         if let Some(redis_adapter) = &self.redis_adapter {
             return redis_adapter.get_training_status(model_id).await;
