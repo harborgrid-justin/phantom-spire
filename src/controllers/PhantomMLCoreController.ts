@@ -4,7 +4,7 @@
  */
 
 import { Request, Response } from 'express';
-import { BaseController } from '../BaseController';
+import { BaseController } from './BaseController';
 import { phantomMLCoreService, MLServiceRequest } from '../services/PhantomMLCoreService';
 import { logger } from '../utils/logger';
 
