@@ -2,7 +2,8 @@
   "name": "@phantom-spire/ml-core",
   "version": "1.0.1",
   "description": "Enterprise machine learning services for threat detection and security analytics",
-  "main": "index.js",
+  "main": "ml-core.js",
+  "types": "ml-core.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/harborgrid-justin/phantom-spire.git",
