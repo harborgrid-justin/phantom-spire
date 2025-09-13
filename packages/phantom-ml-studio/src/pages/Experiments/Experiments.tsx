@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Play as PlayIcon,
+  PlayArrow as PlayIcon,
   Stop as StopIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
@@ -371,7 +371,7 @@ const Experiments: React.FC = () => {
 
       <Card sx={{ mb: 4 }}>
         <CardContent sx={{ pb: 1 }}>
-          <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+          <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
             <Tab label="Experiments" />
             <Tab label="Metrics" />
             <Tab label="Logs" />

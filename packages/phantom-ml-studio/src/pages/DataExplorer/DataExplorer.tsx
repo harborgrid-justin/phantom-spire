@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Button,
-  TextField,
   Select,
   MenuItem,
   FormControl,
@@ -17,7 +16,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Paper,
   IconButton,
   Tabs,
   Tab,
@@ -30,7 +28,7 @@ import {
   Visibility as PreviewIcon,
   Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterPlot, Scatter, Histogram } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Mock data for demonstration
 const mockDatasets = [
@@ -59,7 +57,6 @@ const mockSampleData = [
 const DataExplorer: React.FC = () => {
   const [selectedDataset, setSelectedDataset] = useState<number>(1);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   const handleDatasetChange = (datasetId: number) => {
     setSelectedDataset(datasetId);
@@ -365,9 +362,9 @@ const DataExplorer: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<UploadIcon />}
-          onClick={() => setUploadDialogOpen(true)}
+          disabled
         >
-          Upload Dataset
+          Upload Dataset (Coming Soon)
         </Button>
       </Box>
 
@@ -409,7 +406,7 @@ const DataExplorer: React.FC = () => {
 
       <Card sx={{ mb: 4 }}>
         <CardContent sx={{ pb: 1 }}>
-          <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+          <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
             <Tab label="Overview" />
             <Tab label="Columns" />
             <Tab label="Sample Data" />
