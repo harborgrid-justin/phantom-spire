@@ -23,6 +23,7 @@ import {
   AutoAwesome as AutoMLIcon,
   Science as ExperimentIcon,
   Model as ModelIcon,
+  CompareArrows as CompareIcon,
   Rocket as DeployIcon,
   Settings as SettingsIcon,
   Menu as MenuIcon,
@@ -54,6 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/build' },
     { text: 'Experiments', icon: <ExperimentIcon />, path: '/experiments' },
     { text: 'Models', icon: <ModelIcon />, path: '/models' },
+    { text: 'Model Compare', icon: <CompareIcon />, path: '/compare' },
     { text: 'Deployments', icon: <DeployIcon />, path: '/deploy' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   ];

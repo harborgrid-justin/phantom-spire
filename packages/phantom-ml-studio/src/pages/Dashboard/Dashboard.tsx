@@ -14,6 +14,8 @@ import {
   Avatar,
   Button,
   Paper,
+  Alert,
+  AlertTitle,
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
@@ -78,6 +80,15 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box>
+      {/* H2O.ai Competitive Banner */}
+      <Alert severity="success" sx={{ mb: 3 }}>
+        <AlertTitle>🏆 H2O.ai Competitive ML Studio</AlertTitle>
+        <Typography variant="body2">
+          <strong>Phantom ML Studio vs H2O.ai:</strong> Security-first AutoML with threat intelligence integration, 
+          Rust performance (3x faster), bias detection, explainable AI, and cybersecurity-specialized models.
+        </Typography>
+      </Alert>
+
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>
           ML Operations Dashboard

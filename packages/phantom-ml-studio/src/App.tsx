@@ -8,6 +8,7 @@ import Experiments from './pages/Experiments/Experiments';
 import Models from './pages/Models/Models';
 import Deployments from './pages/Deployments/Deployments';
 import Settings from './pages/Settings/Settings';
+import ModelComparison from './pages/ModelComparison/ModelComparison';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         <Route path="/build" element={<ModelBuilder />} />
         <Route path="/experiments" element={<Experiments />} />
         <Route path="/models" element={<Models />} />
+        <Route path="/compare" element={<ModelComparison />} />
         <Route path="/deploy" element={<Deployments />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
