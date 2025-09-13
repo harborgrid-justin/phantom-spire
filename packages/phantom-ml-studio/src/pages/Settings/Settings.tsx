@@ -630,7 +630,7 @@ const Settings: React.FC = () => {
 
       <Card sx={{ mb: 4 }}>
         <CardContent sx={{ pb: 1 }}>
-          <Tabs value={selectedTab} onChange={(e, newValue) => setSelectedTab(newValue)}>
+          <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
             <Tab label="General" icon={<LanguageIcon />} iconPosition="start" />
             <Tab label="Security" icon={<SecurityIcon />} iconPosition="start" />
             <Tab label="Notifications" icon={<NotificationsIcon />} iconPosition="start" />

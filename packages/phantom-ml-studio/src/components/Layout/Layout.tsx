@@ -15,14 +15,13 @@ import {
   Avatar,
   Divider,
   useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   DataObject as DataIcon,
   AutoAwesome as AutoMLIcon,
   Science as ExperimentIcon,
-  Model as ModelIcon,
+  ModelTraining as ModelIcon,
   CompareArrows as CompareIcon,
   Rocket as DeployIcon,
   Settings as SettingsIcon,
@@ -41,7 +40,6 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
 
