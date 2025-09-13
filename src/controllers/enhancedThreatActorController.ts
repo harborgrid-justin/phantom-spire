@@ -4,8 +4,8 @@
  */
 
 import { Request, Response } from 'express';
-import { BaseController } from '../BaseController';
-import { ThreatIntelService } from '../../services/EnhancedThreatIntelService';
+import { BaseController } from './BaseController';
+import { ThreatIntelService } from '../services/EnhancedThreatIntelService';
 import {
   CreateThreatActorRequest,
   UpdateThreatActorRequest,
@@ -19,7 +19,7 @@ import {
   ThreatHuntingRequest,
   IntelligenceSharingRequest,
   AlertConfigurationRequest
-} from '../../types/api.js';
+} from '../types/api';
 
 /**
  * Enhanced Threat Actor Controller with 18 business-ready modules

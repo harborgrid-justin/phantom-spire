@@ -197,6 +197,19 @@ export abstract class BaseController {
 
     return filters;
   }
+
+  /**
+   * Handle error with custom message (alias for sendError for backward compatibility)
+   */
+  protected handleError(
+    res: Response,
+    error: string | Error,
+    customMessage?: string,
+    statusCode: number = 500
+  ): void {
+    const errorMessage = customMessage || (error instanceof Error ? error.message : error);
+    this.sendError(res, errorMessage, statusCode);
+  }
 }
 
 /**

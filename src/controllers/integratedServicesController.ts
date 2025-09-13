@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { body, param, query, validationResult } from 'express-validator';
-import { businessLogicOrchestrator, BusinessLogicRequest } from '../integration/BusinessLogicOrchestrator';
+import { businessLogicOrchestrator, BusinessLogicRequest } from '../services/integration/BusinessLogicOrchestrator';
 import { napiIntegrationService } from '../integration/NAPIIntegrationService';
 import { ErrorHandler } from '../../utils/serviceUtils';
 
