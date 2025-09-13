@@ -4,7 +4,6 @@ use uuid::Uuid;
 use serde_json;
 
 use crate::models::MLModel;
-use crate::types::PerformanceStatsStorage;
 use crate::core::PhantomMLCore;
 
 /// Analytics operations extension trait for PhantomMLCore

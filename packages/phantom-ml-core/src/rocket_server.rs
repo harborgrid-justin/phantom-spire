@@ -1,6 +1,6 @@
 //! Rocket server module for phantom-ml-core
 //!
-//! Provides RESTful HTTP API endpoints using Rocket framework for ML model operations.
+//! Provides RESTful HTTP API endpoints using a Rocket framework for ML model operations.
 //! Alternative to actix-web with different performance characteristics and API design.
 
 use rocket::serde::{Deserialize, Serialize, json::Json};
@@ -428,5 +428,4 @@ impl RocketMLServer {
 pub async fn start_rocket_ml_server(ml_core: PhantomMLCore) -> Result<(), rocket::Error> {
     let server = RocketMLServer::new(ml_core);
     server.launch().await
-}</content>
-<parameter name="filePath">c:\phantom-spire\packages\phantom-ml-core\src\rocket_server.rs
+}

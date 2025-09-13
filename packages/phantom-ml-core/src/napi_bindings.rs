@@ -17,7 +17,7 @@ pub fn get_version() -> String {
 
 /// Create a new ML model with specified configuration
 #[napi]
-pub async fn create_model(config_json: String) -> Result<String> {
+pub async fn create_model(_config_json: String) -> Result<String> {
     // Implementation would call the actual ML core functions
     // For now, return mock data that matches the guide examples
     let model_id = format!("model_{}", chrono::Utc::now().timestamp_millis());
@@ -35,7 +35,7 @@ pub async fn create_model(config_json: String) -> Result<String> {
 
 /// Train a model with provided training data
 #[napi]
-pub async fn train_model(model_id: String, training_data_json: String) -> Result<String> {
+pub async fn train_model(model_id: String, _training_data_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "training_accuracy": 0.8500 + rand::random::<f64>() * 0.1,
@@ -122,7 +122,7 @@ pub async fn delete_model(model_id: String) -> Result<String> {
 
 /// Validate model integrity and performance
 #[napi]
-pub async fn validate_model(model_id: String, validation_config_json: String) -> Result<String> {
+pub async fn validate_model(model_id: String, _validation_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "validation_results": {
@@ -138,7 +138,7 @@ pub async fn validate_model(model_id: String, validation_config_json: String) ->
 
 /// Export models in multiple formats
 #[napi]
-pub async fn export_model(model_id: String, export_config_json: String) -> Result<String> {
+pub async fn export_model(model_id: String, _export_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "export_path": format!("/exports/{}.pkl", model_id),
@@ -151,7 +151,7 @@ pub async fn export_model(model_id: String, export_config_json: String) -> Resul
 
 /// Import models with validation
 #[napi]
-pub async fn import_model(import_config_json: String) -> Result<String> {
+pub async fn import_model(_import_config_json: String) -> Result<String> {
     let model_id = format!("imported_model_{}", chrono::Utc::now().timestamp_millis());
     let response = serde_json::json!({
         "model_id": model_id,
@@ -166,7 +166,7 @@ pub async fn import_model(import_config_json: String) -> Result<String> {
 
 /// Clone models for versioning
 #[napi]
-pub async fn clone_model(model_id: String, clone_config_json: String) -> Result<String> {
+pub async fn clone_model(model_id: String, _clone_config_json: String) -> Result<String> {
     let new_model_id = format!("cloned_{}", model_id);
     let response = serde_json::json!({
         "original_model_id": model_id,
@@ -178,7 +178,7 @@ pub async fn clone_model(model_id: String, clone_config_json: String) -> Result<
 
 /// Archive models for lifecycle management
 #[napi]
-pub async fn archive_model(model_id: String, archive_config_json: String) -> Result<String> {
+pub async fn archive_model(model_id: String, _archive_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "archive_status": "success",
@@ -190,7 +190,7 @@ pub async fn archive_model(model_id: String, archive_config_json: String) -> Res
 
 /// Restore models from archives
 #[napi]
-pub async fn restore_model(archive_path: String, restore_config_json: String) -> Result<String> {
+pub async fn restore_model(_archive_path: String, _restore_config_json: String) -> Result<String> {
     let model_id = format!("restored_model_{}", chrono::Utc::now().timestamp_millis());
     let response = serde_json::json!({
         "restored_model_id": model_id,
@@ -202,7 +202,7 @@ pub async fn restore_model(archive_path: String, restore_config_json: String) ->
 
 /// Compare multiple models
 #[napi]
-pub async fn compare_models(model_ids_json: String, comparison_config_json: String) -> Result<String> {
+pub async fn compare_models(_model_ids_json: String, _comparison_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "comparison_results": [
             {
@@ -226,7 +226,7 @@ pub async fn compare_models(model_ids_json: String, comparison_config_json: Stri
 
 /// Optimize model performance
 #[napi]
-pub async fn optimize_model(model_id: String, optimization_config_json: String) -> Result<String> {
+pub async fn optimize_model(model_id: String, _optimization_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "optimization_results": {
@@ -243,7 +243,7 @@ pub async fn optimize_model(model_id: String, optimization_config_json: String) 
 
 /// Performs single inference using a trained model
 #[napi]
-pub async fn predict(model_id: String, features_json: String) -> Result<String> {
+pub async fn predict(model_id: String, _features_json: String) -> Result<String> {
     let prediction = if rand::random::<f64>() > 0.5 { 1 } else { 0 };
     let confidence = 0.6 + rand::random::<f64>() * 0.35;
     
@@ -361,7 +361,7 @@ pub async fn engineer_features(raw_data_json: String, feature_config_json: Strin
 
 /// Generates comprehensive analytics and insights from data
 #[napi]
-pub async fn generate_insights(analysis_config_json: String) -> Result<String> {
+pub async fn generate_insights(_analysis_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "threat_trends": {
             "current_level": "moderate",
@@ -400,7 +400,7 @@ pub async fn generate_insights(analysis_config_json: String) -> Result<String> {
 
 /// Performs time series and trend analysis on data
 #[napi]
-pub async fn trend_analysis(data_json: String, trend_config_json: String) -> Result<String> {
+pub async fn trend_analysis(_data_json: String, _trend_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "trend_summary": {
             "threat_count": {
@@ -443,7 +443,7 @@ pub async fn trend_analysis(data_json: String, trend_config_json: String) -> Res
 
 /// Performs feature correlation analysis
 #[napi]
-pub async fn correlation_analysis(data_json: String) -> Result<String> {
+pub async fn correlation_analysis(_data_json: String) -> Result<String> {
     let response = serde_json::json!({
         "strong_correlations": [
             {
@@ -519,7 +519,7 @@ pub async fn statistical_summary(data_json: String) -> Result<String> {
 
 /// Data quality assessment and scoring
 #[napi]
-pub async fn data_quality_assessment(data_json: String, quality_config_json: String) -> Result<String> {
+pub async fn data_quality_assessment(_data_json: String, _quality_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "overall_quality_score": 0.85 + rand::random::<f64>() * 0.10,
         "quality_dimensions": {
@@ -550,7 +550,7 @@ pub async fn data_quality_assessment(data_json: String, quality_config_json: Str
 
 /// Feature importance ranking and analysis
 #[napi]
-pub async fn feature_importance_analysis(model_id: String, analysis_config_json: String) -> Result<String> {
+pub async fn feature_importance_analysis(model_id: String, _analysis_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "feature_importance": [
@@ -568,7 +568,7 @@ pub async fn feature_importance_analysis(model_id: String, analysis_config_json:
 
 /// Model decision explanations and interpretability
 #[napi]
-pub async fn model_explainability(model_id: String, prediction_id: String, explain_config_json: String) -> Result<String> {
+pub async fn model_explainability(model_id: String, prediction_id: String, _explain_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "model_id": model_id,
         "prediction_id": prediction_id,
@@ -795,7 +795,7 @@ pub async fn roi_calculator(roi_config_json: String) -> Result<String> {
 
 /// Cost-benefit analysis
 #[napi]
-pub async fn cost_benefit_analysis(analysis_config_json: String) -> Result<String> {
+pub async fn cost_benefit_analysis(_analysis_config_json: String) -> Result<String> {
     let response = serde_json::json!({
         "total_benefits": 200000.0 + rand::random::<f64>() * 100000.0,
         "total_costs": 80000.0 + rand::random::<f64>() * 40000.0,

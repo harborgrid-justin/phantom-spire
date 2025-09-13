@@ -1,14 +1,11 @@
 use std::collections::HashMap;
 use std::time::Instant;
-use parking_lot::RwLock;
-use dashmap::DashMap;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use uuid::Uuid;
-use rand::prelude::*;
 use serde_json;
 
-use crate::models::{MLModel, InferenceResult, PerformanceStats};
-use crate::types::{ModelCache, ModelStorage, FeatureConfig};
+use crate::models::{MLModel, InferenceResult};
+use crate::types::FeatureConfig;
 use crate::PhantomMLCore;
 
 /// Inference operations extension trait for PhantomMLCore
@@ -465,6 +462,7 @@ impl PhantomMLCore {
 
 #[cfg(test)]
 mod tests {
+    use crate::ManagementOperations;
     use super::*;
 
     #[tokio::test]
@@ -493,7 +491,7 @@ mod tests {
             }
         });
 
-        let create_result = ml_core.create_model(config.to_string()).await.unwrap();
+        let create_result = ml_core.create_model(config.to_string()).unwrap();
         let create_response: serde_json::Value = serde_json::from_str(&create_result).unwrap();
         let model_id = create_response.get("model_id").unwrap().as_str().unwrap();
 
@@ -535,7 +533,7 @@ mod tests {
             }
         });
 
-        let create_result = ml_core.create_model(config.to_string()).await.unwrap();
+        let create_result = ml_core.create_model(config.to_string()).unwrap();
         let create_response: serde_json::Value = serde_json::from_str(&create_result).unwrap();
         let model_id = create_response.get("model_id").unwrap().as_str().unwrap();
 

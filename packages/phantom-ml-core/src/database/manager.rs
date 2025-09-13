@@ -2,7 +2,6 @@
 //! 
 //! Orchestrates multiple database adapters and provides a unified interface for ML data operations.
 
-use std::sync::Arc;
 use std::collections::HashMap;
 use serde_json;
 

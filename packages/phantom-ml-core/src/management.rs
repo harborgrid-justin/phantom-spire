@@ -1,22 +1,19 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use parking_lot::RwLock;
-use dashmap::DashMap;
 use chrono::Utc;
 use uuid::Uuid;
 use base64::engine::general_purpose::STANDARD;
 use base64::Engine;
-use rand::prelude::*;
 use serde_json;
 
 use crate::config::MLModelConfig;
-use crate::models::{MLModel, TrainingResult, InferenceResult};
-use crate::types::{ModelCache, ModelStorage, PerformanceStatsStorage};
+use crate::models::MLModel;
 use crate::core::PhantomMLCore;
 
 /// Management operations extension trait for PhantomMLCore
 pub trait ManagementOperations {
-    /// Create a new model with specified configuration
+    /// Create a new model with a specified configuration
     fn create_model(&self, config_json: String) -> Result<String, String>;
 
     /// Get comprehensive model information
@@ -34,7 +31,7 @@ pub trait ManagementOperations {
     /// Export a model for deployment or sharing
     fn export_model(&self, model_id: String, format: String) -> Result<String, String>;
 
-    /// Import a model from external format
+    /// Import a model from an external format
     fn import_model(&self, import_data_json: String) -> Result<String, String>;
 
     /// Clone an existing model with optional modifications
@@ -86,7 +83,7 @@ impl ManagementOperations for PhantomMLCore {
         self.model_cache.insert(model_id.clone(), Arc::new(RwLock::new(weights)));
         self.models.insert(model_id.clone(), model.clone());
 
-        // Save to database if enabled
+        // Save to a database if enabled
         if self.config.enable_database_persistence {
             if let Some(db_manager) = &self.database_manager {
                 let db_guard = db_manager.read();
