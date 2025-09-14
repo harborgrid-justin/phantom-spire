@@ -12,8 +12,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormControlLabel,
-  Divider,
   List,
   ListItem,
   ListItemText,
@@ -24,7 +22,6 @@ import {
   DialogContent,
   DialogActions,
   Alert,
-  Paper,
   Tabs,
   Tab,
   Chip,
@@ -38,14 +35,12 @@ import {
   Security as SecurityIcon,
   Notifications as NotificationsIcon,
   Storage as StorageIcon,
-  Palette as ThemeIcon,
   Language as LanguageIcon,
 } from '@mui/icons-material';
 
 const Settings: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [apiKeyDialog, setApiKeyDialog] = useState(false);
-  const [newApiKey, setNewApiKey] = useState('');
   const [settings, setSettings] = useState({
     // General
     organizationName: 'Phantom Security Inc.',
