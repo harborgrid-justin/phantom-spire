@@ -29,7 +29,6 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
-  Timeline as TimelineIcon,
   Engineering as EngineeringIcon,
   Shield as ShieldIcon,
   TrendingUp as MonitoringIcon,
@@ -47,6 +46,13 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+interface MenuItem {
+  text: string;
+  icon: React.ReactNode;
+  path: string;
+  isNew?: boolean;
+}
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
@@ -57,7 +63,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setMobileOpen(!mobileOpen);
   };
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
     { text: 'Data Explorer', icon: <DataIcon />, path: '/data' },
     { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/build' },
@@ -112,7 +118,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
-              {(item as any).isNew && (
+              {'isNew' in item && item.isNew && (
                 <Badge
                   badgeContent="NEW"
                   color="secondary"

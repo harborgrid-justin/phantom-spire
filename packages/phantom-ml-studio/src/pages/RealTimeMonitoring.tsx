@@ -31,16 +31,13 @@ import {
 } from '@mui/material';
 import {
   Security as SecurityIcon,
-  Speed as SpeedIcon,
   Timeline as TimelineIcon,
   Warning as WarningIcon,
   CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
   Refresh as RefreshIcon,
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
   TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
@@ -71,7 +68,7 @@ const RealTimeMonitoring: React.FC = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [models, setModels] = useState<ModelMetrics[]>([]);
   const [events, setEvents] = useState<RealTimeEvent[]>([]);
-  const [performanceData, setPerformanceData] = useState<any[]>([]);
+  const [performanceData, setPerformanceData] = useState<PerformanceDataPoint[]>([]);
 
   // Simulate real-time data updates
   useEffect(() => {
@@ -159,7 +156,7 @@ const RealTimeMonitoring: React.FC = () => {
     }
   }, [autoRefresh]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (status) {
       case 'healthy': return 'success';
       case 'warning': return 'warning';
@@ -168,7 +165,7 @@ const RealTimeMonitoring: React.FC = () => {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (severity: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (severity) {
       case 'low': return 'info';
       case 'medium': return 'warning';
@@ -258,7 +255,7 @@ const RealTimeMonitoring: React.FC = () => {
                         <Typography variant="h6">{model.name}</Typography>
                         <Chip
                           label={model.status.toUpperCase()}
-                          color={getStatusColor(model.status) as any}
+                          color={getStatusColor(model.status)}
                           size="small"
                         />
                       </Box>
@@ -408,7 +405,7 @@ const RealTimeMonitoring: React.FC = () => {
                       <TableCell>
                         <Chip 
                           label={event.severity.toUpperCase()}
-                          color={getSeverityColor(event.severity) as any}
+                          color={getSeverityColor(event.severity)}
                           size="small"
                         />
                       </TableCell>

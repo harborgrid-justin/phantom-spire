@@ -1,6 +1,7 @@
 {
   "name": "@phantom-spire/ml-studio",
   "version": "1.0.0",
+  "type": "module",
   "description": "Web-based ML Studio for Phantom Spire - Visual machine learning interface",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

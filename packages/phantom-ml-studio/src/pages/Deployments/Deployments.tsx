@@ -35,12 +35,8 @@ import {
 import {
   PlayArrow as StartIcon,
   Stop as StopIcon,
-  Refresh as RestartIcon,
   Delete as DeleteIcon,
-  Visibility as ViewIcon,
-  Edit as EditIcon,
   Monitor as MonitorIcon,
-  TrendingUp as TrendingUpIcon,
   Warning as WarningIcon,
   CheckCircle as HealthyIcon,
   Error as ErrorIcon,

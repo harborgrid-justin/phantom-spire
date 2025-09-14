@@ -28,7 +28,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Select,
   MenuItem,
   FormControl,
@@ -39,22 +38,14 @@ import {
 import {
   Security as SecurityIcon,
   Warning as WarningIcon,
-  CheckCircle as CheckIcon,
   Error as ErrorIcon,
-  Psychology as AIIcon,
-  Visibility as VisibilityIcon,
-  TrendingUp as TrendingUpIcon,
   Assessment as AssessmentIcon,
   Shield as ShieldIcon,
   Report as ReportIcon,
   Refresh as RefreshIcon,
   Download as DownloadIcon,
-  Share as ShareIcon,
 } from '@mui/icons-material';
 import { 
-  PieChart, 
-  Pie, 
-  Cell, 
   BarChart, 
   Bar, 
   XAxis, 
@@ -265,7 +256,7 @@ const BiasDetectionEngine: React.FC = () => {
     }
   };
 
-  const getComplianceColor = (status: string) => {
+  const getComplianceColor = (status: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
     switch (status) {
       case 'compliant': return 'success';
       case 'warning': return 'warning';
@@ -381,7 +372,7 @@ const BiasDetectionEngine: React.FC = () => {
                     
                     <Chip
                       label={`Compliance: ${selectedModel.complianceStatus.toUpperCase()}`}
-                      color={getComplianceColor(selectedModel.complianceStatus) as any}
+                      color={getComplianceColor(selectedModel.complianceStatus)}
                       sx={{ mb: 2 }}
                     />
                     
