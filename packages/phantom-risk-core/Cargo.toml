@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-risk-core"
 version = "1.0.1"
 description = "Risk assessment and scoring engine core"

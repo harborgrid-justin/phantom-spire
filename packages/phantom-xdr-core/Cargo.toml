@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-xdr-core"
 version = "1.0.1"
 description = "Extended Detection and Response (XDR) core with real-time threat detection and response automation"
@@ -17,7 +17,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # Core NAPI dependencies - standardized versions
-napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"] }
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
 napi-derive = { version = "3.2.5", optional = true }
 
 # Core serialization and data handling
@@ -34,8 +34,8 @@ async-trait = "0.1"
 futures = "0.3"
 
 # Common utilities
-base64 = "0.22.1"
-sha2 = "0.10"
+base64 = { version = "0.22.1", optional = true }
+sha2 = { version = "0.10", optional = true }
 url = "2.5"
 anyhow = "1.0"
 log = "0.4"
@@ -121,14 +121,14 @@ messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
-compression = ["flate2"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
 diesel-orm = ["diesel", "diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

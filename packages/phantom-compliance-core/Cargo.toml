@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-compliance-core"
 version = "1.0.1"
 description = "Compliance and regulatory framework analysis core"
@@ -55,6 +55,9 @@ ring = { version = "0.17", optional = true }
 rustls = { version = "0.23.31", optional = true }
 jsonwebtoken = { version = "9.2", optional = true }
 
+# Enterprise standards dependency
+phantom-enterprise-standards = { path = "../phantom-enterprise-standards", optional = true }
+
 # ORM support - optional
 diesel = { version = "2.2", features = ["postgres", "chrono", "uuid", "serde_json", "r2d2"], optional = true }
 diesel_migrations = { version = "2.2", optional = true }
@@ -82,14 +85,14 @@ messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
-compression = ["flate2"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
 diesel-orm = ["diesel", "diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 
 [build-dependencies]

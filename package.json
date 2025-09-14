@@ -34,7 +34,10 @@
     "packages:build": "npm run build --workspaces",
     "packages:test": "npm run test --workspaces",
     "packages:lint": "npm run lint --workspaces",
-    "packages:clean": "npm run clean --workspaces"
+    "packages:clean": "npm run clean --workspaces",
+    "validate:enterprise": "node scripts/validate-enterprise-standards.mjs",
+    "demo:enterprise": "node scripts/demo-enterprise-cve-standardization.mjs",
+    "test:enterprise": "npm run validate:enterprise && npm run demo:enterprise"
   },
   "keywords": [
     "threat-intelligence",

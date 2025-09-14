@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-intel-core"
 version = "1.0.1"
 edition = "2021"
@@ -29,7 +29,7 @@ bincode = "1.3"
 # High-performance threat intelligence processing
 reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false }
 base64 = "0.21"
-sha2 = "0.10"
+sha2 = { version = "0.10", optional = true }
 indexmap = { version = "2.0", features = ["serde"] }
 url = "2.0"
 ipnetwork = "0.20"
@@ -97,14 +97,14 @@ messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
-compression = ["flate2"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
 diesel-orm = ["diesel", "diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-mitre-core"
 version = "1.0.1"
 description = "Advanced MITRE ATT&CK framework integration and threat analysis system with enterprise-grade performance"
@@ -75,6 +75,9 @@ ring = { version = "0.17", optional = true }
 rustls = { version = "0.23.31", optional = true }
 jsonwebtoken = { version = "9.2", optional = true }
 
+# Enterprise standards dependency
+phantom-enterprise-standards = { path = "../phantom-enterprise-standards", optional = true }
+
 # Compression support - optional
 flate2 = { version = "1.0", optional = true }
 
@@ -98,13 +101,13 @@ messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
-compression = ["flate2"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
 advanced-config = []
 
 # Bundled feature sets
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

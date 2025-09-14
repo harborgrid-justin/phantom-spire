@@ -1,20 +1,42 @@
-[package]
-name = "phantom-attribution-core"
-version = "1.0.1"
-description = "Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking"
-edition = "2021"
-license = "MIT"
-authors = ["Phantom Spire Security Team"]
-homepage = "https://github.com/harborgrid-justin/phantom-spire"
-repository = "https://github.com/harborgrid-justin/phantom-spire"
-documentation = "https://docs.rs/phantom-attribution-core"
-keywords = ["cybersecurity", "phantom-spire", "security", "attribution"]
-categories = ["web-programming", "api-bindings"]
+#!/usr/bin/env powershell
+# Fix all phantom-*-core Cargo.toml files with consistent enterprise standards
 
-[lib]
-name = "phantom_attribution_core"
-crate-type = ["cdylib"]
+$ErrorActionPreference = "Stop"
 
+Write-Host "🔧 Fixing Cargo.toml configurations for all phantom-*-core modules..." -ForegroundColor Green
+
+$modules = Get-ChildItem "packages\" -Directory -Name | Where-Object {$_ -like "phantom-*-core" -and $_ -ne "phantom-enterprise-standards"}
+
+foreach ($module in $modules) {
+    Write-Host "📦 Fixing $module..." -ForegroundColor Blue
+    
+    $cargoPath = "packages\$module\Cargo.toml"
+    
+    if (-not (Test-Path $cargoPath)) {
+        Write-Warning "Skipping $module - Cargo.toml not found"
+        continue
+    }
+    
+    # Read current file
+    $content = Get-Content $cargoPath -Raw
+    
+    # Extract the package section and basic info to preserve
+    $packageSection = ""
+    if ($content -match '(?s)\[package\].*?(?=\[)') {
+        $packageSection = $Matches[0]
+    }
+    
+    $libSection = ""
+    if ($content -match '(?s)\[lib\].*?(?=\[)') {
+        $libSection = $Matches[0]
+    }
+    
+    # Create standardized Cargo.toml based on phantom-enterprise-standards template
+    $moduleNameUnderscore = $module -replace "-", "_"
+    
+    $newContent = @"
+$packageSection
+$libSection
 [dependencies]
 # Core NAPI dependencies - standardized versions
 napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
@@ -24,36 +46,35 @@ napi-derive = { version = "3.2.5", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
-uuid = { version = "1.0", features = ["v4", "serde"] }
+uuid = { version = "1.18.1", features = ["v4", "serde"] }
 regex = "1.10"
 thiserror = "2.0.16"
 
 # Async runtime - standardized across platform
-tokio = { version = "1.0", features = ["full"] }
-async-trait = "0.1"
-futures = "0.3"
+tokio = { version = "1.47.1", features = ["full"] }
+async-trait = "0.1.89"
+futures = "0.3.31"
 
 # Common utilities for all packages
 base64 = { version = "0.22.1", optional = true }
 sha2 = { version = "0.10", optional = true }
-url = "2.5"
-anyhow = "1.0"
-log = "0.4"
+url = "2.5.7"
+anyhow = "1.0.99"
+log = "0.4.28"
 env_logger = "0.11.8"
 
 # High-performance collections and concurrency
 dashmap = "6.1.0"
 parking_lot = "0.12"
-rayon = "1.7"
+rayon = "1.11.0"
+once_cell = "1.19"
 
-# HTTP client - optional but standardized when needed
-reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
+# Enterprise security and compliance
+jsonwebtoken = { version = "9.3", optional = true }
+ring = { version = "0.17", optional = true }
+aes-gcm = { version = "0.10", optional = true }
 
-# Web framework support - optional
-warp = { version = "0.4.2", optional = true }
-actix-web = { version = "4.4", optional = true }
-
-# Database backends - optional, standardized versions
+# Database support - all standardized versions
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
 deadpool-postgres = { version = "0.14.1", optional = true }
 sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
@@ -63,19 +84,20 @@ redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], o
 mongodb = { version = "3.3.0", optional = true }
 elasticsearch = { version = "8.15.0-alpha.1", optional = true }
 
-# Monitoring and observability - optional
+# Web frameworks - optional
+actix-web = { version = "4.4", optional = true }
+rocket = { version = "0.5", features = ["json"], optional = true }
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
+
+# Monitoring and observability
 tracing = { version = "0.1", optional = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
 prometheus = { version = "0.14.0", optional = true }
 metrics = { version = "0.24.2", optional = true }
 
-# Compression support - optional
+# Compression and additional utilities
 flate2 = { version = "1.0", optional = true }
-
-# Security and cryptography - optional
-ring = { version = "0.17", optional = true }
 rustls = { version = "0.23.31", optional = true }
-jsonwebtoken = { version = "9.2", optional = true }
 
 # Enterprise standards dependency
 phantom-enterprise-standards = { path = "../phantom-enterprise-standards", optional = true }
@@ -109,5 +131,17 @@ advanced-config = []
 # Bundled feature sets
 enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
+
 [build-dependencies]
 napi-build = "2.1.0"
+"@
+    
+    # Write the new content
+    $newContent | Set-Content $cargoPath -NoNewline
+    Write-Host "  ✅ Fixed $module Cargo.toml" -ForegroundColor Green
+}
+
+Write-Host "`n🎉 All Cargo.toml files have been standardized!" -ForegroundColor Green
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host "  1. Run: npm run packages:build" -ForegroundColor Cyan
+Write-Host "  2. Run: npm run test:enterprise" -ForegroundColor Cyan

@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-secop-core"
 version = "1.0.1"
 edition = "2021"

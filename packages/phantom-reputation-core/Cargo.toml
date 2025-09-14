@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-reputation-core"
 version = "1.0.1"
 description = "IP, domain, and URL reputation analysis core"

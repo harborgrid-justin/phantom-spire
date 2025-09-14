@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-feeds-core"
 version = "1.0.1"
 description = "Threat intelligence feeds processing and aggregation core with real-time data correlation"
@@ -34,8 +34,8 @@ async-trait = "0.1"
 futures = "0.3"
 
 # Common utilities for all packages
-base64 = "0.22.1"
-sha2 = "0.10"
+base64 = { version = "0.22.1", optional = true }
+sha2 = { version = "0.10", optional = true }
 url = "2.5"
 anyhow = "1.0"
 log = "0.4"
@@ -74,6 +74,9 @@ ring = { version = "0.17", optional = true }
 rustls = { version = "0.23.31", optional = true }
 jsonwebtoken = { version = "9.2", optional = true }
 
+# Enterprise standards dependency
+phantom-enterprise-standards = { path = "../phantom-enterprise-standards", optional = true }
+
 [features]
 default = ["local"]
 
@@ -94,14 +97,14 @@ messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
-compression = ["flate2"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
 diesel-orm = ["diesel", "diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

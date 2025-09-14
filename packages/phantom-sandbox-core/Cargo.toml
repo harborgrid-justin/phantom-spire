@@ -1,4 +1,4 @@
-﻿[package]
+[package]
 name = "phantom-sandbox-core"
 version = "1.0.1"
 description = "Malware sandboxing and dynamic analysis core"
