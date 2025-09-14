@@ -1,0 +1,77 @@
+PASS tests/automl-builder-comprehensive.test.ts (8.072 s)
+  AutoML Builder - Comprehensive Real-Life Tests (50 Tests)
+    Phase 1: Core AutoML Engine Tests
+      AutoML Configuration Validation
+        ✓ Test 1: Should validate basic binary classification config (3 ms)
+        ✓ Test 2: Should validate regression config with time series features (1 ms)
+        ✓ Test 3: Should validate anomaly detection config
+        ✓ Test 4: Should validate security threat detection config (1 ms)
+        ✓ Test 5: Should validate multi-class classification config
+      Algorithm Selection
+        ✓ Test 6: Should select appropriate algorithms for binary classification
+        ✓ Test 7: Should select appropriate algorithms for anomaly detection (1 ms)
+        ✓ Test 8: Should adapt algorithm selection based on data size (23 ms)
+        ✓ Test 9: Should select algorithms for security threat detection (1 ms)
+        ✓ Test 10: Should handle algorithm selection for time series data
+      Feature Engineering
+        ✓ Test 11: Should generate statistical features from numerical data
+        ✓ Test 12: Should extract security-specific features (1 ms)
+        ✓ Test 13: Should handle temporal feature engineering
+        ✓ Test 14: Should create interaction features
+        ✓ Test 15: Should handle mixed data types in feature engineering (1 ms)
+    Phase 2: Data Processing Tests
+      Data Loading and Preprocessing
+        ✓ Test 16: Should handle CSV data loading with missing values
+        ✓ Test 17: Should preprocess network traffic data (1 ms)
+        ✓ Test 18: Should handle log data preprocessing
+        ✓ Test 19: Should preprocess financial transaction data
+        ✓ Test 20: Should handle IoT sensor data preprocessing (1 ms)
+      Data Quality and Validation
+        ✓ Test 21: Should detect and handle outliers
+        ✓ Test 22: Should validate feature correlation (1 ms)
+        ✓ Test 23: Should handle imbalanced datasets
+        ✓ Test 24: Should validate data consistency (1 ms)
+        ✓ Test 25: Should handle duplicate records
+      Multi-format Data Ingestion
+        ✓ Test 26: Should process JSON format data (1 ms)
+        ✓ Test 27: Should handle streaming data format
+        ✓ Test 28: Should process multi-table relational data
+        ✓ Test 29: Should handle time series data format
+        ✓ Test 30: Should process image metadata for security analysis
+    Phase 3: Model Training & Optimization Tests
+      Hyperparameter Optimization
+        ✓ Test 31: Should optimize XGBoost hyperparameters (1 ms)
+        ✓ Test 32: Should optimize Random Forest hyperparameters
+        ✓ Test 33: Should optimize neural network hyperparameters (1 ms)
+        ✓ Test 34: Should perform multi-objective hyperparameter optimization
+        ✓ Test 35: Should handle early stopping in hyperparameter optimization (1 ms)
+      Cross-validation
+        ✓ Test 36: Should perform stratified k-fold cross-validation (1 ms)
+        ✓ Test 37: Should perform time series cross-validation (1 ms)
+        ✓ Test 38: Should perform grouped cross-validation (1 ms)
+      Model Comparison
+        ✓ Test 39: Should compare multiple algorithms on same dataset
+        ✓ Test 40: Should perform statistical significance testing between models (2 ms)
+    Phase 4: Security-Specific ML Tests
+      Threat Detection Models
+        ✓ Test 41: Should detect malware in file analysis (1 ms)
+        ✓ Test 42: Should detect network intrusions
+        ✓ Test 43: Should detect phishing websites (1 ms)
+        ✓ Test 44: Should detect SQL injection attacks
+      Anomaly Detection
+        ✓ Test 45: Should detect system behavior anomalies (1 ms)
+        ✓ Test 46: Should detect user behavior anomalies
+        ✓ Test 47: Should detect financial transaction anomalies (1 ms)
+      Security Feature Extraction
+        ✓ Test 48: Should extract IP reputation features
+        ✓ Test 49: Should extract content-based security features (1 ms)
+        ✓ Test 50: Should extract temporal security features
+    Bonus Tests: Model Explainability and Performance
+      ✓ Bonus Test 1: Should provide model explanations for predictions
+      ✓ Bonus Test 2: Should create and evaluate ensemble models (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       52 passed, 52 total
+Snapshots:   0 total
+Time:        8.3 s, estimated 16 s
+Ran all test suites matching tests/automl-builder-comprehensive.test.ts.
