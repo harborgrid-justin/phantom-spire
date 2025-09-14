@@ -22,7 +22,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Avatar,
   Paper,
   IconButton,
   Tooltip,
@@ -36,13 +35,8 @@ import {
   TableRow,
 } from '@mui/material';
 import {
-  AccountTree as TreeIcon,
-  Psychology as AIIcon,
-  Speed as SpeedIcon,
   Security as SecurityIcon,
-  Visibility as VisibilityIcon,
   PlayArrow as PlayIcon,
-  Stop as StopIcon,
   Settings as SettingsIcon,
   Download as DownloadIcon,
   Share as ShareIcon,
@@ -58,7 +52,7 @@ interface PipelineStep {
   status: 'pending' | 'running' | 'completed' | 'failed';
   duration?: number;
   progress?: number;
-  details?: any;
+  details?: Record<string, unknown>;
   securityScore?: number;
 }
 
@@ -80,7 +74,6 @@ interface AutoMLExperiment {
 const AutoMLPipelineVisualizer: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedExperiment, setSelectedExperiment] = useState<AutoMLExperiment | null>(null);
-  const [experiments, setExperiments] = useState<AutoMLExperiment[]>([]);
   const [showPipelineDetails, setShowPipelineDetails] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -182,7 +175,6 @@ const AutoMLPipelineVisualizer: React.FC = () => {
       ]
     };
 
-    setExperiments([mockExperiment]);
     setSelectedExperiment(mockExperiment);
 
     // Simulate pipeline progress
@@ -289,7 +281,7 @@ const AutoMLPipelineVisualizer: React.FC = () => {
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
   };
 

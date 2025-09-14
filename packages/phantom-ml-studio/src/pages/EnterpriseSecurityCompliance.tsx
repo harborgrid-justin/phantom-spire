@@ -10,7 +10,6 @@ import {
   AlertTitle,
   Tabs,
   Tab,
-  Paper,
   Table,
   TableBody,
   TableCell,
@@ -31,9 +30,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   IconButton,
-  Tooltip,
   Badge,
-  Divider,
 } from '@mui/material';
 import {
   Security as SecurityIcon,
@@ -46,7 +43,6 @@ import {
   Info as InfoIcon,
   Visibility as VisibilityIcon,
   Download as DownloadIcon,
-  Share as ShareIcon,
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
   Timeline as TimelineIcon,
@@ -66,11 +62,6 @@ import {
   CartesianGrid,
   Tooltip as ChartTooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  RadialBarChart,
-  RadialBar,
-  Legend,
 } from 'recharts';
 
 interface ComplianceFramework {
@@ -141,7 +132,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
   const [selectedFramework, setSelectedFramework] = useState<ComplianceFramework | null>(null);
   const [securityMetrics, setSecurityMetrics] = useState<SecurityMetrics | null>(null);
   const [showAuditDialog, setShowAuditDialog] = useState(false);
-  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [_showReportDialog, setShowReportDialog] = useState(false);
 
   useEffect(() => {
     // Initialize with mock compliance data

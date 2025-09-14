@@ -17,10 +17,30 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', '@mui/material', '@emotion/react', '@emotion/styled'],
+          charts: ['recharts', 'plotly.js', 'react-plotly.js'],
+          router: ['react-router-dom'],
+          utils: ['lodash', 'moment', 'axios'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
   resolve: {
     alias: {
       '@': '/src',
     },
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      '@mui/material',
+      'recharts',
+      'react-router-dom',
+    ],
   },
 });
