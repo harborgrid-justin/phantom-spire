@@ -17,7 +17,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 # Core NAPI dependencies - standardized versions
-napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"] }
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
 napi-derive = { version = "3.2.5", optional = true }
 
 # Core serialization and data handling - required for all packages
@@ -34,8 +34,8 @@ async-trait = "0.1"
 futures = "0.3"
 
 # Common utilities for all packages
-base64 = "0.22.1"
-sha2 = "0.10"
+base64 = { version = "0.22.1", optional = true }
+sha2 = { version = "0.10", optional = true }
 url = "2.5"
 anyhow = "1.0"
 log = "0.4"
@@ -49,7 +49,7 @@ indexmap = { version = "2.0", features = ["serde"] }
 once_cell = "1.19"
 
 # HTTP client - for MITRE data fetching
-reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false }
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
 
 # Database backends - optional, standardized versions
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
@@ -86,14 +86,14 @@ napi = ["dep:napi", "dep:napi-derive"]
 local = []
 
 # Database backends
-postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
+postgres = ["tokio-postgres", "sqlx"]
 redis-store = ["redis"]
 mongodb-store = ["mongodb"]
 elasticsearch-store = ["elasticsearch"]
 all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
 # Web and messaging
-web-full = ["actix-web", "reqwest"]
+web-full = ["reqwest"]
 messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
@@ -101,11 +101,10 @@ caching = ["redis-store"]    # Redis-based caching layer
 monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
 crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
 compression = ["flate2"]
-diesel-orm = ["diesel", "diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
 enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
-full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
+full = ["enterprise", "web-full", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

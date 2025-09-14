@@ -1,0 +1,90 @@
+[package]
+name = "phantom-enterprise-standards"
+version = "1.0.0"
+description = "Enterprise standardization framework for all Phantom Spire security modules"
+edition = "2021"
+license = "MIT"
+authors = ["Phantom Spire Security Team"]
+homepage = "https://github.com/harborgrid-justin/phantom-spire"
+repository = "https://github.com/harborgrid-justin/phantom-spire"
+documentation = "https://docs.rs/phantom-enterprise-standards"
+keywords = ["cybersecurity", "phantom-spire", "security", "enterprise", "standards"]
+categories = ["web-programming", "api-bindings"]
+
+[lib]
+name = "phantom_enterprise_standards"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Core NAPI dependencies - standardized versions
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+napi-derive = { version = "3.2.5", optional = true }
+
+# Core serialization and data handling - required for all packages
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.18.1", features = ["v4", "serde"] }
+regex = "1.10"
+thiserror = "2.0.16"
+
+# Async runtime - standardized across platform
+tokio = { version = "1.47.1", features = ["full"] }
+async-trait = "0.1.89"
+futures = "0.3.31"
+
+# Common utilities for all packages
+base64 = "0.22.1"
+sha2 = "0.10"
+url = "2.5.7"
+anyhow = "1.0.99"
+log = "0.4.28"
+env_logger = "0.11.8"
+
+# High-performance collections and concurrency
+dashmap = "6.1.0"
+parking_lot = "0.12"
+rayon = "1.11.0"
+once_cell = "1.19"
+
+# Enterprise security and compliance
+jsonwebtoken = { version = "9.3", optional = true }
+ring = { version = "0.17", optional = true }
+aes-gcm = { version = "0.10", optional = true }
+
+# Database support - all standardized versions
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
+mongodb = { version = "3.3.0", optional = true }
+elasticsearch = { version = "8.15.0-alpha.1", optional = true }
+
+# Monitoring and observability
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+prometheus = { version = "0.14.0", optional = true }
+metrics = { version = "0.24.2", optional = true }
+
+[features]
+default = ["local"]
+
+# Core features
+napi = ["dep:napi", "dep:napi-derive"]
+local = []
+
+# Database backends
+postgres = ["tokio-postgres"]
+redis-store = ["redis"]
+mongodb-store = ["mongodb"]
+elasticsearch-store = ["elasticsearch"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
+
+# Enterprise monitoring and security
+monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
+crypto = ["ring", "jsonwebtoken", "aes-gcm"]
+
+# Bundled feature sets
+enterprise = ["all-databases", "monitoring", "crypto"]
+full = ["enterprise", "napi"]
+
+[build-dependencies]
+napi-build = "2.1.0"

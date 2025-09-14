@@ -1,20 +1,20 @@
 {
-  "name": "@phantom-spire/reputation-core",
+  "name": "@phantom-spire/enterprise-standards",
   "version": "1.0.0",
-  "description": "IP and domain reputation analysis core with threat scoring and blacklist management - Part of the Phantom Spire CTI Platform",
+  "description": "Enterprise standardization framework for all Phantom Spire security modules - Fortune 100 deployment readiness",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/harborgrid-justin/phantom-spire.git",
-    "directory": "packages/phantom-reputation-core"
+    "directory": "packages/phantom-enterprise-standards"
   },
   "bugs": {
     "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
   },
   "napi": {
-    "name": "phantom-reputation-core",
+    "name": "phantom-enterprise-standards",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -42,19 +42,25 @@
     "prepublishOnly": "napi prepublish -t npm",
     "test": "cargo test --features enterprise",
     "test:native": "cargo test --all-features",
+    "test:enterprise": "cargo test --features enterprise -- --test-threads=1",
     "universal": "napi universal",
     "version": "napi version",
     "lint": "cargo clippy --features enterprise",
-    "fmt": "cargo fmt"
+    "fmt": "cargo fmt",
+    "benchmark": "cargo bench --features enterprise",
+    "validate": "cargo check --all-features",
+    "docs": "cargo doc --features enterprise --open"
   },
   "keywords": [
     "@phantom-spire",
-    "enterprise-cti",
-    "reputation-analysis",
-    "threat-scoring",
-    "blacklist",
-    "ip-reputation",
-    "domain-reputation",
+    "enterprise-standards",
+    "business-readiness", 
+    "multi-tenancy",
+    "cross-plugin-intelligence",
+    "compliance-framework",
+    "performance-monitoring",
+    "fortune-100-ready",
+    "palantir-competitive",
     "cybersecurity",
     "phantom-spire",
     "napi",
@@ -77,5 +83,29 @@
   "organization": {
     "name": "Phantom Spire",
     "url": "https://github.com/harborgrid-justin/phantom-spire"
+  },
+  "enterprise": {
+    "tier": "foundation",
+    "features": [
+      "business-readiness-assessment",
+      "enterprise-multi-tenancy",
+      "cross-plugin-intelligence",
+      "compliance-monitoring",
+      "performance-benchmarking",
+      "testing-framework"
+    ],
+    "deployment_targets": [
+      "fortune-100",
+      "enterprise",
+      "government",
+      "financial-services"
+    ],
+    "competitive_advantages": [
+      "Open-source cost model vs Palantir Foundry",
+      "NAPI-RS high-performance Rust implementation", 
+      "Multi-database federated architecture",
+      "Real-time cross-plugin intelligence correlation",
+      "Enterprise-grade compliance automation"
+    ]
   }
 }

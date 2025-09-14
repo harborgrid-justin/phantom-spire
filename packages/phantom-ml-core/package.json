@@ -1,7 +1,7 @@
-﻿{
+{
   "name": "@phantom-spire/ml-core",
   "version": "1.0.1",
-  "description": "Enterprise machine learning services for threat detection and security analytics",
+  "description": "Enterprise machine learning services for threat detection and security analytics - Part of the Phantom Spire CTI Platform",
   "main": "ml-core.js",
   "types": "ml-core.d.ts",
   "repository": {
@@ -10,6 +10,8 @@
     "directory": "packages/phantom-ml-core"
   },
   "keywords": [
+    "@phantom-spire",
+    "enterprise-cti",
     "machine-learning",
     "cybersecurity",
     "threat-detection",
@@ -28,21 +30,12 @@
   "napi": {
     "binaryName": "phantom-ml-core",
     "targets": [
-      "x86_64-pc-windows-msvc",
-      "x86_64-unknown-linux-gnu",
-      "x86_64-unknown-linux-musl",
-      "aarch64-unknown-linux-gnu",
-      "i686-pc-windows-msvc",
-      "armv7-unknown-linux-gnueabihf",
-      "aarch64-apple-darwin",
-      "aarch64-pc-windows-msvc",
-      "aarch64-unknown-linux-musl",
-      "aarch64-linux-android",
-      "arm-linux-androideabi"
+      "x86_64-pc-windows-msvc"
     ]
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   },
   "scripts": {
     "artifacts": "napi artifacts",
@@ -58,17 +51,20 @@
     "version": "napi version",
     "lint": "cargo clippy --features enterprise",
     "fmt": "cargo fmt"
-  },,
+  },
   "devDependencies": {
     "@napi-rs/cli": "^3.2.0",
     "rimraf": "^6.0.1"
-  },,
+  },
   "ava": {
     "timeout": "3m"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "organization": {
+    "name": "Phantom Spire",
+    "url": "https://github.com/harborgrid-justin/phantom-spire"
   }
 }
-

@@ -1,7 +1,7 @@
-﻿{
-  "name": "phantom-ioc-core",
+{
+  "name": "@phantom-spire/ioc-core",
   "version": "1.0.0",
-  "description": "Advanced IOC processing core with threat intelligence and indicator correlation",
+  "description": "Advanced IOC processing core with threat intelligence and indicator correlation - Part of the Phantom Spire CTI Platform",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -46,8 +46,10 @@
     "version": "napi version",
     "lint": "cargo clippy --features enterprise",
     "fmt": "cargo fmt"
-  },,
+  },
   "keywords": [
+    "@phantom-spire",
+    "enterprise-cti",
     "ioc",
     "indicators",
     "threat-intelligence",
@@ -66,9 +68,12 @@
   "devDependencies": {
     "@napi-rs/cli": "^3.2.0",
     "rimraf": "^6.0.1"
-  },,
+  },
   "publishConfig": {
     "access": "public"
+  },
+  "organization": {
+    "name": "Phantom Spire",
+    "url": "https://github.com/harborgrid-justin/phantom-spire"
   }
 }
-

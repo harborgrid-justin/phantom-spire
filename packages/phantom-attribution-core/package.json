@@ -1,7 +1,7 @@
 {
-  "name": "phantom-attribution-core",
+  "name": "@phantom-spire/attribution-core",
   "version": "1.0.0",
-  "description": "Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking",
+  "description": "Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking - Part of the Phantom Spire CTI Platform",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -48,6 +48,8 @@
     "fmt": "cargo fmt"
   },
   "keywords": [
+    "@phantom-spire",
+    "enterprise-cti",
     "attribution",
     "threat-actors",
     "profiling",
@@ -71,5 +73,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "organization": {
+    "name": "Phantom Spire",
+    "url": "https://github.com/harborgrid-justin/phantom-spire"
   }
 }
