@@ -63,6 +63,13 @@ interface RealTimeEvent {
   metadata?: any;
 }
 
+interface PerformanceDataPoint {
+  time: string;
+  accuracy: number;
+  throughput: number;
+  latency: number;
+}
+
 const RealTimeMonitoring: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [autoRefresh, setAutoRefresh] = useState(true);
