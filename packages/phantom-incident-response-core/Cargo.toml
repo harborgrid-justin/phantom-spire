@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "phantom-incident-response-core"
 version = "1.0.1"
 description = "Enterprise incident response core with comprehensive capabilities"
@@ -9,141 +9,113 @@ name = "phantom_incident_response_core"
 crate-type = ["cdylib"]
 
 [dependencies]
-napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json"] }
-napi-derive = "3.2.5"
+# Core NAPI dependencies - standardized versions
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+napi-derive = { version = "3.2.5", optional = true }
+
+# Core serialization and data handling - required for all packages
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 regex = "1.10"
 thiserror = "2.0.16"
-semver = "1.0"
-toml = "0.9.5"
-async-trait = "0.1"
-tokio = { version = "1.0", features = ["full"] }
-num_cpus = "1.16"
-futures-util = "0.3"
 
-# Incident response specific dependencies
-indexmap = { version = "2.0", features = ["serde"] }
-base64 = "0.22"
+# Async runtime - standardized across platform
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Common utilities for all packages
+base64 = "0.22.1"
 sha2 = "0.10"
-hex = "0.4"
-url = "2.0"
+url = "2.5"
 anyhow = "1.0"
 log = "0.4"
 env_logger = "0.11.8"
-clap = { version = "4.0", features = ["derive"] }
-walkdir = "2.4"
-zip = "5.1.1"
-tar = "0.4"
-flate2 = "1.0"
-tempfile = "3.0"
-notify = "8.2.0"
-crossbeam-channel = "0.5"
-rayon = "1.7"
+
+# High-performance collections and concurrency
 dashmap = "6.1.0"
 parking_lot = "0.12"
+rayon = "1.7"
 
-# Web frameworks
-actix-web = { version = "4.4", optional = true }
-rocket = { version = "0.5", features = ["json"], optional = true }
-
-# HTTP client
+# HTTP client - optional but standardized when needed
 reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
 
-# ORM
-diesel = { version = "2.1", features = ["postgres", "mysql", "sqlite", "r2d2", "chrono", "uuid"], optional = true }
-diesel_migrations = { version = "2.1", optional = true }
+# Web framework support - optional
+actix-web = { version = "4.4", optional = true }
 
-# Database dependencies
-tokio-postgres = { version = "0.7", features = ["with-serde_json-1", "with-chrono-0_4"], optional = true }
-elasticsearch = { version = "8.19.0-alpha.1", optional = true }
+# Database backends - optional, standardized versions
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
+redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
 mongodb = { version = "3.3.0", optional = true }
+elasticsearch = { version = "8.15.0-alpha.1", optional = true }
 deadpool-postgres = { version = "0.14.1", optional = true }
-redis = { version = "0.32.5", features = ["aio", "tokio-comp", "connection-manager"], optional = true }
 
-# Message queues and streaming
-rdkafka = { version = "0.38.0", features = ["cmake-build"], optional = true }
-lapin = { version = "3.4.0", optional = true }
-
-# Caching and key-value stores
-memcached-rs = { version = "0.4", optional = true }
-
-# Monitoring and observability
+# Monitoring and observability - optional
 tracing = { version = "0.1", optional = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
 prometheus = { version = "0.14.0", optional = true }
 metrics = { version = "0.24.2", optional = true }
 
-# Security and cryptography
+# Compression support - optional
+flate2 = { version = "1.0", optional = true }
+
+# Security and cryptography - optional
 ring = { version = "0.17", optional = true }
 rustls = { version = "0.23.31", optional = true }
 jsonwebtoken = { version = "9.2", optional = true }
 
-# Email notifications
+# Incident response specific dependencies
+indexmap = { version = "2.0", features = ["serde"] }
+hex = "0.4"
+semver = "1.0"
+toml = "0.9.5"
+num_cpus = "1.16"
+futures-util = "0.3"
+clap = { version = "4.0", features = ["derive"] }
+walkdir = "2.4"
+zip = "5.1.1"
+tar = "0.4"
+tempfile = "3.0"
+notify = "8.2.0"
+crossbeam-channel = "0.5"
+
+# Optional enterprise features
+diesel = { version = "2.2", features = ["postgres", "chrono", "uuid", "serde_json", "r2d2"], optional = true }
+diesel_migrations = { version = "2.2", optional = true }
 lettre = { version = "0.11", features = ["tokio1-rustls-tls"], optional = true }
-
-# Configuration management
 config = { version = "0.15.15", features = ["yaml", "json"], optional = true }
-
-# Rate limiting
-governor = { version = "0.10.1", optional = true }
-
-# Job queues
-sidekiq = { version = "0.13.0", optional = true }
 
 [features]
 default = ["local"]
+
+# Core features
+napi = ["dep:napi", "dep:napi-derive"]
 local = []
 
-# Database features
-postgres = ["tokio-postgres", "deadpool-postgres", "diesel"]
-elasticsearch = ["dep:elasticsearch"]
-mongodb = ["dep:mongodb"]
+# Database backends
+postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
 redis-store = ["redis"]
-all-databases = ["postgres", "elasticsearch", "mongodb", "redis-store", "diesel"]
+mongodb-store = ["mongodb"]
+elasticsearch-store = ["elasticsearch"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
-# Web framework features
-actix = ["actix-web", "reqwest"]
-rocket-web = ["rocket", "reqwest"]
-web-full = ["actix-web", "rocket", "reqwest"]
+# Web and messaging
+web-full = ["actix-web", "reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
 
-# ORM features
-diesel-orm = ["diesel", "diesel_migrations"]
-
-# Message queue features
-kafka = ["rdkafka"]
-rabbitmq = ["lapin"]
-messaging = ["kafka", "rabbitmq"]
-
-# Caching features
-memcached = ["memcached-rs"]
-caching = ["redis-store", "memcached"]
-
-# Monitoring and observability features
+# Enterprise monitoring and security
 monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
+crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
+compression = ["flate2"]
+diesel-orm = ["diesel", "diesel_migrations"]
+advanced-config = []
 
-# Security features
-crypto = ["ring", "rustls", "jsonwebtoken"]
-
-# Notification features
-notifications = ["lettre"]
-
-# Configuration features
-advanced-config = ["config"]
-
-# Rate-limiting features
-rate-limiting = ["governor"]
-
-# Job queue features
-job-queues = ["sidekiq"]
-
-# Enterprise features
-enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "notifications", "rate-limiting", "job-queues"]
-
-# Complete feature set
-full = ["enterprise", "web-full", "diesel-orm", "reqwest", "advanced-config"]
-
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
-napi-build = "2.0"
+napi-build = "2.1.0"

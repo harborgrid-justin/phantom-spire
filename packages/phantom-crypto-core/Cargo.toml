@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "phantom-crypto-core"
 version = "1.0.1"
 edition = "2021"
@@ -10,13 +10,17 @@ authors = ["Phantom Spire Security"]
 crate-type = ["cdylib"]
 
 [dependencies]
-napi = { version = "2.16.0", default-features = false, features = ["napi6", "serde-json"] }
-napi-derive = "2.16.0"
+# Core NAPI dependencies - standardized versions
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+napi-derive = { version = "3.2.5", optional = true }
+
+# Core serialization and data handling - required for all packages
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 tokio = { version = "1.0", features = ["full"] }
+
 # High-performance cryptographic packages
 argon2 = "0.5"
 jsonwebtoken = "9.3"
@@ -29,11 +33,67 @@ hmac = "0.12"
 aes-gcm = "0.10"
 x25519-dalek = "2.0"
 ed25519-dalek = "2.1"
-
-# Additional high-performance crates
 ring = "0.17"
 time = { version = "0.3", features = ["macros", "serde", "parsing", "formatting"] }
 hex = "0.4"
+
+# Database backends - optional, standardized versions
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
+redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
+mongodb = { version = "3.3.0", optional = true }
+elasticsearch = { version = "8.15.0-alpha.1", optional = true }
+deadpool-postgres = { version = "0.14.1", optional = true }
+
+# Web framework support - optional
+actix-web = { version = "4.4", optional = true }
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
+
+# Monitoring and observability - optional
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+prometheus = { version = "0.14.0", optional = true }
+metrics = { version = "0.24.2", optional = true }
+
+# Security and cryptography - optional
+rustls = { version = "0.23.31", optional = true }
+
+# ORM support - optional
+diesel = { version = "2.2", features = ["postgres", "chrono", "uuid", "serde_json", "r2d2"], optional = true }
+diesel_migrations = { version = "2.2", optional = true }
+
+# Compression support - optional
+flate2 = { version = "1.0", optional = true }
+
+[features]
+default = ["local"]
+
+# Core features
+napi = ["dep:napi", "dep:napi-derive"]
+local = []
+
+# Database backends
+postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
+redis-store = ["redis"]
+mongodb-store = ["mongodb"]
+elasticsearch-store = ["elasticsearch"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
+
+# Web and messaging
+web-full = ["actix-web", "reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
+
+# Enterprise monitoring and security
+monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
+crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
+compression = ["flate2"]
+diesel-orm = ["diesel", "diesel_migrations"]
+advanced-config = []
+
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 
 [build-dependencies]
 napi-build = "2.1.0"

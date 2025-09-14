@@ -12,8 +12,14 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 interface Config {
   NODE_ENV: string;
   PORT: number;
+  
+  // Multi-Database Support (All 5 required for enterprise)
   MONGODB_URI: string;
+  POSTGRESQL_URI: string;
+  MYSQL_URI: string;
   REDIS_URL: string;
+  ELASTICSEARCH_URI: string;
+  
   JWT_SECRET: string;
   JWT_EXPIRES_IN: string;
   CORS_ORIGIN: string;
@@ -46,9 +52,18 @@ interface Config {
 export const config: Config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '3000', 10),
+  
+  // Multi-Database Support (Enterprise requirement)
   MONGODB_URI:
     process.env.MONGODB_URI || 'mongodb://localhost:27017/phantom-spire',
+  POSTGRESQL_URI:
+    process.env.POSTGRESQL_URI || 'postgresql://localhost:5432/phantom-spire',
+  MYSQL_URI:
+    process.env.MYSQL_URI || 'mysql://localhost:3306/phantom-spire',
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
+  ELASTICSEARCH_URI:
+    process.env.ELASTICSEARCH_URI || 'http://localhost:9200',
+    
   JWT_SECRET:
     process.env.JWT_SECRET ||
     'your-super-secret-jwt-key-change-this-in-production',

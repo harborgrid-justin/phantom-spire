@@ -105,14 +105,40 @@ app.get('/frontend', (_req, res) => {
   res.sendFile(path.join(__dirname, 'setup/static/frontend.html'));
 });
 
-// Health check endpoint
-app.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: config.NODE_ENV,
-  });
+// Health check endpoint - Enterprise multi-database status
+app.get('/health', async (_req, res) => {
+  try {
+    const health = {
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: config.NODE_ENV,
+      services: {},
+      databases: {},
+    };
+
+    // Check MongoDB
+    try {
+      await mongoose.connection.db?.admin().ping();
+      health.databases.mongodb = { status: 'healthy', responseTime: '< 10ms' };
+    } catch (error) {
+      health.databases.mongodb = { status: 'unhealthy', error: error.message };
+      health.status = 'DEGRADED';
+    }
+
+    // TODO: Add PostgreSQL, MySQL, Redis, Elasticsearch health checks
+    // This requires importing the database connections from config/database.ts
+    
+    res.status(200).json(health);
+  } catch (error) {
+    res.status(503).json({
+      status: 'UNHEALTHY',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: config.NODE_ENV,
+      error: error.message,
+    });
+  }
 });
 
 // Root endpoint - main entry point

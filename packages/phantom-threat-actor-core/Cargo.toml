@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "phantom-threatactor-core"
 version = "1.0.1"
 edition = "2021"
@@ -45,25 +45,34 @@ futures = "0.3"
 parking_lot = "0.12"
 
 [features]
-default = ["napi", "local-storage"]
+default = ["local"]
 
 # Core features
 napi = ["dep:napi", "dep:napi-derive"]
-local-storage = []
+local = []
 
-# Storage backends
-postgres-store = ["tokio-postgres", "sqlx", "deadpool-postgres"]
+# Database backends
+postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
 redis-store = ["redis"]
 mongodb-store = ["mongodb"]
 elasticsearch-store = ["elasticsearch"]
-all-storage = ["postgres-store", "redis-store", "mongodb-store", "elasticsearch-store"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
-# Web and database features
-web-api = ["actix-web", "actix-cors"]
+# Web and messaging
+web-full = ["actix-web", "reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
+
+# Enterprise monitoring and security
+monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
+crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
+compression = ["flate2"]
 diesel-orm = ["diesel", "diesel_migrations"]
+advanced-config = []
 
-# Full feature set
-full = ["all-storage", "web-api", "diesel-orm"]
-
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = { version = "2.1.0" }
+

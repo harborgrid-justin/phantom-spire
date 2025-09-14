@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "phantom-forensics-core"
 version = "1.0.1"
 description = "Digital forensics and incident analysis core with evidence collection and timeline reconstruction"
@@ -83,42 +83,33 @@ num_cpus = "1.16"
 futures-util = "0.3"
 
 [features]
-default = ["napi", "local-storage"]
+default = ["local"]
 
 # Core features
 napi = ["dep:napi", "dep:napi-derive"]
-local-storage = []
+local = []
 
-# Storage backends
-postgres-store = ["tokio-postgres", "sqlx"]
+# Database backends
+postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
 redis-store = ["redis"]
 mongodb-store = ["mongodb"]
 elasticsearch-store = ["elasticsearch"]
-all-storage = ["postgres-store", "redis-store", "mongodb-store", "elasticsearch-store"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
-# Web features
-web-server = ["warp", "reqwest"]
-web-client = ["reqwest"]
+# Web and messaging
+web-full = ["actix-web", "reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
 
-# Monitoring features
+# Enterprise monitoring and security
 monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-
-# Security features
-crypto = ["ring", "rustls", "jsonwebtoken"]
-
-# Utility features
+crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
 compression = ["flate2"]
+diesel-orm = ["diesel", "diesel_migrations"]
+advanced-config = []
 
-# Platform integration features
-multi-tenant = []
-audit-logging = ["monitoring"]
-analytics = []
-
-# Enterprise bundle
-enterprise = ["all-storage", "monitoring", "crypto", "compression", "multi-tenant", "audit-logging", "analytics"]
-
-# Full feature set
-full = ["enterprise", "web-server", "web-client"]
-
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

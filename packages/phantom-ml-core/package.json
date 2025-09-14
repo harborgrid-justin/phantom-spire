@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "@phantom-spire/ml-core",
   "version": "1.0.1",
   "description": "Enterprise machine learning services for threat detection and security analytics",
@@ -46,21 +46,23 @@
   },
   "scripts": {
     "artifacts": "napi artifacts",
-    "bench": "node -r @swc-node/register benchmark/bench.ts",
-    "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
+    "build": "napi build --platform --release --features napi",
+    "build:debug": "napi build --platform --features napi",
+    "build:enterprise": "napi build --platform --release --features enterprise",
+    "build:full": "napi build --platform --release --features full",
+    "clean": "rimraf dist",
     "prepublishOnly": "napi prepublish -t npm",
-    "test": "ava",
+    "test": "cargo test --features enterprise",
+    "test:native": "cargo test --all-features",
     "universal": "napi universal",
     "version": "napi version",
-    "demo:database": "node database-integration-demo.js",
-    "demo:basic": "node test-examples.js",
-    "verify": "node verify-examples.js"
-  },
+    "lint": "cargo clippy --features enterprise",
+    "fmt": "cargo fmt"
+  },,
   "devDependencies": {
     "@napi-rs/cli": "^3.2.0",
-    "ava": "^6.0.0"
-  },
+    "rimraf": "^6.0.1"
+  },,
   "ava": {
     "timeout": "3m"
   },
@@ -69,3 +71,4 @@
     "access": "public"
   }
 }
+

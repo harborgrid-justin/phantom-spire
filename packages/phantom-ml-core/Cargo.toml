@@ -1,4 +1,4 @@
-[package]
+﻿[package]
 name = "phantom-ml-core"
 version = "1.0.1"
 description = "Enterprise machine learning services for threat detection and security analytics"
@@ -113,45 +113,33 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = tr
 flate2 = { version = "1.0", optional = true }
 
 [features]
-default = ["napi", "local-storage"]
+default = ["local"]
 
 # Core features
 napi = ["dep:napi", "dep:napi-derive"]
-local-storage = []
+local = []
 
-# Storage backends
-postgres-store = ["tokio-postgres", "bb8", "bb8-postgres", "rust_decimal", "bincode"]
+# Database backends
+postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
 redis-store = ["redis"]
 mongodb-store = ["mongodb"]
 elasticsearch-store = ["elasticsearch"]
-all-storage = ["postgres-store", "redis-store", "mongodb-store", "elasticsearch-store"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
-# Diesel ORM backend
-diesel-postgres = ["diesel", "diesel-async"]
+# Web and messaging
+web-full = ["actix-web", "reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
 
-# Web features
-web-server = ["warp", "reqwest"]
-actix-web-server = ["actix-web", "actix-cors", "reqwest"]
-rocket-server = ["rocket", "reqwest"]
-web-client = ["reqwest"]
-
-# Monitoring features
-monitoring = ["tracing", "tracing-subscriber"]
-
-# Utility features
+# Enterprise monitoring and security
+monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
+crypto = ["ring", "rustls", "jsonwebtoken", "sha2", "base64"]
 compression = ["flate2"]
+diesel-orm = ["diesel", "diesel_migrations"]
+advanced-config = []
 
-# Platform integration features
-multi-tenant = []
-audit-logging = ["monitoring"]
-analytics = []
-enterprise-security = ["jsonwebtoken", "ring", "aes-gcm", "chacha20poly1305", "argon2"]
-
-# Enterprise bundle
-enterprise = ["all-storage", "monitoring", "compression", "multi-tenant", "audit-logging", "analytics", "enterprise-security"]
-
-# Full feature set
-full = ["enterprise", "web-server", "web-client", "actix-web-server", "rocket-server"]
-
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto"]
+full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
 napi-build = "2.1.0"

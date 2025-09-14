@@ -179,48 +179,108 @@ export class UnifiedDataStoreRegistry {
   }
   
   /**
-   * Cross-plugin query that searches across all stores
+   * Cross-plugin query that searches across all stores with enterprise optimizations
    */
   async crossPluginQuery(query: UnifiedQuery, context: UnifiedQueryContext): Promise<UnifiedQueryResult> {
+    const startTime = Date.now();
     const allRecords: UniversalDataRecord[] = [];
     const allRelationships: DataRelationship[] = [];
     let totalQueryTime = 0;
     let totalCount = 0;
-    
+
+    // Enterprise optimization: Parallel execution with error isolation
     const storePromises = Array.from(this.stores.values()).map(async (store) => {
+      const queryStartTime = Date.now();
       try {
         const result = await store.queryRecords(query, context);
-        return result;
+        const queryDuration = Date.now() - queryStartTime;
+        
+        return {
+          success: true,
+          storeId: store.storeId,
+          result,
+          queryTime: queryDuration,
+        };
       } catch (error) {
+        const queryDuration = Date.now() - queryStartTime;
         console.error(`Store ${store.storeId} query failed:`, error);
-        return null;
+        
+        return {
+          success: false,
+          storeId: store.storeId,
+          error: error instanceof Error ? error.message : String(error),
+          queryTime: queryDuration,
+        };
       }
     });
+
+    const results = await Promise.allSettled(storePromises);
     
-    const results = await Promise.all(storePromises);
+    // Process results with enterprise-grade error handling and metrics
+    const successfulQueries: string[] = [];
+    const failedQueries: string[] = [];
     
-    for (const result of results) {
-      if (result) {
-        allRecords.push(...result.records);
-        allRelationships.push(...result.relationships);
-        totalQueryTime += result.queryTimeMs;
-        if (result.totalCount) {
-          totalCount += result.totalCount;
+    for (const promiseResult of results) {
+      if (promiseResult.status === 'fulfilled') {
+        const queryResult = promiseResult.value;
+        
+        if (queryResult.success) {
+          const { result, storeId } = queryResult;
+          allRecords.push(...result.records.map(r => ({ ...r, _sourceStore: storeId })));
+          allRelationships.push(...result.relationships);
+          totalQueryTime += queryResult.queryTime;
+          if (result.totalCount) {
+            totalCount += result.totalCount;
+          }
+          successfulQueries.push(storeId);
+        } else {
+          failedQueries.push(queryResult.storeId);
         }
+      } else {
+        failedQueries.push('unknown-store');
       }
     }
-    
-    // Apply global limit if specified
-    if (query.limit) {
-      allRecords.splice(query.limit);
+
+    // Enterprise sorting and filtering
+    let sortedRecords = allRecords;
+    if (query.sortBy) {
+      sortedRecords = allRecords.sort((a, b) => {
+        const aVal = a.data[query.sortBy!] || a.metadata[query.sortBy!] || a.createdAt;
+        const bVal = b.data[query.sortBy!] || b.metadata[query.sortBy!] || b.createdAt;
+        
+        if (query.sortDesc) {
+          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+        }
+        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+      });
     }
+
+    // Apply global limit and offset
+    const offset = query.offset || 0;
+    const limit = query.limit || sortedRecords.length;
+    const paginatedRecords = sortedRecords.slice(offset, offset + limit);
+
+    // Enterprise metrics and monitoring
+    const totalDuration = Date.now() - startTime;
     
+    console.log(`Cross-plugin query completed in ${totalDuration}ms`, {
+      successfulStores: successfulQueries.length,
+      failedStores: failedQueries.length,
+      totalRecords: allRecords.length,
+      returnedRecords: paginatedRecords.length,
+      totalRelationships: allRelationships.length,
+    });
+
     return {
-      records: allRecords,
+      records: paginatedRecords,
       relationships: allRelationships,
       totalCount,
-      queryTimeMs: totalQueryTime,
-      pagination: undefined, // TODO: Implement cross-store pagination
+      queryTimeMs: totalDuration,
+      pagination: query.limit ? {
+        page: Math.floor(offset / limit) + 1,
+        size: limit,
+        totalPages: Math.ceil(sortedRecords.length / limit),
+      } : undefined,
     };
   }
   
