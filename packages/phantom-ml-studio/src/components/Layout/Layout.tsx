@@ -29,6 +29,15 @@ import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
+  Timeline as TimelineIcon,
+  Engineering as EngineeringIcon,
+  Shield as ShieldIcon,
+  TrendingUp as MonitoringIcon,
+  AccountTree as PipelineIcon,
+  Store as MarketplaceIcon,
+  Visibility as ExplainableIcon,
+  Assessment as ABTestingIcon,
+  Business as ComplianceIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -58,6 +67,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { text: 'H2O.ai Analysis', icon: <AnalyticsIcon />, path: '/h2o-comparison' },
     { text: 'Deployments', icon: <DeployIcon />, path: '/deploy' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+    // 8 New Advanced Competitive Features
+    { text: '🚀 Live Monitoring', icon: <MonitoringIcon />, path: '/realtime-monitoring', isNew: true },
+    { text: '🔬 Pipeline Studio', icon: <PipelineIcon />, path: '/pipeline-visualizer', isNew: true },
+    { text: '🛡️ Bias Detection', icon: <ShieldIcon />, path: '/bias-detection', isNew: true },
+    { text: '🔧 Feature Engine', icon: <EngineeringIcon />, path: '/feature-engineering', isNew: true },
+    { text: '🏪 Threat Models', icon: <MarketplaceIcon />, path: '/threat-marketplace', isNew: true },
+    { text: '🔍 Explainable AI', icon: <ExplainableIcon />, path: '/explainable-ai', isNew: true },
+    { text: '⚖️ A/B Testing', icon: <ABTestingIcon />, path: '/ab-testing', isNew: true },
+    { text: '🏢 Compliance', icon: <ComplianceIcon />, path: '/enterprise-compliance', isNew: true },
   ];
 
   const drawer = (
@@ -94,6 +112,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
+              {(item as any).isNew && (
+                <Badge
+                  badgeContent="NEW"
+                  color="secondary"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontSize: '0.5rem',
+                      height: 16,
+                      minWidth: 16,
+                    },
+                  }}
+                />
+              )}
             </ListItemButton>
           </ListItem>
         ))}
