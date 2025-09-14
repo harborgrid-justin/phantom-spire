@@ -10,6 +10,14 @@ import Deployments from './pages/Deployments/Deployments';
 import Settings from './pages/Settings/Settings';
 import ModelComparison from './pages/ModelComparison/ModelComparison';
 import H2OComparison from './pages/H2OComparison/H2OComparison';
+import RealTimeMonitoring from './pages/RealTimeMonitoring';
+import AutoMLPipelineVisualizer from './pages/AutoMLPipelineVisualizer';
+import BiasDetectionEngine from './pages/BiasDetectionEngine';
+import InteractiveFeatureEngineering from './pages/InteractiveFeatureEngineering';
+import ThreatIntelligenceMarketplace from './pages/ThreatIntelligenceMarketplace';
+import ExplainableAIVisualizer from './pages/ExplainableAIVisualizer';
+import MultiModelABTesting from './pages/MultiModelABTesting';
+import EnterpriseSecurityCompliance from './pages/EnterpriseSecurityCompliance';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +32,15 @@ const App: React.FC = () => {
         <Route path="/h2o-comparison" element={<H2OComparison />} />
         <Route path="/deploy" element={<Deployments />} />
         <Route path="/settings" element={<Settings />} />
+        {/* 8 New Advanced Competitive Features */}
+        <Route path="/realtime-monitoring" element={<RealTimeMonitoring />} />
+        <Route path="/pipeline-visualizer" element={<AutoMLPipelineVisualizer />} />
+        <Route path="/bias-detection" element={<BiasDetectionEngine />} />
+        <Route path="/feature-engineering" element={<InteractiveFeatureEngineering />} />
+        <Route path="/threat-marketplace" element={<ThreatIntelligenceMarketplace />} />
+        <Route path="/explainable-ai" element={<ExplainableAIVisualizer />} />
+        <Route path="/ab-testing" element={<MultiModelABTesting />} />
+        <Route path="/enterprise-compliance" element={<EnterpriseSecurityCompliance />} />
       </Routes>
     </Layout>
   );
