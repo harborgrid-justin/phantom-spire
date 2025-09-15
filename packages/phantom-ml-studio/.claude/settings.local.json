@@ -6,7 +6,9 @@
       "Bash(done)",
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next build:*)"
     ],
     "deny": [],
     "ask": []

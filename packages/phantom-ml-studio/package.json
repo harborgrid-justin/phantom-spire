@@ -24,6 +24,7 @@
     "@mui/x-charts": "^8.11.2",
     "@mui/x-data-grid": "^8.11.2",
     "@tanstack/react-query": "^5.87.4",
+    "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
     "lodash": "^4.17.21",
     "ml-random-forest": "^2.1.0",
@@ -44,7 +45,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
