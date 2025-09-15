@@ -21,7 +21,7 @@ class PerformanceMonitor {
   private isEnabled: boolean;
 
   constructor() {
-    this.isEnabled = import.meta.env.VITE_ENABLE_PERFORMANCE_MONITORING === 'true';
+    this.isEnabled = process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === 'true';
     
     if (this.isEnabled) {
       this.initializeMonitoring();
@@ -282,11 +282,11 @@ class PerformanceMonitor {
       if (isBeaconSend && navigator.sendBeacon) {
         // Use sendBeacon for reliable delivery during page unload
         navigator.sendBeacon(
-          import.meta.env.VITE_ANALYTICS_ENDPOINT || '/api/analytics',
+          process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics',
           JSON.stringify(payload)
         );
       } else {
-        await fetch(import.meta.env.VITE_ANALYTICS_ENDPOINT || '/api/analytics', {
+        await fetch(process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

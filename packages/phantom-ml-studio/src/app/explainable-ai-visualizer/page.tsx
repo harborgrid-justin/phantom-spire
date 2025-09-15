@@ -15,9 +15,9 @@ import {
 import {
   Security as SecurityIcon,
 } from '@mui/icons-material';
-import { explainableAiVisualizerService } from '../../services/explainableAiVisualizerService';
-import { ModelExplanation } from '../../services/explainableAiVisualizer.types';
-import { ServiceContext } from '../../services/core';
+import { explainableAiVisualizerService } from '@/services/explainable-ai-visualizer';
+import { ModelExplanation } from '@/services/explainable-ai-visualizer';
+import { ServiceContext } from '@/services/core';
 
 const ExplainableAIVisualizerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);

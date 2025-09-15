@@ -1,87 +1,35 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Alert,
-  AlertTitle,
-  Tabs,
-  Tab,
-  CircularProgress,
-} from '@mui/material';
-import {
-  Security as SecurityIcon,
-  Warning as WarningIcon,
-  Assessment as AssessmentIcon,
-} from '@mui/icons-material';
-import { biasDetectionEngineService } from '../../services/biasDetectionEngineService';
-import { ModelBiasAnalysis } from '../../services/biasDetectionEngine.types';
-import { ServiceContext } from '../../services/core';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import BiasDetectionClient from './BiasDetectionClient';
 
-const BiasDetectionEnginePage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0);
-  const [models, setModels] = useState<ModelBiasAnalysis[]>([]);
-  const [selectedModel, setSelectedModel] = useState<ModelBiasAnalysis | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const context: ServiceContext = {
-        requestId: `req-${Date.now()}`,
-        startTime: new Date(),
-        timeout: 5000,
-        permissions: [],
-        metadata: {},
-        trace: {
-            traceId: `trace-${Date.now()}`,
-            spanId: `span-${Date.now()}`,
-            sampled: true,
-            baggage: {},
-        }
-      };
-      const response = await biasDetectionEngineService.getModelBiasAnalysis({
-        id: 'req-bias-analysis',
-        type: 'getModelBiasAnalysis',
-        data: { modelId: 'all' },
-        metadata: { category: 'bias-detection', module: 'bias-detection-page', version: '1.0.0' },
-        context: { environment: 'development' },
-        timestamp: new Date(),
-      }, context);
-
-      if (response.success && response.data) {
-        setModels(response.data);
-        setSelectedModel(response.data[0] || null);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading || !selectedModel) {
-    return <CircularProgress />;
-  }
-
-  return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>Security-First Bias Detection Engine</Typography>
-      <Alert severity="success" sx={{ mb: 3 }}>
-        <AlertTitle>H2O.ai Competitive Advantage</AlertTitle>
-        Security-focused bias detection with impact assessment and compliance monitoring.
-      </Alert>
-      <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} sx={{ mb: 3 }}>
-        <Tab label="Bias Overview" />
-      </Tabs>
-      <Grid container spacing={3}>
-        {/* Content goes here */}
-      </Grid>
-    </Box>
-  );
+export const metadata: Metadata = {
+  title: 'Bias Detection Engine | Phantom ML Studio',
+  description: 'AI fairness tools to detect and mitigate bias in machine learning models with comprehensive analysis and reporting.',
+  keywords: ['AI bias', 'fairness', 'ML ethics', 'bias detection', 'algorithmic fairness'],
+  openGraph: {
+    title: 'Bias Detection Engine - Phantom ML Studio',
+    description: 'Advanced AI fairness and bias detection tools',
+  },
 };
 
-export default BiasDetectionEnginePage;
+export const dynamic = 'force-dynamic';
+
+function BiasDetectionSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6 p-4">
+      <div className="h-8 bg-gray-200 rounded w-64"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-200 rounded-lg h-80"></div>
+        <div className="bg-gray-200 rounded-lg h-80"></div>
+      </div>
+    </div>
+  );
+}
+
+export default function BiasDetectionPage() {
+  return (
+    <Suspense fallback={<BiasDetectionSkeleton />}>
+      <BiasDetectionClient />
+    </Suspense>
+  );
+}

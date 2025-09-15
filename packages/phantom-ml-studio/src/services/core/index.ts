@@ -12,7 +12,6 @@
 // Core Interfaces and Types
 export * from './types/business-logic.types';
 export * from './types/service.types';
-export * from './types/analytics.types';
 
 // Abstract Base Classes
 export * from './base/BaseService';

@@ -30,25 +30,25 @@ interface LazyLoadingOptions {
 }
 
 // Lazy load all major page components for code splitting
-export const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
-export const ModelBuilder = lazy(() => import('../pages/ModelBuilder/ModelBuilder'));
-export const DataExplorer = lazy(() => import('../pages/DataExplorer/DataExplorer'));
-export const Experiments = lazy(() => import('../pages/Experiments/Experiments'));
-export const Models = lazy(() => import('../pages/Models/Models'));
-export const Deployments = lazy(() => import('../pages/Deployments/Deployments'));
-export const Settings = lazy(() => import('../pages/Settings/Settings'));
+export const Dashboard = lazy(() => import('@/app/dashboard/page'));
+export const ModelBuilder = lazy(() => import('@/app/model-builder/page'));
+export const DataExplorer = lazy(() => import('@/app/data-explorer/page'));
+export const Experiments = lazy(() => import('@/app/experiments/page'));
+export const Models = lazy(() => import('@/app/models/page'));
+export const Deployments = lazy(() => import('@/app/deployments/page'));
+export const Settings = lazy(() => import('@/app/settings/page'));
 
 // Advanced feature pages - loaded on demand
-export const H2OComparison = lazy(() => import('../pages/H2OComparison/H2OComparison'));
-export const AutoMLPipelineVisualizer = lazy(() => import('../pages/AutoMLPipelineVisualizer'));
-export const BiasDetectionEngine = lazy(() => import('../pages/BiasDetectionEngine'));
-export const EnterpriseSecurityCompliance = lazy(() => import('../pages/EnterpriseSecurityCompliance'));
-export const ExplainableAIVisualizer = lazy(() => import('../pages/ExplainableAIVisualizer'));
-export const InteractiveFeatureEngineering = lazy(() => import('../pages/InteractiveFeatureEngineering'));
-export const MultiModelABTesting = lazy(() => import('../pages/MultiModelABTesting'));
-export const RealTimeMonitoring = lazy(() => import('../pages/RealTimeMonitoring'));
-export const ThreatIntelligenceMarketplace = lazy(() => import('../pages/ThreatIntelligenceMarketplace'));
-export const ModelComparison = lazy(() => import('../pages/ModelComparison/ModelComparison'));
+export const H2OComparison = lazy(() => import('@/app/h2o-comparison/page'));
+export const AutoMLPipelineVisualizer = lazy(() => import('@/app/automl-pipeline-visualizer/page'));
+export const BiasDetectionEngine = lazy(() => import('@/app/bias-detection-engine/page'));
+export const EnterpriseSecurityCompliance = lazy(() => import('@/app/enterprise-security-compliance/page'));
+export const ExplainableAIVisualizer = lazy(() => import('@/app/explainable-ai-visualizer/page'));
+export const InteractiveFeatureEngineering = lazy(() => import('@/app/interactive-feature-engineering/page'));
+export const MultiModelABTesting = lazy(() => import('@/app/multi-model-ab-testing/page'));
+export const RealTimeMonitoring = lazy(() => import('@/app/real-time-monitoring/page'));
+export const ThreatIntelligenceMarketplace = lazy(() => import('@/app/threat-intelligence-marketplace/page'));
+export const ModelComparison = lazy(() => import('@/app/model-comparison/page'));
 
 // Bundle analyzer friendly exports
 export {

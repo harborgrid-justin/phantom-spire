@@ -4,7 +4,7 @@
  */
 
 // Core Business Logic Types
-export interface BusinessLogicRequest<T = Record<string, unknown>> {
+export interface BusinessLogicRequest<T = any> {
   id: string;
   type: string;
   data: T;

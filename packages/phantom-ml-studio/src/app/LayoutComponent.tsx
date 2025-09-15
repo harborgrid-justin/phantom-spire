@@ -16,7 +16,6 @@ import {
   Avatar,
   Divider,
   useTheme,
-  CssBaseline,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -42,7 +41,6 @@ import {
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import theme from '../theme/theme';
 
 const drawerWidth = 240;
 
@@ -121,7 +119,7 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.text} />
-                {'isNew' in item && item.isNew && (
+                {item.isNew && (
                   <Badge
                     badgeContent="NEW"
                     color="secondary"

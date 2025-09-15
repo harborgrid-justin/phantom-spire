@@ -278,7 +278,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
           this.config.modelId,
           {
             cache_dir: this.config.cache_dir,
-            auth_token: this.config.auth_token,
+            token: this.config.auth_token,
             revision: this.config.revision,
             use_fast: this.config.use_fast_tokenizer,
             local_files_only: this.config.local_files_only
@@ -304,7 +304,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
             this.config.modelId,
             {
               cache_dir: this.config.cache_dir,
-              auth_token: this.config.auth_token,
+              token: this.config.auth_token,
               revision: this.config.revision,
               local_files_only: this.config.local_files_only
             }
@@ -325,14 +325,14 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
       const { pipeline } = await import('@huggingface/transformers');
       
       this.pipeline = await pipeline(
-        this.config.task,
+        this.config.task as any,
         this.config.modelId,
         {
           device: this.config.device,
           torch_dtype: this.config.torch_dtype,
           trust_remote_code: this.config.trust_remote_code,
           cache_dir: this.config.cache_dir,
-          auth_token: this.config.auth_token,
+          token: this.config.auth_token,
           revision: this.config.revision,
           local_files_only: this.config.local_files_only
         }
@@ -454,7 +454,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
     try {
       // Use Hugging Face Hub API to push model
       const { HfApi } = await import('@huggingface/hub');
-      const api = new HfApi({ token: this.config.auth_token });
+      const api = new HfApi({ accessToken: this.config.auth_token });
       
       // Create repository if it doesn't exist
       try {

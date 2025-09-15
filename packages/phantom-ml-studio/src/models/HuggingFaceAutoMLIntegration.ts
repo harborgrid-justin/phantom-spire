@@ -265,9 +265,10 @@ export class HuggingFaceAutoMLIntegration extends EventEmitter {
   private bestTrial?: OptimizationTrial;
   private optimizer?: unknown; // Would be actual optimizer like Optuna/Hyperopt
   
-  constructor(registry: HuggingFaceModelRegistry) {
+  constructor(registry: HuggingFaceModelRegistry, config: AutoMLConfig) {
     super();
     this.registry = registry;
+    this.config = config;
   }
 
   async runAutoML(config: AutoMLConfig): Promise<AutoMLResult> {

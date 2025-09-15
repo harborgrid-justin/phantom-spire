@@ -1,83 +1,36 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Alert,
-  AlertTitle,
-  Tabs,
-  Tab,
-  CircularProgress,
-} from '@mui/material';
-import {
-  Security as SecurityIcon,
-} from '@mui/icons-material';
-import { threatIntelligenceMarketplaceService } from '../../services/threatIntelligenceMarketplaceService';
-import { ThreatModel } from '../../services/threatIntelligenceMarketplace.types';
-import { ServiceContext } from '../../services/core';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import ThreatIntelligenceClient from './ThreatIntelligenceClient';
 
-const ThreatIntelligenceMarketplacePage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0);
-  const [models, setModels] = useState<ThreatModel[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const context: ServiceContext = {
-        requestId: `req-${Date.now()}`,
-        startTime: new Date(),
-        timeout: 5000,
-        permissions: [],
-        metadata: {},
-        trace: {
-            traceId: `trace-${Date.now()}`,
-            spanId: `span-${Date.now()}`,
-            sampled: true,
-            baggage: {},
-        }
-      };
-      const response = await threatIntelligenceMarketplaceService.getThreatModels({
-        id: 'req-threat-models',
-        type: 'getThreatModels',
-        data: null,
-        metadata: { category: 'marketplace', module: 'marketplace-page', version: '1.0.0' },
-        context: { environment: 'development' },
-        timestamp: new Date(),
-      }, context);
-
-      if (response.success && response.data) {
-        setModels(response.data);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return <CircularProgress />;
-  }
-
-  return (
-    <Box sx={{ flexGrow: 1, p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>Threat Intelligence ML Models Marketplace</Typography>
-      <Alert severity="success" sx={{ mb: 3 }}>
-        <AlertTitle>H2O.ai Competitive Edge</AlertTitle>
-        Curated security model marketplace with threat intelligence integration.
-      </Alert>
-      <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} sx={{ mb: 3 }}>
-        <Tab label="Browse Models" />
-      </Tabs>
-      <Grid container spacing={3}>
-        {/* Content goes here */}
-      </Grid>
-    </Box>
-  );
+export const metadata: Metadata = {
+  title: 'Threat Intelligence Marketplace | Phantom ML Studio',
+  description: 'Advanced cybersecurity ML models for threat detection, intelligence analysis, and security automation.',
+  keywords: ['threat intelligence', 'cybersecurity ML', 'threat detection', 'security automation', 'cyber analytics'],
+  openGraph: {
+    title: 'Threat Intelligence Marketplace - Phantom ML Studio',
+    description: 'Enterprise cybersecurity ML models and threat intelligence',
+  },
 };
 
-export default ThreatIntelligenceMarketplacePage;
+export const dynamic = 'force-dynamic';
+
+function ThreatIntelligenceSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6 p-4">
+      <div className="h-8 bg-gray-200 rounded w-72"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-gray-200 rounded-lg h-64"></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function ThreatIntelligenceMarketplacePage() {
+  return (
+    <Suspense fallback={<ThreatIntelligenceSkeleton />}>
+      <ThreatIntelligenceClient />
+    </Suspense>
+  );
+}

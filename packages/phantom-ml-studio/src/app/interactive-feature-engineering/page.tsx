@@ -16,9 +16,9 @@ import {
 import {
   Add as AddIcon,
 } from '@mui/icons-material';
-import { interactiveFeatureEngineeringService } from '../../services/interactiveFeatureEngineeringService';
-import { FeatureEngineeringPipeline } from '../../services/interactiveFeatureEngineering.types';
-import { ServiceContext } from '../../services/core';
+import { interactiveFeatureEngineeringService } from '@/services/interactive-feature-engineering';
+import { FeatureEngineeringPipeline } from '@/services/interactive-feature-engineering';
+import { ServiceContext } from '@/services/core';
 
 const InteractiveFeatureEngineeringPage: React.FC = () => {
   const [loading, setLoading] = useState(true);

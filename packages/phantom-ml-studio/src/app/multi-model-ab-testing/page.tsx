@@ -16,9 +16,9 @@ import {
 import {
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
-import { multiModelAbTestingService } from '../../services/multiModelAbTestingService';
-import { ABTest } from '../../services/multiModelAbTesting.types';
-import { ServiceContext } from '../../services/core';
+import { multiModelAbTestingService } from '@/services/multi-model-ab-testing';
+import { ABTest } from '@/services/multi-model-ab-testing';
+import { ServiceContext } from '@/services/core';
 
 const MultiModelABTestingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);

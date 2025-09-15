@@ -28,7 +28,7 @@ class HealthMonitor {
   private initializeHealthChecks() {
     // API connectivity check
     this.registerCheck('api', async () => {
-      const apiUrl = import.meta.env.VITE_API_URL;
+      const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000/api';
       if (!apiUrl) return { status: 'degraded' as const, error: 'API URL not configured' };
 
       try {
@@ -58,7 +58,7 @@ class HealthMonitor {
 
     // WebSocket connectivity check
     this.registerCheck('websocket', async () => {
-      const wsUrl = import.meta.env.VITE_WS_URL;
+      const MONITORING_ENABLED = process.env.NEXT_PUBLIC_MONITORING_ENABLED === 'true';
       if (!wsUrl) return { status: 'degraded' as const, error: 'WebSocket URL not configured' };
 
       return new Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; error?: string }>((resolve) => {
@@ -161,7 +161,7 @@ class HealthMonitor {
         ];
 
         const missingFeatures = criticalFeatures.filter(
-          feature => !import.meta.env[feature as keyof ImportMetaEnv]
+          feature => !(process.env as any)[feature as keyof any]
         );
 
         if (missingFeatures.length > 0) {
