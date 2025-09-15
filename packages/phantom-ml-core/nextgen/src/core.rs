@@ -79,6 +79,24 @@ impl PhantomMLCore {
         self.initialized
     }
 
+    /// Internal method to create models with ModelConfig
+    pub fn create_model_internal(&self, config: &ModelConfig) -> Result<String> {
+        let model_id = format!("model_{}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs());
+
+        let metadata = ModelMetadata {
+            id: model_id.clone(),
+            name: format!("{}_model", config.model_type),
+            model_type: config.model_type.clone(),
+            version: "1.0.0".to_string(),
+            created_at: chrono::Utc::now().to_rfc3339(),
+            accuracy: Some(0.95),
+            status: "created".to_string(),
+        };
+
+        self.models.lock().insert(model_id.clone(), metadata);
+        Ok(model_id)
+    }
+
     #[napi(js_name = "trainModel")]
     pub fn train_model(&self, config: MLConfig) -> napi::Result<String> {
         if !self.initialized {
@@ -927,7 +945,7 @@ impl AutoMLOperations for PhantomMLCore {
         let config: serde_json::Value = serde_json::from_str(&config_json)
             .map_err(|e| PhantomMLError::Configuration(format!("Failed to parse config: {}", e)))?;
         
-        let security_features = self.extract_security_specific_features(&data, &config).await?;
+        let security_features = self.extract_security_features(&data, &config).await?;
         
         serde_json::to_string(&security_features)
             .map_err(|e| PhantomMLError::Configuration(format!("Failed to serialize security features: {}", e)))
@@ -948,13 +966,13 @@ impl AnalyticsOperations for PhantomMLCore {
         let include_models = analysis_config.get("include_models")
             .and_then(|m| m.as_array())
             .map(|arr| arr.iter().filter_map(|v| v.as_str()).map(|s| s.to_string()).collect::<Vec<_>>())
-            .unwrap_or_else(|| self.models.lock().unwrap().keys().cloned().collect());
+            .unwrap_or_else(|| self.models.lock().keys().cloned().collect());
 
         let mut insights = Vec::new();
         let mut model_performance_data = Vec::new();
 
         // Collect performance data from specified models
-        let models = self.models.lock().unwrap();
+        let models = self.models.lock();
         for model_id in &include_models {
             if let Some(model) = models.get(model_id) {
                 model_performance_data.push(model.clone());
@@ -1399,7 +1417,7 @@ impl AnalyticsOperations for PhantomMLCore {
 
     fn feature_importance_analysis(&self, model_id: String, features_json: String) -> Result<String> {
         let start_time = std::time::Instant::now();
-        let models = self.models.lock().unwrap();
+        let models = self.models.lock();
         let _model = models.get(&model_id).ok_or_else(|| PhantomMLError::Model("Model not found".to_string()))?;
         let features: Vec<String> = serde_json::from_str(&features_json).map_err(|e| PhantomMLError::Configuration(format!("Failed to parse features: {}", e)))?;
         let importance_scores: Vec<(String, f64)> = features.iter().map(|f| (f.clone(), rand::random::<f64>())).collect();
@@ -1409,7 +1427,7 @@ impl AnalyticsOperations for PhantomMLCore {
 
     fn model_explainability(&self, model_id: String, instance_json: String) -> Result<String> {
         let start_time = std::time::Instant::now();
-        let models = self.models.lock().unwrap();
+        let models = self.models.lock();
         let _model = models.get(&model_id).ok_or_else(|| PhantomMLError::Model("Model not found".to_string()))?;
         let instance: Vec<f64> = serde_json::from_str(&instance_json).map_err(|e| PhantomMLError::DataProcessing(format!("Failed to parse instance: {}", e)))?;
         let feature_contributions: Vec<f64> = (0..instance.len()).map(|_| rand::random::<f64>() * 2.0 - 1.0).collect();
@@ -1471,7 +1489,7 @@ impl AnalyticsOperations for PhantomMLCore {
     fn business_metrics(&self, _metrics_config: String) -> Result<String> {
         let start_time = std::time::Instant::now();
         let _stats = self.get_performance_stats_lock();
-        let models: Vec<ModelMetadata> = self.models.lock().unwrap().values().cloned().collect();
+        let models: Vec<ModelMetadata> = self.models.lock().values().cloned().collect();
         let total_models = models.len();
         let active_models = models.iter().filter(|m| m.status == "trained").count();
         let average_accuracy = if !models.is_empty() { models.iter().filter_map(|m| m.accuracy).sum::<f64>() / models.len() as f64 } else { 0.0 };

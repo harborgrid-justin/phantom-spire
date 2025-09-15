@@ -17,6 +17,9 @@ pub enum PhantomMLError {
     #[error("Data error: {0}")]
     DataError(String),
 
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
     #[error("Configuration error: {0}")]
     Configuration(String),
 
@@ -33,6 +36,12 @@ impl From<PhantomMLError> for NapiError {
 impl From<serde_json::Error> for PhantomMLError {
     fn from(err: serde_json::Error) -> Self {
         PhantomMLError::DataProcessing(format!("JSON error: {}", err))
+    }
+}
+
+impl From<polars::error::PolarsError> for PhantomMLError {
+    fn from(err: polars::error::PolarsError) -> Self {
+        PhantomMLError::DataProcessing(format!("Polars error: {}", err))
     }
 }
 

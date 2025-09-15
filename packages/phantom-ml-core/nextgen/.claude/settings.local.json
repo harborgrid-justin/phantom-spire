@@ -42,7 +42,8 @@
       "Bash(cp:*)",
       "WebFetch(domain:napi.rs)",
       "WebSearch",
-      "Bash(cargo check:*)"
+      "Bash(cargo check:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

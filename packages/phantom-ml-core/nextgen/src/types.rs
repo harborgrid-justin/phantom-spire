@@ -38,6 +38,7 @@ pub struct TrainingConfig {
     pub batch_size: u32,
     pub validation_split: f64,
     pub cross_validation: bool,
+    pub cross_validation_folds: u32,
 }
 
 impl Default for TrainingConfig {
@@ -47,6 +48,7 @@ impl Default for TrainingConfig {
             batch_size: 32,
             validation_split: 0.2,
             cross_validation: true,
+            cross_validation_folds: 5,
         }
     }
 }

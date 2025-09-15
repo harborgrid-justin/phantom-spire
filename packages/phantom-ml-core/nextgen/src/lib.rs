@@ -59,15 +59,15 @@ pub use napi_bindings::*;
 
 // Export specific high-level functionality
 pub use security::rate_limiter::{
-    AdvancedRateLimiter, RateLimitConfig, ClientPriority, 
+    AdvancedRateLimiter, RateLimitConfig, ClientPriority,
     check_request_allowed, get_rate_limit_stats
 };
 pub use validation::secure_input::{
-    SecureJsonValidator, ValidationResult, validate_model_config, 
+    SecureJsonValidator, ValidationResult, validate_model_config,
     validate_training_data, validate_huggingface_config
 };
 pub use memory::aligned_simd::{
-    AlignedBuffer, SafeSIMDOperations, SIMDInstructionSet, 
+    AlignedBuffer, SafeSIMDOperations, SIMDInstructionSet,
     AlignedMemoryError, AlignedBufferPool
 };
 
@@ -87,11 +87,11 @@ pub fn init_enterprise() -> crate::error::Result<()> {
 
     // Initialize panic handler
     safety::panic_handler::init_panic_handler();
-    
+
     // Initialize rate limiter with enterprise config - ignore errors for now
     let rate_config = security::rate_limiter::RateLimitConfig::enterprise();
     let _ = security::rate_limiter::initialize_rate_limiter(rate_config);
-    
+
     log::info!("Phantom ML Core v{} initialized with enterprise features", VERSION);
     Ok(())
 }
@@ -99,17 +99,17 @@ pub fn init_enterprise() -> crate::error::Result<()> {
 /// Get comprehensive system information
 pub fn get_system_info() -> std::collections::HashMap<String, String> {
     let mut info = std::collections::HashMap::new();
-    
+
     info.insert("version".to_string(), VERSION.to_string());
     info.insert("napi_version".to_string(), NAPI_VERSION.to_string());
     info.insert("enterprise_features".to_string(), ENTERPRISE_FEATURES.to_string());
-    info.insert("simd_support".to_string(), 
+    info.insert("simd_support".to_string(),
         format!("{:?}", memory::aligned_simd::SafeSIMDOperations::detect_simd_support()));
     info.insert("rate_limiter_stats".to_string(),
         format!("{:?}", security::rate_limiter::get_rate_limit_stats()));
     info.insert("panic_stats".to_string(),
         format!("{:?}", safety::panic_handler::get_panic_stats()));
-    
+
     info
 }
 
