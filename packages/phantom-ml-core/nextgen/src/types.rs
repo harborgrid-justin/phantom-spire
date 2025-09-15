@@ -12,6 +12,45 @@ pub struct MLConfig {
     pub target: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[napi(object)]
+pub struct ModelConfig {
+    pub model_type: String,
+    pub algorithm: String,
+    pub hyperparameters: serde_json::Value,
+    pub feature_config: FeatureConfig,
+    pub training_config: TrainingConfig,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[napi(object)]
+pub struct FeatureConfig {
+    pub normalize: bool,
+    pub scale: bool,
+    pub handle_missing: String,
+    pub categorical_encoding: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[napi(object)]
+pub struct TrainingConfig {
+    pub epochs: u32,
+    pub batch_size: u32,
+    pub validation_split: f64,
+    pub cross_validation: bool,
+}
+
+impl Default for TrainingConfig {
+    fn default() -> Self {
+        Self {
+            epochs: 100,
+            batch_size: 32,
+            validation_split: 0.2,
+            cross_validation: true,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[napi(object)]
 pub struct ModelMetadata {

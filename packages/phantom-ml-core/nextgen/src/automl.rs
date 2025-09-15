@@ -3,8 +3,9 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::error::{Result, PhantomMLError};
-use uuid::Uuid;
+use crate::error::Result;
+use crate::types::{ModelConfig, FeatureConfig, TrainingConfig};
+use std::time::Instant;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AutoMLConfig {
@@ -135,7 +136,7 @@ impl AutoMLEngine {
             &engineered_data
         ).await?;
         
-        let training_.time = start_time.elapsed().as_secs();
+        let training_time = start_time.elapsed().as_secs();
         
         Ok(AutoMLResult {
             experiment_id,
@@ -546,4 +547,3 @@ impl AutoFeatureEngineer {
 // Additional helper types and implementations would go here...
 use polars::prelude::*;
 use rand::Rng;
-use crate::types::*;

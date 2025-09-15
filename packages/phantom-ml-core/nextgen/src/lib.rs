@@ -48,8 +48,14 @@ pub use types::*;
 
 // Re-export key modules for easier access
 pub use ml::*;
-pub use enterprise::*;
 pub use database::*;
+
+// NAPI bindings - only compile when napi feature is enabled
+#[cfg(feature = "napi")]
+mod napi_bindings;
+
+#[cfg(feature = "napi")]
+pub use napi_bindings::*;
 
 // Export specific high-level functionality
 pub use security::rate_limiter::{

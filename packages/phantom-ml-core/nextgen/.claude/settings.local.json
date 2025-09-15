@@ -36,7 +36,13 @@
       "Bash(curl:*)",
       "Bash(npm create:*)",
       "Read(//c/Program Files/nodejs/**)",
-      "Bash(set \"LIB=C:\\Users\\justi\\AppData\\Local\\node-gyp\\Cache\\22.19.0\\x64;%LIB%\")"
+      "Bash(set \"LIB=C:\\Users\\justi\\AppData\\Local\\node-gyp\\Cache\\22.19.0\\x64;%LIB%\")",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "WebFetch(domain:napi.rs)",
+      "WebSearch",
+      "Bash(cargo check:*)"
     ],
     "deny": [],
     "ask": []
