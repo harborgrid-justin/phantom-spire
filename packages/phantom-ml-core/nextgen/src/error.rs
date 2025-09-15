@@ -14,6 +14,9 @@ pub enum PhantomMLError {
     #[error("Data processing error: {0}")]
     DataProcessing(String),
 
+    #[error("Data error: {0}")]
+    DataError(String),
+
     #[error("Configuration error: {0}")]
     Configuration(String),
 

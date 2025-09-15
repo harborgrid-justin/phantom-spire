@@ -5,11 +5,13 @@
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::{broadcast, watch};
+use tokio::sync::broadcast;
 use tokio_util::sync::CancellationToken;
 use std::collections::HashMap;
-use napi::{Error as NapiError, Status, JsObject, Env};
+use napi::{Env};
+use napi::bindgen_prelude::{*, Object as JsObject};
 use serde::{Deserialize, Serialize};
+use crate::error::{Result, PhantomMLError};
 
 /// Unique identifier for cancellable operations
 pub type OperationId = u64;
@@ -58,12 +60,25 @@ impl std::fmt::Display for CancellationReason {
     }
 }
 
+impl AsRef<str> for CancellationReason {
+    fn as_ref(&self) -> &str {
+        match self {
+            CancellationReason::UserRequested => "User requested cancellation",
+            CancellationReason::Timeout => "Operation timed out",
+            CancellationReason::SystemShutdown => "System shutdown",
+            CancellationReason::ResourceExhaustion => "Resource exhaustion",
+            CancellationReason::SecurityViolation => "Security violation",
+        }
+    }
+}
+
 /// Cancellable operation handle
+#[derive(Debug, Clone)]
 pub struct CancellableOperation {
     pub metadata: OperationMetadata,
     pub token: CancellationToken,
     pub start_time: Instant,
-    completion_sender: Option<broadcast::Sender<Result<String, CancellationReason>>>,
+    completion_sender: Option<broadcast::Sender<String>>,
 }
 
 impl CancellableOperation {
@@ -83,10 +98,13 @@ impl CancellableOperation {
     }
 
     /// Wait for cancellation with timeout
-    pub async fn cancelled(&self) -> Result<(), tokio::time::error::Elapsed> {
+    pub async fn cancelled(&self) -> Result<()> {
         if let Some(timeout_ms) = self.metadata.timeout_ms {
             let timeout = Duration::from_millis(timeout_ms);
-            tokio::time::timeout(timeout, self.token.cancelled()).await
+            match tokio::time::timeout(timeout, self.token.cancelled()).await {
+                Ok(_) => Ok(()),
+                Err(_) => Err(PhantomMLError::Internal(format!("Operation '{}' timed out", self.metadata.name)))
+            }
         } else {
             self.token.cancelled().await;
             Ok(())
@@ -94,22 +112,16 @@ impl CancellableOperation {
     }
 
     /// Check cancellation periodically during long operations
-    pub async fn check_cancellation(&self) -> Result<(), NapiError> {
+    pub async fn check_cancellation(&self) -> Result<()> {
         if self.is_cancelled() {
-            return Err(NapiError::new(
-                Status::Cancelled,
-                format!("Operation '{}' was cancelled", self.metadata.name)
-            ));
+            return Err(PhantomMLError::Internal(format!("Operation '{}' was cancelled", self.metadata.name)));
         }
 
         // Check timeout
         if let Some(timeout_ms) = self.metadata.timeout_ms {
             let timeout = Duration::from_millis(timeout_ms);
             if self.start_time.elapsed() > timeout {
-                return Err(NapiError::new(
-                    Status::Cancelled,
-                    format!("Operation '{}' timed out after {:?}", self.metadata.name, timeout)
-                ));
+                return Err(PhantomMLError::Internal(format!("Operation '{}' timed out after {:?}", self.metadata.name, timeout)));
             }
         }
 
@@ -117,17 +129,17 @@ impl CancellableOperation {
     }
 
     /// Complete the operation successfully
-    pub fn complete(self, result: String) {
-        if let Some(sender) = self.completion_sender {
-            let _ = sender.send(Ok(result));
+    pub fn complete(&self, result: String) {
+        if let Some(sender) = &self.completion_sender {
+            let _ = sender.send(result);
         }
     }
 
     /// Complete the operation with cancellation
-    pub fn cancel(self, reason: CancellationReason) {
+    pub fn cancel(&self, reason: CancellationReason) {
         self.token.cancel();
-        if let Some(sender) = self.completion_sender {
-            let _ = sender.send(Err(reason));
+        if let Some(sender) = &self.completion_sender {
+            let _ = sender.send(format!("CANCELLED: {}", reason.to_string()));
         }
     }
 }
@@ -201,7 +213,7 @@ impl OperationManager {
 
                 if let Ok(mut ops) = ops_clone.write() {
                     if let Some(op) = ops.remove(&id_clone) {
-                        op.cancel(CancellationReason::Timeout);
+                        op.clone().cancel(CancellationReason::Timeout);
                     }
                 }
             });
@@ -418,11 +430,12 @@ pub struct AbortSignalWrapper {
 
 impl AbortSignalWrapper {
     /// Create wrapper from JavaScript AbortSignal
-    pub fn from_js_signal(env: Env, signal: JsObject) -> Result<Self, NapiError> {
+    pub fn from_js_signal(env: Env, signal: JsObject) -> Result<Self> {
         let aborted = Arc::new(AtomicBool::new(false));
 
         // Check if already aborted
-        let aborted_property: bool = signal.get_named_property("aborted")?;
+        let aborted_property: bool = signal.get_named_property("aborted")
+            .map_err(|e| PhantomMLError::Internal(format!("Failed to get aborted property: {}", e)))?;
         aborted.store(aborted_property, Ordering::Relaxed);
 
         // TODO: Set up event listener for 'abort' event
@@ -473,8 +486,9 @@ pub fn combine_tokens(tokens: Vec<CancellationToken>) -> CancellationToken {
     
     tokio::spawn(async move {
         let mut futures = Vec::new();
-        for token in tokens {
-            futures.push(Box::pin(token.cancelled()));
+        for token in tokens.into_iter() {
+            let token_clone = token.clone();
+            futures.push(Box::pin(async move { token_clone.cancelled().await }));
         }
         
         if !futures.is_empty() {

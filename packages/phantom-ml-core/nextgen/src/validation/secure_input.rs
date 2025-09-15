@@ -535,23 +535,23 @@ impl SecureJsonValidator {
                 }
             }
             Value::Number(n) => {
-                if !n.is_finite() {
-                    return Err(vec![ValidationError {
-                        error_type: ValidationErrorType::InvalidFormat,
-                        message: "Number is not finite (NaN or infinity)".to_string(),
-                        context: context.to_string(),
-                        field_path: Some(path.to_string()),
-                        severity: ErrorSeverity::High,
-                    }]);
-                }
+                if let Some(f) = n.as_f64() {
+                    if !f.is_finite() {
+                        return Err(vec![ValidationError {
+                            error_type: ValidationErrorType::InvalidFormat,
+                            message: "Number is not finite (NaN or infinity)".to_string(),
+                            context: context.to_string(),
+                            field_path: Some(path.to_string()),
+                            severity: ErrorSeverity::High,
+                        }]);
+                    }
 
-                if let Some(value) = n.as_f64() {
-                    if value.abs() > self.max_numeric_value {
+                    if f.abs() > self.max_numeric_value {
                         return Err(vec![ValidationError {
                             error_type: ValidationErrorType::SizeLimit,
                             message: format!(
                                 "Number exceeds maximum allowed value of {} (got {})",
-                                self.max_numeric_value, value
+                                self.max_numeric_value, f
                             ),
                             context: context.to_string(),
                             field_path: Some(path.to_string()),

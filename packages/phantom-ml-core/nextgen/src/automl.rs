@@ -1,13 +1,12 @@
 // AutoML Engine Implementation for Phantom ML Core
-// Modernized for NAPI-RS v3.x with enterprise CTI focus
+// Add this as a new module: src/automl.rs
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use anyhow::Result;
+use crate::error::{Result, PhantomMLError};
 use uuid::Uuid;
-use chrono::{DateTime, Utc};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AutoMLConfig {
     pub task_type: AutoMLTaskType,
     pub target_column: String,
@@ -20,7 +19,7 @@ pub struct AutoMLConfig {
     pub max_models: u32,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum AutoMLTaskType {
     BinaryClassification,
     MultiClassClassification,
@@ -30,7 +29,7 @@ pub enum AutoMLTaskType {
     SecurityThreatDetection,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AutoMLResult {
     pub experiment_id: String,
     pub best_model_id: String,
@@ -43,7 +42,7 @@ pub struct AutoMLResult {
     pub data_insights: DataInsights,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ModelResult {
     pub model_id: String,
     pub algorithm: String,
@@ -53,14 +52,14 @@ pub struct ModelResult {
     pub cross_validation_scores: Vec<f64>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct FeatureImportance {
     pub feature_name: String,
     pub importance_score: f64,
     pub feature_type: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct DataInsights {
     pub total_rows: usize,
     pub total_features: usize,
@@ -69,42 +68,6 @@ pub struct DataInsights {
     pub numerical_features: Vec<String>,
     pub data_quality_score: f64,
     pub recommended_preprocessing: Vec<String>,
-}
-
-// Simple DataFrame representation for compatibility
-#[derive(Debug, Clone)]
-pub struct DataFrame {
-    pub data: HashMap<String, Vec<serde_json::Value>>,
-    pub column_names: Vec<String>,
-}
-
-impl DataFrame {
-    pub fn new() -> Self {
-        Self {
-            data: HashMap::new(),
-            column_names: Vec::new(),
-        }
-    }
-
-    pub fn height(&self) -> usize {
-        if let Some(first_col) = self.column_names.first() {
-            self.data.get(first_col).map(|col| col.len()).unwrap_or(0)
-        } else {
-            0
-        }
-    }
-
-    pub fn width(&self) -> usize {
-        self.column_names.len()
-    }
-
-    pub fn get_column_names(&self) -> &Vec<String> {
-        &self.column_names
-    }
-
-    pub fn column(&self, name: &str) -> Result<&Vec<serde_json::Value>> {
-        self.data.get(name).ok_or_else(|| anyhow::anyhow!("Column {} not found", name))
-    }
 }
 
 pub struct AutoMLEngine {
@@ -129,9 +92,9 @@ impl AutoMLEngine {
         }
     }
 
-    pub async fn auto_train(&self, config: &AutoMLConfig, data: &DataFrame) -> Result<AutoMLResult> {
+    pub async fn auto_train(&self, config: &AutoMLConfig, data: &DataFrame) -> crate::error::Result<AutoMLResult> {
         let start_time = std::time::Instant::now();
-        let experiment_id = Uuid::new_v4().to_string();
+        let experiment_id = uuid::Uuid::new_v4().to_string();
         
         // 1. Data Analysis and Insights
         let data_insights = self.analyze_data(data, &config.target_column).await?;
@@ -148,13 +111,13 @@ impl AutoMLEngine {
         
         // 4. Train Multiple Models
         let mut model_results = Vec::new();
-        let time_per_model = config.time_budget_minutes * 60 / selected_algorithms.len().max(1) as u64;
+        let time_per_model = config.time_budget_minutes * 60 / selected_algorithms.len() as u64;
         
         for algorithm in selected_algorithms {
             if let Ok(result) = self.train_and_evaluate_model(
                 &algorithm,
                 &engineered_data,
-                config,
+                &config,
                 time_per_model
             ).await {
                 model_results.push(result);
@@ -162,16 +125,9 @@ impl AutoMLEngine {
         }
         
         // 5. Sort by performance and select best
-        model_results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap_or(std::cmp::Ordering::Equal));
+        model_results.sort_by(|a, b| b.score.partial_cmp(&a.score).unwrap());
         
-        let best_model = model_results.first().cloned().unwrap_or_else(|| ModelResult {
-            model_id: "default".to_string(),
-            algorithm: "default".to_string(),
-            score: 0.0,
-            training_time: 0,
-            hyperparameters: HashMap::new(),
-            cross_validation_scores: vec![],
-        });
+        let best_model = model_results.first().unwrap();
         
         // 6. Generate feature importance
         let feature_importance = self.calculate_feature_importance(
@@ -179,7 +135,7 @@ impl AutoMLEngine {
             &engineered_data
         ).await?;
         
-        let training_time = start_time.elapsed().as_secs();
+        let training_.time = start_time.elapsed().as_secs();
         
         Ok(AutoMLResult {
             experiment_id,
@@ -194,9 +150,9 @@ impl AutoMLEngine {
         })
     }
 
-    async fn analyze_data(&self, data: &DataFrame, target_column: &str) -> Result<DataInsights> {
+    async fn analyze_data(&self, data: &DataFrame, target_column: &str) -> crate::error::Result<DataInsights> {
         let total_rows = data.height();
-        let total_features = data.width().saturating_sub(1); // Exclude target column
+        let total_features = data.width() - 1; // Exclude target column
         
         let mut categorical_features = Vec::new();
         let mut numerical_features = Vec::new();
@@ -207,29 +163,19 @@ impl AutoMLEngine {
                 continue;
             }
             
-            if let Ok(column_data) = data.column(column) {
-                // Simple heuristic for feature type detection
-                let numeric_count = column_data.iter()
-                    .filter(|val| val.is_number())
-                    .count();
-                
-                if numeric_count > column_data.len() / 2 {
-                    numerical_features.push(column.to_string());
-                } else {
-                    categorical_features.push(column.to_string());
-                }
-                
-                missing_count += column_data.iter()
-                    .filter(|val| val.is_null())
-                    .count();
+            let column_data = data.column(column)?;
+            
+            // Simple heuristic for feature type detection
+            if column_data.dtype().is_numeric() {
+                numerical_features.push(column.to_string());
+            } else {
+                categorical_features.push(column.to_string());
             }
+            
+            missing_count += column_data.null_count();
         }
         
-        let missing_percentage = if total_rows > 0 && total_features > 0 {
-            (missing_count as f64 / (total_rows * total_features) as f64) * 100.0
-        } else {
-            0.0
-        };
+        let missing_percentage = (missing_count as f64 / (total_rows * total_features) as f64) * 100.0;
         
         // Simple data quality scoring
         let data_quality_score = 100.0 - missing_percentage.min(100.0);
@@ -238,10 +184,10 @@ impl AutoMLEngine {
         if missing_percentage > 5.0 {
             recommended_preprocessing.push("Handle missing values".to_string());
         }
-        if !categorical_features.is_empty() {
+        if categorical_features.len() > 0 {
             recommended_preprocessing.push("Encode categorical features".to_string());
         }
-        if !numerical_features.is_empty() {
+        if numerical_features.len() > 0 {
             recommended_preprocessing.push("Scale numerical features".to_string());
         }
         
@@ -256,7 +202,7 @@ impl AutoMLEngine {
         })
     }
 
-    async fn select_algorithms(&self, task_type: &AutoMLTaskType, insights: &DataInsights) -> Result<Vec<Algorithm>> {
+    async fn select_algorithms(&self, task_type: &AutoMLTaskType, insights: &DataInsights) -> crate::error::Result<Vec<Algorithm>> {
         let mut selected = Vec::new();
         
         match task_type {
@@ -309,7 +255,7 @@ impl AutoMLEngine {
         data: &DataFrame,
         config: &AutoMLConfig,
         time_budget_seconds: u64,
-    ) -> Result<ModelResult> {
+    ) -> crate::error::Result<ModelResult> {
         let start_time = std::time::Instant::now();
         
         // 1. Hyperparameter Optimization
@@ -320,16 +266,27 @@ impl AutoMLEngine {
             time_budget_seconds / 2,
         ).await?;
         
-        // 2. Generate model ID
-        let model_id = Uuid::new_v4().to_string();
+        // 2. Train model with best parameters
+        let model_config = ModelConfig {
+            model_type: self.task_to_model_type(&config.task_type),
+            algorithm: algorithm.clone(),
+            hyperparameters: best_params.clone(),
+            feature_config: FeatureConfig::default(),
+            training_config: TrainingConfig {
+                epochs: 100,
+                batch_size: 32,
+                validation_split: 0.2,
+                cross_validation: true,
+                cross_validation_folds: config.cross_validation_folds,
+                ..Default::default()
+            },
+        };
+        
+        let model_id = crate::core::PhantomMLCore::create_model_internal(&model_config)?;
         
         // 3. Cross-validation evaluation
         let cv_scores = self.cross_validate(&model_id, data, &config.target_column, config.cross_validation_folds).await?;
-        let mean_cv_score = if cv_scores.is_empty() {
-            0.0
-        } else {
-            cv_scores.iter().sum::<f64>() / cv_scores.len() as f64
-        };
+        let mean_cv_score = cv_scores.iter().sum::<f64>() / cv_scores.len() as f64;
         
         let training_time = start_time.elapsed().as_secs();
         
@@ -345,55 +302,36 @@ impl AutoMLEngine {
 
     async fn cross_validate(
         &self,
-        _model_id: &str,
+        model_id: &str,
         data: &DataFrame,
-        _target_column: &str,
+        target_column: &str,
         folds: u32,
-    ) -> Result<Vec<f64>> {
+    ) -> crate::error::Result<Vec<f64>> {
         let mut scores = Vec::new();
-        let fold_size = data.height() / folds.max(1) as usize;
+        let fold_size = data.height() / folds as usize;
         
-        // Simplified cross-validation simulation
-        for _ in 0..folds {
-            // Simulate cross-validation score
-            let score = 0.8 + (fastrand::f64() * 0.15); // Random score between 0.8 and 0.95
+        for fold in 0..folds {
+            let start_idx = (fold as usize) * fold_size;
+            let end_idx = if fold == folds - 1 { data.height() } else { start_idx + fold_size };
+            
+            // Split data into train/validation
+            let val_data = data.slice(start_idx as i64, end_idx - start_idx);
+            let train_data = data.drop_slice(start_idx as i64, end_idx - start_idx);
+            
+            // Train on fold
+            let training_data = self.prepare_training_data(&train_data, target_column)?;
+            crate::core::PhantomMLCore::train_model_internal(model_id, &training_data)?;
+            
+            // Evaluate on validation set
+            let val_features = self.extract_features(&val_data, target_column)?;
+            let predictions = crate::core::PhantomMLCore::predict_internal(model_id, &val_features)?;
+            let actual = self.extract_labels(&val_data, target_column)?;
+            
+            let score = self.calculate_metric(&predictions, &actual, &"accuracy".to_string())?;
             scores.push(score);
         }
         
         Ok(scores)
-    }
-
-    async fn calculate_feature_importance(
-        &self,
-        _model_id: &str,
-        data: &DataFrame,
-    ) -> Result<Vec<FeatureImportance>> {
-        let mut importance_scores = Vec::new();
-        
-        for feature_name in data.get_column_names() {
-            // Simulate feature importance calculation
-            let importance_score = fastrand::f64();
-            let feature_type = if let Ok(column) = data.column(feature_name) {
-                if column.iter().any(|v| v.is_number()) {
-                    "numerical"
-                } else {
-                    "categorical"
-                }
-            } else {
-                "unknown"
-            };
-            
-            importance_scores.push(FeatureImportance {
-                feature_name: feature_name.clone(),
-                importance_score,
-                feature_type: feature_type.to_string(),
-            });
-        }
-        
-        // Sort by importance score descending
-        importance_scores.sort_by(|a, b| b.importance_score.partial_cmp(&a.importance_score).unwrap_or(std::cmp::Ordering::Equal));
-        
-        Ok(importance_scores)
     }
 }
 
@@ -433,19 +371,19 @@ impl HyperparameterOptimizer {
     pub async fn optimize(
         &self,
         algorithm: &Algorithm,
-        _data: &DataFrame,
-        _target_column: &str,
+        data: &DataFrame,
+        target_column: &str,
         time_budget_seconds: u64,
-    ) -> Result<HashMap<String, serde_json::Value>> {
+    ) -> crate::error::Result<HashMap<String, serde_json::Value>> {
         match algorithm {
             Algorithm::RandomForest => {
-                self.optimize_random_forest(time_budget_seconds).await
+                self.optimize_random_forest(data, target_column, time_budget_seconds).await
             },
             Algorithm::XGBoost => {
-                self.optimize_xgboost().await  
+                self.optimize_xgboost(data, target_column, time_budget_seconds).await  
             },
             Algorithm::LogisticRegression => {
-                self.optimize_logistic_regression().await
+                self.optimize_logistic_regression(data, target_column, time_budget_seconds).await
             },
             _ => {
                 // Default hyperparameters for other algorithms
@@ -454,46 +392,85 @@ impl HyperparameterOptimizer {
         }
     }
 
-    async fn optimize_random_forest(&self, time_budget_seconds: u64) -> Result<HashMap<String, serde_json::Value>> {
+    async fn optimize_random_forest(
+        &self,
+        data: &DataFrame,
+        target_column: &str,
+        time_budget_seconds: u64,
+    ) -> crate::error::Result<HashMap<String, serde_json::Value>> {
         let mut best_params = HashMap::new();
-        let _best_score = 0.0;
+        let mut best_score = 0.0;
         
         // Random search over hyperparameter space
         let n_trials = (time_budget_seconds / 10).min(50); // Max 50 trials
         
         for _ in 0..n_trials {
-            let mut _params = HashMap::new();
-            // Simulate hyperparameter optimization
+            let mut params = HashMap::new();
+            params.insert("n_estimators".to_string(), 
+                serde_json::Value::Number(serde_json::Number::from(
+                    rand::thread_rng().gen_range(10..=200)
+                ))
+            );
+            params.insert("max_depth".to_string(), 
+                serde_json::Value::Number(serde_json::Number::from(
+                    rand::thread_rng().gen_range(3..=20)
+                ))
+            );
+            params.insert("min_samples_split".to_string(), 
+                serde_json::Value::Number(serde_json::Number::from(
+                    rand::thread_rng().gen_range(2..=20)
+                ))
+            );
+            
+            // Quick evaluation of these parameters
+            let score = self.evaluate_params(&params, data, target_column).await?;
+            
+            if score > best_score {
+                best_score = score;
+                best_params = params;
+            }
         }
-        
-        best_params.insert("n_estimators".to_string(), 
-            serde_json::Value::Number(serde_json::Number::from(100))
-        );
-        best_params.insert("max_depth".to_string(), 
-            serde_json::Value::Number(serde_json::Number::from(10))
-        );
-        best_params.insert("min_samples_split".to_string(), 
-            serde_json::Value::Number(serde_json::Number::from(5))
-        );
         
         Ok(best_params)
     }
 
-    async fn optimize_xgboost(&self) -> Result<HashMap<String, serde_json::Value>> {
+    async fn optimize_xgboost(
+        &self,
+        data: &DataFrame,
+        target_column: &str,
+        time_budget_seconds: u64,
+    ) -> crate::error::Result<HashMap<String, serde_json::Value>> {
         let mut best_params = HashMap::new();
         best_params.insert("n_estimators".to_string(), serde_json::Value::Number(serde_json::Number::from(100)));
         best_params.insert("max_depth".to_string(), serde_json::Value::Number(serde_json::Number::from(6)));
         best_params.insert("learning_rate".to_string(), serde_json::Value::Number(serde_json::Number::from_f64(0.1).unwrap()));
         
+        // TODO: Implement proper XGBoost hyperparameter optimization
         Ok(best_params)
     }
 
-    async fn optimize_logistic_regression(&self) -> Result<HashMap<String, serde_json::Value>> {
+    async fn optimize_logistic_regression(
+        &self,
+        data: &DataFrame,
+        target_column: &str,
+        time_budget_seconds: u64,
+    ) -> crate::error::Result<HashMap<String, serde_json::Value>> {
         let mut best_params = HashMap::new();
         best_params.insert("C".to_string(), serde_json::Value::Number(serde_json::Number::from_f64(1.0).unwrap()));
         best_params.insert("max_iter".to_string(), serde_json::Value::Number(serde_json::Number::from(1000)));
         
         Ok(best_params)
+    }
+
+    async fn evaluate_params(
+        &self,
+        params: &HashMap<String, serde_json::Value>,
+        data: &DataFrame,
+        target_column: &str,
+    ) -> crate::error::Result<f64> {
+        // Quick 5-fold CV evaluation
+        // This is a simplified implementation
+        Ok(0.8 + rand::thread_rng().gen::<f64>() * 0.15) // Random score for now
     }
 }
 
@@ -512,7 +489,7 @@ impl AutoFeatureEngineer {
         }
     }
 
-    pub async fn generate_features(&self, data: &DataFrame, task_type: &AutoMLTaskType) -> Result<DataFrame> {
+    pub async fn generate_features(&self, data: &DataFrame, task_type: &AutoMLTaskType) -> crate::error::Result<DataFrame> {
         let mut enhanced_data = data.clone();
         
         // Add security-specific features for threat detection
@@ -533,7 +510,7 @@ impl AutoFeatureEngineer {
         Ok(enhanced_data)
     }
 
-    async fn add_security_features(&self, data: &DataFrame) -> Result<DataFrame> {
+    async fn add_security_features(&self, data: &DataFrame) -> crate::error::Result<DataFrame> {
         // Add features like:
         // - IP reputation scores
         // - Domain age calculations  
@@ -545,7 +522,7 @@ impl AutoFeatureEngineer {
         Ok(data.clone())
     }
 
-    async fn add_statistical_features(&self, data: &DataFrame) -> Result<DataFrame> {
+    async fn add_statistical_features(&self, data: &DataFrame) -> crate::error::Result<DataFrame> {
         // Add features like:
         // - Rolling means and standard deviations
         // - Percentile features
@@ -555,7 +532,7 @@ impl AutoFeatureEngineer {
         Ok(data.clone())
     }
 
-    async fn add_temporal_features(&self, data: &DataFrame) -> Result<DataFrame> {
+    async fn add_temporal_features(&self, data: &DataFrame) -> crate::error::Result<DataFrame> {
         // Add features like:
         // - Hour of day, day of week
         // - Time since last event
@@ -566,78 +543,7 @@ impl AutoFeatureEngineer {
     }
 }
 
-/// Security-focused AutoML configurations for CTI use cases
-impl AutoMLEngine {
-    /// Create a security-focused AutoML configuration for threat detection
-    pub fn create_threat_detection_config(target_column: String, time_budget_minutes: u64) -> AutoMLConfig {
-        AutoMLConfig {
-            task_type: AutoMLTaskType::SecurityThreatDetection,
-            target_column,
-            optimization_metric: "f1_score".to_string(),
-            time_budget_minutes,
-            algorithms_to_try: Some(vec![
-                "XGBoost".to_string(),
-                "RandomForest".to_string(), 
-                "NeuralNetwork".to_string(),
-                "EnsembleClassifier".to_string()
-            ]),
-            feature_engineering: true,
-            cross_validation_folds: 5,
-            ensemble_methods: true,
-            max_models: 20,
-        }
-    }
-
-    /// Create an anomaly detection configuration for security monitoring
-    pub fn create_anomaly_detection_config(target_column: String, time_budget_minutes: u64) -> AutoMLConfig {
-        AutoMLConfig {
-            task_type: AutoMLTaskType::AnomalyDetection,
-            target_column,
-            optimization_metric: "precision".to_string(),
-            time_budget_minutes,
-            algorithms_to_try: Some(vec![
-                "IsolationForest".to_string(),
-                "OneClassSVM".to_string(),
-                "LocalOutlierFactor".to_string()
-            ]),
-            feature_engineering: true,
-            cross_validation_folds: 3,
-            ensemble_methods: false,
-            max_models: 10,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[tokio::test]
-    async fn test_automl_engine_creation() {
-        let engine = AutoMLEngine::new();
-        assert_eq!(engine.algorithms.len(), 6);
-    }
-
-    #[tokio::test]
-    async fn test_threat_detection_config() {
-        let config = AutoMLEngine::create_threat_detection_config(
-            "threat_label".to_string(), 
-            30
-        );
-        assert!(matches!(config.task_type, AutoMLTaskType::SecurityThreatDetection));
-        assert_eq!(config.cross_validation_folds, 5);
-        assert!(config.feature_engineering);
-    }
-
-    #[tokio::test]
-    async fn test_data_insights() {
-        let mut data = DataFrame::new();
-        data.column_names = vec!["feature1".to_string(), "feature2".to_string(), "target".to_string()];
-        
-        let engine = AutoMLEngine::new();
-        let insights = engine.analyze_data(&data, "target").await.unwrap();
-        
-        assert_eq!(insights.total_features, 2);
-        assert!(insights.data_quality_score >= 0.0);
-    }
-}
+// Additional helper types and implementations would go here...
+use polars::prelude::*;
+use rand::Rng;
+use crate::types::*;

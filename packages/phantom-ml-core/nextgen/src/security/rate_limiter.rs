@@ -167,7 +167,7 @@ pub struct AdvancedRateLimiter {
     global_semaphore: Arc<Semaphore>,
     system_monitor: SystemMonitor,
     adaptive_controller: AdaptiveController,
-    metrics: RateLimiterMetrics,
+    metrics: Arc<RateLimiterMetrics>,
 }
 
 impl AdvancedRateLimiter {
@@ -175,6 +175,7 @@ impl AdvancedRateLimiter {
         config.validate()?;
         
         let semaphore = Arc::new(Semaphore::new(config.max_concurrent_requests as usize));
+        let metrics = RateLimiterMetrics::new();
 
         Ok(Self {
             config,
@@ -182,7 +183,7 @@ impl AdvancedRateLimiter {
             global_semaphore: semaphore,
             system_monitor: SystemMonitor::new(),
             adaptive_controller: AdaptiveController::new(),
-            metrics: RateLimiterMetrics::new(),
+            metrics,
         })
     }
 
@@ -434,11 +435,12 @@ impl SystemMonitor {
         #[cfg(target_os = "macos")]
         {
             // For macOS, we'll use a conservative estimate
-            // In production, consider using macOS-specific APIs
+            // In production, consider use macOS-specific APIs
             return 100; // Conservative default
         }
 
-        0
+        // Default fallback for other operating systems
+        100
     }
 
     fn get_cpu_usage_percent(&self) -> f32 {
@@ -491,22 +493,22 @@ impl AdaptiveController {
         
         // Calculate adjustment factor based on system load
         let cpu_factor = if cpu_usage > base_config.max_cpu_usage_percent * 0.8 {
-            0.5 // Reduce limits when CPU is high
+            0.5f64 // Reduce limits when CPU is high
         } else if cpu_usage < base_config.max_cpu_usage_percent * 0.3 {
-            1.5 // Increase limits when CPU is low
+            1.5f64 // Increase limits when CPU is low
         } else {
-            1.0 // Keep current limits
+            1.0f64 // Keep current limits
         };
 
         let memory_factor = if memory_usage > base_config.max_memory_usage_mb * 4 / 5 {
-            0.7 // Reduce limits when memory is high
+            0.7f64 // Reduce limits when memory is high
         } else if memory_usage < base_config.max_memory_usage_mb / 3 {
-            1.3 // Increase limits when memory is low
+            1.3f64 // Increase limits when memory is low
         } else {
-            1.0
+            1.0f64
         };
 
-        let adjustment_factor = (cpu_factor * memory_factor).clamp(0.2, 2.0);
+        let adjustment_factor = (cpu_factor * memory_factor).clamp(0.2f64, 2.0f64);
 
         // Record adjustment for analysis
         let mut history = self.adjustment_history.lock();

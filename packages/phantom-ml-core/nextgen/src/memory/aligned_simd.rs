@@ -4,7 +4,7 @@
 
 use std::alloc::{alloc, dealloc, Layout};
 use std::ptr::NonNull;
-use std::mem::{align_of, size_of};
+use std::mem::size_of;
 use std::slice;
 use serde::{Deserialize, Serialize};
 

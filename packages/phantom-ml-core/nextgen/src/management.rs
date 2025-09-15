@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use anyhow::{Result, anyhow};
+use anyhow::Result;
 
 /// Management operations extension trait for PhantomMLCore
 pub trait ManagementOperations {
@@ -185,7 +185,7 @@ impl ModelValidator {
     /// Validate model performance metrics
     pub fn validate_performance(model: &MLModel) -> Result<ValidationResult, String> {
         let mut issues = Vec::new();
-        let mut score = 100.0;
+        let mut score: f64 = 100.0;
 
         // Check accuracy range
         if model.accuracy < 0.0 || model.accuracy > 1.0 {
@@ -359,7 +359,7 @@ impl ModelOptimizer {
     /// Apply performance optimization to a model
     pub fn optimize_performance(
         model: &mut MLModel,
-        learning_rate: f64,
+        _learning_rate: f64,
     ) -> OptimizationResult {
         let original_performance = model.f1_score;
 

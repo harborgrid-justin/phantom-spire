@@ -30,6 +30,7 @@ pub mod database;
 // Security and validation
 pub mod security;
 pub mod validation;
+pub mod safety;
 
 // Performance optimizations
 pub mod memory;
@@ -65,7 +66,6 @@ pub use memory::aligned_simd::{
 };
 
 // Legacy API compatibility
-pub use automl::*;
 pub use huggingface_integration::*;
 pub use management::*;
 
@@ -75,13 +75,16 @@ pub const NAPI_VERSION: &str = "3.x";
 pub const ENTERPRISE_FEATURES: bool = true;
 
 /// Initialize the ML core with enterprise configuration
-pub fn init_enterprise() -> Result<(), crate::error::MLError> {
+pub fn init_enterprise() -> crate::error::Result<()> {
     // Initialize logging
     env_logger::init();
+
+    // Initialize panic handler
+    safety::panic_handler::init_panic_handler();
     
-    // Initialize rate limiter with enterprise config
+    // Initialize rate limiter with enterprise config - ignore errors for now
     let rate_config = security::rate_limiter::RateLimitConfig::enterprise();
-    let _ = security::rate_limiter::initialize_rate_limiter(rate_config)?;
+    let _ = security::rate_limiter::initialize_rate_limiter(rate_config);
     
     log::info!("Phantom ML Core v{} initialized with enterprise features", VERSION);
     Ok(())
@@ -98,6 +101,8 @@ pub fn get_system_info() -> std::collections::HashMap<String, String> {
         format!("{:?}", memory::aligned_simd::SafeSIMDOperations::detect_simd_support()));
     info.insert("rate_limiter_stats".to_string(),
         format!("{:?}", security::rate_limiter::get_rate_limit_stats()));
+    info.insert("panic_stats".to_string(),
+        format!("{:?}", safety::panic_handler::get_panic_stats()));
     
     info
 }

@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 use tokio::sync::RwLock;
 use std::sync::Arc;
-use uuid::Uuid;
+// Remove unused uuid import
 
 /// Hugging Face model integration for CTI applications
 pub struct HuggingFaceIntegration {
@@ -157,7 +157,7 @@ impl HuggingFaceIntegration {
     }
 
     /// Security-specific text classification for CTI
-    async fn predict_text_classification(&self, model: &HuggingFaceModel, input: serde_json::Value) -> Result<serde_json::Value> {
+    async fn predict_text_classification(&self, _model: &HuggingFaceModel, input: serde_json::Value) -> Result<serde_json::Value> {
         let text = input.get("text")
             .and_then(|t| t.as_str())
             .ok_or_else(|| anyhow!("Input must contain 'text' field"))?;
@@ -228,7 +228,7 @@ impl HuggingFaceIntegration {
     }
 
     /// Image classification for malware detection
-    async fn predict_image_classification(&self, model: &HuggingFaceModel, input: serde_json::Value) -> Result<serde_json::Value> {
+    async fn predict_image_classification(&self, _model: &HuggingFaceModel, input: serde_json::Value) -> Result<serde_json::Value> {
         let image_path = input.get("image_path")
             .and_then(|p| p.as_str())
             .ok_or_else(|| anyhow!("Input must contain 'image_path' field"))?;
