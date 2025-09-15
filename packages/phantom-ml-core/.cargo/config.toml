@@ -1,0 +1,60 @@
+[build]
+# Enable parallel compilation
+jobs = 0  # Use all available cores
+
+[target.x86_64-pc-windows-msvc]
+# Windows-specific optimizations
+rustflags = ["-C", "target-cpu=native", "-C", "link-arg=/INCREMENTAL:NO"]
+
+[target.x86_64-apple-darwin]
+# macOS Intel optimizations
+rustflags = ["-C", "target-cpu=native"]
+
+[target.aarch64-apple-darwin]
+# macOS Apple Silicon optimizations
+rustflags = ["-C", "target-cpu=native"]
+
+[target.x86_64-unknown-linux-gnu]
+# Linux optimizations
+rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-Wl,-z,relro,-z,now"]
+
+[target.aarch64-unknown-linux-gnu]
+# ARM64 Linux optimizations
+rustflags = ["-C", "target-cpu=native"]
+
+[profile.release]
+# Maximum optimization for release builds
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
+
+[profile.dev]
+# Faster debug builds
+opt-level = 0
+debug = true
+overflow-checks = true
+
+[profile.bench]
+# Benchmark-specific optimizations
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+debug = false
+
+[env]
+# NAPI-RS specific environment variables
+NAPI_RS_FORCE_WASI = "false"
+CARGO_CFG_TARGET_FEATURE = "crt-static"
+
+# Performance-related environment variables
+RUST_MIN_STACK = "8388608"  # 8MB stack size
+RAYON_NUM_THREADS = "0"     # Use all available cores
+
+[alias]
+# Convenient build aliases
+napi-build = "build --features napi --release"
+napi-test = "test --features napi"
+napi-check = "check --features napi --all-targets"
+napi-clippy = "clippy --features napi --all-targets -- -D warnings"

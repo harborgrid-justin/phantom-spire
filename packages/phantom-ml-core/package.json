@@ -30,8 +30,25 @@
   "napi": {
     "binaryName": "phantom-ml-core",
     "targets": [
-      "x86_64-pc-windows-msvc"
-    ]
+      "x86_64-pc-windows-msvc",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-musl"
+    ],
+    "triples": {
+      "defaults": true,
+      "additional": [
+        "aarch64-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf"
+      ]
+    },
+    "package": {
+      "name": "@phantom-spire/ml-core",
+      "from": "phantom-ml-core"
+    }
   },
   "engines": {
     "node": ">=16.0.0",
@@ -43,21 +60,39 @@
     "build:debug": "napi build --platform --features napi",
     "build:enterprise": "napi build --platform --release --features enterprise",
     "build:full": "napi build --platform --release --features full",
-    "clean": "rimraf dist",
+    "build:optimized": "napi build --platform --release --features napi-optimized",
+    "build:all-targets": "napi build --platform --release --target x86_64-pc-windows-msvc --target x86_64-apple-darwin --target aarch64-apple-darwin --target x86_64-unknown-linux-gnu --target aarch64-unknown-linux-gnu",
+    "clean": "rimraf dist target/release target/debug *.node",
+    "clean:artifacts": "rimraf *.node npm",
     "prepublishOnly": "napi prepublish -t npm",
     "test": "cargo test --features enterprise",
     "test:native": "cargo test --all-features",
+    "test:napi": "node -e \"const { PhantomMLCore } = require('./'); console.log('✅ NAPI module loaded successfully');\"",
+    "test:integration": "npm run build && npm run test:napi",
+    "bench": "cargo bench --features enterprise",
     "universal": "napi universal",
     "version": "napi version",
-    "lint": "cargo clippy --features enterprise",
-    "fmt": "cargo fmt"
+    "lint": "cargo clippy --features enterprise -- -D warnings",
+    "lint:fix": "cargo clippy --features enterprise --fix --allow-dirty",
+    "fmt": "cargo fmt",
+    "fmt:check": "cargo fmt -- --check",
+    "check": "cargo check --all-features",
+    "check:napi": "cargo check --features napi",
+    "doc": "cargo doc --no-deps --features enterprise",
+    "validate": "npm run fmt:check && npm run lint && npm run check && npm run test"
   },
   "devDependencies": {
     "@napi-rs/cli": "^3.2.0",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "c8": "^8.0.0"
   },
-  "ava": {
-    "timeout": "3m"
+  "c8": {
+    "reporter": ["text", "lcov", "html"],
+    "exclude": ["node_modules/**", "target/**", "dist/**", "*.d.ts"]
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",

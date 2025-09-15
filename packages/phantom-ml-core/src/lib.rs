@@ -60,6 +60,7 @@ pub mod enterprise_operations;
 // Utility modules
 pub mod utils;
 pub mod napi_bindings;
+pub mod performance;
 
 // ============================================================================
 // Core Type Re-exports

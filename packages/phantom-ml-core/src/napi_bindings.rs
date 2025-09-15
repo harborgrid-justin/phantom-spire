@@ -1,32 +1,187 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
+use napi::{JsUnknown, Result as NapiResult, Status, Error as NapiError, Env, CallContext};
+use std::sync::Arc;
+use std::collections::HashMap;
 use crate::core::PhantomMLCore;
 use crate::{TrainingOperations, InferenceOperations, ManagementOperations};
 
-// Convert String errors to NAPI errors
-fn string_to_napi_error(err: String) -> napi::Error {
-    napi::Error::from_reason(err)
+/// Advanced error handling with context and structured error responses
+#[derive(Debug, Clone)]
+pub struct StructuredError {
+    pub code: String,
+    pub message: String,
+    pub details: Option<String>,
+    pub context: Option<HashMap<String, String>>,
 }
 
-/// Simple test function to verify NAPI is working
-#[napi]
-pub fn test_napi() -> String {
-    "NAPI is working!".to_string()
+impl StructuredError {
+    pub fn new(code: &str, message: &str) -> Self {
+        Self {
+            code: code.to_string(),
+            message: message.to_string(),
+            details: None,
+            context: None,
+        }
+    }
+
+    pub fn with_details(mut self, details: &str) -> Self {
+        self.details = Some(details.to_string());
+        self
+    }
+
+    pub fn with_context(mut self, key: &str, value: &str) -> Self {
+        if self.context.is_none() {
+            self.context = Some(HashMap::new());
+        }
+        self.context.as_mut().unwrap().insert(key.to_string(), value.to_string());
+        self
+    }
 }
 
-/// Get version information
+/// Convert structured errors to NAPI errors with proper error codes
+fn structured_error_to_napi(err: StructuredError) -> NapiError {
+    let status = match err.code.as_str() {
+        "VALIDATION_ERROR" => Status::InvalidArg,
+        "NOT_FOUND" => Status::InvalidArg,
+        "INTERNAL_ERROR" => Status::GenericFailure,
+        "PERMISSION_DENIED" => Status::InvalidArg,
+        "TIMEOUT" => Status::Cancelled,
+        _ => Status::GenericFailure,
+    };
+
+    let mut message = format!("{}: {}", err.code, err.message);
+    if let Some(details) = err.details {
+        message.push_str(&format!(" ({})", details));
+    }
+
+    NapiError::new(status, message)
+}
+
+/// Convert String errors to structured NAPI errors
+fn string_to_napi_error(err: String) -> NapiError {
+    structured_error_to_napi(StructuredError::new("INTERNAL_ERROR", &err))
+}
+
+/// Enhanced result type for NAPI operations
+type NapiMlResult<T> = std::result::Result<T, StructuredError>;
+
+/// Convert ML results to NAPI results
+fn ml_result_to_napi<T>(result: NapiMlResult<T>) -> NapiResult<T> {
+    result.map_err(structured_error_to_napi)
+}
+
+/// Validate JSON input with proper error handling
+fn validate_json_input(input: &str, context: &str) -> NapiMlResult<()> {
+    if input.trim().is_empty() {
+        return Err(StructuredError::new("VALIDATION_ERROR", "Input cannot be empty")
+            .with_context("input_type", context));
+    }
+
+    if !input.trim_start().starts_with('{') && !input.trim_start().starts_with('[') {
+        return Err(StructuredError::new("VALIDATION_ERROR", "Input must be valid JSON")
+            .with_context("input_type", context)
+            .with_details(&format!("Received: {}", input.chars().take(50).collect::<String>())));
+    }
+
+    Ok(())
+}
+
+/// Thread-safe core instance with proper resource management
+#[cfg(feature = "napi")]
+static CORE_INSTANCE: once_cell::sync::Lazy<Arc<std::sync::Mutex<Option<PhantomMLCore>>>> =
+    once_cell::sync::Lazy::new(|| Arc::new(std::sync::Mutex::new(None)));
+
+/// Enhanced test function with error handling and performance metrics
 #[napi]
-pub fn get_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
+pub fn test_napi() -> NapiResult<String> {
+    let start = std::time::Instant::now();
+    let result = "NAPI is working!".to_string();
+    let duration = start.elapsed();
+
+    Ok(format!("{} (initialized in {:?})", result, duration))
+}
+
+/// Get comprehensive version and build information
+#[napi]
+pub fn get_version() -> NapiResult<String> {
+    let version_info = serde_json::json!({
+        "version": env!("CARGO_PKG_VERSION"),
+        "build_target": env!("TARGET"),
+        "build_profile": if cfg!(debug_assertions) { "debug" } else { "release" },
+        "napi_version": "3.3.0",
+        "features": {
+            "enterprise": cfg!(feature = "enterprise"),
+            "napi_optimized": cfg!(feature = "napi-optimized"),
+            "databases": cfg!(feature = "all-databases")
+        }
+    });
+
+    Ok(version_info.to_string())
+}
+
+/// Initialize global core instance with proper error handling
+#[napi]
+pub fn initialize_core() -> NapiResult<String> {
+    #[cfg(feature = "napi")]
+    {
+        let mut core_guard = CORE_INSTANCE.lock().map_err(|_| {
+            structured_error_to_napi(StructuredError::new("INTERNAL_ERROR", "Failed to acquire core lock"))
+        })?;
+
+        if core_guard.is_some() {
+            return Ok("Core already initialized".to_string());
+        }
+
+        let core = PhantomMLCore::new().map_err(string_to_napi_error)?;
+        *core_guard = Some(core);
+
+        Ok("Core initialized successfully".to_string())
+    }
+
+    #[cfg(not(feature = "napi"))]
+    Err(structured_error_to_napi(StructuredError::new("FEATURE_NOT_ENABLED", "NAPI feature not enabled")))
+}
+
+/// Get core instance with proper error handling
+#[cfg(feature = "napi")]
+fn get_core_instance() -> NapiMlResult<PhantomMLCore> {
+    let core_guard = CORE_INSTANCE.lock().map_err(|_| {
+        StructuredError::new("INTERNAL_ERROR", "Failed to acquire core lock")
+    })?;
+
+    match core_guard.as_ref() {
+        Some(core) => Ok(core.clone()),
+        None => {
+            drop(core_guard);
+            // Try to initialize if not already done
+            let core = PhantomMLCore::new().map_err(|e| {
+                StructuredError::new("INITIALIZATION_ERROR", &format!("Failed to create core: {}", e))
+            })?;
+            Ok(core)
+        }
+    }
 }
 
 // ==================== MODEL MANAGEMENT (13 endpoints) ====================
 
-/// Create a new ML model with specified configuration
+/// Create a new ML model with specified configuration and enhanced validation
 #[napi]
-pub fn create_model(config_json: String) -> Result<String> {
-    let core = PhantomMLCore::new().map_err(string_to_napi_error)?;
-    core.create_model(config_json).map_err(string_to_napi_error).map_err(string_to_napi_error)
+pub fn create_model(config_json: String) -> NapiResult<String> {
+    validate_json_input(&config_json, "model_config")
+        .map_err(structured_error_to_napi)?;
+
+    #[cfg(feature = "napi")]
+    {
+        let core = get_core_instance().map_err(structured_error_to_napi)?;
+        core.create_model(config_json).map_err(string_to_napi_error)
+    }
+
+    #[cfg(not(feature = "napi"))]
+    {
+        let core = PhantomMLCore::new().map_err(string_to_napi_error)?;
+        core.create_model(config_json).map_err(string_to_napi_error)
+    }
 }
 
 /// Train a model with provided training data

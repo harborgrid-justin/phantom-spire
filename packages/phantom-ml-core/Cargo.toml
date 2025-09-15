@@ -10,15 +10,30 @@ repository = "https://github.com/harborgrid-justin/phantom-spire"
 documentation = "https://docs.rs/phantom-ml-core"
 keywords = ["cybersecurity", "phantom-spire", "security", "machine-learning", "ml"]
 categories = ["web-programming", "api-bindings", "science"]
+rust-version = "1.70.0"
+readme = "README.md"
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+    "build.rs"
+]
 
 [lib]
 name = "phantom_ml_core"
 crate-type = ["cdylib"]
+bench = false
+doc = true
 
 [dependencies]
-# Core NAPI dependencies - standardized versions
-napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
+# Core NAPI dependencies - latest stable versions with optimal configuration
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt", "error_anyhow", "compat-mode"], optional = true }
 napi-derive = { version = "3.2.5", optional = true }
+
+# NAPI-RS optimization dependencies
+once_cell = { version = "1.19", optional = true }
+lazy_static = { version = "1.5", optional = true }
 
 # Core serialization and data handling - required for all packages
 serde = { version = "1.0", features = ["derive"] }
@@ -121,8 +136,21 @@ flate2 = { version = "1.0", optional = true }
 default = ["local"]
 
 # Core features
-napi = ["dep:napi", "dep:napi-derive"]
+napi = ["dep:napi", "dep:napi-derive", "dep:once_cell", "dep:lazy_static"]
 local = []
+
+# NAPI-RS optimization features
+napi-optimized = ["napi", "napi-async", "napi-memory"]
+napi-async = ["napi"]
+napi-memory = ["napi"]
+napi-strict = ["napi"]
+napi-experimental = ["napi", "candle-core", "candle-nn"]
+
+# Performance optimization features
+optimized = ["napi-optimized"]
+simd = []
+parallel = ["rayon"]
+memory-efficient = ["napi-memory"]
 
 # Database backends
 postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
