@@ -39,10 +39,10 @@ impl From<serde_json::Error> for PhantomMLError {
     }
 }
 
-impl From<polars::error::PolarsError> for PhantomMLError {
-    fn from(err: polars::error::PolarsError) -> Self {
-        PhantomMLError::DataProcessing(format!("Polars error: {}", err))
-    }
-}
+// impl From<polars::error::PolarsError> for PhantomMLError {
+//     fn from(err: polars::error::PolarsError) -> Self {
+//         PhantomMLError::DataProcessing(format!("Polars error: {}", err))
+//     }
+// }
 
 pub type Result<T> = std::result::Result<T, PhantomMLError>;

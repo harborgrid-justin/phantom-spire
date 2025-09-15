@@ -572,11 +572,13 @@ impl AutoFeatureEngineer {
         Ok(vec![
             FeatureImportance {
                 feature_name: "feature_1".to_string(),
-                importance: 0.8,
+                importance_score: 0.8,
+                feature_type: "numerical".to_string(),
             },
             FeatureImportance {
                 feature_name: "feature_2".to_string(),
-                importance: 0.6,
+                importance_score: 0.6,
+                feature_type: "categorical".to_string(),
             },
         ])
     }
@@ -614,6 +616,7 @@ impl AutoFeatureEngineer {
             score: 0.85 + rand::random::<f64>() * 0.1,
             training_time: 60,
             hyperparameters: std::collections::HashMap::new(),
+            cross_validation_scores: vec![0.8, 0.85, 0.82, 0.87, 0.83],
         })
     }
 

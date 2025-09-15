@@ -4,8 +4,8 @@ use crate::error::{PhantomMLError, Result};
 use crate::types::*;
 use crate::enterprise::{EnterpriseConfig, EnterpriseOperations, TenantConfig, AuditLogEntry};
 use crate::database::InMemoryDatabase;
-use crate::ml::{TrainingOperations, InferenceOperations, AnalyticsOperations, AutoMLOperations};
-use crate::automl::{AutoMLEngine, AutoMLConfig};
+use crate::ml::{TrainingOperations, InferenceOperations, AnalyticsOperations};
+//use crate::automl::{AutoMLEngine, AutoMLConfig};
 use async_trait::async_trait;
 use napi_derive::napi;
 use parking_lot::Mutex;
@@ -733,6 +733,7 @@ impl InferenceOperations for PhantomMLCore {
     }
 }
 
+/*
 #[async_trait]
 impl AutoMLOperations for PhantomMLCore {
     async fn auto_train_model(&self, config_json: String) -> Result<String> {
@@ -951,6 +952,7 @@ impl AutoMLOperations for PhantomMLCore {
             .map_err(|e| PhantomMLError::Configuration(format!("Failed to serialize security features: {}", e)))
     }
 }
+*/
 
 impl AnalyticsOperations for PhantomMLCore {
     fn generate_insights(&self, analysis_config_json: String) -> Result<String> {

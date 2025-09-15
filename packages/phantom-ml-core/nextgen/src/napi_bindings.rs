@@ -4,6 +4,7 @@ use napi::{Result as NapiResult, Status, Error as NapiError};
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::core::PhantomMLCore;
+use crate::types::MLConfig;
 use crate::{TrainingOperations, InferenceOperations, ManagementOperations};
 
 /// Advanced error handling with context and structured error responses
@@ -186,9 +187,11 @@ pub fn create_model(config_json: String) -> NapiResult<String> {
 
 /// Train a model with provided training data
 #[napi]
-pub async fn train_model(model_id: String, training_data_json: String) -> NapiResult<String> {
+pub fn train_model(config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.train_model(model_id, training_data_json).await.map_err(string_to_napi_error)
+    let config: MLConfig = serde_json::from_str(&config_json)
+        .map_err(|e| NapiError::from_reason(format!("Failed to parse config: {}", e)))?;
+    core.train_model(config).map_err(string_to_napi_error)
 }
 
 /// Get detailed information about a specific model
@@ -272,291 +275,291 @@ pub fn optimize_model(model_id: String, optimization_config_json: String) -> Nap
 
 /// Performs single inference using a trained model
 #[napi]
-pub async fn predict(model_id: String, features_json: String) -> NapiResult<String> {
+pub fn predict(model_id: String, features_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.predict(model_id, features_json).map_err(string_to_napi_error).await
+    core.predict(model_id, features_json).map_err(string_to_napi_error)
 }
 
 /// Performs batch inference for high-throughput processing
 #[napi]
-pub async fn predict_batch(model_id: String, batch_features_json: String) -> NapiResult<String> {
+pub fn predict_batch(model_id: String, batch_features_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.predict_batch(model_id, batch_features_json).map_err(string_to_napi_error).await
+    core.predict_batch(model_id, batch_features_json).map_err(string_to_napi_error)
 }
 
 /// Detects anomalies in data with configurable sensitivity
 #[napi]
-pub async fn detect_anomalies(data_json: String, sensitivity: f64) -> NapiResult<String> {
+pub fn detect_anomalies(data_json: String, sensitivity: f64) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.detect_anomalies(data_json, sensitivity).map_err(string_to_napi_error).await
+    core.detect_anomalies(data_json, sensitivity).map_err(string_to_napi_error)
 }
 
 // ==================== FEATURE ENGINEERING (1 endpoint) ====================
 
 /// Performs advanced feature engineering on raw data
 #[napi]
-pub async fn engineer_features(raw_data_json: String, feature_config_json: String) -> NapiResult<String> {
+pub fn engineer_features(raw_data_json: String, feature_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.engineer_features(raw_data_json, feature_config_json).map_err(string_to_napi_error).await
+    core.engineer_features(raw_data_json, feature_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== ANALYTICS & INSIGHTS (7 endpoints) ====================
 
 /// Generates comprehensive analytics and insights from data
 #[napi]
-pub async fn generate_insights(analysis_config_json: String) -> NapiResult<String> {
+pub fn generate_insights(analysis_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.generate_insights(analysis_config_json).map_err(string_to_napi_error).await
+    core.generate_insights(analysis_config_json).map_err(string_to_napi_error)
 }
 
 /// Performs time series and trend analysis on data
 #[napi]
-pub async fn trend_analysis(data_json: String, trend_config_json: String) -> NapiResult<String> {
+pub fn trend_analysis(data_json: String, trend_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.trend_analysis(data_json, trend_config_json).map_err(string_to_napi_error).await
+    core.trend_analysis(data_json, trend_config_json).map_err(string_to_napi_error)
 }
 
 /// Performs feature correlation analysis
 #[napi]
-pub async fn correlation_analysis(data_json: String) -> NapiResult<String> {
+pub fn correlation_analysis(data_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.correlation_analysis(data_json).map_err(string_to_napi_error).await
+    core.correlation_analysis(data_json).map_err(string_to_napi_error)
 }
 
 /// Generates comprehensive statistical summaries of data
 #[napi]
-pub async fn statistical_summary(data_json: String) -> NapiResult<String> {
+pub fn statistical_summary(data_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.statistical_summary(data_json).map_err(string_to_napi_error).await
+    core.statistical_summary(data_json).map_err(string_to_napi_error)
 }
 
 /// Data quality assessment and scoring
 #[napi]
-pub async fn data_quality_assessment(data_json: String, quality_config_json: String) -> NapiResult<String> {
+pub fn data_quality_assessment(data_json: String, quality_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.data_quality_assessment(data_json, quality_config_json).map_err(string_to_napi_error).await
+    core.data_quality_assessment(data_json, quality_config_json).map_err(string_to_napi_error)
 }
 
 /// Feature importance ranking and analysis
 #[napi]
-pub async fn feature_importance_analysis(model_id: String, analysis_config_json: String) -> NapiResult<String> {
+pub fn feature_importance_analysis(model_id: String, analysis_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.feature_importance_analysis(model_id, analysis_config_json).map_err(string_to_napi_error).await
+    core.feature_importance_analysis(model_id, analysis_config_json).map_err(string_to_napi_error)
 }
 
 /// Model decision explanations and interpretability
 #[napi]
-pub async fn model_explainability(model_id: String, prediction_id: String, explain_config_json: String) -> NapiResult<String> {
+pub fn model_explainability(model_id: String, prediction_id: String, explain_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.model_explainability(model_id, prediction_id, explain_config_json).map_err(string_to_napi_error).await
+    core.model_explainability(model_id, prediction_id, explain_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== STREAMING & BATCH PROCESSING (2 endpoints) ====================
 
 /// Real-time streaming predictions
 #[napi]
-pub async fn stream_predict(model_id: String, stream_config_json: String) -> NapiResult<String> {
+pub fn stream_predict(model_id: String, stream_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.stream_predict(model_id, stream_config_json).map_err(string_to_napi_error).await
+    core.stream_predict(model_id, stream_config_json).map_err(string_to_napi_error)
 }
 
 /// Asynchronous batch processing
 #[napi]
-pub async fn batch_process_async(model_id: String, batch_data_json: String) -> NapiResult<String> {
+pub fn batch_process_async(model_id: String, batch_data_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.batch_process_async(model_id, batch_data_json).map_err(string_to_napi_error).await
+    core.batch_process_async(model_id, batch_data_json).map_err(string_to_napi_error)
 }
 
 // ==================== MONITORING & HEALTH (3 endpoints) ====================
 
 /// Real-time performance monitoring
 #[napi]
-pub async fn real_time_monitor(monitor_config_json: String) -> NapiResult<String> {
+pub fn real_time_monitor(monitor_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.real_time_monitor(monitor_config_json).map_err(string_to_napi_error).await
+    core.real_time_monitor(monitor_config_json).map_err(string_to_napi_error)
 }
 
 /// System performance metrics
 #[napi]
-pub async fn get_performance_stats() -> NapiResult<String> {
+pub fn get_performance_stats() -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.get_performance_stats().map_err(string_to_napi_error).await
+    core.get_performance_stats().map_err(string_to_napi_error)
 }
 
 /// System health diagnostics
 #[napi]
-pub async fn get_system_health() -> NapiResult<String> {
+pub fn get_system_health() -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.get_system_health().map_err(string_to_napi_error).await
+    core.get_system_health().map_err(string_to_napi_error)
 }
 
 // ==================== ALERTING & EVENTS (3 endpoints) ====================
 
 /// Automated alert generation
 #[napi]
-pub async fn alert_engine(alert_rules_json: String) -> NapiResult<String> {
+pub fn alert_engine(alert_rules_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.alert_engine(alert_rules_json).map_err(string_to_napi_error).await
+    core.alert_engine(alert_rules_json).map_err(string_to_napi_error)
 }
 
 /// Dynamic threshold management
 #[napi]
-pub async fn threshold_management(threshold_config_json: String) -> NapiResult<String> {
+pub fn threshold_management(threshold_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.threshold_management(threshold_config_json).map_err(string_to_napi_error).await
+    core.threshold_management(threshold_config_json).map_err(string_to_napi_error)
 }
 
 /// Event-driven processing
 #[napi]
-pub async fn event_processor(event_config_json: String) -> NapiResult<String> {
+pub fn event_processor(event_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.event_processor(event_config_json).map_err(string_to_napi_error).await
+    core.event_processor(event_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== COMPLIANCE & SECURITY (3 endpoints) ====================
 
 /// Comprehensive audit logging
 #[napi]
-pub async fn audit_trail(audit_config_json: String) -> NapiResult<String> {
+pub fn audit_trail(audit_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.audit_trail(audit_config_json).map_err(string_to_napi_error).await
+    core.audit_trail(audit_config_json).map_err(string_to_napi_error)
 }
 
 /// Regulatory compliance reports
 #[napi]
-pub async fn compliance_report(report_config_json: String) -> NapiResult<String> {
+pub fn compliance_report(report_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.compliance_report(report_config_json).map_err(string_to_napi_error).await
+    core.compliance_report(report_config_json).map_err(string_to_napi_error)
 }
 
 /// Security assessment and scanning
 #[napi]
-pub async fn security_scan(scan_config_json: String) -> NapiResult<String> {
+pub fn security_scan(scan_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.security_scan(scan_config_json).map_err(string_to_napi_error).await
+    core.security_scan(scan_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== OPERATIONS & BACKUP (2 endpoints) ====================
 
 /// System backup and data protection
 #[napi]
-pub async fn backup_system(backup_config_json: String) -> NapiResult<String> {
+pub fn backup_system(backup_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.backup_system(backup_config_json).map_err(string_to_napi_error).await
+    core.backup_system(backup_config_json).map_err(string_to_napi_error)
 }
 
 /// Disaster recovery procedures
 #[napi]
-pub async fn disaster_recovery(recovery_config_json: String) -> NapiResult<String> {
+pub fn disaster_recovery(recovery_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.disaster_recovery(recovery_config_json).map_err(string_to_napi_error).await
+    core.disaster_recovery(recovery_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== BUSINESS INTELLIGENCE (5 endpoints) ====================
 
 /// ROI calculation and business metrics
 #[napi]
-pub async fn roi_calculator(roi_config_json: String) -> NapiResult<String> {
+pub fn roi_calculator(roi_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.roi_calculator(roi_config_json).map_err(string_to_napi_error).await
+    core.roi_calculator(roi_config_json).map_err(string_to_napi_error)
 }
 
 /// Cost-benefit analysis
 #[napi]
-pub async fn cost_benefit_analysis(analysis_config_json: String) -> NapiResult<String> {
+pub fn cost_benefit_analysis(analysis_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.cost_benefit_analysis(analysis_config_json).map_err(string_to_napi_error).await
+    core.cost_benefit_analysis(analysis_config_json).map_err(string_to_napi_error)
 }
 
 /// Performance forecasting
 #[napi]
-pub async fn performance_forecasting(forecast_config_json: String) -> NapiResult<String> {
+pub fn performance_forecasting(forecast_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.performance_forecasting(forecast_config_json).map_err(string_to_napi_error).await
+    core.performance_forecasting(forecast_config_json).map_err(string_to_napi_error)
 }
 
 /// Resource optimization analytics
 #[napi]
-pub async fn resource_optimization(optimization_config_json: String) -> NapiResult<String> {
+pub fn resource_optimization(optimization_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.resource_optimization(optimization_config_json).map_err(string_to_napi_error).await
+    core.resource_optimization(optimization_config_json).map_err(string_to_napi_error)
 }
 
 /// Business KPI tracking
 #[napi]
-pub async fn business_metrics(metrics_config_json: String) -> NapiResult<String> {
+pub fn business_metrics(metrics_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.business_metrics(metrics_config_json).map_err(string_to_napi_error).await
+    core.business_metrics(metrics_config_json).map_err(string_to_napi_error)
 }
 
 // ==================== AUTOML ENDPOINTS (NEW) ====================
 
 /// Automatically train and optimize ML models using AutoML
 #[napi]
-pub async fn auto_train_model(config_json: String) -> NapiResult<String> {
+pub fn auto_train_model(config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.auto_train_model(config_json).map_err(string_to_napi_error).await
+    core.auto_train_model(config_json).map_err(string_to_napi_error)
 }
 
 /// Get model leaderboard for AutoML experiments
 #[napi]
-pub async fn get_model_leaderboard(experiment_id: String) -> NapiResult<String> {
+pub fn get_model_leaderboard(experiment_id: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.get_model_leaderboard(experiment_id).map_err(string_to_napi_error).await
+    core.get_model_leaderboard(experiment_id).map_err(string_to_napi_error)
 }
 
 /// Automatic feature engineering for datasets
 #[napi]
-pub async fn auto_feature_engineering(data_json: String, config_json: String) -> NapiResult<String> {
+pub fn auto_feature_engineering(data_json: String, config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.auto_feature_engineering(data_json, config_json).map_err(string_to_napi_error).await
+    core.auto_feature_engineering(data_json, config_json).map_err(string_to_napi_error)
 }
 
 /// Explain model predictions with feature importance
 #[napi]
-pub async fn explain_model(model_id: String, instance_json: String) -> NapiResult<String> {
+pub fn explain_model(model_id: String, instance_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.explain_model(model_id, instance_json).map_err(string_to_napi_error).await
+    core.explain_model(model_id, instance_json).map_err(string_to_napi_error)
 }
 
 /// Optimize hyperparameters for a specific model
 #[napi]
-pub async fn optimize_hyperparameters(model_id: String, optimization_config_json: String) -> NapiResult<String> {
+pub fn optimize_hyperparameters(model_id: String, optimization_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.optimize_hyperparameters(model_id, optimization_config_json).map_err(string_to_napi_error).await
+    core.optimize_hyperparameters(model_id, optimization_config_json).map_err(string_to_napi_error)
 }
 
 /// Automated model selection based on data characteristics
 #[napi]
-pub async fn select_best_algorithm(data_json: String, task_type: String) -> NapiResult<String> {
+pub fn select_best_algorithm(data_json: String, task_type: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.select_best_algorithm(data_json, task_type).map_err(string_to_napi_error).await
+    core.select_best_algorithm(data_json, task_type).map_err(string_to_napi_error)
 }
 
 /// Generate automated insights from data
 #[napi]
-pub async fn auto_generate_insights(data_json: String, config_json: String) -> NapiResult<String> {
+pub fn auto_generate_insights(data_json: String, config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.auto_generate_insights(data_json, config_json).map_err(string_to_napi_error).await
+    core.auto_generate_insights(data_json, config_json).map_err(string_to_napi_error)
 }
 
 /// Cross-validate model performance
 #[napi]
-pub async fn cross_validate_model(model_id: String, data_json: String, folds: u32) -> NapiResult<String> {
+pub fn cross_validate_model(model_id: String, data_json: String, folds: u32) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.cross_validate_model(model_id, data_json, folds).map_err(string_to_napi_error).await
+    core.cross_validate_model(model_id, data_json, folds).map_err(string_to_napi_error)
 }
 
 /// Ensemble multiple models for improved performance
 #[napi]
-pub async fn create_ensemble(model_ids: Vec<String>, ensemble_config_json: String) -> NapiResult<String> {
+pub fn create_ensemble(model_ids: Vec<String>, ensemble_config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.create_ensemble(model_ids, ensemble_config_json).map_err(string_to_napi_error).await
+    core.create_ensemble(model_ids, ensemble_config_json).map_err(string_to_napi_error)
 }
 
 /// Security-specific feature extraction
 #[napi]
-pub async fn extract_security_features(data_json: String, config_json: String) -> NapiResult<String> {
+pub fn extract_security_features(data_json: String, config_json: String) -> NapiResult<String> {
     let core = PhantomMLCore::new();
-    core.extract_security_features(data_json, config_json).map_err(string_to_napi_error).await
+    core.extract_security_features(data_json, config_json).map_err(string_to_napi_error)
 }

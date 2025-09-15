@@ -36,7 +36,7 @@ pub mod safety;
 pub mod memory;
 
 // Legacy modules for compatibility
-mod automl;
+//mod automl;
 mod huggingface_integration;
 mod management;
 mod cancellation;
@@ -52,10 +52,10 @@ pub use database::*;
 
 // NAPI bindings - only compile when napi feature is enabled
 #[cfg(feature = "napi")]
-mod napi_bindings;
+mod napi_simple;
 
 #[cfg(feature = "napi")]
-pub use napi_bindings::*;
+pub use napi_simple::*;
 
 // Export specific high-level functionality
 pub use security::rate_limiter::{
