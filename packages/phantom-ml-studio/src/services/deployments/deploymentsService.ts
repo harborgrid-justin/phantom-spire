@@ -1,6 +1,6 @@
 // src/services/deploymentsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from './core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
 import { Deployment, DeploymentConfig, CreateDeploymentRequest, CreateDeploymentResponse, GetDeploymentsRequest, GetDeploymentsResponse, GetDeploymentRequest, GetDeploymentResponse, UpdateDeploymentRequest, UpdateDeploymentResponse, DeleteDeploymentRequest, DeleteDeploymentResponse } from './deployment.types';
 
 const DEPLOYMENTS_SERVICE_DEFINITION: ServiceDefinition = {

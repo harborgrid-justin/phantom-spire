@@ -1,6 +1,6 @@
 // src/services/settingsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from './core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
 import { Settings, ApiKey, GetSettingsRequest, GetSettingsResponse, UpdateSettingsRequest, UpdateSettingsResponse, CreateApiKeyRequest, CreateApiKeyResponse, DeleteApiKeyRequest, DeleteApiKeyResponse } from './settings.types';
 
 const SETTINGS_SERVICE_DEFINITION: ServiceDefinition = {

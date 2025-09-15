@@ -1,39 +1,333 @@
-/**
- * Core Service Module Exports
- * Central module for all core business logic services following Google/Facebook engineering practices
- * 
- * Design Patterns:
- * - Single Responsibility Principle: Each service has one clear responsibility
- * - Dependency Injection: Services can be easily mocked and tested
- * - Interface Segregation: Small, focused interfaces
- * - Command/Query Separation: Clear separation of read and write operations
- */
+// Core ML Services - Enterprise ML Platform for Phantom Spire
+export { MLEngine } from './ml-engine/MLEngine';
+export { AutoMLPipelineOrchestrator } from './automl/AutoMLPipelineOrchestrator';
+export { HuggingFaceIntegrationService } from './huggingface/HuggingFaceIntegrationService';
+export { ModelRegistryService } from './model-registry/ModelRegistryService';
+export { RealTimeMonitoringService } from './monitoring/RealTimeMonitoringService';
 
-// Core Interfaces and Types
+// Training and Data Services
+export { TrainingOrchestrator } from './training/TrainingOrchestrator';
+export { DataPipelineService } from './data/DataPipelineService';
+
+// Deployment and Security Services
+export { ModelDeploymentService } from './deployment/ModelDeploymentService';
+export { SecurityService } from './security/SecurityService';
+
+// Base Classes and Types
+export { BaseBusinessLogic } from './base/BaseBusinessLogic';
+export { BaseBusinessLogic as BusinessLogicBase } from './base/BaseBusinessLogic';
 export * from './types/business-logic.types';
 export * from './types/service.types';
 
-// Abstract Base Classes
-export * from './base/BaseService';
-export * from './base/BusinessLogicBase';
+// Service Factory for creating configured service instances
+export class MLServiceFactory {
+  private static instance: MLServiceFactory;
+  private services: Map<string, any> = new Map();
 
-// Core Services
-// export * from './services/ServiceRegistry';
-// export * from './services/EventBus';
-// export * from './services/ConfigurationManager';
-// export * from './services/CacheManager';
-// export * from './services/ErrorHandler';
+  private constructor() {}
 
-// Utilities
-// export * from './utils/validation.utils';
-// export * from './utils/performance.utils';
-// export * from './utils/retry.utils';
-// export * from './utils/logger.utils';
+  public static getInstance(): MLServiceFactory {
+    if (!MLServiceFactory.instance) {
+      MLServiceFactory.instance = new MLServiceFactory();
+    }
+    return MLServiceFactory.instance;
+  }
 
-// Middleware and Decorators
-// export * from './middleware/performance.middleware';
-// export * from './middleware/validation.middleware';
-// export * from './middleware/error.middleware';
-// export * from './decorators/cache.decorator';
-// export * from './decorators/retry.decorator';
-// export * from './decorators/log.decorator';
+  public createMLEngine(config?: any): MLEngine {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 30000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        huggingface: 'https://api-inference.huggingface.co',
+        modelRegistry: process.env.MODEL_REGISTRY_URL || 'http://localhost:8080',
+        monitoring: process.env.MONITORING_URL || 'http://localhost:9090'
+      },
+      credentials: {
+        huggingfaceToken: process.env.HUGGINGFACE_TOKEN || '',
+        awsAccessKey: process.env.AWS_ACCESS_KEY_ID || '',
+        awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+      }
+    };
+
+    return new MLEngine({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createAutoMLOrchestrator(config?: any): AutoMLPipelineOrchestrator {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 60000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        mlEngine: 'http://localhost:8081',
+        dataService: 'http://localhost:8082'
+      },
+      credentials: {}
+    };
+
+    return new AutoMLPipelineOrchestrator({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createHuggingFaceService(config?: any): HuggingFaceIntegrationService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 120000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        huggingface: 'https://api-inference.huggingface.co',
+        hub: 'https://huggingface.co'
+      },
+      credentials: {
+        huggingfaceToken: process.env.HUGGINGFACE_TOKEN || ''
+      }
+    };
+
+    return new HuggingFaceIntegrationService({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createModelRegistry(config?: any): ModelRegistryService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 30000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        storage: process.env.MODEL_STORAGE_URL || 's3://phantom-ml-models',
+        database: process.env.DATABASE_URL || 'postgresql://localhost:5432/phantom_ml'
+      },
+      credentials: {
+        awsAccessKey: process.env.AWS_ACCESS_KEY_ID || '',
+        awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+      }
+    };
+
+    return new ModelRegistryService({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createMonitoringService(config?: any): RealTimeMonitoringService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 15000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        metrics: process.env.METRICS_URL || 'http://localhost:9090',
+        alerts: process.env.ALERTS_URL || 'http://localhost:9093'
+      },
+      credentials: {}
+    };
+
+    return new RealTimeMonitoringService({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createTrainingOrchestrator(config?: any): TrainingOrchestrator {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 3600000 // 1 hour for training
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        compute: process.env.COMPUTE_URL || 'http://localhost:8083',
+        storage: process.env.STORAGE_URL || 's3://phantom-ml-training'
+      },
+      credentials: {
+        awsAccessKey: process.env.AWS_ACCESS_KEY_ID || '',
+        awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY || ''
+      }
+    };
+
+    return new TrainingOrchestrator({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createDataPipelineService(config?: any): DataPipelineService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 300000 // 5 minutes for data operations
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        dataWarehouse: process.env.DATA_WAREHOUSE_URL || 'postgresql://localhost:5432/phantom_data',
+        streaming: process.env.STREAMING_URL || 'kafka://localhost:9092'
+      },
+      credentials: {
+        databaseUser: process.env.DB_USER || 'phantom_user',
+        databasePassword: process.env.DB_PASSWORD || ''
+      }
+    };
+
+    return new DataPipelineService({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createDeploymentService(config?: any): ModelDeploymentService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 180000 // 3 minutes for deployments
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        kubernetes: process.env.K8S_API_URL || 'https://kubernetes.default.svc',
+        registry: process.env.CONTAINER_REGISTRY || 'ghcr.io/phantom-spire'
+      },
+      credentials: {
+        kubeconfig: process.env.KUBECONFIG || '',
+        registryToken: process.env.REGISTRY_TOKEN || ''
+      }
+    };
+
+    return new ModelDeploymentService({ ...defaultConfig, ...config }, environment);
+  }
+
+  public createSecurityService(config?: any): SecurityService {
+    const defaultConfig = {
+      enableLogging: true,
+      enableMetrics: true,
+      enableEvents: true,
+      retryAttempts: 3,
+      timeoutMs: 30000
+    };
+
+    const environment = {
+      name: process.env.NODE_ENV || 'development',
+      region: process.env.AWS_REGION || 'us-east-1',
+      apiEndpoints: {
+        auth: process.env.AUTH_URL || 'http://localhost:8084',
+        vault: process.env.VAULT_URL || 'http://localhost:8200'
+      },
+      credentials: {
+        vaultToken: process.env.VAULT_TOKEN || '',
+        jwtSecret: process.env.JWT_SECRET || 'phantom-ml-secret'
+      }
+    };
+
+    return new SecurityService({ ...defaultConfig, ...config }, environment);
+  }
+
+  // Convenience method to get all services
+  public getAllServices(): {
+    mlEngine: MLEngine;
+    automl: AutoMLPipelineOrchestrator;
+    huggingface: HuggingFaceIntegrationService;
+    modelRegistry: ModelRegistryService;
+    monitoring: RealTimeMonitoringService;
+    training: TrainingOrchestrator;
+    dataPipeline: DataPipelineService;
+    deployment: ModelDeploymentService;
+    security: SecurityService;
+  } {
+    return {
+      mlEngine: this.createMLEngine(),
+      automl: this.createAutoMLOrchestrator(),
+      huggingface: this.createHuggingFaceService(),
+      modelRegistry: this.createModelRegistry(),
+      monitoring: this.createMonitoringService(),
+      training: this.createTrainingOrchestrator(),
+      dataPipeline: this.createDataPipelineService(),
+      deployment: this.createDeploymentService(),
+      security: this.createSecurityService()
+    };
+  }
+
+  // Health check for all services
+  public async healthCheck(): Promise<{
+    overall: 'healthy' | 'unhealthy' | 'degraded';
+    services: Record<string, {
+      status: 'healthy' | 'unhealthy' | 'degraded';
+      latency: number;
+      checks: any[];
+    }>;
+  }> {
+    const services = this.getAllServices();
+    const serviceChecks: Record<string, any> = {};
+
+    for (const [name, service] of Object.entries(services)) {
+      try {
+        const start = Date.now();
+        const health = await (service as any).executeHealthCheck();
+        const latency = Date.now() - start;
+
+        serviceChecks[name] = {
+          status: health.status,
+          latency,
+          checks: health.checks
+        };
+      } catch (error) {
+        serviceChecks[name] = {
+          status: 'unhealthy',
+          latency: -1,
+          checks: [],
+          error: error instanceof Error ? error.message : 'Unknown error'
+        };
+      }
+    }
+
+    // Determine overall health
+    const statuses = Object.values(serviceChecks).map(s => s.status);
+    const unhealthyCount = statuses.filter(s => s === 'unhealthy').length;
+    const degradedCount = statuses.filter(s => s === 'degraded').length;
+
+    let overall: 'healthy' | 'unhealthy' | 'degraded';
+    if (unhealthyCount > 0) {
+      overall = 'unhealthy';
+    } else if (degradedCount > 0) {
+      overall = 'degraded';
+    } else {
+      overall = 'healthy';
+    }
+
+    return { overall, services: serviceChecks };
+  }
+}
+
+// Export singleton instance
+export const mlServices = MLServiceFactory.getInstance();

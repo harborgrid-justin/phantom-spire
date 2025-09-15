@@ -369,3 +369,24 @@ export interface EnsembleMetadata {
   executionTime: number;
   correlationMatrix?: number[][];
 }
+
+// Base Business Logic Interface
+export interface BusinessLogic {
+  // Abstract interface that all business logic services implement
+}
+
+// Configuration Interfaces
+export interface BusinessLogicConfig {
+  enableLogging: boolean;
+  enableMetrics: boolean;
+  enableEvents: boolean;
+  retryAttempts: number;
+  timeoutMs: number;
+}
+
+export interface EnvironmentConfig {
+  name: string;
+  region: string;
+  apiEndpoints: Record<string, string>;
+  credentials: Record<string, string>;
+}

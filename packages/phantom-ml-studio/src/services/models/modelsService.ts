@@ -1,8 +1,8 @@
 // src/services/modelsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from './core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
 import { RegisteredModel, ModelVersion, RegisterModelRequest, RegisterModelResponse, GetModelsRequest, GetModelsResponse, GetModelRequest, GetModelResponse, CreateModelVersionRequest, CreateModelVersionResponse, UpdateModelVersionStatusRequest, UpdateModelVersionStatusResponse, ModelVersionStatus } from './models.types';
-import { ModelResult } from './modelBuilder.types';
+import { ModelResult } from '../model-builder/modelBuilder.types';
 
 const MODELS_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-models',

@@ -5,7 +5,8 @@
       "Bash(do echo \"Updating $page\")",
       "Bash(done)",
       "Bash(npm run build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find:*)"
     ],
     "deny": [],
     "ask": []

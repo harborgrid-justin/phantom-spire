@@ -1,6 +1,6 @@
 // src/services/dashboardService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from './core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
 import { DashboardData, GetDashboardDataRequest, GetDashboardDataResponse } from './dashboard.types';
 
 const DASHBOARD_SERVICE_DEFINITION: ServiceDefinition = {
