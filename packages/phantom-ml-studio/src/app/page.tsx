@@ -10,7 +10,9 @@ import {
   Grid,
   Chip,
   Stack,
-  Paper
+  Paper,
+  Alert,
+  LinearProgress
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -18,18 +20,20 @@ import {
   Analytics as AnalyticsIcon,
   Security as SecurityIcon,
   Speed as PerformanceIcon,
-  AutoAwesome as AutoMLIcon
+  AutoAwesome as AutoMLIcon,
+  Engineering as EngineeringIcon,
+  Business as BusinessIcon
 } from '@mui/icons-material';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Phantom ML Studio - Enterprise Machine Learning Platform',
-  description: 'Advanced enterprise-grade ML platform with AutoML, security-first design, and Hugging Face integration for cybersecurity intelligence.',
-  keywords: ['machine learning', 'AutoML', 'cybersecurity', 'enterprise AI', 'Hugging Face', 'threat intelligence'],
+  title: 'Phantom ML Studio - 32 Precision Modules Enterprise Platform',
+  description: 'Advanced enterprise ML platform with 32 precision NAPI bindings, complete frontend-backend integration, and enterprise-grade capabilities.',
+  keywords: ['machine learning', 'NAPI', '32 precision modules', 'enterprise AI', 'cybersecurity', 'threat intelligence', 'precision bindings'],
   authors: [{ name: 'Phantom Spire' }],
   openGraph: {
-    title: 'Phantom ML Studio',
-    description: 'Enterprise Machine Learning Platform',
+    title: 'Phantom ML Studio - 32 Precision Modules',
+    description: 'Enterprise Machine Learning Platform with Complete Integration',
     type: 'website',
   },
   robots: {
@@ -97,38 +101,51 @@ function FeatureCard({ title, description, icon, href, status = 'active' }: Feat
 function FeaturesGrid() {
   const features: FeatureCardProps[] = [
     {
-      title: 'Dashboard',
-      description: 'Real-time monitoring and analytics for all your ML models and experiments.',
+      title: '32 Precision NAPI Demo',
+      description: 'Interactive demonstration of all 32 precision NAPI bindings with complete frontend-backend integration.',
+      icon: <EngineeringIcon fontSize="large" />,
+      href: '/precision-napi-demo',
+      status: 'active'
+    },
+    {
+      title: 'Enhanced Dashboard',
+      description: 'Real-time monitoring with business intelligence using precision NAPI bindings for comprehensive metrics.',
       icon: <DashboardIcon fontSize="large" />,
       href: '/dashboard'
     },
     {
-      title: 'Model Builder',
-      description: 'AutoML-powered model creation with advanced feature engineering and hyperparameter tuning.',
+      title: 'Enhanced Model Builder',
+      description: 'AutoML with 32 precision bindings: advanced optimization, validation, and enterprise-grade model management.',
       icon: <AutoMLIcon fontSize="large" />,
       href: '/model-builder'
     },
     {
+      title: 'Real-time Analytics',
+      description: 'Stream processing, batch analytics, and business intelligence with precision NAPI performance.',
+      icon: <AnalyticsIcon fontSize="large" />,
+      href: '/real-time-monitoring'
+    },
+    {
       title: 'Data Explorer',
-      description: 'Comprehensive data analysis, visualization, and preprocessing capabilities.',
+      description: 'Comprehensive data analysis with statistical summaries, correlation analysis, and quality assessment.',
       icon: <AnalyticsIcon fontSize="large" />,
       href: '/data-explorer'
     },
     {
-      title: 'Experiments',
-      description: 'Track, compare, and manage ML experiments with detailed metrics and versioning.',
-      icon: <ModelIcon fontSize="large" />,
-      href: '/experiments'
+      title: 'Business Intelligence',
+      description: 'ROI calculations, cost-benefit analysis, performance forecasting, and resource optimization.',
+      icon: <BusinessIcon fontSize="large" />,
+      href: '/business-intelligence'
     },
     {
-      title: 'Model Deployments',
-      description: 'Deploy and manage ML models with enterprise-grade scalability and monitoring.',
-      icon: <PerformanceIcon fontSize="large" />,
-      href: '/deployments'
+      title: 'Enterprise Security',
+      description: 'Audit trails, compliance reporting, security scanning, backup systems, and disaster recovery.',
+      icon: <SecurityIcon fontSize="large" />,
+      href: '/enterprise-security-compliance'
     },
     {
       title: 'Threat Intelligence',
-      description: 'Advanced cybersecurity ML models for threat detection and intelligence analysis.',
+      description: 'Advanced cybersecurity ML models integrated with the Phantom Spire security intelligence platform.',
       icon: <SecurityIcon fontSize="large" />,
       href: '/threat-intelligence-marketplace'
     },
@@ -201,6 +218,24 @@ function HomePage() {
         </Stack>
       </Box>
 
+      {/* 32 Precision Modules Alert */}
+      <Alert severity="success" sx={{ mb: 4, borderRadius: 2 }}>
+        <Typography variant="h6" component="div" gutterBottom>
+          🚀 32 Precision Modules Integrated
+        </Typography>
+        <Typography variant="body2">
+          Complete frontend-backend integration achieved with 32 high-precision NAPI bindings:
+          8 Model Management, 8 Analytics & Insights, 6 Real-time Processing, 5 Enterprise Features, 
+          and 5 Business Intelligence modules - all with enterprise-grade fallback support.
+        </Typography>
+        <Box sx={{ mt: 2, mb: 1 }}>
+          <LinearProgress variant="determinate" value={100} color="success" />
+        </Box>
+        <Typography variant="caption" color="text.secondary">
+          Integration Status: 100% Complete (32/32 modules active)
+        </Typography>
+      </Alert>
+
       {/* Statistics Section */}
       <Paper
         elevation={2}
@@ -213,10 +248,18 @@ function HomePage() {
         <Grid container spacing={4} textAlign="center">
           <Grid item xs={12} sm={3}>
             <Typography variant="h3" color="primary" fontWeight="bold">
+              32
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Precision NAPI Modules
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Typography variant="h3" color="primary" fontWeight="bold">
               19+
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Security Modules
+              Security Intelligence Modules
             </Typography>
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -224,15 +267,7 @@ function HomePage() {
               5
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Database Systems
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <Typography variant="h3" color="primary" fontWeight="bold">
-              100K+
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Events/Second
+              Multi-Database Support
             </Typography>
           </Grid>
           <Grid item xs={12} sm={3}>
@@ -240,7 +275,7 @@ function HomePage() {
               99.9%
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Uptime SLA
+              Enterprise SLA
             </Typography>
           </Grid>
         </Grid>

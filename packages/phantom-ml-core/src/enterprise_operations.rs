@@ -8,7 +8,6 @@ use chrono::Utc;
 use serde_json;
 
 /// Enterprise-grade security and compliance operations
-#[napi]
 pub trait EnterpriseOperations {
     /// Configure multi-tenant isolation and resource quotas
     fn configure_multi_tenancy(&self, config: EnterpriseSecurityConfig) -> Result<bool>;
@@ -50,7 +49,7 @@ pub trait EnterpriseOperations {
 #[napi]
 impl EnterpriseOperations for PhantomMLCore {
     #[napi]
-    fn configure_multi_tenancy(&self, config: EnterpriseSecurityConfig) -> Result<bool> {
+    pub fn configure_multi_tenancy(&self, config: EnterpriseSecurityConfig) -> Result<bool> {
         // Initialize multi-tenant architecture
         let tenant_config = &config.multi_tenant;
         

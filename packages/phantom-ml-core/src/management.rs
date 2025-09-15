@@ -3,7 +3,9 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 use chrono::Utc;
 use uuid::Uuid;
+#[cfg(feature = "crypto")]
 use base64::engine::general_purpose::STANDARD;
+#[cfg(feature = "crypto")]
 use base64::Engine;
 use serde_json;
 

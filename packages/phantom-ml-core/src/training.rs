@@ -4,7 +4,8 @@ use uuid::Uuid;
 use serde_json;
 use ndarray::{Array1, Array2};
 use linfa::prelude::*;
-use linfa_trees::RandomForest;
+// Note: RandomForest is available in different modules depending on linfa version
+// use linfa_trees::DecisionTree; // Available alternative
 
 use crate::models::TrainingResult;
 use crate::PhantomMLCore;
