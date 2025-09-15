@@ -26,12 +26,11 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense, ErrorBoundary } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { headers } from 'next/headers';
 
 // Dynamic imports for optimal code splitting and lazy loading
-const DashboardClient = dynamic(() => import('./DashboardClient'), {
-  ssr: false,
+const DashboardClient = dynamicImport(() => import('./DashboardClient'), {
   loading: () => <DashboardSkeleton />
 });
 

@@ -144,7 +144,7 @@ export class EnhancedDashboardService extends BusinessLogicBase {
       napiBindingsUsed.push('costBenefitAnalysis');
 
       // 3. Performance Forecasting
-      let forecastData: any = {};
+      let forecastData: Record<string, unknown> = {};
       if (includeForecasts) {
         const forecastConfig = JSON.stringify({
           horizon: '90d',
@@ -332,10 +332,10 @@ export class EnhancedDashboardService extends BusinessLogicBase {
   /**
    * Generate trend data for visualization
    */
-  private generateTrendData(category: string, timeRange: string): Array<any> {
+  private generateTrendData(category: string, timeRange: string): Array<Record<string, unknown>> {
     const now = new Date();
     const points = 30; // 30 data points
-    const data: Array<any> = [];
+    const data: Array<Record<string, unknown>> = [];
 
     for (let i = points - 1; i >= 0; i--) {
       const timestamp = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000)).toISOString();

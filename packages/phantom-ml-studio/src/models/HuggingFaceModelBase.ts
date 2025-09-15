@@ -13,6 +13,48 @@
 
 import { EventEmitter } from 'events';
 
+// Type definitions for Hugging Face model components
+export interface HFModel {
+  forward?: (...args: unknown[]) => unknown;
+  generate?: (inputs: unknown, options?: Record<string, unknown>) => Promise<unknown>;
+  call?: (inputs: unknown) => unknown;
+  [key: string]: unknown;
+}
+
+export interface HFTokenizer {
+  encode?: (text: string, options?: Record<string, unknown>) => number[];
+  decode?: (tokens: number[], options?: Record<string, unknown>) => string;
+  tokenize?: (text: string) => string[];
+  [key: string]: unknown;
+}
+
+export interface HFProcessor {
+  process?: (inputs: unknown, options?: Record<string, unknown>) => unknown;
+  preprocess?: (inputs: unknown) => unknown;
+  postprocess?: (outputs: unknown) => unknown;
+  [key: string]: unknown;
+}
+
+export interface HFPipeline {
+  predict?: (inputs: unknown, options?: Record<string, unknown>) => Promise<unknown>;
+  forward?: (inputs: unknown) => Promise<unknown>;
+  [key: string]: unknown;
+}
+
+export interface Logger {
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string, ...args: unknown[]) => void;
+  debug: (message: string, ...args: unknown[]) => void;
+}
+
+export interface MetricsCollector {
+  collect: (metric: string, value: number, tags?: Record<string, string>) => void;
+  increment: (metric: string, tags?: Record<string, string>) => void;
+  gauge: (metric: string, value: number, tags?: Record<string, string>) => void;
+  histogram: (metric: string, value: number, tags?: Record<string, string>) => void;
+}
+
 // Core Hugging Face interfaces and types
 export interface HFModelConfig {
   modelId: string;
@@ -99,17 +141,17 @@ export interface PredictionInput {
   audio?: string | Buffer | Uint8Array;
   question?: string;
   context?: string;
-  inputs?: any;
+  inputs?: string | string[] | Record<string, unknown>;
 }
 
 export interface PredictionOutput {
-  predictions: any[];
+  predictions: unknown[];
   scores: number[];
   labels?: string[];
   confidence: number;
   latency: number;
   modelVersion: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface TrainingProgress {
@@ -178,10 +220,10 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
   protected isLoaded: boolean = false;
   protected isTraining: boolean = false;
   protected trainingProgress: TrainingProgress | null = null;
-  protected model: any = null;
-  protected tokenizer: any = null;
-  protected processor: any = null;
-  protected pipeline: any = null;
+  protected model: HFModel | null = null;
+  protected tokenizer: HFTokenizer | null = null;
+  protected processor: HFProcessor | null = null;
+  protected pipeline: HFPipeline | null = null;
   
   // Enterprise features
   protected securityAnalysis: SecurityAnalysis | null = null;
@@ -189,8 +231,8 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
   protected performanceMetrics: Record<string, number> = {};
   
   // Logging and monitoring
-  protected logger: any;
-  protected metricsCollector: any;
+  protected logger: Logger;
+  protected metricsCollector: MetricsCollector;
   
   constructor(config: HFModelConfig, metadata?: Partial<ModelMetadata>) {
     super();
@@ -212,10 +254,10 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
   // Abstract methods that must be implemented by concrete classes
   abstract loadModel(): Promise<void>;
   abstract predict(input: PredictionInput): Promise<PredictionOutput>;
-  abstract fineTune(trainingData: any[], config: TrainingConfig): Promise<void>;
+  abstract fineTune(trainingData: Record<string, unknown>[], config: TrainingConfig): Promise<void>;
   abstract validateInput(input: PredictionInput): boolean;
-  abstract preprocess(input: any): Promise<any>;
-  abstract postprocess(output: any): Promise<any>;
+  abstract preprocess(input: unknown): Promise<unknown>;
+  abstract postprocess(output: unknown): Promise<unknown>;
 
   // Core lifecycle methods
   async initialize(): Promise<void> {
@@ -347,7 +389,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
   }
 
   // Training orchestration
-  async startTraining(trainingData: any[], config: TrainingConfig): Promise<void> {
+  async startTraining(trainingData: Record<string, unknown>[], config: TrainingConfig): Promise<void> {
     if (this.isTraining) {
       throw new Error('Model is already training');
     }
@@ -481,7 +523,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
     }
   }
 
-  protected async getFilesToUpload(dir: string): Promise<any[]> {
+  protected async getFilesToUpload(dir: string): Promise<{ name: string; path: string }[]> {
     const fs = await import('fs/promises');
     const path = await import('path');
     const files = [];
@@ -683,7 +725,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
     }
   }
 
-  protected async validateTrainingData(data: any[]): Promise<void> {
+  protected async validateTrainingData(data: Record<string, unknown>[]): Promise<void> {
     if (!Array.isArray(data) || data.length === 0) {
       throw new Error('Training data must be a non-empty array');
     }
@@ -715,7 +757,7 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
     return processorTasks.includes(this.config.task);
   }
 
-  protected getProcessorClass(): any {
+  protected getProcessorClass(): typeof HFProcessor | null {
     // Return appropriate processor class based on task
     // This would be expanded with actual processor imports
     return null;
@@ -724,10 +766,10 @@ export abstract class HuggingFaceModelBase extends EventEmitter {
   protected setupLogging(): void {
     // Set up enterprise logging
     this.logger = {
-      info: (message: string, ...args: any[]) => console.log(`[INFO] ${this.config.modelId}: ${message}`, ...args),
-      warn: (message: string, ...args: any[]) => console.warn(`[WARN] ${this.config.modelId}: ${message}`, ...args),
-      error: (message: string, ...args: any[]) => console.error(`[ERROR] ${this.config.modelId}: ${message}`, ...args),
-      debug: (message: string, ...args: any[]) => console.debug(`[DEBUG] ${this.config.modelId}: ${message}`, ...args)
+      info: (message: string, ...args: unknown[]) => console.log(`[INFO] ${this.config.modelId}: ${message}`, ...args),
+      warn: (message: string, ...args: unknown[]) => console.warn(`[WARN] ${this.config.modelId}: ${message}`, ...args),
+      error: (message: string, ...args: unknown[]) => console.error(`[ERROR] ${this.config.modelId}: ${message}`, ...args),
+      debug: (message: string, ...args: unknown[]) => console.debug(`[DEBUG] ${this.config.modelId}: ${message}`, ...args)
     };
   }
 

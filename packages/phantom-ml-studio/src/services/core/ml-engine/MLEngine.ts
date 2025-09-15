@@ -12,12 +12,13 @@
 import { BaseBusinessLogic } from '../base/BaseBusinessLogic';
 import { ServiceDefinition, ServiceContext } from '../types/service.types';
 import { BusinessLogicRequest, BusinessLogicResponse } from '../types/business-logic.types';
+import { ServiceConfig, ServiceEnvironment } from '../index';
 
 // Enhanced ML Types for H2O.ai Competition
 export interface MLDataset {
   id: string;
   name: string;
-  data: any[][];
+  data: unknown[][];
   headers: string[];
   targetColumn: string;
   taskType: 'classification' | 'regression' | 'clustering' | 'timeseries' | 'nlp' | 'computer_vision';
@@ -89,7 +90,7 @@ export interface MLModel {
   id: string;
   name: string;
   algorithm: MLAlgorithm;
-  hyperparameters: { [key: string]: any };
+  hyperparameters: { [key: string]: unknown };
   features: string[];
   targetColumn: string;
   taskType: string;
@@ -118,8 +119,8 @@ export interface HyperparameterSpace {
   [param: string]: {
     type: 'int' | 'float' | 'categorical' | 'bool';
     range?: [number, number];
-    choices?: any[];
-    default: any;
+    choices?: unknown[];
+    default: unknown;
     description: string;
   };
 }
@@ -234,7 +235,7 @@ export interface ModelLeaderboardEntry {
   score: number;
   crossValidationScore: number;
   trainingTime: number;
-  hyperparameters: { [key: string]: any };
+  hyperparameters: { [key: string]: unknown };
   status: 'completed' | 'failed' | 'timeout';
   rank: number;
 }
@@ -301,7 +302,7 @@ export class MLEngine extends BaseBusinessLogic {
   private runningJobs: Map<string, AutoMLJob> = new Map();
   private modelRegistry: Map<string, MLModel> = new Map();
 
-  constructor(config: any, environment: any) {
+  constructor(config: ServiceConfig, environment: ServiceEnvironment) {
     super(config, environment);
     this.initializeAlgorithms();
   }
@@ -421,7 +422,7 @@ export class MLEngine extends BaseBusinessLogic {
     request: BusinessLogicRequest<{
       modelId: string;
       dataset?: MLDataset;
-      instances?: any[][];
+      instances?: unknown[][];
       explanationType: 'global' | 'local' | 'both';
     }>,
     context: ServiceContext
@@ -602,7 +603,7 @@ export class MLEngine extends BaseBusinessLogic {
   private async engineerFeatures(dataset: MLDataset, options: FeatureEngineeringOptions): Promise<FeatureEngineeringResult> {
     throw new Error('Not implemented');
   }
-  private async generateExplanations(model: MLModel, dataset?: MLDataset, instances?: any[][], type?: string): Promise<ModelExplanations> {
+  private async generateExplanations(model: MLModel, dataset?: MLDataset, instances?: unknown[][], type?: string): Promise<ModelExplanations> {
     throw new Error('Not implemented');
   }
   private async analyzeBias(model: MLModel, dataset: MLDataset, protectedAttrs: string[], metrics: string[]): Promise<BiasReport> {

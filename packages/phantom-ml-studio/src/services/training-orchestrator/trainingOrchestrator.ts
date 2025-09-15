@@ -729,7 +729,7 @@ export class TrainingOrchestrator extends EventEmitter {
     }
   }
 
-  private async executeTraining(job: TrainingJob, model: HuggingFaceModelBase, dataset: any): Promise<void> {
+  private async executeTraining(job: TrainingJob, model: HuggingFaceModelBase, dataset: unknown): Promise<void> {
     try {
       // Set up progress tracking
       model.on('trainingProgress', (progress: TrainingProgress) => {
@@ -908,7 +908,7 @@ export class TrainingOrchestrator extends EventEmitter {
     );
   }
 
-  private getAvailableResources(node: TrainingNode): any {
+  private getAvailableResources(node: TrainingNode): { cpu: number; memory: number; gpu?: number } {
     // Calculate available resources based on current usage
     const capacity = node.maxCapacity;
     const usage = node.currentLoad;
@@ -1072,7 +1072,7 @@ export class TrainingOrchestrator extends EventEmitter {
     // Save trained model
   }
 
-  private async uploadCheckpointToRemote(checkpoint: CheckpointInfo, config: any): Promise<string> {
+  private async uploadCheckpointToRemote(checkpoint: CheckpointInfo, config: Record<string, unknown>): Promise<string> {
     // Upload checkpoint to remote storage
     return 'https://remote-storage/checkpoint-url';
   }
@@ -1144,7 +1144,7 @@ export class TrainingOrchestrator extends EventEmitter {
     return Array.from(this.allocations.values());
   }
 
-  getSystemStats(): any {
+  getSystemStats(): { cpu: number; memory: number; disk: number; gpu?: number } {
     const jobs = Array.from(this.jobs.values());
     const nodes = Array.from(this.nodes.values());
     

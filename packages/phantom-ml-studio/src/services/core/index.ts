@@ -19,10 +19,33 @@ export { BaseBusinessLogic as BusinessLogicBase } from './base/BaseBusinessLogic
 export * from './types/business-logic.types';
 export * from './types/service.types';
 
+// Type definitions for service configurations
+export interface ServiceConfig {
+  enableLogging?: boolean;
+  enableMetrics?: boolean;
+  enableEvents?: boolean;
+  retryAttempts?: number;
+  timeoutMs?: number;
+}
+
+export interface ServiceEnvironment {
+  name: string;
+  region: string;
+  apiEndpoints: Record<string, string>;
+  credentials: Record<string, string>;
+}
+
+export interface ServiceHealthCheck {
+  status: 'healthy' | 'unhealthy' | 'degraded';
+  latency: number;
+  checks: unknown[];
+  error?: string;
+}
+
 // Service Factory for creating configured service instances
 export class MLServiceFactory {
   private static instance: MLServiceFactory;
-  private services: Map<string, any> = new Map();
+  private services: Map<string, unknown> = new Map();
 
   private constructor() {}
 
@@ -33,7 +56,7 @@ export class MLServiceFactory {
     return MLServiceFactory.instance;
   }
 
-  public createMLEngine(config?: any): MLEngine {
+  public createMLEngine(config?: Partial<ServiceConfig>): MLEngine {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -60,7 +83,7 @@ export class MLServiceFactory {
     return new MLEngine({ ...defaultConfig, ...config }, environment);
   }
 
-  public createAutoMLOrchestrator(config?: any): AutoMLPipelineOrchestrator {
+  public createAutoMLOrchestrator(config?: Partial<ServiceConfig>): AutoMLPipelineOrchestrator {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -82,7 +105,7 @@ export class MLServiceFactory {
     return new AutoMLPipelineOrchestrator({ ...defaultConfig, ...config }, environment);
   }
 
-  public createHuggingFaceService(config?: any): HuggingFaceIntegrationService {
+  public createHuggingFaceService(config?: Partial<ServiceConfig>): HuggingFaceIntegrationService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -106,7 +129,7 @@ export class MLServiceFactory {
     return new HuggingFaceIntegrationService({ ...defaultConfig, ...config }, environment);
   }
 
-  public createModelRegistry(config?: any): ModelRegistryService {
+  public createModelRegistry(config?: Partial<ServiceConfig>): ModelRegistryService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -131,7 +154,7 @@ export class MLServiceFactory {
     return new ModelRegistryService({ ...defaultConfig, ...config }, environment);
   }
 
-  public createMonitoringService(config?: any): RealTimeMonitoringService {
+  public createMonitoringService(config?: Partial<ServiceConfig>): RealTimeMonitoringService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -153,7 +176,7 @@ export class MLServiceFactory {
     return new RealTimeMonitoringService({ ...defaultConfig, ...config }, environment);
   }
 
-  public createTrainingOrchestrator(config?: any): TrainingOrchestrator {
+  public createTrainingOrchestrator(config?: Partial<ServiceConfig>): TrainingOrchestrator {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -178,7 +201,7 @@ export class MLServiceFactory {
     return new TrainingOrchestrator({ ...defaultConfig, ...config }, environment);
   }
 
-  public createDataPipelineService(config?: any): DataPipelineService {
+  public createDataPipelineService(config?: Partial<ServiceConfig>): DataPipelineService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -203,7 +226,7 @@ export class MLServiceFactory {
     return new DataPipelineService({ ...defaultConfig, ...config }, environment);
   }
 
-  public createDeploymentService(config?: any): ModelDeploymentService {
+  public createDeploymentService(config?: Partial<ServiceConfig>): ModelDeploymentService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -228,7 +251,7 @@ export class MLServiceFactory {
     return new ModelDeploymentService({ ...defaultConfig, ...config }, environment);
   }
 
-  public createSecurityService(config?: any): SecurityService {
+  public createSecurityService(config?: Partial<ServiceConfig>): SecurityService {
     const defaultConfig = {
       enableLogging: true,
       enableMetrics: true,
@@ -284,11 +307,11 @@ export class MLServiceFactory {
     services: Record<string, {
       status: 'healthy' | 'unhealthy' | 'degraded';
       latency: number;
-      checks: any[];
+      checks: unknown[];
     }>;
   }> {
     const services = this.getAllServices();
-    const serviceChecks: Record<string, any> = {};
+    const serviceChecks: Record<string, ServiceHealthCheck> = {};
 
     for (const [name, service] of Object.entries(services)) {
       try {

@@ -4,7 +4,7 @@ interface HealthCheck {
   lastCheck: number;
   responseTime?: number;
   error?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface SystemHealth {
@@ -48,7 +48,7 @@ class HealthMonitor {
         }
 
         return { status: 'healthy' as const };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return { 
           status: 'unhealthy' as const, 
           error: error.message || 'API unreachable' 
@@ -80,7 +80,7 @@ class HealthMonitor {
             clearTimeout(timeout);
             resolve({ status: 'unhealthy', error: 'WebSocket connection failed' });
           };
-        } catch (error: any) {
+        } catch (error: unknown) {
           resolve({ status: 'unhealthy', error: error.message || 'WebSocket error' });
         }
       });
@@ -107,7 +107,7 @@ class HealthMonitor {
         sessionStorage.removeItem(testKey);
 
         return { status: 'healthy' as const };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return { 
           status: 'unhealthy' as const, 
           error: `Storage error: ${error.message}` 
@@ -143,7 +143,7 @@ class HealthMonitor {
         }
         
         return { status: 'healthy' as const };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return { 
           status: 'degraded' as const, 
           error: `Memory check failed: ${error.message}` 
@@ -173,7 +173,7 @@ class HealthMonitor {
         }
 
         return { status: 'healthy' as const };
-      } catch (error: any) {
+      } catch (error: unknown) {
         return { 
           status: 'unhealthy' as const, 
           error: `Feature check failed: ${error.message}` 
@@ -187,7 +187,7 @@ class HealthMonitor {
     checkFn: () => Promise<{ 
       status: 'healthy' | 'degraded' | 'unhealthy'; 
       error?: string; 
-      metadata?: Record<string, any> 
+      metadata?: Record<string, unknown> 
     }>
   ) {
     this.checks.set(name, {
@@ -218,7 +218,7 @@ class HealthMonitor {
         error: result.error,
         metadata: result.metadata,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       const endTime = performance.now();
       
       this.checks.set(name, {

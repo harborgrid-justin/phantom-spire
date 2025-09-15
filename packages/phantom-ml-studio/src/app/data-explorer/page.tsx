@@ -34,12 +34,11 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense, ErrorBoundary } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { headers } from 'next/headers';
 
 // Dynamic imports for optimal code splitting and performance
-const DataExplorerClient = dynamic(() => import('./DataExplorerClient'), {
-  ssr: false,
+const DataExplorerClient = dynamicImport(() => import('./DataExplorerClient'), {
   loading: () => <DataExplorerSkeleton />
 });
 

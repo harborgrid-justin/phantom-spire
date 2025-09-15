@@ -34,12 +34,11 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense, ErrorBoundary } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { headers } from 'next/headers';
 
 // Dynamic imports for optimal experiment tracking interface loading
-const ExperimentsClient = dynamic(() => import('./ExperimentsClient'), {
-  ssr: false,
+const ExperimentsClient = dynamicImport(() => import('./ExperimentsClient'), {
   loading: () => <ExperimentsSkeleton />
 });
 

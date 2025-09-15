@@ -48,14 +48,21 @@ export interface PhantomMLCoreBindings {
 }
 
 class PhantomMLCoreService implements PhantomMLCoreBindings {
-  private nativeModule: any;
+  private nativeModule: unknown;
 
   constructor() {
-    try {
-      // Load the NAPI module
-      this.nativeModule = require('@phantom-spire/ml-core');
-    } catch (error) {
-      console.warn('Native ML core module not available, using fallback:', error);
+    // Only load NAPI module on server side
+    if (typeof window === 'undefined' && typeof process !== 'undefined') {
+      try {
+        // Load the NAPI module only on server side
+        this.nativeModule = require('@phantom-spire/ml-core');
+      } catch (error) {
+        console.warn('Native ML core module not available, using fallback:', error);
+        this.nativeModule = null;
+      }
+    } else {
+      // Client side - use fallback
+      console.info('ML Core service running in browser mode with fallbacks');
       this.nativeModule = null;
     }
   }

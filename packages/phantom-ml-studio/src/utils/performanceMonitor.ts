@@ -3,7 +3,7 @@ interface PerformanceMetrics {
   name: string;
   value: number;
   timestamp: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 interface UserInteraction {
@@ -71,7 +71,7 @@ class PerformanceMonitor {
     // First Input Delay
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        const firstInputEntry = entry as any; // PerformanceEventTiming not fully typed
+        const firstInputEntry = entry as PerformanceEventTiming;
         this.recordMetric({
           name: 'FID',
           value: firstInputEntry.processingStart - firstInputEntry.startTime,
@@ -83,7 +83,7 @@ class PerformanceMonitor {
     // Cumulative Layout Shift
     new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        const layoutShiftEntry = entry as any; // PerformanceLayoutShift not fully typed
+        const layoutShiftEntry = entry as PerformanceEntry & { value: number; hadRecentInput: boolean; };
         if (!layoutShiftEntry.hadRecentInput) {
           this.recordMetric({
             name: 'CLS',

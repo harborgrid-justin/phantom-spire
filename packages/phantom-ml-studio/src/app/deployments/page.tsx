@@ -34,12 +34,11 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense, ErrorBoundary } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { headers } from 'next/headers';
 
 // Dynamic imports for optimal deployment management interface loading
-const DeploymentsClient = dynamic(() => import('./DeploymentsClient'), {
-  ssr: false,
+const DeploymentsClient = dynamicImport(() => import('./DeploymentsClient'), {
   loading: () => <DeploymentsSkeleton />
 });
 

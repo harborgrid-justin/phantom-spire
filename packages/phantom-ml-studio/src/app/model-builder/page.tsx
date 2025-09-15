@@ -18,11 +18,10 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 
 // Dynamic import for client component to optimize bundle splitting
-const ModelBuilderClient = dynamic(() => import('./ModelBuilderClient'), {
-  ssr: false,
+const ModelBuilderClient = dynamicImport(() => import('./ModelBuilderClient'), {
   loading: () => <ModelBuilderSkeleton />
 });
 

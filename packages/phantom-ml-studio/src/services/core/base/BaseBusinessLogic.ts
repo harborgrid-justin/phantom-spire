@@ -21,7 +21,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
     return `${prefix}_${timestamp}_${random}_${count}`;
   }
 
-  protected async validateInput<T>(input: T, schema?: any): Promise<{ isValid: boolean; errors: string[] }> {
+  protected async validateInput<T>(input: T, schema?: Record<string, unknown>): Promise<{ isValid: boolean; errors: string[] }> {
     // Basic validation - in a real implementation, this would use a schema validation library
     const errors: string[] = [];
 
@@ -42,7 +42,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
     action: string,
     resourceType: string,
     resourceId: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const logEntry = {
       timestamp: new Date().toISOString(),
@@ -66,7 +66,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
       operation: string;
       resourceType?: string;
       resourceId?: string;
-      metadata?: Record<string, any>;
+      metadata?: Record<string, unknown>;
     }
   ): Promise<void> {
     const errorEntry = {
@@ -172,7 +172,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
   protected async measurePerformance<T>(
     operationName: string,
     operation: () => Promise<T>
-  ): Promise<{ result: T; duration: number; metadata: Record<string, any> }> {
+  ): Promise<{ result: T; duration: number; metadata: Record<string, unknown> }> {
     const startTime = process.hrtime.bigint();
     const startMemory = process.memoryUsage();
 
@@ -233,8 +233,8 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
 
   protected async publishEvent(
     eventType: string,
-    payload: Record<string, any>,
-    metadata?: Record<string, any>
+    payload: Record<string, unknown>,
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const event = {
       id: this.generateId('event'),
@@ -254,7 +254,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
 
   protected async scheduleTask(
     taskName: string,
-    payload: Record<string, any>,
+    payload: Record<string, unknown>,
     executeAt: Date
   ): Promise<string> {
     const taskId = this.generateId('task');
@@ -377,7 +377,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
   }
 
   protected async executeWithContext<T>(
-    context: any,
+    context: unknown,
     operationName: string,
     operation: () => Promise<T>
   ): Promise<T> {
