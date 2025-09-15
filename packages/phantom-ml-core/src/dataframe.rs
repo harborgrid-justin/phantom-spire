@@ -137,4 +137,4 @@ impl Clone for PolarsSeries {
 
 // Alias Polars' DataFrame and Series for clarity within this module.
 type PolarsDataFrame = polars::frame::DataFrame;
-type PolarsSeries = self::PolarsSeries;
+pub use self::PolarsSeries;
