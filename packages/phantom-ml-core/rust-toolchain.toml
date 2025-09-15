@@ -1,17 +1,4 @@
 [toolchain]
 channel = "stable"
-components = ["rustfmt", "clippy", "rust-src", "rust-analyzer"]
-targets = [
-    "x86_64-pc-windows-msvc",
-    "x86_64-apple-darwin",
-    "aarch64-apple-darwin",
-    "x86_64-unknown-linux-gnu",
-    "aarch64-unknown-linux-gnu",
-    "x86_64-unknown-linux-musl",
-    "aarch64-unknown-linux-musl"
-]
+targets = ["x86_64-pc-windows-msvc"]
 profile = "default"
-
-[env]
-RUST_BACKTRACE = "1"
-CARGO_TERM_COLOR = "always"

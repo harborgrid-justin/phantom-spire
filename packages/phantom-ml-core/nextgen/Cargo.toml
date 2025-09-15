@@ -1,0 +1,123 @@
+
+[package]
+name = "phantom-ml-core"
+version = "1.0.1"
+description = "Enterprise machine learning services for threat detection and security analytics"
+edition = "2021"
+license = "MIT"
+authors = ["Phantom Spire Security Team"]
+rust-version = "1.77.0"
+
+[lib]
+name = "phantom_ml_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Core NAPI dependencies with latest stable versions
+napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt", "type-def"] }
+napi-derive = { version = "3.0.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# ML and data processing
+ndarray = { version = "0.16", features = ["serde"] }
+smartcore = { version = "0.3", features = ["serde"] }
+
+# Async runtime and utilities
+tokio = { version = "1.0", features = ["full"] }
+tokio-util = "0.7"
+async-trait = "0.1"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Performance monitoring and concurrency
+once_cell = "1.19"
+parking_lot = "0.12"
+dashmap = "5.5"
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# UUID generation with performance features
+uuid = { version = "1.0", features = ["v4", "serde", "fast-rng"] }
+
+# Enhanced random number generation
+rand = "0.8"
+fastrand = "2.0"
+
+# Security and validation
+regex = "1.10"
+base64 = "0.21"
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Thread-safe collections and data structures
+arc-swap = "1.6"
+
+# Additional dependencies for enterprise features
+bincode = { version = "1.3", optional = true }
+linfa = { version = "0.7", optional = true }
+linfa-trees = { version = "0.7", optional = true }
+
+# Database drivers (optional) - using latest stable versions
+tokio-postgres = { version = "0.7", optional = true }
+deadpool-postgres = { version = "0.12", optional = true }
+mongodb = { version = "2.8", optional = true }
+redis = { version = "0.25", optional = true }
+# elasticsearch = { version = "8.15", optional = true } # Temporarily disabled - version issues
+diesel = { version = "2.1", optional = true }
+
+# Web server support (optional)
+axum = { version = "0.7", optional = true }
+tower = { version = "0.4", optional = true }
+
+# Compression support (optional)
+flate2 = { version = "1.0", optional = true }
+zstd = { version = "0.13", optional = true }
+
+[build-dependencies]
+napi-build = "2.2.0"
+
+[profile.release]
+lto = true
+strip = "symbols"
+codegen-units = 1
+panic = "abort"
+opt-level = 3
+
+[profile.dev]
+debug = true
+opt-level = 0
+
+# Feature flags for flexible enterprise deployment
+[features]
+default = ["local", "napi"]
+
+# Core features
+napi = []
+local = []
+
+# Enterprise feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "web-full"]
+full = ["enterprise", "diesel-orm", "compression", "advanced-config"]
+
+# Database features - elasticsearch temporarily disabled due to version issues
+all-databases = ["postgresql", "mongodb", "redis"]
+postgresql = ["dep:tokio-postgres", "dep:deadpool-postgres"]
+mongodb = ["dep:mongodb"]
+redis = ["dep:redis"]
+# elasticsearch = ["dep:elasticsearch"] # Temporarily disabled
+diesel-orm = ["dep:diesel"]
+
+# Service features
+messaging = []
+caching = []
+monitoring = []
+crypto = []
+web-full = ["dep:axum", "dep:tower"]
+compression = ["dep:flate2", "dep:zstd"]
+advanced-config = []

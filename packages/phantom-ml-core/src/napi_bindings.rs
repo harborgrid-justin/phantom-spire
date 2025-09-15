@@ -1,6 +1,6 @@
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
-use napi::{JsUnknown, Result as NapiResult, Status, Error as NapiError, Env, CallContext};
+use napi::{Unknown, Result as NapiResult, Status, Error as NapiError, Env, CallContext};
 use std::sync::Arc;
 use std::collections::HashMap;
 use crate::core::PhantomMLCore;
@@ -107,7 +107,7 @@ pub fn test_napi() -> NapiResult<String> {
 pub fn get_version() -> NapiResult<String> {
     let version_info = serde_json::json!({
         "version": env!("CARGO_PKG_VERSION"),
-        "build_target": env!("TARGET"),
+        "build_target": std::env::var("TARGET").unwrap_or_else(|_| "unknown".to_string()),
         "build_profile": if cfg!(debug_assertions) { "debug" } else { "release" },
         "napi_version": "3.3.0",
         "features": {

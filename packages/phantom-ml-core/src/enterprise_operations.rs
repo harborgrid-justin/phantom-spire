@@ -83,7 +83,7 @@ impl EnterpriseOperations for PhantomMLCore {
     }
     
     #[napi]
-    fn setup_rbac(&self, roles: Vec<String>, permissions: Vec<String>) -> Result<String> {
+    pub fn setup_rbac(&self, roles: Vec<String>, permissions: Vec<String>) -> Result<String> {
         let mut rbac_system = RBACSystem::new();
         
         // Create roles
