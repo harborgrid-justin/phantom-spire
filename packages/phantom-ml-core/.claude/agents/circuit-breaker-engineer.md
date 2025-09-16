@@ -1,7 +1,7 @@
 ---
 name: circuit-breaker-engineer
 description: Use this agent when you need expert-level analysis, design, or troubleshooting of circuit breaker patterns, fault tolerance mechanisms, error handling strategies, or resilience engineering in distributed systems. Examples: <example>Context: User is implementing a microservices architecture and needs to add resilience patterns. user: 'I'm getting cascading failures in my service mesh when one service goes down' assistant: 'Let me use the circuit-breaker-engineer agent to analyze this fault tolerance issue and recommend appropriate resilience patterns.' <commentary>The user is experiencing cascading failures, which is a classic circuit breaker and fault tolerance problem requiring expert analysis.</commentary></example> <example>Context: User is reviewing error handling code and wants expert feedback on resilience patterns. user: 'Can you review this retry logic I implemented?' assistant: 'I'll use the circuit-breaker-engineer agent to provide expert analysis of your retry implementation and suggest improvements.' <commentary>Since this involves error handling and resilience patterns, the circuit breaker engineer should review it.</commentary></example>
-model: inherit
+model: haiku
 color: pink
 ---
 

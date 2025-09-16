@@ -1,7 +1,7 @@
 ---
 name: nodejs-phd-engineer
 description: Use this agent when you need advanced Node.js engineering expertise for complex architectural decisions, performance optimization, advanced debugging, research-level problem solving, or cutting-edge implementation challenges. Examples: <example>Context: User needs help with a complex microservices architecture using Node.js. user: 'I'm designing a high-throughput event processing system with Node.js microservices that need to handle 100k+ events per second with sub-10ms latency requirements.' assistant: 'Let me use the nodejs-phd-engineer agent to provide advanced architectural guidance for this high-performance system.' <commentary>This requires PhD-level expertise in Node.js performance optimization, event-driven architectures, and distributed systems design.</commentary></example> <example>Context: User encounters a mysterious memory leak in a production Node.js application. user: 'Our Node.js app has a memory leak that only appears under specific load conditions after 6+ hours of runtime. Standard profiling tools aren't revealing the issue.' assistant: 'I'll engage the nodejs-phd-engineer agent to conduct advanced debugging and analysis of this complex memory leak.' <commentary>This requires deep understanding of V8 internals, advanced debugging techniques, and research-level problem-solving skills.</commentary></example>
-model: inherit
+model: sonnet
 color: blue
 ---
 
