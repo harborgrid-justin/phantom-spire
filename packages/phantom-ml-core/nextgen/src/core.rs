@@ -7,7 +7,6 @@ use crate::types::*;
 // use crate::database::InMemoryDatabase;
 // use crate::ml::{TrainingOperations, InferenceOperations, AnalyticsOperations};
 //use crate::automl::{AutoMLEngine, AutoMLConfig};
-use async_trait::async_trait;
 use napi_derive::napi;
 use parking_lot::Mutex;
 use std::collections::HashMap;
@@ -27,6 +26,7 @@ pub struct PhantomMLCore {
     version: String,
     initialized: bool,
     models: Arc<Mutex<HashMap<String, ModelMetadata>>>,
+    datasets: Arc<Mutex<HashMap<String, DatasetMetadata>>>,
     start_time: Instant,
     // Temporarily disabled for minimal build
     // enterprise_config: Option<EnterpriseConfig>,
@@ -42,6 +42,7 @@ impl PhantomMLCore {
             version: env!("CARGO_PKG_VERSION").to_string(),
             initialized: false,
             models: Arc::new(Mutex::new(HashMap::new())),
+            datasets: Arc::new(Mutex::new(HashMap::new())),
             start_time: Instant::now(),
             // Temporarily disabled for minimal build
             // enterprise_config: None,
@@ -66,6 +67,9 @@ impl PhantomMLCore {
 
         // Initialize core components
         self.initialized = true;
+
+        // Initialize sample datasets
+        self.initialize_sample_datasets();
 
         // Update performance stats
         {
@@ -223,6 +227,62 @@ impl PhantomMLCore {
 
     pub fn get_performance_stats_lock(&self) -> parking_lot::MutexGuard<'static, PerformanceStats> {
         PERFORMANCE_STATS.lock()
+    }
+
+    /// Initialize sample datasets for demonstration
+    fn initialize_sample_datasets(&self) {
+        let mut datasets = self.datasets.lock();
+
+        let sample_datasets = vec![
+            DatasetMetadata {
+                id: "ds_security_logs".to_string(),
+                name: "Security Event Logs".to_string(),
+                description: "Network security event logs for threat detection training".to_string(),
+                dataset_type: "security".to_string(),
+                size: 524288000, // 500MB
+                created_at: chrono::Utc::now().to_rfc3339(),
+                last_modified: chrono::Utc::now().to_rfc3339(),
+                status: "available".to_string(),
+                feature_count: 15,
+                sample_count: 100000,
+            },
+            DatasetMetadata {
+                id: "ds_user_behavior".to_string(),
+                name: "User Behavior Analytics".to_string(),
+                description: "User behavior patterns for anomaly detection".to_string(),
+                dataset_type: "behavioral".to_string(),
+                size: 134217728, // 128MB
+                created_at: chrono::Utc::now().to_rfc3339(),
+                last_modified: chrono::Utc::now().to_rfc3339(),
+                status: "available".to_string(),
+                feature_count: 8,
+                sample_count: 50000,
+            },
+            DatasetMetadata {
+                id: "ds_network_traffic".to_string(),
+                name: "Network Traffic Analysis".to_string(),
+                description: "Network traffic patterns for intrusion detection".to_string(),
+                dataset_type: "network".to_string(),
+                size: 1073741824, // 1GB
+                created_at: chrono::Utc::now().to_rfc3339(),
+                last_modified: chrono::Utc::now().to_rfc3339(),
+                status: "available".to_string(),
+                feature_count: 20,
+                sample_count: 250000,
+            },
+        ];
+
+        for dataset in sample_datasets {
+            datasets.insert(dataset.id.clone(), dataset);
+        }
+    }
+
+    #[napi(js_name = "getDatasets")]
+    pub fn get_datasets(&self) -> napi::Result<String> {
+        let datasets = self.datasets.lock();
+        let dataset_list: Vec<&DatasetMetadata> = datasets.values().collect();
+        serde_json::to_string(&dataset_list)
+            .map_err(|e| PhantomMLError::Internal(format!("Serialization error: {}", e)).into())
     }
 }
 

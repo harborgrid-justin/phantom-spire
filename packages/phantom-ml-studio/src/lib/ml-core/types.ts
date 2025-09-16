@@ -1,7 +1,157 @@
 /**
  * Type definitions for ML Core integration
+ * These types match the Rust NAPI structures from phantom-ml-core
  */
 
+// ===========================
+// CORE NATIVE EXTENSION TYPES
+// ===========================
+
+/**
+ * Training configuration for model training
+ */
+export interface TrainingConfig {
+  epochs: number
+  batch_size: number
+  validation_split: number
+  cross_validation: boolean
+  cross_validation_folds: number
+}
+
+/**
+ * Feature configuration for data preprocessing
+ */
+export interface FeatureConfig {
+  normalize: boolean
+  scale: boolean
+  handle_missing: string
+  categorical_encoding: string
+}
+
+/**
+ * Model configuration for training and deployment
+ */
+export interface ModelConfig {
+  model_type: string
+  algorithm: string
+  hyperparameters: string // JSON string for NAPI compatibility
+  feature_config: FeatureConfig
+  training_config: TrainingConfig
+}
+
+/**
+ * Enhanced model structure with comprehensive metadata
+ */
+export interface Model {
+  id: string
+  name: string
+  model_type: string
+  algorithm: string
+  version: string
+  status: string
+  accuracy?: number
+  precision?: number
+  recall?: number
+  f1_score?: number
+  created_at: string
+  last_trained?: string
+  training_time_ms?: number
+  dataset_id?: string
+  feature_count: number
+  model_size_mb: number
+  inference_time_avg_ms: number
+  tags: string[]
+}
+
+/**
+ * Enhanced dataset structure
+ */
+export interface Dataset {
+  id: string
+  name: string
+  description: string
+  dataset_type: string
+  format: string
+  size_bytes: number
+  size_human: string
+  created_at: string
+  last_modified: string
+  status: string
+  feature_count: number
+  sample_count: number
+  target_column?: string
+  missing_values_percent: number
+  data_quality_score: number
+  tags: string[]
+  source: string
+}
+
+/**
+ * Training metrics for progress tracking
+ */
+export interface TrainingMetrics {
+  train_loss: number[]
+  val_loss: number[]
+  train_accuracy: number[]
+  val_accuracy: number[]
+  learning_rate: number
+  batch_size: number
+  total_parameters: number
+  training_samples: number
+  validation_samples: number
+}
+
+/**
+ * Training job for async operations
+ */
+export interface TrainingJob {
+  job_id: string
+  model_id: string
+  status: string
+  progress_percent: number
+  current_epoch: number
+  total_epochs: number
+  current_loss?: number
+  best_accuracy?: number
+  started_at: string
+  estimated_completion?: string
+  error_message?: string
+  metrics: TrainingMetrics
+}
+
+/**
+ * Prediction result structure
+ */
+export interface PredictionResult {
+  prediction: number
+  confidence: number
+  model_id: string
+  features_used: string[]
+}
+
+/**
+ * System performance statistics
+ */
+export interface PerformanceStats {
+  total_operations: number
+  average_inference_time_ms: number
+  peak_memory_usage_mb: number
+  active_models: number
+  uptime_seconds: number
+}
+
+/**
+ * System information
+ */
+export interface SystemInfo {
+  platform: string
+  arch: string
+  version: string
+  target: string
+  features: string[]
+}
+
+// Legacy types for backward compatibility
 export interface MLModelConfig {
   modelType: 'classification' | 'regression' | 'clustering' | 'anomaly_detection' | 'time_series'
   algorithm: string
@@ -13,7 +163,22 @@ export interface MLModelConfig {
   tags?: string[]
 }
 
-export interface TrainingJob {
+/**
+ * Training result structure
+ */
+export interface TrainingResult {
+  model_id: string
+  status: string
+  accuracy: number
+  metrics: string
+  training_time_ms: number
+}
+
+/**
+ * Legacy training job for backward compatibility
+ * @deprecated Use TrainingJob from core types instead
+ */
+export interface LegacyTrainingJob {
   id: string
   modelConfig: MLModelConfig
   status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
@@ -23,6 +188,43 @@ export interface TrainingJob {
   result?: TrainingResult
   error?: string
   logs: string[]
+}
+
+/**
+ * Studio-specific training job with UI properties
+ */
+export interface StudioTrainingJob extends TrainingJob {
+  logs: string[]
+  result?: TrainingResult
+}
+
+/**
+ * Model metadata for legacy compatibility
+ */
+export interface ModelMetadata {
+  id: string
+  name: string
+  model_type: string
+  version: string
+  created_at: string
+  accuracy?: number
+  status: string
+}
+
+/**
+ * Dataset metadata for legacy compatibility
+ */
+export interface DatasetMetadata {
+  id: string
+  name: string
+  description: string
+  dataset_type: string
+  size: number
+  created_at: string
+  last_modified: string
+  status: string
+  feature_count: number
+  sample_count: number
 }
 
 export interface ModelEvaluation {
@@ -66,7 +268,11 @@ export interface ModelDeployment {
   updatedAt: string
 }
 
-export interface Dataset {
+/**
+ * Legacy dataset interface - use Dataset from core types instead
+ * @deprecated Use Dataset interface instead
+ */
+export interface LegacyDataset {
   id: string
   name: string
   description?: string
@@ -263,4 +469,86 @@ export interface Alert {
   acknowledgedAt?: string
   resolvedAt?: string
   assignee?: string
+}
+
+// ===========================
+// API RESPONSE WRAPPER TYPES
+// ===========================
+
+/**
+ * Standard API response wrapper
+ */
+export interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  timestamp: string
+}
+
+/**
+ * API error response
+ */
+export interface ApiError {
+  code: string
+  message: string
+  details?: Record<string, any>
+  timestamp: string
+}
+
+/**
+ * Health check response
+ */
+export interface HealthCheckResponse {
+  status: 'healthy' | 'degraded' | 'unhealthy'
+  version: string
+  uptime: number
+  components: {
+    native_extension: boolean
+    database: boolean
+    storage: boolean
+  }
+  timestamp: string
+}
+
+// ===========================
+// UTILITY TYPES
+// ===========================
+
+/**
+ * Configuration for ML Core integration
+ */
+export interface MLCoreConfig {
+  environment: string
+  features: string[]
+  fallback_to_mock: boolean
+  api_timeout_ms: number
+}
+
+/**
+ * Status of ML Core initialization
+ */
+export interface MLCoreStatus {
+  isInitialized: boolean
+  isLoading: boolean
+  error?: string
+  hasNativeExtension: boolean
+  version?: string
+}
+
+/**
+ * Native extension interface definition
+ */
+export interface PhantomMLCore {
+  getVersion(): string
+  initialize(config?: string): boolean
+  isInitialized(): boolean
+  hello(): string
+  plus100(input: number): number
+
+  // New expanded API functions
+  getModels(): Model[]
+  getDatasets(): Dataset[]
+  getPerformanceStats(): PerformanceStats
+  trainModel(config: TrainingConfig): TrainingJob
+  getPredictions(modelId: string, data: string): PredictionResult
 }

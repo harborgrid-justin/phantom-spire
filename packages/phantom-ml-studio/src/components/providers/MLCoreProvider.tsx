@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { mlCoreManager, MLConfig, ModelMetadata, TrainingResult, PredictionResult, PerformanceStats, SystemInfo } from '../../lib/ml-core'
+import { mlCoreManager, MLConfig, ModelMetadata, TrainingResult, PredictionResult, PerformanceStats, SystemInfo, DatasetMetadata } from '../../lib/ml-core'
 
 interface MLCoreContextType {
   isInitialized: boolean
@@ -12,16 +12,19 @@ interface MLCoreContextType {
   trainModel: (config: MLConfig) => Promise<TrainingResult>
   predict: (modelId: string, features: number[]) => Promise<PredictionResult>
   getModels: () => Promise<ModelMetadata[]>
+  getDatasets: () => Promise<DatasetMetadata[]>
   getPerformanceStats: () => Promise<PerformanceStats>
   getSystemInfo: () => Promise<SystemInfo>
 
   // State
   models: ModelMetadata[]
+  datasets: DatasetMetadata[]
   performanceStats: PerformanceStats | null
   systemInfo: SystemInfo | null
 
   // Utility methods
   refreshModels: () => Promise<void>
+  refreshDatasets: () => Promise<void>
   refreshStats: () => Promise<void>
 }
 
@@ -36,6 +39,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [models, setModels] = useState<ModelMetadata[]>([])
+  const [datasets, setDatasets] = useState<DatasetMetadata[]>([])
   const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null)
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
 
@@ -52,6 +56,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
         // Load initial data
         await Promise.all([
           refreshModels(),
+          refreshDatasets(),
           refreshStats(),
           loadSystemInfo()
         ])
@@ -75,6 +80,15 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
       setModels(modelList)
     } catch (err) {
       console.error('Failed to refresh models:', err)
+    }
+  }
+
+  const refreshDatasets = async () => {
+    try {
+      const datasetList = await mlCoreManager.getDatasets()
+      setDatasets(datasetList)
+    } catch (err) {
+      console.error('Failed to refresh datasets:', err)
     }
   }
 
@@ -126,6 +140,12 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     return modelList
   }
 
+  const getDatasets = async (): Promise<DatasetMetadata[]> => {
+    const datasetList = await mlCoreManager.getDatasets()
+    setDatasets(datasetList)
+    return datasetList
+  }
+
   const getPerformanceStats = async (): Promise<PerformanceStats> => {
     const stats = await mlCoreManager.getPerformanceStats()
     setPerformanceStats(stats)
@@ -142,22 +162,37 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     isInitialized,
     isLoading,
     error,
+    hasNativeExtension,
+    version,
 
-    // Core methods
+    // Enhanced Core methods
     trainModel,
-    predict,
+    getPredictions,
     getModels,
+    getDatasets,
     getPerformanceStats,
     getSystemInfo,
+    healthCheck,
 
-    // State
+    // Legacy methods for backward compatibility
+    trainModelLegacy,
+    predict,
+    getModelsLegacy,
+    getDatasetsLegacy,
+
+    // Enhanced State
     models,
+    datasets,
     performanceStats,
     systemInfo,
+    mlCoreStatus,
 
-    // Utility methods
+    // Enhanced Utility methods
     refreshModels,
-    refreshStats
+    refreshDatasets,
+    refreshStats,
+    refreshSystemInfo,
+    refreshAll
   }
 
   return (
