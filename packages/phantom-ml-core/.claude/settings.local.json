@@ -13,7 +13,9 @@
       "Bash(dir:*)",
       "Bash(npx napi build:*)",
       "Bash(find:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(grep:*)",
+      "Read(//c/phantom-spire/packages/**)"
     ],
     "deny": [],
     "ask": []
