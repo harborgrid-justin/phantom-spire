@@ -20,7 +20,9 @@
       "Bash(npx next dev:*)",
       "Bash(npx tsc:*)",
       "Bash(cat:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(rm:*)",
+      "Bash(ln:*)"
     ],
     "deny": [],
     "ask": []
