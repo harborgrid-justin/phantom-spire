@@ -1,87 +1,280 @@
-# `@napi-rs/package-template`
+# @phantom-spire/ml-core
 
-![https://github.com/napi-rs/package-template/actions](https://github.com/napi-rs/package-template/workflows/CI/badge.svg)
+Enterprise machine learning services for threat detection and security analytics - Part of the Phantom Spire CTI Platform.
 
-> Template project for writing node packages with napi-rs.
+## Overview
 
-# Usage
+This is a Node.js module that provides Rust-powered machine learning capabilities through NAPI-RS v3.x. The module includes both the native `.node` binary and JavaScript/TypeScript bindings for easy integration.
 
-1. Click **Use this template**.
-2. **Clone** your project.
-3. Run `yarn install` to install dependencies.
-4. Run `yarn napi rename -n [@your-scope/package-name] -b [binary-name]` command under the project folder to rename your package.
+## Installation
 
-## Install this test package
+### Local Installation
 
-```bash
-yarn add @napi-rs/package-template
-```
-
-## Ability
-
-### Build
-
-After `yarn build/npm run build` command, you can see `package-template.[darwin|win32|linux].node` file in project root. This is the native addon built from [lib.rs](./src/lib.rs).
-
-### Test
-
-With [ava](https://github.com/avajs/ava), run `yarn test/npm run test` to testing native addon. You can also switch to another testing framework if you want.
-
-### CI
-
-With GitHub Actions, each commit and pull request will be built and tested automatically in [`node@20`, `@node22`] x [`macOS`, `Linux`, `Windows`] matrix. You will never be afraid of the native addon broken in these platforms.
-
-### Release
-
-Release native package is very difficult in old days. Native packages may ask developers who use it to install `build toolchain` like `gcc/llvm`, `node-gyp` or something more.
-
-With `GitHub actions`, we can easily prebuild a `binary` for major platforms. And with `N-API`, we should never be afraid of **ABI Compatible**.
-
-The other problem is how to deliver prebuild `binary` to users. Downloading it in `postinstall` script is a common way that most packages do it right now. The problem with this solution is it introduced many other packages to download binary that has not been used by `runtime codes`. The other problem is some users may not easily download the binary from `GitHub/CDN` if they are behind a private network (But in most cases, they have a private NPM mirror).
-
-In this package, we choose a better way to solve this problem. We release different `npm packages` for different platforms. And add it to `optionalDependencies` before releasing the `Major` package to npm.
-
-`NPM` will choose which native package should download from `registry` automatically. You can see [npm](./npm) dir for details. And you can also run `yarn add @napi-rs/package-template` to see how it works.
-
-## Develop requirements
-
-- Install the latest `Rust`
-- Install `Node.js@10+` which fully supported `Node-API`
-- Install `yarn@1.x`
-
-## Test in local
-
-- yarn
-- yarn build
-- yarn test
-
-And you will see:
+You can install this module locally from the current directory:
 
 ```bash
-$ ava --verbose
-
-  ✔ sync function from native code
-  ✔ sleep function from native code (201ms)
-  ─
-
-  2 tests passed
-✨  Done in 1.12s.
+npm install
+npm run build
 ```
 
-## Release package
+### As a Dependency
 
-Ensure you have set your **NPM_TOKEN** in the `GitHub` project setting.
+Add to your `package.json`:
 
-In `Settings -> Secrets`, add **NPM_TOKEN** into it.
+```json
+{
+  "dependencies": {
+    "@phantom-spire/ml-core": "file:./path/to/this/directory"
+  }
+}
+```
 
-When you want to release the package:
+Or install directly:
 
 ```bash
-npm version [<newversion> | major | minor | patch | premajor | preminor | prepatch | prerelease [--preid=<prerelease-id>] | from-git]
-
-git push
+npm install ./path/to/this/directory
 ```
 
-GitHub actions will do the rest job for you.
+## Usage
 
-> WARN: Don't run `npm publish` manually.
+### JavaScript/CommonJS
+
+```javascript
+const phantomML = require('@phantom-spire/ml-core');
+
+// Test basic functionality
+console.log(phantomML.testNapi());
+
+// Get system information
+console.log(phantomML.getSystemInfo());
+
+// Get version
+console.log(phantomML.getVersion());
+
+// Create ML Core instance
+const core = new phantomML.PhantomMLCore();
+console.log('Version:', core.getVersion());
+
+// Initialize the core
+core.initialize();
+console.log('Initialized:', core.isInitialized());
+
+// Train a simple model
+const config = {
+  model_type: 'linear_regression',
+  parameters: '{"learning_rate": 0.01}'
+};
+const trainingResult = phantomML.trainSimpleModel(config);
+console.log('Training result:', trainingResult);
+
+// Make predictions
+phantomML.predictSimple('model_001', [1.0, 2.0, 3.0])
+  .then(result => console.log('Prediction:', result))
+  .catch(err => console.error('Prediction error:', err));
+```
+
+### TypeScript/ESM
+
+```typescript
+import {
+  PhantomMLCore,
+  testNapi,
+  getSystemInfo,
+  getVersion,
+  trainSimpleModel,
+  predictSimple,
+  SimpleMLConfig
+} from '@phantom-spire/ml-core';
+
+// Test basic functionality
+console.log(testNapi());
+
+// Get system information
+console.log(getSystemInfo());
+
+// Create ML Core instance
+const core = new PhantomMLCore();
+console.log('Version:', core.getVersion());
+
+// Train a model with proper typing
+const config: SimpleMLConfig = {
+  model_type: 'random_forest',
+  parameters: JSON.stringify({
+    n_estimators: 100,
+    max_depth: 10
+  })
+};
+
+const result = trainSimpleModel(config);
+console.log('Training result:', result);
+
+// Async prediction
+const prediction = await predictSimple('model_001', [1.5, 2.5, 3.5]);
+console.log('Prediction:', prediction);
+```
+
+## API Reference
+
+### Classes
+
+#### `PhantomMLCore`
+
+Main class for machine learning operations.
+
+```typescript
+class PhantomMLCore {
+  constructor();
+  getVersion(): string;
+  initialize(): boolean;
+  isInitialized(): boolean;
+}
+```
+
+### Functions
+
+#### `testNapi(): string`
+
+Tests that the NAPI binding is working correctly.
+
+#### `getVersion(): string`
+
+Returns version information as JSON string.
+
+#### `getSystemInfo(): string`
+
+Returns system information including platform, architecture, and version.
+
+#### `trainSimpleModel(config: SimpleMLConfig): string`
+
+Trains a simple model with the given configuration.
+
+#### `predictSimple(modelId: string, features: number[]): Promise<string>`
+
+Makes predictions using a trained model (async function).
+
+### Interfaces
+
+```typescript
+interface SimpleMLConfig {
+  model_type: string;
+  parameters: string; // JSON string
+}
+
+interface FeatureConfig {
+  normalize: boolean;
+  scale: boolean;
+  handleMissing: string;
+  categoricalEncoding: string;
+}
+
+interface TrainingConfig {
+  epochs: number;
+  batchSize: number;
+  validationSplit: number;
+  crossValidation: boolean;
+  crossValidationFolds: number;
+}
+```
+
+## Development
+
+### Building
+
+```bash
+# Build in development mode
+npm run build:dev
+
+# Build in release mode
+npm run build
+
+# Build for debugging
+npm run build:debug
+```
+
+### Testing
+
+```bash
+# Run JavaScript tests
+npm test
+
+# Run native Rust tests
+npm run test:native
+
+# Run development server
+npm run dev
+```
+
+### Formatting
+
+```bash
+# Format all code
+npm run format
+
+# Format specific languages
+npm run format:rs      # Rust
+npm run format:prettier # JS/TS
+npm run format:toml    # TOML files
+```
+
+## File Structure
+
+```
+.
+├── package.json          # Node.js package configuration
+├── index.js              # Main JavaScript entry point
+├── index.d.ts            # TypeScript definitions
+├── phantom_ml_core.node  # Native binary (generated)
+├── src/                  # Rust source code
+│   ├── lib.rs           # Main library
+│   └── napi_simple.rs   # NAPI bindings
+├── Cargo.toml           # Rust package configuration
+└── README.md            # This file
+```
+
+## Platform Support
+
+This module supports the following platforms:
+
+- **Windows**: x64, ia32, arm64
+- **macOS**: x64, arm64 (Apple Silicon)
+- **Linux**: x64, arm64, arm (GNU and musl)
+- **FreeBSD**: x64, arm64
+- **Android**: arm64, arm
+- **OpenHarmony**: x64, arm64, arm
+
+## Enterprise Features
+
+- Advanced memory-aligned SIMD operations
+- Enterprise-grade rate limiting and security
+- Comprehensive input validation and sanitization
+- Multi-database support for federated queries
+- HuggingFace integration for modern ML workflows
+
+## Troubleshooting
+
+### Module Loading Issues
+
+If you encounter segmentation faults or loading issues:
+
+1. **Rebuild the module**: `npm run build`
+2. **Check Node.js version**: Requires Node.js 8.9.0+
+3. **Platform compatibility**: Ensure your platform is supported
+4. **Clean rebuild**: `npm run clean && npm run build`
+
+### Common Issues
+
+- **Missing .node file**: Run `npm run build` to generate it
+- **Version mismatch**: Ensure all dependencies are compatible
+- **Platform-specific binaries**: The correct .node file will be loaded automatically
+
+## License
+
+MIT License - see LICENSE file for details.
+
+## Contributing
+
+This module is part of the Phantom Spire CTI Platform. For issues and contributions, please refer to the main repository.
+
+---
+
+**Note**: This module contains native code and requires Node.js 8.9.0 or later. The `.node` file is platform-specific and will be automatically selected based on your system.
