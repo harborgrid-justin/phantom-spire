@@ -17,7 +17,7 @@ pub struct MLConfig {
 pub struct ModelConfig {
     pub model_type: String,
     pub algorithm: String,
-    pub hyperparameters: serde_json::Value,
+    pub hyperparameters: String, // JSON string instead of Value for NAPI compatibility
     pub feature_config: FeatureConfig,
     pub training_config: TrainingConfig,
 }

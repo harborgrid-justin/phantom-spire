@@ -5,7 +5,7 @@
 
 use super::*;
 use crate::agents::{AgentContext, AgentResult};
-use napi::bindgen_prelude::*;
+use napi::{Error, Status};
 use napi_derive::napi;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -32,7 +32,7 @@ impl PluginSystemApi {
         &self,
         config_directory: Option<String>,
         environment: Option<String>,
-    ) -> Result<()> {
+    ) -> napi::Result<()> {
         let config_dir = config_directory.unwrap_or_else(|| "./plugins".to_string());
         let env = environment.unwrap_or_else(|| "development".to_string());
 
@@ -71,7 +71,7 @@ impl PluginSystemApi {
 
     /// List all available plugins
     #[napi]
-    pub async fn list_plugins(&self) -> Result<Vec<String>> {
+    pub async fn list_plugins(&self) -> napi::Result<Vec<String>> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             Ok(api.list_plugins().await)
@@ -82,7 +82,7 @@ impl PluginSystemApi {
 
     /// Get plugin information
     #[napi]
-    pub async fn get_plugin_info(&self, plugin_id: String) -> Result<Option<PluginInfoJs>> {
+    pub async fn get_plugin_info(&self, plugin_id: String) -> napi::Result<Option<PluginInfoJs>> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             Ok(api.get_plugin_info(&plugin_id).await.map(|metadata| PluginInfoJs {
@@ -110,7 +110,7 @@ impl PluginSystemApi {
         plugin_id: String,
         operation: String,
         input: serde_json::Value,
-    ) -> Result<serde_json::Value> {
+    ) -> napi::Result<serde_json::Value> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             api.execute_plugin(&plugin_id, &operation, input).await
@@ -126,7 +126,7 @@ impl PluginSystemApi {
         &self,
         plugin_id: String,
         agent_context: AgentContextJs,
-    ) -> Result<AgentResultJs> {
+    ) -> napi::Result<AgentResultJs> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             let context = AgentContext {
@@ -161,7 +161,7 @@ impl PluginSystemApi {
         &self,
         query: String,
         limit: Option<u32>,
-    ) -> Result<Vec<MarketplaceEntryJs>> {
+    ) -> napi::Result<Vec<MarketplaceEntryJs>> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             let results = api.search_marketplace(&query, limit).await
@@ -193,7 +193,7 @@ impl PluginSystemApi {
         plugin_id: String,
         version: Option<String>,
         target_directory: String,
-    ) -> Result<InstallationResultJs> {
+    ) -> napi::Result<InstallationResultJs> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             let result = api.install_plugin(
@@ -224,7 +224,7 @@ impl PluginSystemApi {
         &self,
         plugin_id: String,
         updates: HashMap<String, serde_json::Value>,
-    ) -> Result<()> {
+    ) -> napi::Result<()> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             api.update_plugin_config(&plugin_id, updates).await
@@ -236,7 +236,7 @@ impl PluginSystemApi {
 
     /// Get plugin health status
     #[napi]
-    pub async fn get_plugin_health(&self, plugin_id: String) -> Result<Option<PluginHealthJs>> {
+    pub async fn get_plugin_health(&self, plugin_id: String) -> napi::Result<Option<PluginHealthJs>> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             Ok(api.get_plugin_health(&plugin_id).await.map(|health| PluginHealthJs {
@@ -264,7 +264,7 @@ impl PluginSystemApi {
 
     /// Get system metrics
     #[napi]
-    pub async fn get_metrics(&self) -> Result<serde_json::Value> {
+    pub async fn get_metrics(&self) -> napi::Result<serde_json::Value> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             let metrics = api.get_metrics().await;
@@ -282,7 +282,7 @@ impl PluginSystemApi {
         recipient: String,
         message_type: String,
         payload: serde_json::Value,
-    ) -> Result<()> {
+    ) -> napi::Result<()> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             api.send_plugin_message(&sender, &recipient, &message_type, payload).await
@@ -294,7 +294,7 @@ impl PluginSystemApi {
 
     /// Shutdown the plugin system
     #[napi]
-    pub async fn shutdown(&self) -> Result<()> {
+    pub async fn shutdown(&self) -> napi::Result<()> {
         let mut inner = self.inner.write().await;
         if let Some(api) = inner.take() {
             api.shutdown().await
@@ -306,7 +306,7 @@ impl PluginSystemApi {
 
     /// Create example plugins for testing
     #[napi]
-    pub async fn create_example_plugins(&self) -> Result<Vec<String>> {
+    pub async fn create_example_plugins(&self) -> napi::Result<Vec<String>> {
         let inner = self.inner.read().await;
         if let Some(_api) = inner.as_ref() {
             // Return list of example plugins that can be created
@@ -327,7 +327,7 @@ impl PluginSystemApi {
         example_type: String,
         operation: String,
         sample_data: serde_json::Value,
-    ) -> Result<serde_json::Value> {
+    ) -> napi::Result<serde_json::Value> {
         let inner = self.inner.read().await;
         if let Some(api) = inner.as_ref() {
             let plugin_id = match example_type.as_str() {
@@ -423,7 +423,7 @@ pub struct PluginHealthJs {
 pub async fn create_plugin_system(
     config_directory: Option<String>,
     environment: Option<String>,
-) -> Result<PluginSystemApi> {
+) -> napi::Result<PluginSystemApi> {
     let api = PluginSystemApi::new();
     api.initialize(config_directory, environment).await?;
     Ok(api)
@@ -464,7 +464,7 @@ pub fn create_sample_plugin_config(plugin_id: String) -> serde_json::Value {
 
 /// Validate plugin manifest format
 #[napi]
-pub fn validate_plugin_manifest(manifest: serde_json::Value) -> Result<bool> {
+pub fn validate_plugin_manifest(manifest: serde_json::Value) -> napi::Result<bool> {
     // Basic validation of plugin manifest structure
     let plugin_section = manifest.get("plugin")
         .ok_or_else(|| Error::new(Status::InvalidArg, "Missing [plugin] section"))?;
@@ -490,7 +490,7 @@ pub fn validate_plugin_manifest(manifest: serde_json::Value) -> Result<bool> {
 
 /// Create sample data for testing plugins
 #[napi]
-pub fn create_sample_data(data_type: String) -> Result<serde_json::Value> {
+pub fn create_sample_data(data_type: String) -> napi::Result<serde_json::Value> {
     match data_type.as_str() {
         "log_entries" => {
             Ok(serde_json::json!([

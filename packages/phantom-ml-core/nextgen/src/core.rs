@@ -2,19 +2,19 @@
 
 use crate::error::{PhantomMLError, Result};
 use crate::types::*;
-use crate::enterprise::{EnterpriseConfig, EnterpriseOperations, TenantConfig, AuditLogEntry};
-use crate::database::InMemoryDatabase;
-use crate::ml::{TrainingOperations, InferenceOperations, AnalyticsOperations};
+// Temporarily disabled imports for minimal build
+// use crate::enterprise::{EnterpriseConfig, EnterpriseOperations, TenantConfig, AuditLogEntry};
+// use crate::database::InMemoryDatabase;
+// use crate::ml::{TrainingOperations, InferenceOperations, AnalyticsOperations};
 //use crate::automl::{AutoMLEngine, AutoMLConfig};
 use async_trait::async_trait;
 use napi_derive::napi;
 use parking_lot::Mutex;
-use serde_json;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
-static PERFORMANCE_STATS: Mutex<PerformanceStats> = Mutex::new(PerformanceStats {
+static PERFORMANCE_STATS: parking_lot::Mutex<PerformanceStats> = parking_lot::Mutex::new(PerformanceStats {
     total_operations: 0,
     average_inference_time_ms: 0.0,
     peak_memory_usage_mb: 0.0,
@@ -28,9 +28,10 @@ pub struct PhantomMLCore {
     initialized: bool,
     models: Arc<Mutex<HashMap<String, ModelMetadata>>>,
     start_time: Instant,
-    enterprise_config: Option<EnterpriseConfig>,
-    #[allow(dead_code)]
-    database: Arc<InMemoryDatabase>,
+    // Temporarily disabled for minimal build
+    // enterprise_config: Option<EnterpriseConfig>,
+    // #[allow(dead_code)]
+    // database: Arc<InMemoryDatabase>,
 }
 
 #[napi]
@@ -42,8 +43,9 @@ impl PhantomMLCore {
             initialized: false,
             models: Arc::new(Mutex::new(HashMap::new())),
             start_time: Instant::now(),
-            enterprise_config: None,
-            database: Arc::new(InMemoryDatabase::new()),
+            // Temporarily disabled for minimal build
+            // enterprise_config: None,
+            // database: Arc::new(InMemoryDatabase::new()),
         }
     }
 
@@ -81,7 +83,13 @@ impl PhantomMLCore {
 
     /// Internal method to create models with ModelConfig
     pub fn create_model_internal(&self, config: &ModelConfig) -> Result<String> {
-        let model_id = format!("model_{}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs());
+        let model_id = format!(
+            "model_{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_err(|e| PhantomMLError::Internal(format!("System time error: {}", e)))?
+                .as_secs()
+        );
 
         let metadata = ModelMetadata {
             id: model_id.clone(),
@@ -106,7 +114,13 @@ impl PhantomMLCore {
         let start_time = Instant::now();
 
         // Simulate model training
-        let model_id = format!("model_{}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs());
+        let model_id = format!(
+            "model_{}",
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map_err(|e| PhantomMLError::Internal(format!("System time error: {}", e)))?
+                .as_secs()
+        );
 
         let metadata = ModelMetadata {
             id: model_id.clone(),
@@ -145,7 +159,8 @@ impl PhantomMLCore {
             stats.active_models += 1;
         }
 
-        Ok(serde_json::to_string(&result).unwrap())
+        serde_json::to_string(&result)
+            .map_err(|e| PhantomMLError::Internal(format!("Serialization error: {}", e)).into())
     }
 
     #[napi(js_name = "predict")]
@@ -186,21 +201,24 @@ impl PhantomMLCore {
                 / stats.total_operations as f64;
         }
 
-        Ok(serde_json::to_string(&result).unwrap())
+        serde_json::to_string(&result)
+            .map_err(|e| PhantomMLError::Internal(format!("Serialization error: {}", e)).into())
     }
 
     #[napi(js_name = "getModels")]
     pub fn get_models(&self) -> napi::Result<String> {
         let models = self.models.lock();
         let model_list: Vec<&ModelMetadata> = models.values().collect();
-        Ok(serde_json::to_string(&model_list).unwrap())
+        serde_json::to_string(&model_list)
+            .map_err(|e| PhantomMLError::Internal(format!("Serialization error: {}", e)).into())
     }
 
     #[napi(js_name = "getPerformanceStats")]
     pub fn get_performance_stats(&self) -> napi::Result<String> {
         let mut stats = PERFORMANCE_STATS.lock();
         stats.uptime_seconds = self.start_time.elapsed().as_secs() as i64;
-        Ok(serde_json::to_string(&*stats).unwrap())
+        serde_json::to_string(&*stats)
+            .map_err(|e| PhantomMLError::Internal(format!("Serialization error: {}", e)).into())
     }
 
     pub fn get_performance_stats_lock(&self) -> parking_lot::MutexGuard<'static, PerformanceStats> {
@@ -223,7 +241,7 @@ pub fn get_system_info() -> String {
         ],
     };
 
-    serde_json::to_string(&system_info).unwrap()
+    serde_json::to_string(&system_info).unwrap_or_else(|_| "{}".to_string())
 }
 
 #[napi(js_name = "getBuildInfo")]
@@ -241,6 +259,8 @@ pub fn get_build_info() -> String {
     }).to_string()
 }
 
+// Temporarily disabled for minimal build
+/*
 impl EnterpriseOperations for PhantomMLCore {
     fn initialize_enterprise(&mut self, config: EnterpriseConfig) -> Result<()> {
         self.enterprise_config = Some(config);
@@ -305,7 +325,10 @@ impl EnterpriseOperations for PhantomMLCore {
         Ok(governance_result.to_string())
     }
 }
+*/
 
+// Temporarily disabled for minimal build - all trait implementations
+/*
 // Implement all the ML operation traits for PhantomMLCore
 impl TrainingOperations for PhantomMLCore {
     fn train_model(&self, config: MLConfig) -> Result<String> {
@@ -996,9 +1019,9 @@ impl AnalyticsOperations for PhantomMLCore {
                     .sum::<f64>() / accuracies.len() as f64;
 
                 let best_model = model_performance_data.iter()
-                    .max_by(|a, b| a.accuracy.partial_cmp(&b.accuracy).unwrap());
+                    .max_by(|a, b| a.accuracy.partial_cmp(&b.accuracy).unwrap_or(std::cmp::Ordering::Equal));
                 let worst_model = model_performance_data.iter()
-                    .min_by(|a, b| a.accuracy.partial_cmp(&b.accuracy).unwrap());
+                    .min_by(|a, b| a.accuracy.partial_cmp(&b.accuracy).unwrap_or(std::cmp::Ordering::Equal));
 
                 if let (Some(best), Some(worst)) = (best_model, worst_model) {
                     insights.push(serde_json::json!({
@@ -1360,7 +1383,7 @@ impl AnalyticsOperations for PhantomMLCore {
         correlations.sort_by(|a, b| {
             b.get("correlation").and_then(|v| v.as_f64()).unwrap_or(0.0).abs()
                 .partial_cmp(&a.get("correlation").and_then(|v| v.as_f64()).unwrap_or(0.0).abs())
-                .unwrap()
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         let analysis_time = start_time.elapsed().as_millis() as u64;
@@ -1501,3 +1524,4 @@ impl AnalyticsOperations for PhantomMLCore {
         Ok(serde_json::json!({"metrics_id": uuid::Uuid::new_v4().to_string(), "kpis": {"total_models": total_models, "active_models": active_models, "model_utilization_percent": model_utilization, "average_model_accuracy": average_accuracy, "business_value_score": business_value_score}, "processing_time_ms": processing_time}).to_string())
     }
 }
+*/

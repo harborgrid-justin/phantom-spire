@@ -11,24 +11,24 @@
 
 pub mod core;
 pub mod loader;
-pub mod wasm;
+// pub mod wasm; // Temporarily disabled due to wasmparser dependency issues
 pub mod registry;
 pub mod config;
 pub mod security;
-pub mod discovery;
+// pub mod discovery; // Temporarily disabled due to walkdir dependency issues
 pub mod api;
 pub mod marketplace;
 pub mod monitoring;
-pub mod examples;
+// pub mod examples; // Temporarily disabled due to trait object issues
 pub mod napi;
 
 pub use core::*;
 pub use loader::*;
-pub use wasm::*;
+// pub use wasm::*;
 pub use registry::*;
 pub use config::*;
 pub use security::*;
-pub use discovery::*;
+// pub use discovery::*;
 pub use api::*;
 pub use marketplace::*;
 pub use monitoring::*;
