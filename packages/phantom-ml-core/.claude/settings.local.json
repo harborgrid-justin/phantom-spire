@@ -16,7 +16,8 @@
       "mcp__ide__getDiagnostics",
       "Bash(grep:*)",
       "Read(//c/phantom-spire/packages/**)",
-      "Read(//c/phantom-spire/**)"
+      "Read(//c/phantom-spire/**)",
+      "Bash(npx next dev:*)"
     ],
     "deny": [],
     "ask": []
