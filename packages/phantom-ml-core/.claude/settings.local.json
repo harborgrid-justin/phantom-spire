@@ -11,7 +11,9 @@
       "Bash(rustc:*)",
       "Bash(cargo:*)",
       "Bash(dir:*)",
-      "Bash(npx napi build:*)"
+      "Bash(npx napi build:*)",
+      "Bash(find:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
