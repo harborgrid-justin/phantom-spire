@@ -6,7 +6,7 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
+  
   Button,
   Chip,
   Table,
@@ -35,6 +35,7 @@ import {
   Badge,
   IconButton
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Search,
   Security,
@@ -190,7 +191,7 @@ export default function ThreatIntelligenceClient() {
 
       setThreatFeeds(mockFeeds);
       setLoading(false);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch threat feeds');
       setLoading(false);
     }
@@ -246,7 +247,7 @@ export default function ThreatIntelligenceClient() {
       ];
 
       setThreatData(mockThreatData);
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to fetch threat data:', err);
     }
   };
@@ -261,27 +262,27 @@ export default function ThreatIntelligenceClient() {
     return matchesSearch && matchesCategory && matchesPricing;
   });
 
-  const handleSubscribe = async (feedId: string) => {
+  const handleSubscribe = async (_feedId: string) => {
     try {
       setThreatFeeds(feeds => feeds.map(feed =>
         feed.id === feedId ? { ...feed, subscribed: true } : feed
       ));
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to subscribe to feed');
     }
   };
 
-  const handleUnsubscribe = async (feedId: string) => {
+  const handleUnsubscribe = async (_feedId: string) => {
     try {
       setThreatFeeds(feeds => feeds.map(feed =>
         feed.id === feedId ? { ...feed, subscribed: false } : feed
       ));
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to unsubscribe from feed');
     }
   };
 
-  const getCategoryColor = (category: string) => {
+  const getCategoryColor = (_category: string) => {
     const colors: { [key: string]: any } = {
       'malware': 'error',
       'phishing': 'warning',
@@ -293,7 +294,7 @@ export default function ThreatIntelligenceClient() {
     return colors[category] || 'default';
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (_severity: string) => {
     switch (severity) {
       case 'critical': return 'error';
       case 'high': return 'warning';
@@ -345,7 +346,7 @@ export default function ThreatIntelligenceClient() {
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} md={4}>
+                <Grid xs={12} md={4}>
                   <TextField
                     fullWidth
                     placeholder="Search feeds..."
@@ -360,7 +361,7 @@ export default function ThreatIntelligenceClient() {
                     }}
                   />
                 </Grid>
-                <Grid item xs={12} md={3}>
+                <Grid xs={12} md={3}>
                   <FormControl fullWidth>
                     <InputLabel>Category</InputLabel>
                     <Select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
@@ -374,7 +375,7 @@ export default function ThreatIntelligenceClient() {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} md={3}>
+                <Grid xs={12} md={3}>
                   <FormControl fullWidth>
                     <InputLabel>Pricing</InputLabel>
                     <Select value={pricingFilter} onChange={(e) => setPricingFilter(e.target.value)}>
@@ -392,7 +393,7 @@ export default function ThreatIntelligenceClient() {
           {/* Feeds Grid */}
           <Grid container spacing={3}>
             {filteredFeeds.map((feed) => (
-              <Grid item xs={12} md={6} lg={4} key={feed.id}>
+              <Grid xs={12} md={6} lg={4} key={feed.id}>
                 <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
@@ -490,34 +491,34 @@ export default function ThreatIntelligenceClient() {
       {activeTab === 1 && (
         <Grid container spacing={3}>
           {threatFeeds.filter(feed => feed.subscribed).map((feed) => (
-            <Grid item xs={12} key={feed.id}>
+            <Grid xs={12} key={feed.id}>
               <Card>
                 <CardContent>
                   <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={3}>
+                    <Grid xs={12} md={3}>
                       <Typography variant="h6">{feed.name}</Typography>
                       <Typography variant="body2" color="text.secondary">
                         {feed.provider}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12} md={2}>
+                    <Grid xs={12} md={2}>
                       <Chip
                         label={feed.category}
                         color={getCategoryColor(feed.category)}
                         size="small"
                       />
                     </Grid>
-                    <Grid item xs={12} md={2}>
+                    <Grid xs={12} md={2}>
                       <Typography variant="body2">
                         Updates: {feed.updates}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12} md={2}>
+                    <Grid xs={12} md={2}>
                       <Typography variant="body2">
                         Last Update: {feed.lastUpdate.toLocaleString()}
                       </Typography>
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid xs={12} md={3}>
                       <Box display="flex" gap={1}>
                         <Button size="small" startIcon={<Download />}>
                           Download
@@ -600,32 +601,32 @@ export default function ThreatIntelligenceClient() {
                 {selectedFeed.description}
               </Typography>
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Provider:</strong> {selectedFeed.provider}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Category:</strong> {selectedFeed.category}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Updates:</strong> {selectedFeed.updates}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Format:</strong> {selectedFeed.format.toUpperCase()}
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Confidence:</strong> {selectedFeed.confidence}%
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid xs={6}>
                   <Typography variant="body2">
                     <strong>Coverage:</strong> {selectedFeed.coverage.join(', ')}
                   </Typography>

@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Container,
-  Grid2 as Grid,
   Card,
   CardContent,
   Chip,
@@ -13,6 +12,7 @@ import {
   Paper,
   Stack
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 
 export const metadata: Metadata = {
   title: 'Phantom ML Studio - 32 Precision Modules Enterprise Platform',

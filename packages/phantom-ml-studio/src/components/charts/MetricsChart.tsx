@@ -11,7 +11,8 @@ import {
   Tooltip
 } from 'recharts'
 import { useTheme } from '@mui/material/styles'
-import { Box, Typography, Card, CardContent, Grid, Paper } from '@mui/material'
+import { Box, Typography, Card, CardContent,  Paper } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 
 interface MetricData {
   metric: string
@@ -72,7 +73,7 @@ export function MetricsChart({
                   borderRadius: theme.shape.borderRadius,
                   color: theme.palette.text.primary
                 }}
-                formatter={(value: number) => [`${(value * 100).toFixed(1)}%`, 'Score']}
+                formatter={(_value: number) => [`${(value * 100).toFixed(1)}%`, 'Score']}
               />
             </RadarChart>
           </ResponsiveContainer>
@@ -114,7 +115,7 @@ export function ModelPerformanceChart({
         </Typography>
 
         <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={6} sm={3}>
+          <Grid xs={6} sm={3}>
             <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.light', color: 'primary.contrastText' }}>
               <Typography variant="h5" fontWeight="bold">
                 {(accuracy * 100).toFixed(1)}%
@@ -122,7 +123,7 @@ export function ModelPerformanceChart({
               <Typography variant="caption">Accuracy</Typography>
             </Paper>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid xs={6} sm={3}>
             <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'secondary.light', color: 'secondary.contrastText' }}>
               <Typography variant="h5" fontWeight="bold">
                 {(precision * 100).toFixed(1)}%
@@ -130,7 +131,7 @@ export function ModelPerformanceChart({
               <Typography variant="caption">Precision</Typography>
             </Paper>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid xs={6} sm={3}>
             <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'success.light', color: 'success.contrastText' }}>
               <Typography variant="h5" fontWeight="bold">
                 {(recall * 100).toFixed(1)}%
@@ -138,7 +139,7 @@ export function ModelPerformanceChart({
               <Typography variant="caption">Recall</Typography>
             </Paper>
           </Grid>
-          <Grid item xs={6} sm={3}>
+          <Grid xs={6} sm={3}>
             <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.light', color: 'warning.contrastText' }}>
               <Typography variant="h5" fontWeight="bold">
                 {(f1Score * 100).toFixed(1)}%
@@ -177,7 +178,7 @@ export function ModelPerformanceChart({
                   borderRadius: theme.shape.borderRadius,
                   color: theme.palette.text.primary
                 }}
-                formatter={(value: number) => [`${(value * 100).toFixed(1)}%`, 'Score']}
+                formatter={(_value: number) => [`${(value * 100).toFixed(1)}%`, 'Score']}
               />
             </RadarChart>
           </ResponsiveContainer>

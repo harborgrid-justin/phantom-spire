@@ -6,7 +6,7 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
+  
   Button,
   TextField,
   Switch,
@@ -31,6 +31,7 @@ import {
   DialogActions,
   Chip
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Save,
   Add,
@@ -151,7 +152,7 @@ export default function SettingsClient() {
 
       setSettings(mockSettings);
       setLoading(false);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch settings');
       setLoading(false);
     }
@@ -187,7 +188,7 @@ export default function SettingsClient() {
       ];
 
       setApiKeys(mockApiKeys);
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to fetch API keys:', err);
     }
   };
@@ -199,7 +200,7 @@ export default function SettingsClient() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       setSuccess('Settings saved successfully');
       setTimeout(() => setSuccess(null), 3000);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to save settings');
     }
     setSaveLoading(false);
@@ -219,12 +220,12 @@ export default function SettingsClient() {
       setApiKeys([...apiKeys, newKey]);
       setApiKeyDialogOpen(false);
       setNewApiKey({ name: '', permissions: [] });
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to create API key');
     }
   };
 
-  const handleDeleteApiKey = (keyId: string) => {
+  const handleDeleteApiKey = (_keyId: string) => {
     setApiKeys(apiKeys.filter(key => key.id !== keyId));
   };
 
@@ -294,7 +295,7 @@ export default function SettingsClient() {
           <CardContent>
             <Typography variant="h6" gutterBottom>General Settings</Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Organization Name"
@@ -302,7 +303,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('general', 'organizationName', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Default Project"
@@ -310,7 +311,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('general', 'defaultProject', e.target.value)}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel>Language</InputLabel>
                   <Select
@@ -324,7 +325,7 @@ export default function SettingsClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel>Timezone</InputLabel>
                   <Select
@@ -338,7 +339,7 @@ export default function SettingsClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -349,7 +350,7 @@ export default function SettingsClient() {
                   label="Enable Auto-Save"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -370,7 +371,7 @@ export default function SettingsClient() {
           <CardContent>
             <Typography variant="h6" gutterBottom>Security Settings</Typography>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Session Timeout (minutes)"
@@ -379,7 +380,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('security', 'sessionTimeout', parseInt(e.target.value))}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -390,7 +391,7 @@ export default function SettingsClient() {
                   label="Enable Two-Factor Authentication"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -401,7 +402,7 @@ export default function SettingsClient() {
                   label="Encrypt Data at Rest"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -412,7 +413,7 @@ export default function SettingsClient() {
                   label="Enable Audit Logging"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <Typography variant="subtitle2" gutterBottom>IP Whitelist</Typography>
                 {settings.security.ipWhitelist.map((ip, index) => (
                   <Chip

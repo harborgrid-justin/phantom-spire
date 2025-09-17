@@ -232,7 +232,7 @@ export interface TrainingJobMetadata {
   experimentId?: string;
   tags: string[];
   description?: string;
-  hyperparameters: Record<string, any>;
+  hyperparameters: Record<string, unknown>;
   modelArchitecture?: string;
   trainingFramework: string;
   version: string;
@@ -341,7 +341,7 @@ export interface CheckpointInfo {
   remoteUrl?: string;
   size: number; // bytes
   hash: string; // SHA-256
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   createdAt: Date;
   isValid: boolean;
   canResume: boolean;
@@ -732,7 +732,7 @@ export class TrainingOrchestrator extends EventEmitter {
   private async executeTraining(job: TrainingJob, model: HuggingFaceModelBase, dataset: unknown): Promise<void> {
     try {
       // Set up progress tracking
-      model.on('trainingProgress', (progress: TrainingProgress) => {
+      model.on('trainingProgress', (_progress: TrainingProgress) => {
         job.progress = progress;
         this.recordMetrics(job.id, progress);
         this.emit('trainingProgress', { job, progress });
@@ -908,7 +908,7 @@ export class TrainingOrchestrator extends EventEmitter {
     );
   }
 
-  private getAvailableResources(node: TrainingNode): { cpu: number; memory: number; gpu?: number } {
+  private getAvailableResources(node: TrainingNode): { cpuCores: number; memoryGB: number; diskSpaceGB: number; gpuCount: number; gpuMemoryGB: number } {
     // Calculate available resources based on current usage
     const capacity = node.maxCapacity;
     const usage = node.currentLoad;
@@ -987,7 +987,7 @@ export class TrainingOrchestrator extends EventEmitter {
     // Resume jobs that were interrupted
   }
 
-  private async validateJobConfig(job: TrainingJob): Promise<void> {
+  private async validateJobConfig(_job: TrainingJob): Promise<void> {
     // Validate job configuration
   }
 
@@ -996,20 +996,20 @@ export class TrainingOrchestrator extends EventEmitter {
     this.queue.push(jobId);
   }
 
-  private async stopRunningJob(jobId: string): Promise<void> {
+  private async stopRunningJob(_jobId: string): Promise<void> {
     // Stop running training job
   }
 
-  private async freeJobResources(jobId: string): Promise<void> {
+  private async freeJobResources(_jobId: string): Promise<void> {
     // Free allocated resources
   }
 
-  private isJobRunningOnNode(jobId: string, nodeId: string): boolean {
+  private isJobRunningOnNode(_jobId: string, _nodeId: string): boolean {
     // Check if job is running on specific node
     return false;
   }
 
-  private async migrateJob(jobId: string, fromNodeId: string): Promise<void> {
+  private async migrateJob(_jobId: string, _fromNodeId: string): Promise<void> {
     // Migrate job from one node to another
   }
 
@@ -1031,11 +1031,11 @@ export class TrainingOrchestrator extends EventEmitter {
     };
   }
 
-  private async releaseNodeResources(nodeId: string, jobId: string): Promise<void> {
+  private async releaseNodeResources(_nodeId: string, _jobId: string): Promise<void> {
     // Release node resources
   }
 
-  private async prepareTrainingEnvironment(job: TrainingJob): Promise<void> {
+  private async prepareTrainingEnvironment(_job: TrainingJob): Promise<void> {
     // Set up training environment
   }
 
@@ -1050,38 +1050,38 @@ export class TrainingOrchestrator extends EventEmitter {
     return {} as HuggingFaceModelBase;
   }
 
-  private async prepareDataset(dataset: TrainingDataset): Promise<any> {
+  private async prepareDataset(_dataset: TrainingDataset): Promise<unknown> {
     // Prepare and load dataset
     return {};
   }
 
-  private async setupCheckpointing(job: TrainingJob): Promise<void> {
+  private async setupCheckpointing(_job: TrainingJob): Promise<void> {
     // Set up checkpointing system
   }
 
-  private async setupMonitoring(job: TrainingJob): Promise<void> {
+  private async setupMonitoring(_job: TrainingJob): Promise<void> {
     // Set up monitoring and alerting
   }
 
-  private shouldCreateCheckpoint(job: TrainingJob): boolean {
+  private shouldCreateCheckpoint(_job: TrainingJob): boolean {
     // Determine if checkpoint should be created
     return true;
   }
 
-  private async saveTrainedModel(job: TrainingJob, model: HuggingFaceModelBase): Promise<void> {
+  private async saveTrainedModel(_job: TrainingJob, _model: HuggingFaceModelBase): Promise<void> {
     // Save trained model
   }
 
-  private async uploadCheckpointToRemote(checkpoint: CheckpointInfo, config: Record<string, unknown>): Promise<string> {
+  private async uploadCheckpointToRemote(_checkpoint: CheckpointInfo, _config: Record<string, unknown>): Promise<string> {
     // Upload checkpoint to remote storage
     return 'https://remote-storage/checkpoint-url';
   }
 
-  private async cleanupOldCheckpoints(jobId: string, maxCheckpoints: number): Promise<void> {
+  private async cleanupOldCheckpoints(_jobId: string, _maxCheckpoints: number): Promise<void> {
     // Clean up old checkpoints
   }
 
-  private getMetricValue(metrics: TrainingMetrics, metricName: string): number | undefined {
+  private getMetricValue(metrics: TrainingMetrics, _metricName: string): number | undefined {
     // Extract metric value by name
     return metrics.trainingLoss;
   }
@@ -1149,7 +1149,7 @@ export class TrainingOrchestrator extends EventEmitter {
     const nodes = Array.from(this.nodes.values());
     
     return {
-      jobs: {
+      jobMetrics: {
         total: jobs.length,
         queued: jobs.filter(j => j.status === 'queued').length,
         running: jobs.filter(j => j.status === 'running').length,

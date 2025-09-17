@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useMemo } from 'react'
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
+  
   LinearProgress,
   Chip,
   Table,
@@ -15,15 +15,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import {
   TrendingUp as TrendingIcon,
   Speed as SpeedIcon,
   Memory as MemoryIcon,
   Storage as StorageIcon
 } from '@mui/icons-material'
-import { usePerformanceStats, useModels } from '../providers/MLCoreProvider'
+import { TimeAgo } from '../common/TimeAgo'
+import { useDashboardData } from '../../hooks/useMLCore'
 
 interface MetricCardProps {
   title: string
@@ -34,31 +37,58 @@ interface MetricCardProps {
   icon: React.ReactNode
 }
 
-function MetricCard({ title, value, max, unit, color, icon }: MetricCardProps) {
+const MetricCard = React.memo(function MetricCard({ title, value, max, unit, color, icon }: MetricCardProps) {
   const percentage = (value / max) * 100
+  const safePercentage = Math.min(percentage, 100)
+  const usageLevel = percentage > 80 ? 'High' : percentage > 50 ? 'Medium' : 'Low'
+
+  const titleId = `metric-${title.replace(/\s+/g, '-').toLowerCase()}-title`
+  const progressId = `metric-${title.replace(/\s+/g, '-').toLowerCase()}-progress`
 
   return (
-    <Card className="ml-card">
+    <Card
+      className="ml-card"
+      component="article"
+      role="region"
+      aria-labelledby={titleId}
+    >
       <CardContent>
         <Box className="flex items-center justify-between mb-3">
-          <Typography variant="h6" className="font-semibold">
+          <Typography
+            id={titleId}
+            variant="h6"
+            className="font-semibold"
+            component="h3"
+          >
             {title}
           </Typography>
-          <Box className="p-2 rounded-lg bg-gray-100">
-            {icon}
+          <Box
+            className="p-2 rounded-lg bg-gray-100"
+            role="img"
+            aria-label={`${title} metric icon`}
+          >
+            {React.cloneElement(icon as React.ReactElement, {
+              'aria-hidden': true
+            })}
           </Box>
         </Box>
 
-        <Typography variant="h4" className="font-bold mb-2">
+        <Typography
+          variant="h4"
+          className="font-bold mb-2"
+          aria-describedby={progressId}
+        >
           {value.toFixed(1)} {unit}
         </Typography>
 
         <LinearProgress
+          id={progressId}
           variant="determinate"
-          value={Math.min(percentage, 100)}
+          value={safePercentage}
           color={color}
           className="mb-2"
           sx={{ height: 8, borderRadius: 4 }}
+          aria-label={`${title} usage: ${percentage.toFixed(1)}% of capacity`}
         />
 
         <Box className="flex items-center justify-between">
@@ -67,66 +97,28 @@ function MetricCard({ title, value, max, unit, color, icon }: MetricCardProps) {
           </Typography>
           <Chip
             size="small"
-            label={percentage > 80 ? 'High' : percentage > 50 ? 'Medium' : 'Low'}
+            label={usageLevel}
             color={percentage > 80 ? 'warning' : percentage > 50 ? 'info' : 'success'}
             variant="outlined"
+            aria-label={`Usage level: ${usageLevel}`}
           />
         </Box>
       </CardContent>
     </Card>
   )
-}
+})
 
 export function PerformanceOverview() {
-  const { performanceStats, refreshStats } = usePerformanceStats()
-  const { models } = useModels()
-  const [isLoading, setIsLoading] = useState(true)
+  const { performance, models, isLoading, hasError } = useDashboardData({
+    refetchInterval: 15000 // 15 seconds
+  })
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
-        await refreshStats()
-      } catch (error) {
-        console.error('Failed to load performance data:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+  const performanceStats = performance.data
+  const modelsData = models.data || []
+  const error = hasError
 
-    loadData()
-
-    // Auto-refresh every minute
-    const interval = setInterval(loadData, 60000)
-    return () => clearInterval(interval)
-  }, [refreshStats])
-
-  if (isLoading || !performanceStats) {
-    return (
-      <Box>
-        <Typography variant="h5" className="font-bold text-gray-900 mb-6">
-          Performance Monitoring
-        </Typography>
-        <Grid container spacing={3}>
-          {[1, 2, 3, 4].map((i) => (
-            <Grid item xs={12} sm={6} lg={3} key={i}>
-              <Card className="ml-card">
-                <CardContent>
-                  <Box className="animate-pulse">
-                    <Box className="h-4 bg-gray-200 rounded mb-2"></Box>
-                    <Box className="h-8 bg-gray-200 rounded mb-2"></Box>
-                    <Box className="h-2 bg-gray-200 rounded"></Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    )
-  }
-
-  const metrics = [
+  // Define memos before any early returns to avoid React hooks rule violations
+  const metrics = useMemo(() => [
     {
       title: 'CPU Usage',
       value: Math.random() * 80, // Mock CPU usage
@@ -137,7 +129,7 @@ export function PerformanceOverview() {
     },
     {
       title: 'Memory',
-      value: performanceStats.peak_memory_usage_mb,
+      value: performanceStats?.peak_memory_usage_mb || 0,
       max: 1024, // 1GB max for demo
       unit: 'MB',
       color: 'secondary' as const,
@@ -145,7 +137,7 @@ export function PerformanceOverview() {
     },
     {
       title: 'Avg Latency',
-      value: performanceStats.average_inference_time_ms,
+      value: performanceStats?.average_inference_time_ms || 0,
       max: 100, // 100ms max for good performance
       unit: 'ms',
       color: 'warning' as const,
@@ -159,15 +151,46 @@ export function PerformanceOverview() {
       color: 'success' as const,
       icon: <StorageIcon />
     }
-  ]
+  ], [performanceStats])
 
-  const modelPerformanceData = models.map((model, index) => ({
+  const modelPerformanceData = useMemo(() => modelsData.map((model) => ({
     name: model.name,
     accuracy: model.accuracy || 0,
     predictions: Math.floor(Math.random() * 1000) + 100,
     avgLatency: (Math.random() * 10) + 1,
-    lastUsed: new Date(Date.now() - Math.random() * 86400000).toLocaleString()
-  }))
+    lastUsed: new Date(Date.now() - Math.random() * 86400000).toISOString()
+  })), [modelsData])
+
+  if (isLoading) {
+    return (
+      <Box>
+        <Typography variant="h5" className="font-bold text-gray-900 mb-6">
+          Performance Monitoring
+        </Typography>
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+          <CircularProgress size={60} />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box>
+        <Typography variant="h5" className="font-bold text-gray-900 mb-6">
+          Performance Monitoring
+        </Typography>
+        <Box textAlign="center" py={4}>
+          <Typography variant="h6" color="error" gutterBottom>
+            Error Loading Performance Data
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {error}
+          </Typography>
+        </Box>
+      </Box>
+    )
+  }
 
   return (
     <Box>
@@ -176,7 +199,13 @@ export function PerformanceOverview() {
       </Typography>
 
       {/* System Metrics */}
-      <Grid container spacing={3} className="mb-8">
+      <Grid
+        container
+        spacing={3}
+        className="mb-8"
+        role="group"
+        aria-label="System performance metrics"
+      >
         {metrics.map((metric, index) => (
           <Grid item xs={12} sm={6} lg={3} key={metric.title}>
             <Box
@@ -236,7 +265,7 @@ export function PerformanceOverview() {
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="body2" color="text.secondary">
-                          {model.lastUsed}
+                          <TimeAgo timestamp={model.lastUsed} />
                         </Typography>
                       </TableCell>
                     </TableRow>

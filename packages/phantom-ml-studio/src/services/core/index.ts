@@ -15,7 +15,7 @@ export { SecurityService } from './security/SecurityService';
 
 // Base Classes and Types
 export { BaseBusinessLogic } from './base/BaseBusinessLogic';
-export { BaseBusinessLogic as BusinessLogicBase } from './base/BaseBusinessLogic';
+export { BusinessLogicBase } from './base/BusinessLogicBase';
 export * from './types/business-logic.types';
 export * from './types/service.types';
 

@@ -85,7 +85,7 @@ export default function DeploymentsClient() {
       setError(null);
 
       const response = await deploymentsService.getDeployments(
-        { id: 'get_deps_req', type: 'getDeployments' } as any,
+        { id: 'get_deps_req', type: 'getDeployments' as const },
         {}
       );
 
@@ -117,7 +117,7 @@ export default function DeploymentsClient() {
     fetchDeployments(true);
   }, [fetchDeployments]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (_status: string) => {
     switch (status) {
       case 'active': return 'success';
       case 'inactive': return 'default';
@@ -128,7 +128,7 @@ export default function DeploymentsClient() {
     }
   };
 
-  const getEnvironmentColor = (environment: string) => {
+  const getEnvironmentColor = (_environment: string) => {
     switch (environment) {
       case 'production': return 'error';
       case 'staging': return 'warning';
@@ -152,7 +152,7 @@ export default function DeploymentsClient() {
       field: 'modelId',
       headerName: 'Model ID',
       width: 200,
-      valueGetter: (params: any) => params.row.config.modelId,
+      valueGetter: (_params: any) => params.row.config.modelId,
       renderCell: (params) => (
         <Typography variant="body2" fontFamily="monospace">
           {params.value}
@@ -163,7 +163,7 @@ export default function DeploymentsClient() {
       field: 'status',
       headerName: 'Status',
       width: 120,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (_params: GridRenderCellParams) => (
         <Chip
           label={params.value}
           color={getStatusColor(params.value)}
@@ -176,7 +176,7 @@ export default function DeploymentsClient() {
       field: 'environment',
       headerName: 'Environment',
       width: 130,
-      valueGetter: (params: any) => params.row.config.environment,
+      valueGetter: (_params: any) => params.row.config.environment,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -189,13 +189,13 @@ export default function DeploymentsClient() {
       field: 'instanceType',
       headerName: 'Instance Type',
       width: 150,
-      valueGetter: (params: any) => params.row.config.instanceType
+      valueGetter: (_params: any) => params.row.config.instanceType
     },
     {
       field: 'endpointUrl',
       headerName: 'Endpoint',
       width: 300,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (_params: GridRenderCellParams) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Link
             href={params.value}
@@ -215,7 +215,7 @@ export default function DeploymentsClient() {
       field: 'createdAt',
       headerName: 'Created At',
       width: 180,
-      valueFormatter: (params: { value: any }) => new Date(params.value).toLocaleString()
+      valueFormatter: (_params: { value: any }) => new Date(params.value).toLocaleString()
     },
     {
       field: 'actions',
@@ -311,7 +311,7 @@ export default function DeploymentsClient() {
         {/* Statistics Cards */}
         {deployments.length > 0 && (
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid xs={12} sm={6} md={2.4}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="primary.main">
@@ -323,7 +323,7 @@ export default function DeploymentsClient() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid xs={12} sm={6} md={2.4}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="success.main">
@@ -335,7 +335,7 @@ export default function DeploymentsClient() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid xs={12} sm={6} md={2.4}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="text.secondary">
@@ -347,7 +347,7 @@ export default function DeploymentsClient() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid xs={12} sm={6} md={2.4}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="error.main">
@@ -359,7 +359,7 @@ export default function DeploymentsClient() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid xs={12} sm={6} md={2.4}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" color="primary.main">

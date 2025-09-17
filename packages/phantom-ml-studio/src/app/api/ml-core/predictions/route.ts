@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         // Serialize to JSON string
         serializedData = JSON.stringify(data)
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         success: false,
         error: 'Invalid data format: must be valid JSON',

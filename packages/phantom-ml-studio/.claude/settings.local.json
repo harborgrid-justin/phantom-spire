@@ -30,7 +30,19 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "Bash(PORT=3001 npm run dev)",
-      "Bash(npx cypress run:*)"
+      "Bash(npx cypress run:*)",
+      "Bash(timeout 15s npm run dev)",
+      "Bash(timeout 10s npm run dev)",
+      "Bash(xargs ls:*)",
+      "Bash(curl:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(rg:*)",
+      "Bash(done)",
+      "Bash(do echo \"Checking $file\")",
+      "Bash(echo \"Needs update: $file\")",
+      "Bash(do echo \"Updating $file\")",
+      "Bash(xargs sed:*)"
     ],
     "deny": [],
     "ask": []

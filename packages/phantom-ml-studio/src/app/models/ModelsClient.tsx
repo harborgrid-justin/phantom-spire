@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { useModels, useStarModel } from '../../hooks/useMLCore';
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
   Chip,
   Table,
@@ -41,6 +41,7 @@ import {
   Divider,
   LinearProgress
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Add,
   Refresh,
@@ -101,11 +102,7 @@ interface ModelMetrics {
 
 export default function ModelsClient() {
   const [activeTab, setActiveTab] = useState(0);
-  const [models, setModels] = useState<Model[]>([]);
-  const [filteredModels, setFilteredModels] = useState<Model[]>([]);
   const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -116,173 +113,48 @@ export default function ModelsClient() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchModels();
-    fetchMetrics();
-  }, []);
+  // React Query hooks
+  const { data: models = [], isLoading: loading, error } = useModels({
+    refetchInterval: 60000 // 1 minute
+  });
+  const starModelMutation = useStarModel();
 
-  useEffect(() => {
-    filterAndSortModels();
-  }, [models, searchTerm, filterType, filterStatus, sortBy, sortOrder]);
-
-  const fetchModels = async () => {
-    try {
-      // Mock data - replace with actual API calls
-      const mockModels: Model[] = [
-        {
-          id: 'model_1',
-          name: 'Customer Churn Predictor',
-          type: 'classification',
-          algorithm: 'Random Forest',
-          version: '1.2.3',
-          status: 'deployed',
-          accuracy: 0.924,
-          f1Score: 0.891,
-          precision: 0.912,
-          recall: 0.878,
-          size: '15.2 MB',
-          framework: 'phantom-ml-core',
-          createdAt: new Date('2024-01-15T10:30:00Z'),
-          lastTrained: new Date('2024-01-15T10:30:00Z'),
-          deployments: 3,
-          predictions: 125000,
-          starred: true,
-          tags: ['customer', 'churn', 'production'],
-          creator: 'Alice Johnson',
-          description: 'Predicts customer churn probability based on usage patterns and demographics',
-          performanceScore: 87,
-          securityScore: 95,
-          features: ['usage_frequency', 'account_age', 'support_tickets', 'billing_amount']
-        },
-        {
-          id: 'model_2',
-          name: 'Fraud Detection Engine',
-          type: 'anomaly_detection',
-          algorithm: 'Isolation Forest',
-          version: '2.1.0',
-          status: 'ready',
-          accuracy: 0.956,
-          f1Score: 0.941,
-          precision: 0.951,
-          recall: 0.932,
-          size: '42.1 MB',
-          framework: 'phantom-ml-core',
-          createdAt: new Date('2024-01-13T09:15:00Z'),
-          lastTrained: new Date('2024-01-13T09:15:00Z'),
-          deployments: 0,
-          predictions: 0,
-          starred: true,
-          tags: ['fraud', 'security', 'finance'],
-          creator: 'Bob Smith',
-          description: 'Real-time fraud detection for financial transactions',
-          performanceScore: 98,
-          securityScore: 92,
-          features: ['transaction_amount', 'merchant_category', 'location', 'time_of_day']
-        },
-        {
-          id: 'model_3',
-          name: 'Revenue Forecasting',
-          type: 'regression',
-          algorithm: 'XGBoost',
-          version: '1.0.1',
-          status: 'training',
-          accuracy: 0.0,
-          f1Score: 0.0,
-          precision: 0.0,
-          recall: 0.0,
-          size: '0 MB',
-          framework: 'phantom-ml-core',
-          createdAt: new Date('2024-01-16T14:20:00Z'),
-          lastTrained: new Date('2024-01-16T14:20:00Z'),
-          deployments: 0,
-          predictions: 0,
-          starred: false,
-          tags: ['revenue', 'forecasting', 'finance'],
-          creator: 'Carol Davis',
-          description: 'Quarterly revenue forecasting model',
-          performanceScore: 0,
-          securityScore: 85,
-          features: ['historical_revenue', 'market_conditions', 'seasonal_factors']
-        },
-        {
-          id: 'model_4',
-          name: 'Sentiment Analysis API',
-          type: 'nlp',
-          algorithm: 'BERT',
-          version: '3.2.1',
-          status: 'deployed',
-          accuracy: 0.889,
-          f1Score: 0.876,
-          precision: 0.883,
-          recall: 0.869,
-          size: '438 MB',
-          framework: 'transformers',
-          createdAt: new Date('2024-01-12T11:45:00Z'),
-          lastTrained: new Date('2024-01-14T16:30:00Z'),
-          deployments: 2,
-          predictions: 89000,
-          starred: false,
-          tags: ['nlp', 'sentiment', 'social'],
-          creator: 'David Wilson',
-          description: 'Multi-language sentiment analysis for social media content',
-          performanceScore: 91,
-          securityScore: 88,
-          features: ['text_content', 'language', 'source_platform']
-        },
-        {
-          id: 'model_5',
-          name: 'Image Classification',
-          type: 'computer_vision',
-          algorithm: 'ResNet-50',
-          version: '1.5.0',
-          status: 'failed',
-          accuracy: 0.0,
-          f1Score: 0.0,
-          precision: 0.0,
-          recall: 0.0,
-          size: '0 MB',
-          framework: 'pytorch',
-          createdAt: new Date('2024-01-14T08:00:00Z'),
-          lastTrained: new Date('2024-01-14T08:00:00Z'),
-          deployments: 0,
-          predictions: 0,
-          starred: false,
-          tags: ['cv', 'classification', 'images'],
-          creator: 'Eva Brown',
-          description: 'Product image classification for e-commerce',
-          performanceScore: 0,
-          securityScore: 90,
-          features: ['image_features', 'color_histogram', 'texture_features']
-        }
-      ];
-
-      setModels(mockModels);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to fetch models');
-      setLoading(false);
+  // Calculate metrics from models data
+  const calculatedMetrics = useMemo((): ModelMetrics => {
+    if (!models.length) {
+      return {
+        totalModels: 0,
+        readyModels: 0,
+        deployedModels: 0,
+        trainingModels: 0,
+        averageAccuracy: 0,
+        totalPredictions: 0
+      }
     }
-  };
 
-  const fetchMetrics = async () => {
-    try {
-      const mockMetrics: ModelMetrics = {
-        totalModels: 5,
-        readyModels: 1,
-        deployedModels: 2,
-        trainingModels: 1,
-        averageAccuracy: 0.892,
-        totalPredictions: 214000
-      };
+    const readyModels = models.filter(m => m.status === 'ready').length
+    const deployedModels = models.filter(m => m.status === 'deployed').length
+    const trainingModels = models.filter(m => m.status === 'training').length
+    const totalPredictions = models.reduce((sum, m) => sum + (m.predictions || 0), 0)
+    const avgAccuracy = models.reduce((sum, m) => sum + (m.accuracy || 0), 0) / models.length
 
-      setMetrics(mockMetrics);
-    } catch (err) {
-      console.error('Failed to fetch metrics:', err);
+    return {
+      totalModels: models.length,
+      readyModels,
+      deployedModels,
+      trainingModels,
+      averageAccuracy: avgAccuracy,
+      totalPredictions
     }
-  };
+  }, [models])
 
-  const filterAndSortModels = () => {
-    let filtered = models.filter(model => {
+  // Use calculated metrics or fallback to state
+  const displayMetrics = metrics || calculatedMetrics
+
+
+  // Memoized filtering and sorting
+  const filteredAndSortedModels = useMemo(() => {
+    const filtered = models.filter(model => {
       const matchesSearch = model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            model.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            model.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -292,7 +164,7 @@ export default function ModelsClient() {
       return matchesSearch && matchesType && matchesStatus;
     });
 
-    filtered.sort((a, b) => {
+    return filtered.sort((a, b) => {
       let aValue: any = a[sortBy as keyof Model];
       let bValue: any = b[sortBy as keyof Model];
 
@@ -307,11 +179,9 @@ export default function ModelsClient() {
         return aValue < bValue ? 1 : -1;
       }
     });
+  }, [models, searchTerm, filterType, filterStatus, sortBy, sortOrder]);
 
-    setFilteredModels(filtered);
-  };
-
-  const getStatusColor = (status: string) => {
+  const getStatusColor = useCallback((status: string) => {
     switch (status) {
       case 'deployed': return 'success';
       case 'ready': return 'info';
@@ -320,9 +190,9 @@ export default function ModelsClient() {
       case 'archived': return 'default';
       default: return 'default';
     }
-  };
+  }, []);
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = useCallback((status: string) => {
     switch (status) {
       case 'deployed': return <CheckCircle />;
       case 'ready': return <Info />;
@@ -330,9 +200,9 @@ export default function ModelsClient() {
       case 'failed': return <Error />;
       default: return <Info />;
     }
-  };
+  }, []);
 
-  const getTypeColor = (type: string) => {
+  const getTypeColor = useCallback((type: string) => {
     const colors: { [key: string]: any } = {
       'classification': 'primary',
       'regression': 'secondary',
@@ -342,17 +212,17 @@ export default function ModelsClient() {
       'computer_vision': 'error'
     };
     return colors[type] || 'default';
-  };
+  }, []);
 
-  const handleStarToggle = async (modelId: string) => {
-    try {
-      setModels(models.map(model =>
-        model.id === modelId ? { ...model, starred: !model.starred } : model
-      ));
-    } catch (err) {
-      setError('Failed to update model');
-    }
-  };
+  const handleStarToggle = useCallback(async (_modelId: string) => {
+    const model = models.find(m => m.id === modelId)
+    if (!model) return
+
+    starModelMutation.mutate({
+      modelId,
+      starred: !model.starred
+    })
+  }, [models, starModelMutation]);
 
   const handleModelAction = (action: string, model: Model) => {
     console.log(`${action} model:`, model.id);
@@ -371,8 +241,8 @@ export default function ModelsClient() {
   return (
     <Box sx={{ p: 3 }}>
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
-          {error}
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error.message || 'Failed to load models'}
         </Alert>
       )}
 
@@ -401,68 +271,66 @@ export default function ModelsClient() {
       </Box>
 
       {/* Metrics Cards */}
-      {metrics && (
-        <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="primary">{metrics.totalModels}</Typography>
-                <Typography variant="body2" color="text.secondary">Total Models</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="success.main">{metrics.deployedModels}</Typography>
-                <Typography variant="body2" color="text.secondary">Deployed</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="info.main">{metrics.readyModels}</Typography>
-                <Typography variant="body2" color="text.secondary">Ready</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="warning.main">{metrics.trainingModels}</Typography>
-                <Typography variant="body2" color="text.secondary">Training</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="secondary.main">
-                  {(metrics.averageAccuracy * 100).toFixed(1)}%
-                </Typography>
-                <Typography variant="body2" color="text.secondary">Avg Accuracy</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={2}>
-            <Card>
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h4" color="text.primary">
-                  {(metrics.totalPredictions / 1000).toFixed(0)}K
-                </Typography>
-                <Typography variant="body2" color="text.secondary">Predictions</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+      <Grid container spacing={3} mb={3}>
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="primary">{displayMetrics.totalModels}</Typography>
+              <Typography variant="body2" color="text.secondary">Total Models</Typography>
+            </CardContent>
+          </Card>
         </Grid>
-      )}
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="success.main">{displayMetrics.deployedModels}</Typography>
+              <Typography variant="body2" color="text.secondary">Deployed</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="info.main">{displayMetrics.readyModels}</Typography>
+              <Typography variant="body2" color="text.secondary">Ready</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="warning.main">{displayMetrics.trainingModels}</Typography>
+              <Typography variant="body2" color="text.secondary">Training</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="secondary.main">
+                {(displayMetrics.averageAccuracy * 100).toFixed(1)}%
+              </Typography>
+              <Typography variant="body2" color="text.secondary">Avg Accuracy</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid xs={12} sm={6} md={2}>
+          <Card>
+            <CardContent sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" color="text.primary">
+                {(displayMetrics.totalPredictions / 1000).toFixed(0)}K
+              </Typography>
+              <Typography variant="body2" color="text.secondary">Predictions</Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
       {/* Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
               <TextField
                 fullWidth
                 label="Search models..."
@@ -471,7 +339,7 @@ export default function ModelsClient() {
                 size="small"
               />
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid xs={12} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Type</InputLabel>
                 <Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
@@ -485,7 +353,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid xs={12} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Status</InputLabel>
                 <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
@@ -498,7 +366,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid xs={12} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Sort By</InputLabel>
                 <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -510,7 +378,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={2}>
+            <Grid xs={12} md={2}>
               <FormControl fullWidth size="small">
                 <InputLabel>Order</InputLabel>
                 <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}>
@@ -524,13 +392,21 @@ export default function ModelsClient() {
       </Card>
 
       {/* Models Table */}
-      <Card>
+      <Card component="section" aria-labelledby="models-table-title">
         <CardContent>
+          <Typography
+            id="models-table-title"
+            variant="h6"
+            component="h2"
+            className="sr-only"
+          >
+            Models List
+          </Typography>
           <TableContainer>
-            <Table>
+            <Table aria-label="Machine learning models table">
               <TableHead>
                 <TableRow>
-                  <TableCell></TableCell>
+                  <TableCell aria-label="Star toggle column"></TableCell>
                   <TableCell>Model</TableCell>
                   <TableCell>Type</TableCell>
                   <TableCell>Status</TableCell>
@@ -543,12 +419,14 @@ export default function ModelsClient() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredModels.map((model) => (
+                {filteredAndSortedModels.map((model) => (
                   <TableRow key={model.id} hover>
                     <TableCell>
                       <IconButton
                         size="small"
                         onClick={() => handleStarToggle(model.id)}
+                        aria-label={model.starred ? `Remove ${model.name} from favorites` : `Add ${model.name} to favorites`}
+                        title={model.starred ? 'Remove from favorites' : 'Add to favorites'}
                       >
                         {model.starred ? <Star color="warning" /> : <StarBorder />}
                       </IconButton>
@@ -579,7 +457,7 @@ export default function ModelsClient() {
                       <Chip
                         icon={getStatusIcon(model.status)}
                         label={model.status}
-                        color={getStatusColor(model.status) as any}
+                        color={getStatusColor($1) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
                         size="small"
                       />
                     </TableCell>
@@ -623,6 +501,9 @@ export default function ModelsClient() {
                           setMenuAnchor(e.currentTarget);
                           setSelectedModel(model);
                         }}
+                        aria-label={`More actions for ${model.name}`}
+                        aria-haspopup="menu"
+                        title="More actions"
                       >
                         <MoreVert />
                       </IconButton>
@@ -640,6 +521,7 @@ export default function ModelsClient() {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
+        aria-label={`Actions for ${selectedModel?.name || 'selected model'}`}
       >
         <MenuItemComponent onClick={() => handleModelAction('view', selectedModel!)}>
           <ListItemIcon><Visibility /></ListItemIcon>

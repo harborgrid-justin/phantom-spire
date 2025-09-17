@@ -78,7 +78,7 @@ export interface ResourceOptimization {
 export class TrainingOrchestrator extends BaseBusinessLogic {
   private trainingJobs: Map<string, TrainingJob> = new Map();
   private checkpoints: Map<string, ModelCheckpoint[]> = new Map();
-  private progressCallbacks: Map<string, (progress: TrainingProgress) => void> = new Map();
+  private progressCallbacks: Map<string, (_progress: TrainingProgress) => void> = new Map();
 
   async startTraining(
     config: TrainingConfig,
@@ -257,7 +257,7 @@ export class TrainingOrchestrator extends BaseBusinessLogic {
     await this.restoreModelState(checkpoint);
   }
 
-  onProgressUpdate(jobId: string, callback: (progress: TrainingProgress) => void): void {
+  onProgressUpdate(jobId: string, callback: (_progress: TrainingProgress) => void): void {
     this.progressCallbacks.set(jobId, callback);
   }
 

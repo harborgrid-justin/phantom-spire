@@ -20,10 +20,10 @@ const SETTINGS_SERVICE_DEFINITION: ServiceDefinition = {
     config: {
         enabled: true,
         autoStart: true,
-        retryPolicy: { maxRetries: 2, baseDelay: 50 },
-        timeouts: { request: 3000, connection: 1000 },
-        caching: { enabled: false },
-        monitoring: { metricsEnabled: true, tracingEnabled: true },
+        retryPolicy: { maxRetries: 2, baseDelay: 50, maxDelay: 1000, exponentialBackoff: true, jitter: true, retryableErrors: ['ECONNRESET', 'ETIMEDOUT'] },
+        timeouts: { request: 3000, connection: 1000, idle: 30000 },
+        caching: { enabled: false, provider: 'memory' as const, ttl: 3600, maxSize: 100, compressionEnabled: false },
+        monitoring: { metricsEnabled: true, tracingEnabled: true, healthCheckEnabled: true, alerting: { enabled: false, errorRate: { warning: 0.1, critical: 0.2, evaluationWindow: 300 }, responseTime: { warning: 1000, critical: 2000, evaluationWindow: 300 }, throughput: { warning: 100, critical: 50, evaluationWindow: 300 }, availability: { warning: 0.95, critical: 0.9, evaluationWindow: 300 } }, sampling: { rate: 0.1, maxTracesPerSecond: 10, slowRequestThreshold: 1000 } },
     },
 };
 

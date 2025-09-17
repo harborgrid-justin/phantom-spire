@@ -224,7 +224,7 @@ export interface StateChangeEvent {
 
 export class StateStore extends EventEmitter {
   private data: Map<string, any> = new Map();
-  private subscriptions: Map<string, Set<(data: any) => void>> = new Map();
+  private subscriptions: Map<string, Set<(_data: any) => void>> = new Map();
   private history: StateChangeEvent[] = [];
   private maxHistorySize = 1000;
 
@@ -289,7 +289,7 @@ export class StateStore extends EventEmitter {
     return Array.from(this.data.entries());
   }
 
-  subscribe(key: string, callback: (data: any) => void): () => void {
+  subscribe(key: string, callback: (_data: any) => void): () => void {
     if (!this.subscriptions.has(key)) {
       this.subscriptions.set(key, new Set());
     }
@@ -413,7 +413,7 @@ export class EnterpriseStateManager extends EventEmitter {
   }
 
   private setupEventForwarding(): void {
-    this.store.on('change', (event: StateChangeEvent) => {
+    this.store.on('change', (_event: StateChangeEvent) => {
       this.emit('state_changed', event);
 
       // Persist important state changes
@@ -770,7 +770,7 @@ export class EnterpriseStateManager extends EventEmitter {
 
   // ==================== PUBLIC API - UTILITIES ====================
 
-  subscribe(key: string, callback: (data: any) => void): () => void {
+  subscribe(key: string, callback: (_data: any) => void): () => void {
     return this.store.subscribe(key, callback);
   }
 

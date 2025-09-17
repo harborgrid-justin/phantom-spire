@@ -19,7 +19,7 @@ import { explainableAiVisualizerService } from '@/services/explainable-ai-visual
 import { ModelExplanation } from '@/services/explainable-ai-visualizer';
 import { ServiceContext } from '@/services/core';
 
-const ExplainableAIVisualizerPage: React.FC = () => {
+export default function ExplainableAIVisualizerPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [explanation, setExplanation] = useState<ModelExplanation | null>(null);
@@ -80,4 +80,3 @@ const ExplainableAIVisualizerPage: React.FC = () => {
   );
 };
 
-export default ExplainableAIVisualizerPage;

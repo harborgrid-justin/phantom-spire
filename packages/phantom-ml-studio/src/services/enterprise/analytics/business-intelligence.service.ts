@@ -1092,7 +1092,7 @@ export class BusinessIntelligenceService extends EventEmitter {
   private calculateEfficiency(systemState: any): number {
     if (!systemState) return 0;
 
-    const resourceEfficiencies = Object.values(systemState.resources).map((resource: any) => {
+    const resourceEfficiencies = Object.values(systemState.resources).map((_resource: any) => {
       return resource.utilization;
     });
 

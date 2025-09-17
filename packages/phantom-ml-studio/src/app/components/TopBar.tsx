@@ -18,19 +18,17 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
-import {
-  Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  Settings as SettingsIcon,
-  Help as HelpIcon,
-  Logout as LogoutIcon,
-  Person as PersonIcon,
-  Dashboard as DashboardIcon,
-  Science as ScienceIcon,
-  Warning as WarningIcon,
-  CheckCircle as CheckCircleIcon,
-  Info as InfoIcon,
-} from '@mui/icons-material';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsIcon from '@mui/icons-material/Settings';
+import HelpIcon from '@mui/icons-material/Help';
+import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ScienceIcon from '@mui/icons-material/Biotech';
+import WarningIcon from '@mui/icons-material/Warning';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import InfoIcon from '@mui/icons-material/Info';
 
 interface TopBarProps {
   drawerWidth: number;
@@ -139,8 +137,8 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
   };
 
   const handleNotificationClick = (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(n => 
+    setNotifications(prev =>
+      prev.map(n =>
         n.id === notificationId ? { ...n, read: true } : n
       )
     );

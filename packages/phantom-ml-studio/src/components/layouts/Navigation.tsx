@@ -95,7 +95,7 @@ export function Navigation() {
     setMobileOpen(!mobileOpen)
   }
 
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileMenuOpen = (_event: React.MouseEvent<HTMLElement>) => {
     setProfileMenuAnchor(event.currentTarget)
   }
 

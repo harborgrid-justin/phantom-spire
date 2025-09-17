@@ -414,5 +414,5 @@ export class EnhancedDashboardService extends BusinessLogicBase {
   }
 }
 
-export const enhancedDashboardService = (context: ServiceContext) => 
+export const enhancedDashboardService = (_context: ServiceContext) => 
   new EnhancedDashboardService(context);

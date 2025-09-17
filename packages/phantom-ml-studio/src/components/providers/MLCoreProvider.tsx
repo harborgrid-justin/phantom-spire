@@ -9,7 +9,7 @@ interface MLCoreContextType {
   error: string | null
 
   // Core methods
-  trainModel: (config: MLConfig) => Promise<TrainingResult>
+  trainModel: (_config: MLConfig) => Promise<TrainingResult>
   predict: (modelId: string, features: number[]) => Promise<PredictionResult>
   getModels: () => Promise<ModelMetadata[]>
   getDatasets: () => Promise<DatasetMetadata[]>
@@ -53,7 +53,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
         console.log('🔄 Initializing ML Core...')
         await mlCoreManager.initializeMLCore()
 
-        // Load initial data
+        // Load initial data in parallel
         await Promise.all([
           refreshModels(),
           refreshDatasets(),
@@ -63,23 +63,27 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
 
         setIsInitialized(true)
         console.log('✅ ML Core Provider initialized successfully')
-      } catch (err) {
+      } catch (_err) {
         console.error('❌ Failed to initialize ML Core Provider:', err)
         setError(err instanceof Error ? err.message : 'Failed to initialize ML Core')
+        // Don't prevent initialization on error - allow fallback behavior
+        setIsInitialized(true)
       } finally {
         setIsLoading(false)
       }
     }
 
     initializeMLCore()
+    // Empty dependency array to run only on mount
   }, [])
 
   const refreshModels = async () => {
     try {
       const modelList = await mlCoreManager.getModels()
       setModels(modelList)
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to refresh models:', err)
+      setError('Failed to refresh models')
     }
   }
 
@@ -87,8 +91,9 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     try {
       const datasetList = await mlCoreManager.getDatasets()
       setDatasets(datasetList)
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to refresh datasets:', err)
+      setError('Failed to refresh datasets')
     }
   }
 
@@ -96,8 +101,9 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     try {
       const stats = await mlCoreManager.getPerformanceStats()
       setPerformanceStats(stats)
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to refresh performance stats:', err)
+      setError('Failed to refresh performance stats')
     }
   }
 
@@ -105,7 +111,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     try {
       const info = await mlCoreManager.getSystemInfo()
       setSystemInfo(info)
-    } catch (err) {
+    } catch (_err) {
       console.error('Failed to load system info:', err)
     }
   }
@@ -116,7 +122,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
       // Refresh models list after training
       await refreshModels()
       return result
-    } catch (err) {
+    } catch (_err) {
       console.error('Training failed:', err)
       throw err
     }
@@ -128,7 +134,7 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
       // Refresh stats after prediction
       await refreshStats()
       return result
-    } catch (err) {
+    } catch (_err) {
       console.error('Prediction failed:', err)
       throw err
     }
@@ -158,41 +164,50 @@ export function MLCoreProvider({ children }: MLCoreProviderProps) {
     return info
   }
 
+  const refreshSystemInfo = async () => {
+    try {
+      await loadSystemInfo()
+    } catch (_err) {
+      console.error('Failed to refresh system info:', err)
+    }
+  }
+
+  const refreshAll = async () => {
+    try {
+      await Promise.all([
+        refreshModels(),
+        refreshDatasets(),
+        refreshStats(),
+        refreshSystemInfo()
+      ])
+    } catch (_err) {
+      console.error('Failed to refresh all data:', err)
+    }
+  }
+
   const contextValue: MLCoreContextType = {
     isInitialized,
     isLoading,
     error,
-    hasNativeExtension,
-    version,
 
-    // Enhanced Core methods
+    // Core methods
     trainModel,
-    getPredictions,
+    predict,
     getModels,
     getDatasets,
     getPerformanceStats,
     getSystemInfo,
-    healthCheck,
 
-    // Legacy methods for backward compatibility
-    trainModelLegacy,
-    predict,
-    getModelsLegacy,
-    getDatasetsLegacy,
-
-    // Enhanced State
+    // State
     models,
     datasets,
     performanceStats,
     systemInfo,
-    mlCoreStatus,
 
-    // Enhanced Utility methods
+    // Utility methods
     refreshModels,
     refreshDatasets,
-    refreshStats,
-    refreshSystemInfo,
-    refreshAll
+    refreshStats
   }
 
   return (

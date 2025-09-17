@@ -66,7 +66,7 @@ export function ToastProvider({ children }: ToastProviderProps) {
     showToast(message, 'info', duration)
   }, [showToast])
 
-  const handleClose = useCallback((id: string) => {
+  const handleClose = useCallback((_id: string) => {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }, [])
 

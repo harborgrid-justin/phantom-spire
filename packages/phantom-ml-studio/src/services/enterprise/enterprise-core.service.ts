@@ -55,7 +55,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     // Load native module only on server side
     if (typeof window === 'undefined') {
       try {
-        const mlModule = require('@phantom-spire/ml-core');
+        import mlModule from '@phantom-spire/ml-core';
         this.mlCore = new mlModule.PhantomMLCore();
         console.log('✅ Enterprise ML Core: Native module loaded successfully');
       } catch (error) {
@@ -92,7 +92,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
 
         if (!model) {
           return JSON.stringify({
@@ -146,7 +146,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
 
         if (!model) {
           throw new Error(`Model ${modelId} not found`);
@@ -260,7 +260,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const sourceModel = models.find((m: any) => m.id === modelId);
+        const sourceModel = models.find((_m: any) => m.id === modelId);
 
         if (!sourceModel) {
           throw new Error(`Source model ${modelId} not found`);
@@ -310,7 +310,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
 
         if (!model) {
           throw new Error(`Model ${modelId} not found`);
@@ -407,7 +407,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore && modelIds.length > 0) {
         const models = await this.mlCore.getModels();
-        const foundModels = models.filter((m: any) => modelIds.includes(m.id));
+        const foundModels = models.filter((_m: any) => modelIds.includes(m.id));
 
         const comparison = {
           comparisonId: `comparison_${Date.now()}`,
@@ -434,10 +434,10 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
             }))
           },
           rankings: {
-            byAccuracy: foundModels.sort((a: any, b: any) => (b.accuracy || 0.85) - (a.accuracy || 0.85)).map((m: any) => m.id),
-            bySpeed: foundModels.map((m: any) => m.id).reverse(),
-            byROI: foundModels.map((m: any) => m.id),
-            overall: foundModels.map((m: any) => m.id)
+            byAccuracy: foundModels.sort((a: any, b: any) => (b.accuracy || 0.85) - (a.accuracy || 0.85)).map((_m: any) => m.id),
+            bySpeed: foundModels.map((_m: any) => m.id).reverse(),
+            byROI: foundModels.map((_m: any) => m.id),
+            overall: foundModels.map((_m: any) => m.id)
           },
           recommendations: {
             production: foundModels[0]?.id || modelIds[0],
@@ -470,7 +470,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
       if (this.mlCore) {
         const config = JSON.parse(optimizationConfig);
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
 
         if (!model) {
           throw new Error(`Model ${modelId} not found`);
@@ -622,7 +622,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
   private async loadSystemModels(): Promise<void> {
     if (this.mlCore) {
       const models = await this.mlCore.getModels();
-      models.forEach((model: any) => {
+      models.forEach((_model: any) => {
         this.modelRegistry.set(model.id, {
           id: model.id,
           name: model.name || `Model_${model.id}`,
@@ -988,7 +988,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
         const configuration = JSON.parse(config);
 
         if (!model) {
@@ -1046,7 +1046,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
     try {
       if (this.mlCore) {
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
         const configuration = JSON.parse(config);
 
         if (!model) {
@@ -1183,7 +1183,7 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
       if (this.mlCore) {
         const config = JSON.parse(streamConfig);
         const models = await this.mlCore.getModels();
-        const model = models.find((m: any) => m.id === modelId);
+        const model = models.find((_m: any) => m.id === modelId);
 
         if (!model) {
           throw new Error(`Model ${modelId} not found`);

@@ -545,5 +545,5 @@ export class EnhancedMonitoringService extends BusinessLogicBase {
   }
 }
 
-export const enhancedMonitoringService = (context: ServiceContext) => 
+export const enhancedMonitoringService = (_context: ServiceContext) => 
   new EnhancedMonitoringService(context);

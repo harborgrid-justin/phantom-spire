@@ -28,7 +28,7 @@ class HealthMonitor {
   private initializeHealthChecks() {
     // API connectivity check
     this.registerCheck('api', async () => {
-      const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000/api';
+      const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000/api';
       if (!apiUrl) return { status: 'degraded' as const, error: 'API URL not configured' };
 
       try {
@@ -49,16 +49,16 @@ class HealthMonitor {
 
         return { status: 'healthy' as const };
       } catch (error: unknown) {
-        return { 
-          status: 'unhealthy' as const, 
-          error: error.message || 'API unreachable' 
+        return {
+          status: 'unhealthy' as const,
+          error: (error as Error).message || 'API unreachable'
         };
       }
     });
 
     // WebSocket connectivity check
     this.registerCheck('websocket', async () => {
-      const MONITORING_ENABLED = process.env.NEXT_PUBLIC_MONITORING_ENABLED === 'true';
+      const wsUrl = process.env.NEXT_PUBLIC_WS_ENDPOINT || 'ws://localhost:3001';
       if (!wsUrl) return { status: 'degraded' as const, error: 'WebSocket URL not configured' };
 
       return new Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; error?: string }>((resolve) => {
@@ -81,7 +81,7 @@ class HealthMonitor {
             resolve({ status: 'unhealthy', error: 'WebSocket connection failed' });
           };
         } catch (error: unknown) {
-          resolve({ status: 'unhealthy', error: error.message || 'WebSocket error' });
+          resolve({ status: 'unhealthy', error: (error as Error).message || 'WebSocket error' });
         }
       });
     });
@@ -108,9 +108,9 @@ class HealthMonitor {
 
         return { status: 'healthy' as const };
       } catch (error: unknown) {
-        return { 
-          status: 'unhealthy' as const, 
-          error: `Storage error: ${error.message}` 
+        return {
+          status: 'unhealthy' as const,
+          error: `Storage error: ${(error as Error).message}`
         };
       }
     });
@@ -119,7 +119,7 @@ class HealthMonitor {
     this.registerCheck('memory', async () => {
       try {
         if ('memory' in performance) {
-          const memory = (performance as any).memory;
+          const memory = (performance as Performance & { memory: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
           const usedMB = memory.usedJSHeapSize / 1024 / 1024;
           const totalMB = memory.totalJSHeapSize / 1024 / 1024;
           const limitMB = memory.jsHeapSizeLimit / 1024 / 1024;
@@ -144,9 +144,9 @@ class HealthMonitor {
         
         return { status: 'healthy' as const };
       } catch (error: unknown) {
-        return { 
-          status: 'degraded' as const, 
-          error: `Memory check failed: ${error.message}` 
+        return {
+          status: 'degraded' as const,
+          error: `Memory check failed: ${(error as Error).message}`
         };
       }
     });
@@ -161,7 +161,7 @@ class HealthMonitor {
         ];
 
         const missingFeatures = criticalFeatures.filter(
-          feature => !(process.env as any)[feature as keyof any]
+          feature => !process.env[feature]
         );
 
         if (missingFeatures.length > 0) {
@@ -174,9 +174,9 @@ class HealthMonitor {
 
         return { status: 'healthy' as const };
       } catch (error: unknown) {
-        return { 
-          status: 'unhealthy' as const, 
-          error: `Feature check failed: ${error.message}` 
+        return {
+          status: 'unhealthy' as const,
+          error: `Feature check failed: ${(error as Error).message}`
         };
       }
     });
@@ -197,17 +197,17 @@ class HealthMonitor {
     });
 
     // Store the check function for later execution
-    (this.checks.get(name) as any).checkFn = checkFn;
+    (this.checks.get(name) as HealthCheck & { checkFn: typeof checkFn }).checkFn = checkFn;
   }
 
   private async runCheck(name: string): Promise<void> {
-    const check = this.checks.get(name);
-    if (!check || !(check as any).checkFn) return;
+    const check = this.checks.get(name) as HealthCheck & { checkFn?: () => Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; error?: string; metadata?: Record<string, unknown> }> };
+    if (!check || !check.checkFn) return;
 
     const startTime = performance.now();
     
     try {
-      const result = await (check as any).checkFn();
+      const result = await check.checkFn();
       const endTime = performance.now();
       
       this.checks.set(name, {
@@ -226,7 +226,7 @@ class HealthMonitor {
         status: 'unhealthy',
         lastCheck: Date.now(),
         responseTime: endTime - startTime,
-        error: error.message || 'Check failed',
+        error: (error as Error).message || 'Check failed',
       });
     }
   }

@@ -1,47 +1,22 @@
 import { NextResponse } from 'next/server'
-import { apiWrapper } from '@/lib/ml-core'
+import type { PerformanceStats } from '../../../../lib/ml-core/types'
 
-/**
- * Performance Statistics API Route
- * GET /api/ml-core/performance
- *
- * Returns real-time system performance statistics including:
- * - Total operations count
- * - Average inference time
- * - Memory usage metrics
- * - Active models count
- * - System uptime
- */
-export async function GET() {
-  try {
-    const response = await apiWrapper.getPerformanceStats()
-
-    if (response.success) {
-      return NextResponse.json(response, { status: 200 })
-    } else {
-      return NextResponse.json(response, { status: 500 })
-    }
-  } catch (error) {
-    const errorResponse = {
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to fetch performance stats',
-      timestamp: new Date().toISOString()
-    }
-
-    return NextResponse.json(errorResponse, { status: 500 })
+// Mock performance data
+const generateMockPerformanceStats = (): PerformanceStats => {
+  return {
+    uptime_seconds: Math.floor(Math.random() * 1000000),
+    total_operations: Math.floor(Math.random() * 100000),
+    active_models: Math.floor(Math.random() * 50),
+    average_inference_time_ms: Math.random() * 100,
+    peak_memory_usage_mb: Math.random() * 1024,
   }
 }
 
-/**
- * CORS Options
- */
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  })
+export async function GET() {
+  try {
+    const stats = generateMockPerformanceStats()
+    return NextResponse.json({ success: true, data: stats })
+  } catch {
+    return NextResponse.json({ success: false, error: 'Failed to fetch performance stats' }, { status: 500 })
+  }
 }

@@ -105,7 +105,7 @@ export default function ModelBuilderClient() {
     }
   }, [error]);
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+  const onDrop = useCallback(async (_acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       setIsLoading(true);
       setError(null);
@@ -163,12 +163,12 @@ export default function ModelBuilderClient() {
     maxSize: 50 * 1024 * 1024, // 50MB limit
   });
 
-  const handleConfigChange = useCallback((event: SelectChangeEvent<any>) => {
+  const handleConfigChange = useCallback((_event: SelectChangeEvent<any>) => {
     const { name, value } = event.target;
     setModelConfig(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleAlgorithmChange = useCallback((event: SelectChangeEvent<any>) => {
+  const handleAlgorithmChange = useCallback((_event: SelectChangeEvent<any>) => {
     const { target: { value } } = event;
     setModelConfig(prev => ({
       ...prev,
@@ -199,7 +199,7 @@ export default function ModelBuilderClient() {
 
       setTrainingStatus('Initializing training pipeline...');
 
-      const progressCallback = (newProgress: number) => {
+      const progressCallback = (_newProgress: number) => {
         setProgress(newProgress);
         if (newProgress < 25) {
           setTrainingStatus('Preprocessing data...');
@@ -448,14 +448,14 @@ export default function ModelBuilderClient() {
                         field: 'algorithm',
                         headerName: 'Algorithm',
                         width: 200,
-                        valueFormatter: (params: any) =>
-                          params.value.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+                        valueFormatter: (_params: any) =>
+                          params.value.replace(/_/g, ' ').replace(/\b\w/g, (_l: string) => l.toUpperCase())
                       },
                       {
                         field: 'score',
                         headerName: 'Score',
                         width: 150,
-                        valueFormatter: (params: any) => params.value.toFixed(4)
+                        valueFormatter: (_params: any) => params.value.toFixed(4)
                       },
                       {
                         field: 'trainingTime',
@@ -466,7 +466,7 @@ export default function ModelBuilderClient() {
                         field: 'hyperparameters',
                         headerName: 'Hyperparameters',
                         width: 300,
-                        valueFormatter: (params: any) => JSON.stringify(params.value)
+                        valueFormatter: (_params: any) => JSON.stringify(params.value)
                       },
                     ]}
                     density="compact"

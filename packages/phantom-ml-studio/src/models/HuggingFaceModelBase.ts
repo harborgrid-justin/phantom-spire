@@ -17,27 +17,27 @@ import { EventEmitter } from 'events';
 export interface HFModel {
   forward?: (...args: unknown[]) => unknown;
   generate?: (inputs: unknown, options?: Record<string, unknown>) => Promise<unknown>;
-  call?: (inputs: unknown) => unknown;
+  call?: (_inputs: unknown) => unknown;
   [key: string]: unknown;
 }
 
 export interface HFTokenizer {
   encode?: (text: string, options?: Record<string, unknown>) => number[];
   decode?: (tokens: number[], options?: Record<string, unknown>) => string;
-  tokenize?: (text: string) => string[];
+  tokenize?: (_text: string) => string[];
   [key: string]: unknown;
 }
 
 export interface HFProcessor {
   process?: (inputs: unknown, options?: Record<string, unknown>) => unknown;
-  preprocess?: (inputs: unknown) => unknown;
-  postprocess?: (outputs: unknown) => unknown;
+  preprocess?: (_inputs: unknown) => unknown;
+  postprocess?: (_outputs: unknown) => unknown;
   [key: string]: unknown;
 }
 
 export interface HFPipeline {
   predict?: (inputs: unknown, options?: Record<string, unknown>) => Promise<unknown>;
-  forward?: (inputs: unknown) => Promise<unknown>;
+  forward?: (_inputs: unknown) => Promise<unknown>;
   [key: string]: unknown;
 }
 

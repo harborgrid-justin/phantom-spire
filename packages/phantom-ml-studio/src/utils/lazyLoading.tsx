@@ -1,4 +1,4 @@
-import { lazy, Suspense, ComponentType } from 'react';
+import { lazy } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 // Create a reusable loading fallback component
@@ -18,17 +18,6 @@ const LoadingFallback = ({ message = 'Loading...' }: { message?: string }) => (
   </Box>
 );
 
-// Type definitions for lazy loading
-interface LazyComponentProps {
-  [key: string]: unknown;
-}
-
-interface LazyLoadingOptions {
-  loadingMessage?: string;
-  errorMessage?: string;
-  retryButton?: boolean;
-}
-
 // Lazy load all major page components for code splitting
 export const Dashboard = lazy(() => import('@/app/dashboard/page'));
 export const ModelBuilder = lazy(() => import('@/app/model-builder/page'));
@@ -39,7 +28,6 @@ export const Deployments = lazy(() => import('@/app/deployments/page'));
 export const Settings = lazy(() => import('@/app/settings/page'));
 
 // Advanced feature pages - loaded on demand
-export const H2OComparison = lazy(() => import('@/app/h2o-comparison/page'));
 export const AutoMLPipelineVisualizer = lazy(() => import('@/app/automl-pipeline-visualizer/page'));
 export const BiasDetectionEngine = lazy(() => import('@/app/bias-detection-engine/page'));
 export const EnterpriseSecurityCompliance = lazy(() => import('@/app/enterprise-security-compliance/page'));
@@ -48,7 +36,6 @@ export const InteractiveFeatureEngineering = lazy(() => import('@/app/interactiv
 export const MultiModelABTesting = lazy(() => import('@/app/multi-model-ab-testing/page'));
 export const RealTimeMonitoring = lazy(() => import('@/app/real-time-monitoring/page'));
 export const ThreatIntelligenceMarketplace = lazy(() => import('@/app/threat-intelligence-marketplace/page'));
-export const ModelComparison = lazy(() => import('@/app/model-comparison/page'));
 
 // Bundle analyzer friendly exports
 export {

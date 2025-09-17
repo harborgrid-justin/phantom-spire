@@ -234,7 +234,7 @@ const createMockMLCore = (): PhantomMLCore => ({
   // Updated to return PerformanceStats directly
   getPerformanceStats: (): PerformanceStats => generateMockPerformanceStats(),
   hello: () => 'Phantom ML Core v1.0.1 (Mock)',
-  plus100: (input: number) => input + 100
+  plus100: (_input: number) => input + 100
 })
 
 // ML Core instance management

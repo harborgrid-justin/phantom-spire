@@ -24,7 +24,6 @@ import {
   TrendingDown as TrendingDownIcon
 } from '@mui/icons-material';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { PieChart } from '@mui/x-charts/PieChart';
 
 import { dashboardService } from '@/services/dashboard';
 import { DashboardData } from '@/services/dashboard';
@@ -80,7 +79,7 @@ export default function DashboardClient() {
     try {
       setError(null);
       const response = await dashboardService.getDashboardData(
-        { id: 'dash_req', type: 'getDashboardData' } as any,
+        { id: 'dash_req', type: 'getDashboardData' as const },
         {}
       );
 
@@ -246,7 +245,7 @@ export default function DashboardClient() {
             </Typography>
             <Box sx={{ height: 300 }}>
               <BarChart
-                dataset={dashboardData.resourceUtilization as any}
+                dataset={dashboardData.resourceUtilization}
                 xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
                 series={[{
                   dataKey: 'usage',

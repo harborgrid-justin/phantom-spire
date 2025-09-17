@@ -83,7 +83,7 @@ export default function ExperimentsClient() {
       setError(null);
 
       const response = await experimentsService.getExperiments(
-        { id: 'get_exps_req', type: 'getExperiments' } as any,
+        { id: 'get_exps_req', type: 'getExperiments' as const },
         {}
       );
 
@@ -115,7 +115,7 @@ export default function ExperimentsClient() {
     fetchExperiments(true);
   }, [fetchExperiments]);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (_status: string) => {
     switch (status) {
       case 'completed': return 'success';
       case 'running': return 'primary';
@@ -144,7 +144,7 @@ export default function ExperimentsClient() {
       field: 'bestScore',
       headerName: 'Best Score',
       width: 150,
-      valueGetter: (params: any) => {
+      valueGetter: (_params: any) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -156,7 +156,7 @@ export default function ExperimentsClient() {
       field: 'bestAlgorithm',
       headerName: 'Best Algorithm',
       width: 200,
-      valueGetter: (params: any) => {
+      valueGetter: (_params: any) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -167,7 +167,7 @@ export default function ExperimentsClient() {
       field: 'startTime',
       headerName: 'Start Time',
       width: 200,
-      valueFormatter: (params: { value: any }) => {
+      valueFormatter: (_params: { value: any }) => {
         if (!params || !params.value) {
           return 'N/A';
         }
@@ -178,7 +178,7 @@ export default function ExperimentsClient() {
       field: 'endTime',
       headerName: 'End Time',
       width: 200,
-      valueFormatter: (params: { value: any }) => {
+      valueFormatter: (_params: { value: any }) => {
         if (!params || !params.value) {
           return 'Running...';
         }

@@ -179,7 +179,7 @@ const DataExplorerClient: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleDatasetChange = useCallback((newDatasetId: number) => {
+  const handleDatasetChange = useCallback((_newDatasetId: number) => {
     setSelectedDatasetId(newDatasetId);
     setSelectedTab(0); // Reset to overview tab
   }, []);

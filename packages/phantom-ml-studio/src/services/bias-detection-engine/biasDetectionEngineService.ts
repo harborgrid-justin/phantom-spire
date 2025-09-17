@@ -94,13 +94,14 @@ class BiasDetectionEngineService extends BusinessLogicBase {
     // --- Public API Methods ---
 
     public async getModelBiasAnalysis(request: GetModelBiasAnalysisRequest, context: ServiceContext): Promise<GetModelBiasAnalysisResponse> {
-        return this.executeWithContext(context, 'getModelBiasAnalysis', async () => {
+        const result = await this.executeWithContext(context, 'getModelBiasAnalysis', async () => {
             const mockModels: ModelBiasAnalysis[] = [
                 { modelId: 'threat-detector-v3', modelName: 'Advanced Threat Detection', algorithm: 'XGBoost-Security', overallBiasScore: 87.5, complianceStatus: 'compliant', protectedAttributes: ['geographic_region', 'organization_size'], securityImpact: 'Low risk', lastAnalyzed: new Date().toISOString(), biasMetrics: [] },
                 { modelId: 'anomaly-detector-v2', modelName: 'Network Anomaly Detector', algorithm: 'Neural-Security', overallBiasScore: 72.3, complianceStatus: 'warning', protectedAttributes: ['network_segment', 'user_privilege_level'], securityImpact: 'Medium risk', lastAnalyzed: new Date().toISOString(), biasMetrics: [] },
             ];
             return this.createSuccessResponse(request, mockModels);
-        }) as Promise<GetModelBiasAnalysisResponse>;
+        });
+        return result as GetModelBiasAnalysisResponse;
     }
 
     // --- Lifecycle Methods ---

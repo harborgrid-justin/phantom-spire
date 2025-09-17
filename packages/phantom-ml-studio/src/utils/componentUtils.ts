@@ -1,19 +1,12 @@
-import { ComponentType, LazyExoticComponent } from 'react';
+import { ComponentType } from 'react';
 
 // Type definitions
 interface LazyComponentProps {
   [key: string]: unknown;
 }
 
-interface LazyLoadingOptions {
-  loadingMessage?: string;
-  errorMessage?: string;
-  retryButton?: boolean;
-}
-
 // Preload components for better user experience
-export const preloadComponent = (
-  importFn: () => Promise<{ default: ComponentType<LazyComponentProps> }>
+export const preloadComponent = (importFn: () => Promise<{ default: ComponentType<LazyComponentProps> }>
 ) => {
   return importFn();
 };
@@ -50,8 +43,7 @@ export const preloadAdvancedFeatures = async () => {
 };
 
 // Resource priority loading for performance optimization
-export const scheduleComponentPreload = (
-  importFn: () => Promise<{ default: ComponentType<LazyComponentProps> }>,
+export const scheduleComponentPreload = (importFn: () => Promise<{ default: ComponentType<LazyComponentProps> }>,
   priority: 'high' | 'low' = 'low'
 ) => {
   if (priority === 'high') {

@@ -20,7 +20,7 @@ import { multiModelAbTestingService } from '@/services/multi-model-ab-testing';
 import { ABTest } from '@/services/multi-model-ab-testing';
 import { ServiceContext } from '@/services/core';
 
-const MultiModelABTestingPage: React.FC = () => {
+export default function MultiModelABTestingPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [tests, setTests] = useState<ABTest[]>([]);
@@ -82,4 +82,3 @@ const MultiModelABTestingPage: React.FC = () => {
   );
 };
 
-export default MultiModelABTestingPage;

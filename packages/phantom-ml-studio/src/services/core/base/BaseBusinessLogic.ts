@@ -113,14 +113,13 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
     };
   }
 
-  protected async withRetry<T>(
-    operation: () => Promise<T>,
+  protected async withRetry<T>(_operation: () => Promise<T>,
     options: {
       maxRetries?: number;
       baseDelay?: number;
       maxDelay?: number;
       backoffMultiplier?: number;
-      retryCondition?: (error: Error) => boolean;
+      retryCondition?: (_error: Error) => boolean;
     } = {}
   ): Promise<T> {
     const {

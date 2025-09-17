@@ -137,7 +137,7 @@ class ModelBuilderService extends BusinessLogicBase {
         const categoricalColumns = this.getCategoricalColumns(data);
 
         // Apply transformations
-        transformedData.forEach((row: DataRow) => {
+        transformedData.forEach((_row: DataRow) => {
             // Polynomial features
             for (const col of numericColumns) {
                 const newColName = `${col}^2`;
@@ -229,7 +229,7 @@ class ModelBuilderService extends BusinessLogicBase {
         }) as Promise<ParseDataResponse>;
     }
 
-    public async startTraining(request: StartTrainingRequest, context: ServiceContext, onProgress: (progress: number) => void): Promise<StartTrainingResponse> {
+    public async startTraining(request: StartTrainingRequest, context: ServiceContext, onProgress: (_progress: number) => void): Promise<StartTrainingResponse> {
         return this.executeWithContext(context, 'startTraining', async () => {
             const { config, data } = request.data; // Use incoming data
             const startTime = Date.now();

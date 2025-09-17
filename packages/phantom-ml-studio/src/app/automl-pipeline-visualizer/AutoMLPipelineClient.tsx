@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
   LinearProgress,
   Chip,
@@ -16,7 +15,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Alert,
   CircularProgress,
   Dialog,
@@ -30,24 +28,14 @@ import {
   MenuItem,
   Stepper,
   Step,
-  StepLabel,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot
+  StepLabel
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   PlayArrow,
   Pause,
   Stop,
-  Refresh,
-  Settings,
-  TrendingUp,
-  Assessment,
-  Memory,
-  Speed
+  Refresh
 } from '@mui/icons-material';
 
 interface Pipeline {
@@ -157,7 +145,7 @@ export default function AutoMLPipelineClient() {
         { algorithm: 'Random Forest', accuracy: 0.87, f1Score: 0.85, precision: 0.88, recall: 0.83, trainingTime: 45000, status: 'completed' },
         { algorithm: 'Gradient Boosting', accuracy: 0.89, f1Score: 0.87, precision: 0.90, recall: 0.85, trainingTime: 62000, status: 'completed' },
         { algorithm: 'XGBoost', accuracy: 0.91, f1Score: 0.89, precision: 0.92, recall: 0.87, trainingTime: 78000, status: 'running' },
-        { algorithm: 'Neural Network', accuracy: 0.0, f1Score: 0.0, precision: 0.0, recall: 0.0, trainingTime: 0, status: 'pending' }
+        { algorithm: 'Neural Network', accuracy: 0.0, f1Score: 0.0, precision: 0.0, recall: 0.0, trainingTime: 0, status: 'running' }
       ];
 
       setPipelines(mockPipelines);
@@ -165,7 +153,7 @@ export default function AutoMLPipelineClient() {
       setAlgorithmPerformance(mockAlgorithmPerformance);
       setSelectedPipeline(mockPipelines[0]);
       setLoading(false);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch pipeline data');
       setLoading(false);
     }
@@ -176,7 +164,7 @@ export default function AutoMLPipelineClient() {
       // Mock API call
       console.log(`${action} pipeline ${pipelineId}`);
       await fetchPipelines();
-    } catch (err) {
+    } catch (_err) {
       setError(`Failed to ${action} pipeline`);
     }
   };
@@ -188,7 +176,7 @@ export default function AutoMLPipelineClient() {
       setCreateDialogOpen(false);
       setNewPipelineConfig({ name: '', datasetId: '', maxTrainingTime: 60, algorithms: [] });
       await fetchPipelines();
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to create pipeline');
     }
   };
@@ -252,7 +240,7 @@ export default function AutoMLPipelineClient() {
 
       <Grid container spacing={3}>
         {/* Pipeline Overview */}
-        <Grid item xs={12} md={8}>
+        <Grid xs={12} md={8}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -282,7 +270,7 @@ export default function AutoMLPipelineClient() {
                         <TableCell>
                           <Chip
                             label={pipeline.status}
-                            color={getStatusColor(pipeline.status) as any}
+                            color={getStatusColor(pipeline.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
                             size="small"
                           />
                         </TableCell>
@@ -348,7 +336,7 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Pipeline Details */}
-        <Grid item xs={12} md={4}>
+        <Grid xs={12} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -361,7 +349,7 @@ export default function AutoMLPipelineClient() {
                   </Typography>
                   <Box mb={2}>
                     <Typography variant="body2" color="text.secondary">
-                      Status: <Chip label={selectedPipeline.status} color={getStatusColor(selectedPipeline.status) as any} size="small" />
+                      Status: <Chip label={selectedPipeline.status} color={getStatusColor(selectedPipeline.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'} size="small" />
                     </Typography>
                   </Box>
                   <Box mb={2}>
@@ -392,14 +380,14 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Pipeline Steps */}
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Pipeline Steps
               </Typography>
               <Stepper orientation="vertical">
-                {pipelineSteps.map((step, index) => (
+                {pipelineSteps.map((step) => (
                   <Step key={step.id} active={step.status === 'running'} completed={step.status === 'completed'}>
                     <StepLabel
                       error={step.status === 'failed'}
@@ -431,7 +419,7 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Algorithm Performance */}
-        <Grid item xs={12} md={6}>
+        <Grid xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -464,7 +452,7 @@ export default function AutoMLPipelineClient() {
                         <TableCell>
                           <Chip
                             label={algo.status}
-                            color={getStatusColor(algo.status) as any}
+                            color={getStatusColor(algo.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
                             size="small"
                           />
                         </TableCell>
@@ -484,7 +472,7 @@ export default function AutoMLPipelineClient() {
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <TextField
                   fullWidth
                   label="Pipeline Name"
@@ -492,7 +480,7 @@ export default function AutoMLPipelineClient() {
                   onChange={(e) => setNewPipelineConfig({ ...newPipelineConfig, name: e.target.value })}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <FormControl fullWidth>
                   <InputLabel>Dataset</InputLabel>
                   <Select
@@ -505,7 +493,7 @@ export default function AutoMLPipelineClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Max Training Time (minutes)"

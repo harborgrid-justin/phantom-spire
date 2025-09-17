@@ -214,7 +214,7 @@ export type EventPriority = 'low' | 'normal' | 'high' | 'critical';
 export interface EventHandler<T = Record<string, unknown>> {
   id: string;
   eventType: string;
-  handler: (event: ServiceEvent<T>) => Promise<void>;
+  handler: (_event: ServiceEvent<T>) => Promise<void>;
   options: EventHandlerOptions;
 }
 

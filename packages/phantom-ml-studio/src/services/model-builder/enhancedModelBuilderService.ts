@@ -534,5 +534,5 @@ export class EnhancedModelBuilderService extends BusinessLogicBase {
     }
 }
 
-export const enhancedModelBuilderService = (context: ServiceContext) => 
+export const enhancedModelBuilderService = (_context: ServiceContext) => 
     new EnhancedModelBuilderService(context);

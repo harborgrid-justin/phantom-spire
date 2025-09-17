@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import {
   Box,
@@ -7,33 +5,54 @@ import {
   CardContent,
   Typography,
   Chip,
-  CircularProgress,
   Alert,
-  Grid,
+  
   Tooltip
 } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import {
   CheckCircle as CheckIcon,
   Error as ErrorIcon,
   Warning as WarningIcon,
   Info as InfoIcon
 } from '@mui/icons-material'
-import { useMLCoreStatus, useSystemInfo } from '../providers/MLCoreProvider'
+import type { SystemInfo } from '../../lib/ml-core/types'
 
-export function MLSystemStatus() {
-  const { isInitialized, isLoading, error } = useMLCoreStatus()
-  const { systemInfo } = useSystemInfo()
+interface MLStatus {
+  isInitialized: boolean
+  error: string | null
+  systemInfo: SystemInfo | null
+}
 
-  const getStatusInfo = () => {
-    if (isLoading) {
+async function getMLCoreStatus(): Promise<MLStatus> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ml-core/status`, {
+      cache: 'no-store'
+    })
+
+    if (!res.ok) {
       return {
-        status: 'loading',
-        message: 'Initializing ML Core...',
-        color: 'warning' as const,
-        icon: <CircularProgress size={20} />
+        isInitialized: false,
+        error: 'Failed to fetch ML Core status',
+        systemInfo: null
       }
     }
 
+    const data = await res.json()
+    return data.data
+  } catch (error) {
+    return {
+      isInitialized: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch ML Core status',
+      systemInfo: null
+    }
+  }
+}
+
+export async function MLSystemStatus() {
+  const { isInitialized, error, systemInfo } = await getMLCoreStatus()
+
+  const getStatusInfo = () => {
     if (error) {
       return {
         status: 'error',
@@ -89,7 +108,7 @@ export function MLSystemStatus() {
         )}
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Core Version
@@ -105,7 +124,7 @@ export function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Platform
@@ -116,7 +135,7 @@ export function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Target
@@ -127,7 +146,7 @@ export function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Features

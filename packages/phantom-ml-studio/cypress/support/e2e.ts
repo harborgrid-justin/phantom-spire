@@ -18,7 +18,7 @@ import './commands.ts'
 import './index.d.ts'
 
 // Handle React version conflicts and uncaught exceptions
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on('uncaught:exception', (err) => {
   // Prevent Cypress from failing the test when React version conflicts occur
   if (err.message.includes('React Element from an older version')) {
     return false;

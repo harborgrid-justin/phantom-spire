@@ -3,20 +3,20 @@
 // Custom Commands for Phantom ML Studio E2E Tests
 
 // Authentication and Session Management (simplified for no-auth setup)
-Cypress.Commands.add('login', (username = 'testuser', password = 'testpass') => {
+Cypress.Commands.add('login', () => {
   // Since there's no authentication system, just visit dashboard
   cy.visit('/dashboard')
   cy.url().should('include', '/dashboard')
 })
 
 // Navigation Commands
-Cypress.Commands.add('navigateToPage', (pagePath: string) => {
+Cypress.Commands.add('navigateToPage', (_pagePath: string) => {
   cy.visit(pagePath)
   cy.url().should('include', pagePath)
   cy.get('[data-cy="page-loading"]').should('not.exist')
 })
 
-Cypress.Commands.add('navigateViaSidebar', (menuItem: string) => {
+Cypress.Commands.add('navigateViaSidebar', (_menuItem: string) => {
   cy.get('[data-cy="sidebar-toggle"]').click({ force: true })
   cy.get(`[data-cy="sidebar-menu-${menuItem}"]`).click()
   cy.get('[data-cy="page-loading"]').should('not.exist')
@@ -46,7 +46,7 @@ Cypress.Commands.add('createModel', (modelName: string, algorithm = 'random-fore
   cy.get('[data-cy="model-created-notification"]').should('be.visible')
 })
 
-Cypress.Commands.add('trainModel', (modelId: string, options?: any) => {
+Cypress.Commands.add('trainModel', (_modelId: string) => {
   cy.get(`[data-cy="model-${modelId}-train-button"]`).click()
   cy.get('[data-cy="training-started-notification"]').should('be.visible')
   cy.get('[data-cy="training-progress"]').should('be.visible')
@@ -81,7 +81,7 @@ Cypress.Commands.add('interactWithChart', (action: string, coordinates?: { x: nu
   }
 })
 
-Cypress.Commands.add('validateChartData', (expectedDataPoints: any[]) => {
+Cypress.Commands.add('validateChartData', (_expectedDataPoints: unknown[]) => {
   const chartSelector = '[data-cy="chart"]'
   cy.get(chartSelector).should('be.visible')
   // Validate that the chart contains expected number of data points
@@ -89,19 +89,19 @@ Cypress.Commands.add('validateChartData', (expectedDataPoints: any[]) => {
 })
 
 // Form Validation Commands
-Cypress.Commands.add('fillForm', (formData: Record<string, any>) => {
+Cypress.Commands.add('fillForm', (formData: Record<string, unknown>) => {
   Object.entries(formData).forEach(([field, value]) => {
     cy.get(`[data-cy="${field}"]`).clear().type(String(value))
   })
 })
 
-Cypress.Commands.add('validateFormErrors', (expectedErrors: string[]) => {
+Cypress.Commands.add('validateFormErrors', (_expectedErrors: string[]) => {
   expectedErrors.forEach(error => {
     cy.get(`[data-cy="${error}-error"]`).should('be.visible')
   })
 })
 
-Cypress.Commands.add('submitFormAndVerify', (expectedResult: string) => {
+Cypress.Commands.add('submitFormAndVerify', (_expectedResult: string) => {
   cy.get('[data-cy="submit-button"]').click()
   cy.get(`[data-cy="${expectedResult}"]`).should('be.visible')
 })
@@ -119,8 +119,8 @@ Cypress.Commands.add('testFormValidation', (formSelector: string, fieldTests: Ar
 })
 
 // API and Data Commands
-Cypress.Commands.add('mockApiResponse', (endpoint: string, response: any) => {
-  cy.intercept('GET', endpoint, response).as('mockedAPI')
+Cypress.Commands.add('mockApiResponse', (endpoint: string, response: unknown) => {
+  cy.intercept('GET', endpoint, { body: response }).as('mockedAPI')
 })
 
 Cypress.Commands.add('seedTestData', (dataType: string, count = 10) => {
@@ -146,16 +146,16 @@ Cypress.Commands.add('cleanupTestData', () => {
 })
 
 Cypress.Commands.add('mockHuggingFaceAPI', (response = { models: [] }) => {
-  cy.intercept('GET', '**/api/huggingface/**', response).as('huggingFaceAPI')
+  cy.intercept('GET', '**/api/huggingface/**', { body: response }).as('huggingFaceAPI')
 })
 
 Cypress.Commands.add('mockModelTraining', (modelId: string, status = 'completed') => {
-  cy.intercept('POST', `**/api/models/${modelId}/train`, { status: 'started' }).as('trainModel')
-  cy.intercept('GET', `**/api/models/${modelId}/status`, { status }).as('modelStatus')
+  cy.intercept('POST', `**/api/models/${modelId}/train`, { body: { status: 'started' } }).as('trainModel')
+  cy.intercept('GET', `**/api/models/${modelId}/status`, { body: { status } }).as('modelStatus')
 })
 
 // Accessibility Commands
-Cypress.Commands.add('checkA11y', (context?: string, options?: any) => {
+Cypress.Commands.add('checkA11y', (context?: string, options?: { rules?: Record<string, { enabled: boolean }> }) => {
   cy.injectAxe()
   cy.checkA11y(context, {
     rules: {
@@ -183,7 +183,7 @@ Cypress.Commands.add('measurePageLoad', () => {
   })
 })
 
-Cypress.Commands.add('checkResponsiveDesign', (breakpoints: string[]) => {
+Cypress.Commands.add('checkResponsiveDesign', (_breakpoints: string[]) => {
   const viewports = {
     'mobile': { width: 375, height: 667 },
     'tablet': { width: 768, height: 1024 },
@@ -217,7 +217,7 @@ Cypress.Commands.add('filterDataTable', (column: string, value: string) => {
   cy.get('[data-cy="table-loading"]').should('not.exist')
 })
 
-Cypress.Commands.add('exportTableData', (format: string) => {
+Cypress.Commands.add('exportTableData', (_format: string) => {
   cy.get('[data-cy="table-export-button"]').click()
   cy.get(`[data-cy="export-format-${format}"]`).click()
   cy.get('[data-cy="export-confirm"]').click()
@@ -231,7 +231,7 @@ Cypress.Commands.add('sortTable', (columnSelector: string, direction = 'asc') =>
   cy.get('[data-cy="table-loading"]').should('not.exist')
 })
 
-Cypress.Commands.add('filterTable', (filterValue: string) => {
+Cypress.Commands.add('filterTable', (_filterValue: string) => {
   cy.get('[data-cy="table-filter-input"]').type(filterValue)
   cy.get('[data-cy="table-filter-apply"]').click()
   cy.get('[data-cy="table-loading"]').should('not.exist')
@@ -249,7 +249,7 @@ Cypress.Commands.add('dismissNotification', () => {
 })
 
 // Modal and Dialog Commands
-Cypress.Commands.add('openModal', (modalType: string) => {
+Cypress.Commands.add('openModal', (_modalType: string) => {
   cy.get(`[data-cy="open-${modalType}-modal"]`).click()
   cy.get('[data-cy="modal-overlay"]').should('be.visible')
   cy.get('[data-cy="modal-content"]').should('be.visible')
@@ -260,7 +260,7 @@ Cypress.Commands.add('closeModal', () => {
   cy.get('[data-cy="modal-overlay"]').should('not.exist')
 })
 
-Cypress.Commands.add('confirmDialog', (action: 'accept' | 'cancel') => {
+Cypress.Commands.add('confirmDialog', (_action: 'accept' | 'cancel') => {
   cy.get(`[data-cy="dialog-${action}"]`).click()
   cy.get('[data-cy="dialog"]').should('not.exist')
 })
@@ -269,7 +269,7 @@ Cypress.Commands.add('confirmDialog', (action: 'accept' | 'cancel') => {
 Cypress.Commands.add('injectAxe', () => {
   cy.window({ log: false }).then((win) => {
     // Mock axe implementation for tests without cypress-axe
-    (win as any).axe = {
+    (win as unknown as Window & { axe: { run: () => Promise<{ violations: unknown[] }> } }).axe = {
       run: () => Promise.resolve({ violations: [] })
     }
   })

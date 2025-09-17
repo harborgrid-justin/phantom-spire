@@ -20,7 +20,7 @@ import { interactiveFeatureEngineeringService } from '@/services/interactive-fea
 import { FeatureEngineeringPipeline } from '@/services/interactive-feature-engineering';
 import { ServiceContext } from '@/services/core';
 
-const InteractiveFeatureEngineeringPage: React.FC = () => {
+export default function InteractiveFeatureEngineeringPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [pipeline, setPipeline] = useState<FeatureEngineeringPipeline | null>(null);
@@ -80,4 +80,3 @@ const InteractiveFeatureEngineeringPage: React.FC = () => {
   );
 };
 
-export default InteractiveFeatureEngineeringPage;

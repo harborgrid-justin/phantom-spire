@@ -210,7 +210,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async saveModel(artifact: ModelArtifact): Promise<string> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const modelDir = path.join(this.basePath, 'models', artifact.modelId);
     await fs.mkdir(modelDir, { recursive: true });
@@ -227,7 +227,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async loadModel(modelId: string, version?: string): Promise<ModelArtifact> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const modelDir = path.join(this.basePath, 'models', modelId);
     const files = await fs.readdir(modelDir);
@@ -257,7 +257,7 @@ export class FileSystemProvider implements StorageProvider {
   async deleteModel(modelId: string, version?: string): Promise<boolean> {
     try {
       const fs = require('fs').promises;
-      const path = require('path');
+      import path from 'path';
 
       if (version) {
         const modelDir = path.join(this.basePath, 'models', modelId);
@@ -282,7 +282,7 @@ export class FileSystemProvider implements StorageProvider {
   async listModelVersions(modelId: string): Promise<string[]> {
     try {
       const fs = require('fs').promises;
-      const path = require('path');
+      import path from 'path';
 
       const modelDir = path.join(this.basePath, 'models', modelId);
       const files = await fs.readdir(modelDir);
@@ -303,7 +303,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async saveConfiguration(config: ModelConfiguration): Promise<string> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const filePath = path.join(this.basePath, 'configs', `${config.id}.json`);
     await fs.writeFile(filePath, JSON.stringify(config, null, 2));
@@ -312,7 +312,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async loadConfiguration(configId: string): Promise<ModelConfiguration> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const filePath = path.join(this.basePath, 'configs', `${configId}.json`);
     const content = await fs.readFile(filePath, 'utf-8');
@@ -322,7 +322,7 @@ export class FileSystemProvider implements StorageProvider {
   async deleteConfiguration(configId: string): Promise<boolean> {
     try {
       const fs = require('fs').promises;
-      const path = require('path');
+      import path from 'path';
 
       const filePath = path.join(this.basePath, 'configs', `${configId}.json`);
       await fs.unlink(filePath);
@@ -334,7 +334,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async saveAuditLog(entry: AuditLogEntry): Promise<string> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const dateStr = entry.timestamp.toISOString().split('T')[0];
     const auditDir = path.join(this.basePath, 'audit', dateStr);
@@ -348,7 +348,7 @@ export class FileSystemProvider implements StorageProvider {
   async queryAuditLogs(filter: Record<string, any>, limit = 1000): Promise<AuditLogEntry[]> {
     // Simple file-based query implementation
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const auditBaseDir = path.join(this.basePath, 'audit');
     const entries: AuditLogEntry[] = [];
@@ -392,7 +392,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async saveMetrics(snapshot: MetricsSnapshot): Promise<string> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const dateStr = snapshot.timestamp.toISOString().split('T')[0];
     const metricsDir = path.join(this.basePath, 'metrics', snapshot.type, dateStr);
@@ -406,7 +406,7 @@ export class FileSystemProvider implements StorageProvider {
   async queryMetrics(filter: Record<string, any>, limit = 1000): Promise<MetricsSnapshot[]> {
     // Simple file-based query implementation
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const metricsBaseDir = path.join(this.basePath, 'metrics');
     const snapshots: MetricsSnapshot[] = [];
@@ -457,7 +457,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async saveDataset(dataset: DataSet): Promise<string> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const filePath = path.join(this.basePath, 'datasets', `${dataset.id}.json`);
     await fs.writeFile(filePath, JSON.stringify(dataset, null, 2));
@@ -466,7 +466,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async loadDataset(datasetId: string): Promise<DataSet> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const filePath = path.join(this.basePath, 'datasets', `${datasetId}.json`);
     const content = await fs.readFile(filePath, 'utf-8');
@@ -475,7 +475,7 @@ export class FileSystemProvider implements StorageProvider {
 
   async queryDatasets(filter: Record<string, never>): Promise<DataSet[]> {
     const fs = require('fs').promises;
-    const path = require('path');
+    import path from 'path';
 
     const datasetsDir = path.join(this.basePath, 'datasets');
     const datasets: DataSet[] = [];
@@ -575,8 +575,7 @@ export class EnterprisePersistenceService extends EventEmitter {
     return provider;
   }
 
-  private async replicateOperation<T>(
-    operation: (provider: StorageProvider) => Promise<T>
+  private async replicateOperation<T>(_operation: (provider: StorageProvider) => Promise<T>
   ): Promise<T> {
     const primary = this.getPrimaryProvider();
     const result = await operation(primary);

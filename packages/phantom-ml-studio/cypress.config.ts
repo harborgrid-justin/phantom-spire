@@ -1,5 +1,6 @@
 import { defineConfig } from 'cypress';
-const webpackPreprocessor = require('@cypress/webpack-preprocessor');
+import webpackPreprocessor from '@cypress/webpack-preprocessor';
+import type { Configuration } from 'webpack';
 
 export default defineConfig({
   e2e: {
@@ -24,8 +25,8 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       // TypeScript and webpack preprocessing
-      const webpackOptions = {
-        mode: 'development',
+      const webpackOptions: Configuration = {
+        mode: 'development' as const,
         module: {
           rules: [
             {
@@ -51,7 +52,7 @@ export default defineConfig({
           // Implement database cleanup logic
           return null;
         },
-        generateTestData(options) {
+        generateTestData() {
           // Generate dynamic test data
           return { data: 'test-data' };
         },

@@ -13,26 +13,24 @@ import {
   Divider,
   Badge,
 } from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  DataObject as DataIcon,
-  AutoAwesome as AutoMLIcon,
-  Science as ExperimentIcon,
-  ModelTraining as ModelIcon,
-  CompareArrows as CompareIcon,
-  Analytics as AnalyticsIcon,
-  Rocket as DeployIcon,
-  Settings as SettingsIcon,
-  Security as SecurityIcon,
-  TrendingUp as MonitoringIcon,
-  AccountTree as PipelineIcon,
-  Store as MarketplaceIcon,
-  Visibility as ExplainableIcon,
-  Assessment as ABTestingIcon,
-  Business as ComplianceIcon,
-  Shield as ShieldIcon,
-  Engineering as EngineeringIcon,
-} from '@mui/icons-material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import DataIcon from '@mui/icons-material/DataObject';
+import AutoMLIcon from '@mui/icons-material/AutoAwesome';
+import ExperimentIcon from '@mui/icons-material/Biotech';
+import ModelIcon from '@mui/icons-material/Psychology';
+import CompareIcon from '@mui/icons-material/CompareArrows';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import DeployIcon from '@mui/icons-material/CloudUpload';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SecurityIcon from '@mui/icons-material/Lock';
+import MonitoringIcon from '@mui/icons-material/TrendingUp';
+import PipelineIcon from '@mui/icons-material/AccountTree';
+import MarketplaceIcon from '@mui/icons-material/Store';
+import ExplainableIcon from '@mui/icons-material/Visibility';
+import ABTestingIcon from '@mui/icons-material/Assessment';
+import ComplianceIcon from '@mui/icons-material/Business';
+import ShieldIcon from '@mui/icons-material/Shield';
+import EngineeringIcon from '@mui/icons-material/Build';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

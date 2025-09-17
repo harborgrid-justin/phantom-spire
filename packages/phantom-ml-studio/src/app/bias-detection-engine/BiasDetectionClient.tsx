@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
   LinearProgress,
   Chip,
@@ -16,14 +15,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   Alert,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -35,9 +32,9 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  IconButton,
-  Tooltip
+  IconButton
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Warning,
   CheckCircle,
@@ -47,9 +44,7 @@ import {
   Assessment,
   Security,
   Balance,
-  TrendingUp,
   BugReport,
-  Visibility,
   MoreVert
 } from '@mui/icons-material';
 
@@ -178,7 +173,7 @@ export default function BiasDetectionClient() {
       setBiasReports(mockReports);
       setSelectedReport(mockReports[0]);
       setLoading(false);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch bias reports');
       setLoading(false);
     }
@@ -217,8 +212,8 @@ export default function BiasDetectionClient() {
       ];
 
       setFairnessAnalysis(mockAnalysis);
-    } catch (err) {
-      console.error('Failed to fetch fairness analysis:', err);
+    } catch (_err) {
+      console.error('Failed to fetch fairness analysis:', _err);
     }
   };
 
@@ -246,7 +241,7 @@ export default function BiasDetectionClient() {
       setRunAnalysisDialogOpen(false);
       setAnalysisConfig({ modelId: '', protectedAttributes: [], sensitivityLevel: 'medium' });
       await fetchBiasReports();
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to run bias analysis');
     }
   };
@@ -304,7 +299,7 @@ export default function BiasDetectionClient() {
       {activeTab === 0 && (
         <Grid container spacing={3}>
           {/* Reports List */}
-          <Grid item xs={12} md={8}>
+          <Grid xs={12} md={8}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -336,7 +331,7 @@ export default function BiasDetectionClient() {
                                 variant="determinate"
                                 value={report.overallScore * 100}
                                 sx={{ width: 100, mr: 1 }}
-                                color={getStatusColor(report.status) as any}
+                                color={getStatusColor(report.status) as 'success' | 'warning' | 'error'}
                               />
                               <Typography variant="body2">
                                 {(report.overallScore * 100).toFixed(0)}%
@@ -347,7 +342,7 @@ export default function BiasDetectionClient() {
                             <Chip
                               icon={getStatusIcon(report.status)}
                               label={report.status.replace('_', ' ')}
-                              color={getStatusColor(report.status) as any}
+                              color={getStatusColor(report.status) as 'success' | 'warning' | 'error' | 'default'}
                               size="small"
                             />
                           </TableCell>
@@ -374,7 +369,7 @@ export default function BiasDetectionClient() {
           </Grid>
 
           {/* Report Details */}
-          <Grid item xs={12} md={4}>
+          <Grid xs={12} md={4}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -389,7 +384,7 @@ export default function BiasDetectionClient() {
                       <Chip
                         icon={getStatusIcon(selectedReport.status)}
                         label={selectedReport.status.replace('_', ' ')}
-                        color={getStatusColor(selectedReport.status) as any}
+                        color={getStatusColor(selectedReport.status) as 'success' | 'warning' | 'error' | 'default'}
                       />
                     </Box>
                     <Typography variant="h4" gutterBottom>
@@ -408,14 +403,14 @@ export default function BiasDetectionClient() {
                           <Typography variant="body2">{metric.metric}</Typography>
                           <Chip
                             label={metric.status}
-                            color={getStatusColor(metric.status) as any}
+                            color={getStatusColor(metric.status) as 'success' | 'warning' | 'error' | 'default'}
                             size="small"
                           />
                         </Box>
                         <LinearProgress
                           variant="determinate"
                           value={(metric.value / metric.threshold) * 100}
-                          color={getStatusColor(metric.status) as any}
+                          color={getStatusColor(metric.status) as 'success' | 'warning' | 'error'}
                           sx={{ mt: 0.5 }}
                         />
                         <Typography variant="caption" color="text.secondary">
@@ -438,7 +433,7 @@ export default function BiasDetectionClient() {
       {activeTab === 1 && (
         <Grid container spacing={3}>
           {fairnessAnalysis.map((analysis) => (
-            <Grid item xs={12} md={6} key={analysis.attribute}>
+            <Grid xs={12} md={6} key={analysis.attribute}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -504,7 +499,7 @@ export default function BiasDetectionClient() {
 
       {activeTab === 2 && (
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -539,7 +534,7 @@ export default function BiasDetectionClient() {
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControl fullWidth>
                   <InputLabel>Model</InputLabel>
                   <Select
@@ -552,7 +547,7 @@ export default function BiasDetectionClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12}>
+              <Grid xs={12}>
                 <FormControl fullWidth>
                   <InputLabel>Sensitivity Level</InputLabel>
                   <Select

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Grid,
+  
   Card,
   CardContent,
   Typography,
@@ -33,6 +33,7 @@ import {
   IconButton,
   Badge,
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Security as SecurityIcon,
   Shield as ShieldIcon,
@@ -127,7 +128,7 @@ interface SecurityMetrics {
   };
 }
 
-const EnterpriseSecurityCompliance: React.FC = () => {
+export default function EnterpriseSecurityCompliancePage() {
   const [activeTab, setActiveTab] = useState(0);
   const [frameworks, setFrameworks] = useState<ComplianceFramework[]>([]);
   const [selectedFramework, setSelectedFramework] = useState<ComplianceFramework | null>(null);
@@ -352,7 +353,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
     setActiveTab(newValue);
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (_status: string) => {
     switch (status) {
       case 'compliant': return 'success';
       case 'partial': return 'warning';
@@ -364,7 +365,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
     }
   };
 
-  const getRiskColor = (risk: string) => {
+  const getRiskColor = (_risk: string) => {
     switch (risk) {
       case 'low': return 'success';
       case 'medium': return 'warning';
@@ -374,7 +375,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (_status: string) => {
     switch (status) {
       case 'compliant':
       case 'met':
@@ -448,7 +449,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
 
       {/* Compliance Overview Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -463,7 +464,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -478,7 +479,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -493,7 +494,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -520,7 +521,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
       {activeTab === 0 && (
         <Grid container spacing={3}>
           {/* Compliance Status Chart */}
-          <Grid item xs={12} md={8}>
+          <Grid xs={12} md={8}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -540,7 +541,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
           </Grid>
 
           {/* Framework Summary */}
-          <Grid item xs={12} md={4}>
+          <Grid xs={12} md={4}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -576,7 +577,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
           </Grid>
 
           {/* Recent Activities */}
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -648,7 +649,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
 
       {activeTab === 1 && (
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          <Grid xs={12} md={4}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -693,7 +694,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid xs={12} md={8}>
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -707,7 +708,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
                 </Box>
 
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid item xs={6} md={3}>
+                  <Grid xs={6} md={3}>
                     <Typography variant="body2" color="text.secondary">
                       Overall Score
                     </Typography>
@@ -715,7 +716,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
                       {selectedFramework.overallScore}%
                     </Typography>
                   </Grid>
-                  <Grid item xs={6} md={3}>
+                  <Grid xs={6} md={3}>
                     <Typography variant="body2" color="text.secondary">
                       Risk Level
                     </Typography>
@@ -725,7 +726,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
                       size="small"
                     />
                   </Grid>
-                  <Grid item xs={6} md={3}>
+                  <Grid xs={6} md={3}>
                     <Typography variant="body2" color="text.secondary">
                       Last Audit
                     </Typography>
@@ -733,7 +734,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
                       {new Date(selectedFramework.lastAudit).toLocaleDateString()}
                     </Typography>
                   </Grid>
-                  <Grid item xs={6} md={3}>
+                  <Grid xs={6} md={3}>
                     <Typography variant="body2" color="text.secondary">
                       Next Audit
                     </Typography>
@@ -812,7 +813,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
 
       {activeTab === 2 && (
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -841,7 +842,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -925,14 +926,14 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Model Security & Operational Security Metrics
                 </Typography>
                 <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <Typography variant="subtitle1" gutterBottom>
                       Model Security
                     </Typography>
@@ -975,7 +976,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
                     </List>
                   </Grid>
                   
-                  <Grid item xs={12} md={6}>
+                  <Grid xs={12} md={6}>
                     <Typography variant="subtitle1" gutterBottom>
                       Operational Security
                     </Typography>
@@ -1027,14 +1028,14 @@ const EnterpriseSecurityCompliance: React.FC = () => {
 
       {activeTab === 3 && (
         <Grid container spacing={3}>
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Alert severity="info" sx={{ mb: 3 }}>
               <AlertTitle>🤖 ML-Specific Governance</AlertTitle>
               Specialized compliance controls for machine learning and AI systems
             </Alert>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -1082,7 +1083,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -1130,7 +1131,7 @@ const EnterpriseSecurityCompliance: React.FC = () => {
             </Card>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid xs={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -1215,4 +1216,3 @@ const EnterpriseSecurityCompliance: React.FC = () => {
   );
 };
 
-export default EnterpriseSecurityCompliance;

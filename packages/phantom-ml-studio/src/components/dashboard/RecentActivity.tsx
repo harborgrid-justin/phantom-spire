@@ -1,5 +1,3 @@
-'use client'
-
 import React from 'react'
 import {
   Box,
@@ -23,6 +21,7 @@ import {
   Error as ErrorIcon,
   Warning as WarningIcon
 } from '@mui/icons-material'
+import { TimeAgo } from '../common/TimeAgo'
 
 interface ActivityItem {
   id: string
@@ -31,69 +30,23 @@ interface ActivityItem {
   description: string
   timestamp: string
   status: 'success' | 'error' | 'warning' | 'info'
-  details?: Record<string, any>
+  details?: Record<string, string | number | boolean>
 }
 
-// Mock activity data - in real app this would come from an API
-const generateMockActivity = (): ActivityItem[] => {
-  const activities: ActivityItem[] = [
-    {
-      id: '1',
-      type: 'training',
-      title: 'Security Classification Model Trained',
-      description: 'Random Forest model trained with 95.2% accuracy',
-      timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 min ago
-      status: 'success',
-      details: { accuracy: 0.952, duration: '2m 34s' }
-    },
-    {
-      id: '2',
-      type: 'prediction',
-      title: 'Batch Predictions Completed',
-      description: '1,250 threat predictions processed successfully',
-      timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 min ago
-      status: 'success',
-      details: { count: 1250, avgLatency: '12ms' }
-    },
-    {
-      id: '3',
-      type: 'upload',
-      title: 'New Dataset Uploaded',
-      description: 'Security logs dataset (2.3GB, 450k records)',
-      timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(), // 90 min ago
-      status: 'info',
-      details: { size: '2.3GB', records: 450000 }
-    },
-    {
-      id: '4',
-      type: 'analysis',
-      title: 'Model Drift Detection',
-      description: 'Anomaly detection model showing 5.2% drift',
-      timestamp: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
-      status: 'warning',
-      details: { drift: 0.052, threshold: 0.1 }
-    },
-    {
-      id: '5',
-      type: 'training',
-      title: 'Regression Model Training Failed',
-      description: 'Insufficient training data for regression model',
-      timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(), // 3 hours ago
-      status: 'error',
-      details: { error: 'Insufficient data', samples: 45 }
-    },
-    {
-      id: '6',
-      type: 'prediction',
-      title: 'Real-time Inference Started',
-      description: 'Live threat detection pipeline activated',
-      timestamp: new Date(Date.now() - 1000 * 60 * 240).toISOString(), // 4 hours ago
-      status: 'success',
-      details: { pipeline: 'threat-detection-v2' }
-    }
-  ]
+async function getRecentActivity(): Promise<ActivityItem[]> {
+  // In a real app, this would fetch from a full URL
+  // For this example, we're calling the internal API route
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/ml-core/activity`, {
+    cache: 'no-store' // Fetch fresh data on every request
+  })
 
-  return activities
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    throw new Error('Failed to fetch activity data')
+  }
+
+  const data = await res.json()
+  return data.data || []
 }
 
 const getActivityIcon = (type: ActivityItem['type']) => {
@@ -127,20 +80,8 @@ const getStatusColor = (status: ActivityItem['status']) => {
   return colorMap[status]
 }
 
-const formatTimeAgo = (timestamp: string): string => {
-  const now = new Date()
-  const time = new Date(timestamp)
-  const diffMs = now.getTime() - time.getTime()
-  const diffMins = Math.floor(diffMs / (1000 * 60))
-
-  if (diffMins < 1) return 'Just now'
-  if (diffMins < 60) return `${diffMins}m ago`
-  if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`
-  return `${Math.floor(diffMins / 1440)}d ago`
-}
-
-export function RecentActivity() {
-  const activities = generateMockActivity()
+export async function RecentActivity() {
+  const activities = await getRecentActivity()
 
   return (
     <Card className="ml-card">
@@ -186,7 +127,7 @@ export function RecentActivity() {
                         </Typography>
                         <Box className="flex items-center gap-2">
                           <Typography variant="caption" color="text.secondary">
-                            {formatTimeAgo(activity.timestamp)}
+                            <TimeAgo timestamp={activity.timestamp} />
                           </Typography>
                           {activity.details && Object.keys(activity.details).length > 0 && (
                             <Box className="flex gap-1">

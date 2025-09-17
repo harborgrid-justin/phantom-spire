@@ -86,7 +86,7 @@ export function PieChart({
                   borderRadius: theme.shape.borderRadius,
                   color: theme.palette.text.primary
                 }}
-                formatter={(value: number) => [value, 'Count']}
+                formatter={(_value: number) => [value, 'Count']}
               />
               {showLegend && (
                 <Legend

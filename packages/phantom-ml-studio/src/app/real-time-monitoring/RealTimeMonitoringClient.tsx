@@ -6,7 +6,7 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
+  
   Button,
   Chip,
   Alert,
@@ -21,6 +21,7 @@ import {
   Paper,
   Divider
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Refresh,
   Warning,
@@ -148,13 +149,13 @@ export default function RealTimeMonitoringClient() {
       setModelMetrics(mockModelMetrics);
       setAlerts(mockAlerts);
       setLoading(false);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch monitoring data');
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (_status: string) => {
     switch (status) {
       case 'healthy': return 'success';
       case 'warning': return 'warning';
@@ -163,7 +164,7 @@ export default function RealTimeMonitoringClient() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityColor = (_severity: string) => {
     switch (severity) {
       case 'low': return 'info';
       case 'medium': return 'warning';
@@ -173,7 +174,7 @@ export default function RealTimeMonitoringClient() {
     }
   };
 
-  const handleAcknowledgeAlert = (alertId: string) => {
+  const handleAcknowledgeAlert = (_alertId: string) => {
     setAlerts(alerts.map(alert =>
       alert.id === alertId ? { ...alert, acknowledged: true } : alert
     ));
@@ -211,7 +212,7 @@ export default function RealTimeMonitoringClient() {
 
       {/* System Metrics */}
       <Grid container spacing={3} mb={3}>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -230,7 +231,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -249,7 +250,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -268,7 +269,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid xs={12} md={3}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -291,7 +292,7 @@ export default function RealTimeMonitoringClient() {
 
       {/* Model Performance */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid xs={12} md={8}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -317,7 +318,7 @@ export default function RealTimeMonitoringClient() {
                         <TableCell>
                           <Chip
                             label={model.status}
-                            color={getStatusColor(model.status) as any}
+                            color={getStatusColor($1) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
                             size="small"
                           />
                         </TableCell>
@@ -336,7 +337,7 @@ export default function RealTimeMonitoringClient() {
         </Grid>
 
         {/* Active Alerts */}
-        <Grid item xs={12} md={4}>
+        <Grid xs={12} md={4}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
