@@ -1,0 +1,121 @@
+{
+  "overview": {
+    "totalModels": 24,
+    "activeExperiments": 7,
+    "deployedModels": 12,
+    "totalDatasets": 156,
+    "lastUpdated": "2025-01-17T16:30:00Z"
+  },
+  "performance": {
+    "systemHealth": "healthy",
+    "uptime": 99.8,
+    "averageResponseTime": 145,
+    "requestsPerSecond": 2847,
+    "errorRate": 0.2,
+    "cpuUsage": 68,
+    "memoryUsage": 72,
+    "diskUsage": 45
+  },
+  "modelMetrics": {
+    "averageAccuracy": 0.91,
+    "totalPredictions": 1456782,
+    "predictionsTrend": [
+      { "date": "2025-01-10", "predictions": 195432 },
+      { "date": "2025-01-11", "predictions": 208915 },
+      { "date": "2025-01-12", "predictions": 223176 },
+      { "date": "2025-01-13", "predictions": 198743 },
+      { "date": "2025-01-14", "predictions": 234521 },
+      { "date": "2025-01-15", "predictions": 241087 },
+      { "date": "2025-01-16", "predictions": 254908 },
+      { "date": "2025-01-17", "predictions": 187234 }
+    ]
+  },
+  "recentActivity": [
+    {
+      "id": "activity_001",
+      "type": "model_deployed",
+      "message": "Price Optimization Model v2.1.1 deployed to production",
+      "timestamp": "2025-01-17T15:45:00Z",
+      "severity": "info",
+      "modelId": "model_003"
+    },
+    {
+      "id": "activity_002",
+      "type": "experiment_completed",
+      "message": "Model Performance A/B Test completed with 95% confidence",
+      "timestamp": "2025-01-17T15:30:00Z",
+      "severity": "success",
+      "experimentId": "exp_001"
+    },
+    {
+      "id": "activity_003",
+      "type": "alert_triggered",
+      "message": "High error rate detected in Fraud Detection System",
+      "timestamp": "2025-01-17T14:20:00Z",
+      "severity": "warning",
+      "modelId": "model_002"
+    },
+    {
+      "id": "activity_004",
+      "type": "dataset_uploaded",
+      "message": "New customer data uploaded (25,000 records)",
+      "timestamp": "2025-01-17T13:15:00Z",
+      "severity": "info",
+      "datasetId": "dataset_006"
+    },
+    {
+      "id": "activity_005",
+      "type": "model_training_failed",
+      "message": "Sentiment Analysis Classifier training failed - insufficient data",
+      "timestamp": "2025-01-16T15:45:00Z",
+      "severity": "error",
+      "modelId": "model_004"
+    }
+  ],
+  "charts": {
+    "accuracyTrend": [
+      { "date": "2025-01-10", "accuracy": 0.89, "models": 18 },
+      { "date": "2025-01-11", "accuracy": 0.90, "models": 19 },
+      { "date": "2025-01-12", "accuracy": 0.91, "models": 20 },
+      { "date": "2025-01-13", "accuracy": 0.90, "models": 21 },
+      { "date": "2025-01-14", "accuracy": 0.92, "models": 22 },
+      { "date": "2025-01-15", "accuracy": 0.91, "models": 23 },
+      { "date": "2025-01-16", "accuracy": 0.93, "models": 24 },
+      { "date": "2025-01-17", "accuracy": 0.91, "models": 24 }
+    ],
+    "algorithmDistribution": [
+      { "algorithm": "Random Forest", "count": 8, "percentage": 33.3 },
+      { "algorithm": "Neural Network", "count": 6, "percentage": 25.0 },
+      { "algorithm": "Linear Regression", "count": 4, "percentage": 16.7 },
+      { "algorithm": "SVM", "count": 3, "percentage": 12.5 },
+      { "algorithm": "Transformer", "count": 2, "percentage": 8.3 },
+      { "algorithm": "Other", "count": 1, "percentage": 4.2 }
+    ],
+    "resourceUtilization": [
+      { "time": "00:00", "cpu": 45, "memory": 62, "gpu": 0 },
+      { "time": "04:00", "cpu": 38, "memory": 58, "gpu": 0 },
+      { "time": "08:00", "cpu": 72, "memory": 78, "gpu": 45 },
+      { "time": "12:00", "cpu": 89, "memory": 85, "gpu": 78 },
+      { "time": "16:00", "cpu": 68, "memory": 72, "gpu": 56 },
+      { "time": "20:00", "cpu": 52, "memory": 65, "gpu": 23 }
+    ]
+  },
+  "alerts": [
+    {
+      "id": "alert_001",
+      "type": "performance",
+      "message": "Model response time exceeded 200ms threshold",
+      "severity": "warning",
+      "timestamp": "2025-01-17T16:15:00Z",
+      "modelId": "model_002"
+    },
+    {
+      "id": "alert_002",
+      "type": "accuracy",
+      "message": "Model accuracy dropped below 85% threshold",
+      "severity": "critical",
+      "timestamp": "2025-01-17T14:30:00Z",
+      "modelId": "model_007"
+    }
+  ]
+}

@@ -1,0 +1,465 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: 'Test execution level'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - smoke
+          - regression
+          - full
+
+env:
+  NODE_VERSION: '20.x'
+  CYPRESS_CACHE_FOLDER: '~/.cache/Cypress'
+  NEXT_TELEMETRY_DISABLED: 1
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Quick validation checks
+  validation:
+    name: Quick Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Check package.json
+        run: |
+          if [ ! -f package.json ]; then
+            echo "package.json not found"
+            exit 1
+          fi
+
+      - name: Validate branch protection
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "PR from ${{ github.head_ref }} to ${{ github.base_ref }}"
+
+  # Dependency installation with caching
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    needs: validation
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Verify installation
+        run: npm list --depth=0
+
+  # Parallel linting
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    needs: install
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Run ESLint
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: TypeScript type checking
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+  # Build optimization
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: install
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        build-mode: [development, production]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Cache build output
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next
+            out
+          key: ${{ runner.os }}-build-${{ matrix.build-mode }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ matrix.build-mode }}-
+
+      - name: Build application (${{ matrix.build-mode }})
+        run: |
+          if [ "${{ matrix.build-mode }}" = "production" ]; then
+            npm run build
+          else
+            npm run build --mode=development
+          fi
+        env:
+          NODE_ENV: ${{ matrix.build-mode }}
+
+      - name: Upload build artifacts
+        if: matrix.build-mode == 'production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            .next
+            out
+          retention-days: 7
+
+      - name: Analyze bundle size
+        if: matrix.build-mode == 'production'
+        run: |
+          npx next-bundle-analyzer || true
+          npx size-limit --json > bundle-size.json || true
+
+      - name: Upload bundle analysis
+        if: matrix.build-mode == 'production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: |
+            bundle-size.json
+            .next/analyze
+          retention-days: 30
+
+  # Parallel E2E testing with matrix strategy
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ${{ matrix.os }}
+    needs: build
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        browser: [chrome, firefox, edge]
+        test-suite: [smoke, critical, full]
+        include:
+          - os: windows-latest
+            browser: chrome
+            test-suite: smoke
+          - os: macos-latest
+            browser: chrome
+            test-suite: smoke
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Restore build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next
+            out
+          key: ${{ runner.os }}-build-production-${{ github.sha }}
+
+      - name: Cache Cypress
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/Cypress
+            ~/AppData/Local/Cypress/Cache
+            ~/Library/Caches/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Cypress
+        run: npx cypress install
+
+      - name: Start application
+        run: |
+          npm run start &
+          npx wait-on http://localhost:3000 -t 60000
+
+      - name: Run E2E tests (${{ matrix.test-suite }})
+        run: |
+          if [ "${{ matrix.test-suite }}" = "smoke" ]; then
+            npx cypress run --browser ${{ matrix.browser }} --spec "cypress/e2e/smoke/**/*.cy.{js,ts}"
+          elif [ "${{ matrix.test-suite }}" = "critical" ]; then
+            npx cypress run --browser ${{ matrix.browser }} --spec "cypress/e2e/critical/**/*.cy.{js,ts}"
+          else
+            npx cypress run --browser ${{ matrix.browser }}
+          fi
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_PARALLEL: true
+          CYPRESS_GROUP: ${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-suite }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-suite }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+            cypress/results
+          retention-days: 7
+
+      - name: Upload coverage
+        if: matrix.test-suite == 'full'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: e2e-${{ matrix.browser }}
+          name: E2E-${{ matrix.browser }}
+
+  # Performance testing
+  performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Restore build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next
+            out
+          key: ${{ runner.os }}-build-production-${{ github.sha }}
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          npm run start &
+          npx wait-on http://localhost:3000
+          lhci autorun --collect.url=http://localhost:3000 --collect.url=http://localhost:3000/dashboard || true
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-results
+          path: .lighthouseci
+          retention-days: 30
+
+      - name: Performance budget check
+        run: |
+          node scripts/check-performance-budget.js || true
+
+  # Security scanning
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: install
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: npm audit --production
+        continue-on-error: true
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload security results
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: snyk-report.json
+          retention-days: 30
+
+  # Deploy preview for PRs
+  deploy-preview:
+    name: Deploy Preview
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: [lint, build, e2e-tests]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel Preview
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          scope: ${{ secrets.VERCEL_SCOPE }}
+          alias-domains: pr-${{ github.event.pull_request.number }}.phantom-ml-studio.dev
+
+  # Production deployment
+  deploy-production:
+    name: Deploy to Production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    needs: [lint, build, e2e-tests, security, performance]
+    timeout-minutes: 15
+    environment:
+      name: production
+      url: https://phantom-ml-studio.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          scope: ${{ secrets.VERCEL_SCOPE }}
+
+      - name: Purge CDN cache
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+
+      - name: Notify deployment
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Production deployment completed'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+  # Test report generation
+  test-report:
+    name: Generate Test Report
+    if: always()
+    runs-on: ubuntu-latest
+    needs: [e2e-tests, performance]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: test-artifacts
+
+      - name: Generate consolidated report
+        run: |
+          npm install -g mochawesome-merge mochawesome-report-generator
+          mochawesome-merge test-artifacts/cypress-results-**/results/*.json > merged-report.json || true
+          marge merged-report.json -o test-report -i --charts || true
+
+      - name: Upload final report
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-test-report
+          path: test-report
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('test-report/summary.txt', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Test Results\n\n${report}`
+            });

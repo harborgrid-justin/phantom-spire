@@ -208,7 +208,7 @@ export function QuickStats() {
 
       <Grid container spacing={3} role="group" aria-label="Performance statistics">
         {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} lg={3} key={stat.title}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={stat.title}>
             <Box
               className="animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
@@ -236,7 +236,7 @@ export function QuickStats() {
       {performanceStats && !error && (
         <Box className="mt-4 p-4 bg-gray-50 rounded-lg">
           <Grid container spacing={2}>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Typography variant="body2" color="text.secondary">
                 Active Models
               </Typography>
@@ -244,7 +244,7 @@ export function QuickStats() {
                 {performanceStats.active_models}
               </Typography>
             </Grid>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Typography variant="body2" color="text.secondary">
                 Total Operations
               </Typography>
@@ -252,7 +252,7 @@ export function QuickStats() {
                 {performanceStats.total_operations.toLocaleString()}
               </Typography>
             </Grid>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Typography variant="body2" color="text.secondary">
                 Avg Inference Time
               </Typography>
@@ -260,7 +260,7 @@ export function QuickStats() {
                 {formatLatency(performanceStats.average_inference_time_ms)}
               </Typography>
             </Grid>
-            <Grid item xs={6} md={3}>
+            <Grid size={{ xs: 6, md: 3 }}>
               <Typography variant="body2" color="text.secondary">
                 Peak Memory
               </Typography>

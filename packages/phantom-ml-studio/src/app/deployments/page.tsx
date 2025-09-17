@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview Model Deployments Page - Enterprise ML Production Management Platform
  *
@@ -32,92 +34,17 @@
  * @subcategory Model Serving
  */
 
-import type { Metadata, Viewport } from 'next';
-import { Suspense, ErrorBoundary } from 'react';
+// Metadata moved to layout.tsx
+import { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import dynamicImport from 'next/dynamic';
-import { headers } from 'next/headers';
 
 // Dynamic imports for optimal deployment management interface loading
 const DeploymentsClient = dynamicImport(() => import('./DeploymentsClient'), {
   loading: () => <DeploymentsSkeleton />
 });
 
-/**
- * Comprehensive metadata configuration for ML deployment and production systems
- * Optimized for DevOps and MLOps community visibility
- */
-export const metadata: Metadata = {
-  title: {
-    default: 'Deployments | Phantom ML Studio',
-    template: '%s | ML Deployments - Production Platform'
-  },
-  description: 'Enterprise ML deployment platform featuring Kubernetes orchestration, multi-cloud support, auto-scaling, blue-green deployments, canary releases, comprehensive monitoring, and production-grade security for machine learning model serving.',
-  keywords: [
-    'ML deployment', 'model serving', 'Kubernetes', 'container orchestration',
-    'production ML', 'auto-scaling', 'load balancing', 'blue-green deployment',
-    'canary release', 'shadow deployment', 'feature store', 'model versioning',
-    'multi-cloud', 'edge computing', 'microservices', 'API gateway',
-    'monitoring', 'observability', 'MLOps', 'DevOps', 'CI/CD', 'production systems'
-  ],
-  authors: [{ name: 'Phantom ML Studio Production Team' }],
-  creator: 'Phantom ML Studio',
-  publisher: 'Phantom ML Studio',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Phantom ML Studio',
-    title: 'ML Deployments - Enterprise Production Platform',
-    description: 'Comprehensive model deployment with Kubernetes orchestration, auto-scaling, and production-grade monitoring.',
-    url: 'https://phantom-ml.com/deployments',
-    images: [
-      {
-        url: '/og-deployments.png',
-        width: 1200,
-        height: 630,
-        alt: 'Phantom ML Studio Deployments Interface with Production Monitoring',
-      },
-    ],
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@PhantomMLStudio',
-    creator: '@PhantomMLStudio',
-    title: 'ML Deployments - Production Platform',
-    description: 'Enterprise model deployment with Kubernetes and auto-scaling capabilities',
-    images: ['/twitter-deployments.png'],
-  },
-  alternates: {
-    canonical: 'https://phantom-ml.com/deployments',
-  },
-  category: 'Production',
-  classification: 'Model Serving',
-};
-
-/**
- * Advanced viewport configuration for deployment management interfaces
- */
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 3,
-  userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f172a' }
-  ],
-  colorScheme: 'light dark',
-};
+// Metadata and viewport moved to layout.tsx since this is now a client component
 
 /**
  * Performance configuration for real-time deployment monitoring
@@ -312,7 +239,7 @@ function DeploymentsSkeleton() {
  * Error Boundary for Deployments Components
  * Provides comprehensive error recovery with production system context
  */
-function DeploymentsErrorFallback({ error, resetErrorBoundary }: any) {
+function DeploymentsErrorFallback() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-lg mx-auto text-center">
@@ -321,7 +248,7 @@ function DeploymentsErrorFallback({ error, resetErrorBoundary }: any) {
           <p className="text-red-600 mb-4">Unable to load deployment management interface</p>
           <div className="space-y-2 mb-4">
             <button
-              onClick={resetErrorBoundary}
+              onClick={() => window.location.reload()}
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
             >
               Retry Deployments
@@ -355,10 +282,9 @@ function DeploymentsErrorFallback({ error, resetErrorBoundary }: any) {
  *
  * @returns {JSX.Element} The complete deployment management interface
  */
-export default async function DeploymentsPage(): Promise<JSX.Element> {
-  // Extract user context for personalized deployment recommendations
-  const headersList = headers();
-  const userAgent = headersList.get('user-agent') || '';
+export default function DeploymentsPage(): JSX.Element {
+  // Extract user context for personalized deployment recommendations - client-side
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
   const isBot = /bot|crawler|spider/i.test(userAgent);
 
   // Optimize for search engine crawlers with production context
@@ -393,13 +319,7 @@ export default async function DeploymentsPage(): Promise<JSX.Element> {
 
   return (
     <main className="min-h-screen bg-gray-50" role="main">
-      <ErrorBoundary
-        FallbackComponent={DeploymentsErrorFallback}
-        onError={(error, errorInfo) => {
-          console.error('Deployments Error:', error, errorInfo);
-          // Here you would typically send to error tracking service with production context
-        }}
-      >
+      <ErrorBoundary fallback={<DeploymentsErrorFallback />}>
         <Suspense fallback={<DeploymentsSkeleton />}>
           <DeploymentsClient />
         </Suspense>

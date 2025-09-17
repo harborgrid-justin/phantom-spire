@@ -319,7 +319,7 @@ export default function TrainingPage() {
             </Typography>
             <Grid container spacing={2}>
               {mockDatasets.map((dataset) => (
-                <Grid xs={12} md={6} key={dataset.id}>
+                <Grid size={{ xs: 12, md: 6 }} key={dataset.id}>
                   <Card
                     variant={selectedDataset?.id === dataset.id ? "outlined" : "elevation"}
                     sx={{
@@ -338,19 +338,19 @@ export default function TrainingPage() {
                         {dataset.description}
                       </Typography>
                       <Grid container spacing={2}>
-                        <Grid xs={6}>
+                        <Grid size={{ xs: 6 }}>
                           <Typography variant="caption" color="text.secondary">Size</Typography>
                           <Typography variant="body2">{dataset.size}</Typography>
                         </Grid>
-                        <Grid xs={6}>
+                        <Grid size={{ xs: 6 }}>
                           <Typography variant="caption" color="text.secondary">Rows</Typography>
                           <Typography variant="body2">{dataset.rows.toLocaleString()}</Typography>
                         </Grid>
-                        <Grid xs={6}>
+                        <Grid size={{ xs: 6 }}>
                           <Typography variant="caption" color="text.secondary">Columns</Typography>
                           <Typography variant="body2">{dataset.columns}</Typography>
                         </Grid>
-                        <Grid xs={6}>
+                        <Grid size={{ xs: 6 }}>
                           <Typography variant="caption" color="text.secondary">Type</Typography>
                           <Chip label={dataset.type} size="small" />
                         </Grid>
@@ -381,7 +381,7 @@ export default function TrainingPage() {
             </Typography>
             <Grid container spacing={2}>
               {algorithms.map((algorithm) => (
-                <Grid xs={12} md={6} key={algorithm.name}>
+                <Grid size={{ xs: 12, md: 6 }} key={algorithm.name}>
                   <Card
                     variant={selectedAlgorithm === algorithm.name ? "outlined" : "elevation"}
                     sx={{
@@ -428,7 +428,7 @@ export default function TrainingPage() {
             </Typography>
 
             <Grid container spacing={3}>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card>
                   <CardContent>
                     <Typography variant="subtitle1" gutterBottom>
@@ -484,7 +484,7 @@ export default function TrainingPage() {
                 </Card>
               </Grid>
 
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card>
                   <CardContent>
                     <Typography variant="subtitle1" gutterBottom>
@@ -569,19 +569,19 @@ export default function TrainingPage() {
                   </Box>
 
                   <Grid container spacing={2} mb={2}>
-                    <Grid xs={6} md={3}>
+                    <Grid size={{ xs: 6, md: 3 }}>
                       <Typography variant="caption" color="text.secondary">Algorithm</Typography>
                       <Typography variant="body2">{currentJob.algorithm}</Typography>
                     </Grid>
-                    <Grid xs={6} md={3}>
+                    <Grid size={{ xs: 6, md: 3 }}>
                       <Typography variant="caption" color="text.secondary">Dataset</Typography>
                       <Typography variant="body2">{currentJob.dataset}</Typography>
                     </Grid>
-                    <Grid xs={6} md={3}>
+                    <Grid size={{ xs: 6, md: 3 }}>
                       <Typography variant="caption" color="text.secondary">Target</Typography>
                       <Typography variant="body2">{currentJob.target}</Typography>
                     </Grid>
-                    <Grid xs={6} md={3}>
+                    <Grid size={{ xs: 6, md: 3 }}>
                       <Typography variant="caption" color="text.secondary">Features</Typography>
                       <Typography variant="body2">{currentJob.features.length}</Typography>
                     </Grid>
@@ -593,7 +593,7 @@ export default function TrainingPage() {
                         Training Metrics
                       </Typography>
                       <Grid container spacing={2}>
-                        <Grid xs={6} md={3}>
+                        <Grid size={{ xs: 6, md: 3 }}>
                           <Paper sx={{ p: 2, textAlign: 'center' }}>
                             <Typography variant="h6" color="primary">
                               {(currentJob.metrics.accuracy! * 100).toFixed(1)}%
@@ -601,7 +601,7 @@ export default function TrainingPage() {
                             <Typography variant="caption">Accuracy</Typography>
                           </Paper>
                         </Grid>
-                        <Grid xs={6} md={3}>
+                        <Grid size={{ xs: 6, md: 3 }}>
                           <Paper sx={{ p: 2, textAlign: 'center' }}>
                             <Typography variant="h6" color="secondary">
                               {(currentJob.metrics.f1Score! * 100).toFixed(1)}%
@@ -609,7 +609,7 @@ export default function TrainingPage() {
                             <Typography variant="caption">F1 Score</Typography>
                           </Paper>
                         </Grid>
-                        <Grid xs={6} md={3}>
+                        <Grid size={{ xs: 6, md: 3 }}>
                           <Paper sx={{ p: 2, textAlign: 'center' }}>
                             <Typography variant="h6" color="success.main">
                               {(currentJob.metrics.precision! * 100).toFixed(1)}%
@@ -617,7 +617,7 @@ export default function TrainingPage() {
                             <Typography variant="caption">Precision</Typography>
                           </Paper>
                         </Grid>
-                        <Grid xs={6} md={3}>
+                        <Grid size={{ xs: 6, md: 3 }}>
                           <Paper sx={{ p: 2, textAlign: 'center' }}>
                             <Typography variant="h6" color="warning.main">
                               {(currentJob.metrics.recall! * 100).toFixed(1)}%

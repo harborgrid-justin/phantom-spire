@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview Data Explorer Page - Advanced Dataset Analysis & Visualization Interface
  *
@@ -32,93 +34,17 @@
  * @subcategory Exploratory Data Analysis
  */
 
-import type { Metadata, Viewport } from 'next';
-import { Suspense, ErrorBoundary } from 'react';
+// Metadata moved to layout.tsx
+import { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import dynamicImport from 'next/dynamic';
-import { headers } from 'next/headers';
 
 // Dynamic imports for optimal code splitting and performance
 const DataExplorerClient = dynamicImport(() => import('./DataExplorerClient'), {
   loading: () => <DataExplorerSkeleton />
 });
 
-/**
- * Comprehensive metadata configuration optimized for data science and analytics discovery
- * Enhanced for academic and research community visibility
- */
-export const metadata: Metadata = {
-  title: {
-    default: 'Data Explorer | Phantom ML Studio',
-    template: '%s | Data Explorer - Advanced Analytics Platform'
-  },
-  description: 'Enterprise-grade data exploration platform featuring advanced statistical analysis, interactive visualizations, automated data profiling, feature engineering discovery, and comprehensive data quality assessment for machine learning datasets.',
-  keywords: [
-    'data exploration', 'exploratory data analysis', 'EDA', 'statistical analysis',
-    'data visualization', 'data profiling', 'feature engineering', 'data quality',
-    'statistical computing', 'descriptive statistics', 'inferential statistics',
-    'correlation analysis', 'outlier detection', 'data preprocessing',
-    'interactive analytics', 'dataset analysis', 'ML preprocessing',
-    'statistical dashboard', 'data science tools', 'analytics platform'
-  ],
-  authors: [{ name: 'Phantom ML Studio Data Science Team' }],
-  creator: 'Phantom ML Studio',
-  publisher: 'Phantom ML Studio',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Phantom ML Studio',
-    title: 'Data Explorer - Advanced Dataset Analysis Platform',
-    description: 'Comprehensive data exploration with statistical analysis, interactive visualizations, and automated insights generation for machine learning workflows.',
-    url: 'https://phantom-ml.com/data-explorer',
-    images: [
-      {
-        url: '/og-data-explorer.png',
-        width: 1200,
-        height: 630,
-        alt: 'Phantom ML Studio Data Explorer Interface with Statistical Analysis',
-      },
-    ],
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@PhantomMLStudio',
-    creator: '@PhantomMLStudio',
-    title: 'Data Explorer - Advanced Analytics Platform',
-    description: 'Enterprise data exploration with statistical analysis and interactive visualizations',
-    images: ['/twitter-data-explorer.png'],
-  },
-  alternates: {
-    canonical: 'https://phantom-ml.com/data-explorer',
-  },
-  category: 'Data Science',
-  classification: 'Statistical Computing',
-};
-
-/**
- * Advanced viewport configuration optimized for data visualization and analytics interfaces
- */
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 4,
-  userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-    { media: '(prefers-color-scheme: dark)', color: '#0c0c0c' }
-  ],
-  colorScheme: 'light dark',
-};
+// Metadata and viewport moved to layout.tsx since this is now a client component
 
 /**
  * Performance configuration for data-intensive analytics
@@ -285,10 +211,10 @@ function DataExplorerSkeleton() {
 }
 
 /**
- * Error Boundary for Data Explorer Components
+ * Error Fallback for Data Explorer Components
  * Provides comprehensive error recovery with data analysis context
  */
-function DataExplorerErrorFallback({ error: _error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
+function DataExplorerErrorFallback() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-lg mx-auto text-center">
@@ -297,7 +223,7 @@ function DataExplorerErrorFallback({ error: _error, resetErrorBoundary }: { erro
           <p className="text-red-600 mb-4">Unable to load data exploration interface</p>
           <div className="space-y-2 mb-4">
             <button
-              onClick={resetErrorBoundary}
+              onClick={() => window.location.reload()}
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
             >
               Retry Analysis
@@ -331,10 +257,9 @@ function DataExplorerErrorFallback({ error: _error, resetErrorBoundary }: { erro
  *
  * @returns {JSX.Element} The complete data exploration interface
  */
-export default async function DataExplorerPage(): Promise<JSX.Element> {
-  // Extract user context for personalized analysis recommendations
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') || '';
+export default function DataExplorerPage(): JSX.Element {
+  // Extract user context for personalized analysis recommendations - client-side
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
   const isBot = /bot|crawler|spider/i.test(userAgent);
 
   // Optimize for search engine crawlers with structured content
@@ -369,13 +294,7 @@ export default async function DataExplorerPage(): Promise<JSX.Element> {
 
   return (
     <main className="min-h-screen bg-gray-50" role="main">
-      <ErrorBoundary
-        FallbackComponent={DataExplorerErrorFallback}
-        onError={(error, errorInfo) => {
-          console.error('Data Explorer Error:', error, errorInfo);
-          // Here you would typically send to error tracking service with analytics context
-        }}
-      >
+      <ErrorBoundary fallback={<DataExplorerErrorFallback />}>
         <Suspense fallback={<DataExplorerSkeleton />}>
           <DataExplorerClient />
         </Suspense>

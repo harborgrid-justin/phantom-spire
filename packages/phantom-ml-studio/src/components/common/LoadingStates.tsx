@@ -260,7 +260,7 @@ export function ModelLoadingSkeleton() {
   return (
     <Grid container spacing={3}>
       {Array.from({ length: 8 }).map((_, index) => (
-        <Grid xs={12} sm={6} md={4} lg={3} key={index}>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
           <SkeletonCard
             lines={2}
             hasAvatar={true}
@@ -279,7 +279,7 @@ export function DashboardLoadingSkeleton() {
       {/* Stats Cards */}
       <Grid container spacing={3}>
         {Array.from({ length: 4 }).map((_, index) => (
-          <Grid xs={12} sm={6} lg={3} key={index}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={index}>
             <SkeletonCard lines={1} height={100} />
           </Grid>
         ))}

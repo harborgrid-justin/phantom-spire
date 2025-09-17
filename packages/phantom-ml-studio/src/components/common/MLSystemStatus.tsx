@@ -108,7 +108,7 @@ export async function MLSystemStatus() {
         )}
 
         <Grid container spacing={2}>
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Core Version
@@ -124,7 +124,7 @@ export async function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Platform
@@ -135,7 +135,7 @@ export async function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Target
@@ -146,7 +146,7 @@ export async function MLSystemStatus() {
             </Box>
           </Grid>
 
-          <Grid xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Box className="p-3 bg-gray-50 rounded-lg">
               <Typography variant="body2" color="text.secondary" className="mb-1">
                 Features

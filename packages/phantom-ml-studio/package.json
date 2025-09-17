@@ -3,12 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3000",
     "dev:turbopack": "next dev --turbopack",
     "build": "next build",
     "build:turbopack": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:chrome": "cypress run --browser chrome",
+    "cypress:run:firefox": "cypress run --browser firefox",
+    "test:e2e": "cypress run",
+    "test:e2e:dev": "start-server-and-test dev http://localhost:3000 cypress:run"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -48,17 +54,27 @@
     "@cypress/code-coverage": "^3.14.6",
     "@cypress/webpack-preprocessor": "^6.0.4",
     "@eslint/eslintrc": "^3",
+    "@faker-js/faker": "^10.0.0",
+    "@lhci/cli": "^0.15.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "axe-core": "^4.10.3",
+    "compression-webpack-plugin": "^11.1.0",
     "cypress": "^15.2.0",
     "cypress-axe": "^1.7.0",
+    "cypress-multi-reporters": "^2.0.5",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
+    "mochawesome": "^7.1.4",
+    "mochawesome-merge": "^5.0.0",
+    "mochawesome-report-generator": "^6.3.0",
+    "start-server-and-test": "^2.0.8",
     "tailwindcss": "^4",
+    "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.4",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

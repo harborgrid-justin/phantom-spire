@@ -156,22 +156,24 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
         borderColor: 'divider',
         color: 'text.primary',
       }}
+      data-cy="nav-topbar"
     >
       <Toolbar sx={{ justifyContent: 'space-between' }}>
         {/* Left side: Menu button and title */}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }} data-cy="nav-topbar-left">
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={onDrawerToggle}
             sx={{ mr: 2, display: { md: 'none' } }}
+            data-cy="btn-mobile-menu-toggle"
           >
             <MenuIcon />
           </IconButton>
           
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} data-cy="nav-brand">
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 600 }} data-cy="nav-brand-title">
               ML Studio
             </Typography>
             <Chip
@@ -180,12 +182,13 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
               color="primary"
               variant="outlined"
               sx={{ fontWeight: 500 }}
+              data-cy="nav-brand-badge"
             />
           </Box>
         </Box>
 
         {/* Right side: Actions and profile */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} data-cy="nav-topbar-right">
           {/* System Status */}
           <Tooltip title="System Status: All services operational">
             <Chip
@@ -195,6 +198,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
               color="success"
               variant="filled"
               sx={{ fontWeight: 500 }}
+              data-cy="nav-system-status"
             />
           </Tooltip>
 
@@ -204,8 +208,9 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
               color="inherit"
               onClick={handleNotificationMenuOpen}
               sx={{ ml: 1 }}
+              data-cy="btn-notifications"
             >
-              <Badge badgeContent={unreadCount} color="error">
+              <Badge badgeContent={unreadCount} color="error" data-cy="badge-notifications">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -213,14 +218,14 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
 
           {/* Help */}
           <Tooltip title="Help & Documentation">
-            <IconButton color="inherit">
+            <IconButton color="inherit" data-cy="btn-help">
               <HelpIcon />
             </IconButton>
           </Tooltip>
 
           {/* Settings */}
           <Tooltip title="Settings">
-            <IconButton color="inherit">
+            <IconButton color="inherit" data-cy="btn-settings">
               <SettingsIcon />
             </IconButton>
           </Tooltip>
@@ -228,7 +233,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
           {/* Profile */}
           <Button
             onClick={handleProfileMenuOpen}
-            startIcon={<Avatar sx={{ width: 28, height: 28 }}>U</Avatar>}
+            startIcon={<Avatar sx={{ width: 28, height: 28 }} data-cy="nav-user-avatar">U</Avatar>}
             sx={{
               ml: 1,
               textTransform: 'none',
@@ -237,6 +242,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
                 backgroundColor: 'action.hover',
               },
             }}
+            data-cy="btn-user-menu"
           >
             User
           </Button>
@@ -254,33 +260,34 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
         PaperProps={{
           sx: { mt: 1, minWidth: 200 }
         }}
+        data-cy="menu-profile"
       >
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleProfileMenuClose} data-cy="menu-item-profile">
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
           <ListItemText primary="Profile" />
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleProfileMenuClose} data-cy="menu-item-my-dashboard">
           <ListItemIcon>
             <DashboardIcon />
           </ListItemIcon>
           <ListItemText primary="My Dashboard" />
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleProfileMenuClose} data-cy="menu-item-my-experiments">
           <ListItemIcon>
             <ScienceIcon />
           </ListItemIcon>
           <ListItemText primary="My Experiments" />
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleProfileMenuClose} data-cy="menu-item-profile-settings">
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="Settings" />
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
+        <MenuItem onClick={handleProfileMenuClose} data-cy="menu-item-logout">
           <ListItemIcon>
             <LogoutIcon />
           </ListItemIcon>
@@ -296,17 +303,18 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         PaperProps={{
-          sx: { 
-            mt: 1, 
-            maxWidth: 400, 
+          sx: {
+            mt: 1,
+            maxWidth: 400,
             minWidth: 300,
             maxHeight: 400,
             overflowY: 'auto'
           }
         }}
+        data-cy="menu-notifications"
       >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} data-cy="notifications-header">
+          <Typography variant="h6" sx={{ fontWeight: 600 }} data-cy="notifications-title">
             Notifications
           </Typography>
           {unreadCount > 0 && (
@@ -314,6 +322,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
               size="small"
               onClick={markAllAsRead}
               sx={{ textTransform: 'none' }}
+              data-cy="btn-mark-all-read"
             >
               Mark all as read
             </Button>
@@ -322,7 +331,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
         <Divider />
         
         {notifications.length === 0 ? (
-          <Box sx={{ p: 3, textAlign: 'center' }}>
+          <Box sx={{ p: 3, textAlign: 'center' }} data-cy="notifications-empty">
             <Typography color="text.secondary">No notifications</Typography>
           </Box>
         ) : (
@@ -337,6 +346,7 @@ export function TopBar({ drawerWidth, onDrawerToggle }: TopBarProps) {
                 py: 1.5,
                 backgroundColor: notification.read ? 'transparent' : 'action.hover',
               }}
+              data-cy={`notification-item-${notification.id}`}
             >
               <ListItemIcon sx={{ mt: 0.5 }}>
                 {getNotificationIcon(notification.type)}

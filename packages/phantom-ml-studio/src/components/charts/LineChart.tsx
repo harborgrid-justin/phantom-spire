@@ -52,14 +52,14 @@ export function LineChart({
   ]
 
   return (
-    <Card className="ml-card">
+    <Card className="ml-card" data-cy="chart-line-card">
       <CardContent>
         {title && (
-          <Typography variant="h6" gutterBottom className="font-semibold">
+          <Typography variant="h6" gutterBottom className="font-semibold" data-cy="chart-title">
             {title}
           </Typography>
         )}
-        <Box sx={{ width: '100%', height }}>
+        <Box sx={{ width: '100%', height }} data-cy="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsLineChart
               data={data}
@@ -69,16 +69,19 @@ export function LineChart({
                 left: 20,
                 bottom: 5,
               }}
+              data-cy="chart-line"
             >
-              {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />}
+              {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} data-cy="chart-grid" />}
               <XAxis
                 dataKey="name"
                 tick={{ fontSize: 12 }}
                 stroke={theme.palette.text.secondary}
+                data-cy="chart-x-axis"
               />
               <YAxis
                 tick={{ fontSize: 12 }}
                 stroke={theme.palette.text.secondary}
+                data-cy="chart-y-axis"
               />
               <Tooltip
                 contentStyle={{
@@ -87,8 +90,9 @@ export function LineChart({
                   borderRadius: theme.shape.borderRadius,
                   color: theme.palette.text.primary
                 }}
+                data-cy="chart-tooltip"
               />
-              {showLegend && <Legend />}
+              {showLegend && <Legend data-cy="chart-legend" />}
               {lines.map((line, index) => (
                 <Line
                   key={line.dataKey}
@@ -99,6 +103,7 @@ export function LineChart({
                   dot={{ fill: line.stroke || defaultColors[index % defaultColors.length], strokeWidth: 2, r: 4 }}
                   activeDot={{ r: 6 }}
                   name={line.name || line.dataKey}
+                  data-cy={`chart-line-${line.dataKey}`}
                 />
               ))}
             </RechartsLineChart>

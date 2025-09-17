@@ -240,7 +240,7 @@ export default function AutoMLPipelineClient() {
 
       <Grid container spacing={3}>
         {/* Pipeline Overview */}
-        <Grid xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -336,7 +336,7 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Pipeline Details */}
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -380,7 +380,7 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Pipeline Steps */}
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -419,7 +419,7 @@ export default function AutoMLPipelineClient() {
         </Grid>
 
         {/* Algorithm Performance */}
-        <Grid xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -472,7 +472,7 @@ export default function AutoMLPipelineClient() {
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   fullWidth
                   label="Pipeline Name"
@@ -480,7 +480,7 @@ export default function AutoMLPipelineClient() {
                   onChange={(e) => setNewPipelineConfig({ ...newPipelineConfig, name: e.target.value })}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Dataset</InputLabel>
                   <Select
@@ -493,7 +493,7 @@ export default function AutoMLPipelineClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Max Training Time (minutes)"

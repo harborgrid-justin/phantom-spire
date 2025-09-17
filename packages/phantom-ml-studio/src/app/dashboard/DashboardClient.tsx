@@ -150,18 +150,18 @@ export default function DashboardClient() {
     <DashboardErrorBoundary>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header with refresh */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" component="h1">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }} data-cy="dashboard-header">
+          <Typography variant="h4" component="h1" data-cy="dashboard-title">
             Dashboard
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} data-cy="dashboard-actions">
             {lastUpdated && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" data-cy="last-updated">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </Typography>
             )}
             <Tooltip title="Refresh data">
-              <IconButton onClick={handleRefresh} disabled={isLoading}>
+              <IconButton onClick={handleRefresh} disabled={isLoading} data-cy="btn-refresh">
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -170,7 +170,7 @@ export default function DashboardClient() {
 
         {/* Show loading overlay for refresh */}
         {isLoading && dashboardData && (
-          <Alert severity="info" sx={{ mb: 2 }}>
+          <Alert severity="info" sx={{ mb: 2 }} data-cy="alert-refreshing">
             Refreshing dashboard data...
           </Alert>
         )}
@@ -185,48 +185,49 @@ export default function DashboardClient() {
           },
           gap: 3,
           mb: 3
-        }}>
-          <Card elevation={2}>
+        }} data-cy="dashboard-metrics-grid">
+          <Card elevation={2} data-cy="metric-card-models-production">
             <CardContent>
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+              <Typography variant="h6" color="text.secondary" gutterBottom data-cy="metric-label">
                 Models in Production
               </Typography>
-              <Typography variant="h3" color="primary.main" fontWeight="bold">
+              <Typography variant="h3" color="primary.main" fontWeight="bold" data-cy="metric-value">
                 {dashboardData.modelsInProduction}
               </Typography>
             </CardContent>
           </Card>
 
-          <Card elevation={2}>
+          <Card elevation={2} data-cy="metric-card-active-experiments">
             <CardContent>
-              <Typography variant="h6" color="text.secondary" gutterBottom>
+              <Typography variant="h6" color="text.secondary" gutterBottom data-cy="metric-label">
                 Active Experiments
               </Typography>
-              <Typography variant="h3" color="secondary.main" fontWeight="bold">
+              <Typography variant="h3" color="secondary.main" fontWeight="bold" data-cy="metric-value">
                 {dashboardData.activeExperiments}
               </Typography>
             </CardContent>
           </Card>
 
           {dashboardData.performanceMetrics.map(metric => (
-            <Card key={metric.name} elevation={2}>
+            <Card key={metric.name} elevation={2} data-cy={`metric-card-${metric.name.toLowerCase().replace(/\s+/g, '-')}`}>
               <CardContent>
-                <Typography variant="h6" color="text.secondary" gutterBottom>
+                <Typography variant="h6" color="text.secondary" gutterBottom data-cy="metric-label">
                   {metric.name}
                 </Typography>
-                <Typography variant="h4" fontWeight="bold">
+                <Typography variant="h4" fontWeight="bold" data-cy="metric-value">
                   {metric.value}{metric.name === 'Model Accuracy' ? '%' : 'ms'}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }} data-cy="metric-change">
                   {metric.change > 0 ? (
-                    <TrendingUpIcon color="success" fontSize="small" />
+                    <TrendingUpIcon color="success" fontSize="small" data-cy="trend-up-icon" />
                   ) : (
-                    <TrendingDownIcon color="error" fontSize="small" />
+                    <TrendingDownIcon color="error" fontSize="small" data-cy="trend-down-icon" />
                   )}
                   <Typography
                     color={metric.change > 0 ? 'success.main' : 'error.main'}
                     variant="body2"
                     sx={{ ml: 0.5 }}
+                    data-cy="metric-change-value"
                   >
                     {Math.abs(metric.change)}%
                   </Typography>
@@ -237,13 +238,13 @@ export default function DashboardClient() {
         </Box>
 
         {/* Charts Section */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }} data-cy="dashboard-charts-grid">
           {/* Resource Utilization */}
-          <Paper elevation={2} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper elevation={2} sx={{ p: 3 }} data-cy="card-resource-utilization">
+            <Typography variant="h6" gutterBottom data-cy="chart-title">
               Resource Utilization
             </Typography>
-            <Box sx={{ height: 300 }}>
+            <Box sx={{ height: 300 }} data-cy="chart-container">
               <BarChart
                 dataset={dashboardData.resourceUtilization}
                 xAxis={[{ scaleType: 'band', dataKey: 'name' }]}
@@ -253,39 +254,40 @@ export default function DashboardClient() {
                   color: '#667eea'
                 }]}
                 margin={{ left: 40, right: 40, top: 40, bottom: 40 }}
+                data-cy="chart-resource-utilization"
               />
             </Box>
           </Paper>
 
           {/* Recent Activity */}
-          <Paper elevation={2} sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper elevation={2} sx={{ p: 3 }} data-cy="card-recent-activity">
+            <Typography variant="h6" gutterBottom data-cy="activity-title">
               Recent Activity
             </Typography>
-            <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
-              <List>
+            <Box sx={{ maxHeight: 300, overflow: 'auto' }} data-cy="activity-container">
+              <List data-cy="list-recent-activity">
                 {dashboardData.recentActivity.map((activity, index) => (
                   <React.Fragment key={activity.id}>
-                    <ListItem>
+                    <ListItem data-cy={`activity-item-${index}`}>
                       <ListItemText
                         primary={
-                          <Typography variant="body1" fontWeight="medium">
+                          <Typography variant="body1" fontWeight="medium" data-cy="activity-type">
                             {activity.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                           </Typography>
                         }
                         secondary={
                           <Box>
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" color="text.secondary" data-cy="activity-description">
                               {activity.description}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" color="text.secondary" data-cy="activity-timestamp">
                               {new Date(activity.timestamp).toLocaleString()}
                             </Typography>
                           </Box>
                         }
                       />
                     </ListItem>
-                    {index < dashboardData.recentActivity.length - 1 && <Divider />}
+                    {index < dashboardData.recentActivity.length - 1 && <Divider data-cy={`activity-divider-${index}`} />}
                   </React.Fragment>
                 ))}
               </List>

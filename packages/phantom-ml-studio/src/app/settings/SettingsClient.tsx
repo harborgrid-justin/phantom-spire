@@ -295,7 +295,7 @@ export default function SettingsClient() {
           <CardContent>
             <Typography variant="h6" gutterBottom>General Settings</Typography>
             <Grid container spacing={3}>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Organization Name"
@@ -303,7 +303,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('general', 'organizationName', e.target.value)}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Default Project"
@@ -311,7 +311,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('general', 'defaultProject', e.target.value)}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Language</InputLabel>
                   <Select
@@ -325,7 +325,7 @@ export default function SettingsClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth>
                   <InputLabel>Timezone</InputLabel>
                   <Select
@@ -339,7 +339,7 @@ export default function SettingsClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -350,7 +350,7 @@ export default function SettingsClient() {
                   label="Enable Auto-Save"
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -371,7 +371,7 @@ export default function SettingsClient() {
           <CardContent>
             <Typography variant="h6" gutterBottom>Security Settings</Typography>
             <Grid container spacing={3}>
-              <Grid xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   label="Session Timeout (minutes)"
@@ -380,7 +380,7 @@ export default function SettingsClient() {
                   onChange={(e) => updateSettings('security', 'sessionTimeout', parseInt(e.target.value))}
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -391,7 +391,7 @@ export default function SettingsClient() {
                   label="Enable Two-Factor Authentication"
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -402,7 +402,7 @@ export default function SettingsClient() {
                   label="Encrypt Data at Rest"
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControlLabel
                   control={
                     <Switch
@@ -413,7 +413,7 @@ export default function SettingsClient() {
                   label="Enable Audit Logging"
                 />
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="subtitle2" gutterBottom>IP Whitelist</Typography>
                 {settings.security.ipWhitelist.map((ip, index) => (
                   <Chip

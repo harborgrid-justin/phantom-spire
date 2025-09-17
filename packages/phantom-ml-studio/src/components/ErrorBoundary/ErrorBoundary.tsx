@@ -1,3 +1,5 @@
+'use client';
+
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Box, Typography, Button, Alert, Stack } from '@mui/material';
 import { RefreshRounded, BugReportRounded } from '@mui/icons-material';

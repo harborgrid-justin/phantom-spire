@@ -54,14 +54,14 @@ export function BarChart({
   ]
 
   return (
-    <Card className="ml-card">
+    <Card className="ml-card" data-cy="chart-bar-card">
       <CardContent>
         {title && (
-          <Typography variant="h6" gutterBottom className="font-semibold">
+          <Typography variant="h6" gutterBottom className="font-semibold" data-cy="chart-title">
             {title}
           </Typography>
         )}
-        <Box sx={{ width: '100%', height }}>
+        <Box sx={{ width: '100%', height }} data-cy="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsBarChart
               data={data}
@@ -72,19 +72,22 @@ export function BarChart({
                 bottom: 5,
               }}
               layout={orientation === 'horizontal' ? 'horizontal' : 'vertical'}
+              data-cy="chart-bar"
             >
-              {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} />}
+              {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={theme.palette.divider} data-cy="chart-grid" />}
               <XAxis
                 type={orientation === 'horizontal' ? 'number' : 'category'}
                 dataKey={orientation === 'horizontal' ? undefined : 'name'}
                 tick={{ fontSize: 12 }}
                 stroke={theme.palette.text.secondary}
+                data-cy="chart-x-axis"
               />
               <YAxis
                 type={orientation === 'horizontal' ? 'category' : 'number'}
                 dataKey={orientation === 'horizontal' ? 'name' : undefined}
                 tick={{ fontSize: 12 }}
                 stroke={theme.palette.text.secondary}
+                data-cy="chart-y-axis"
               />
               <Tooltip
                 contentStyle={{
@@ -93,8 +96,9 @@ export function BarChart({
                   borderRadius: theme.shape.borderRadius,
                   color: theme.palette.text.primary
                 }}
+                data-cy="chart-tooltip"
               />
-              {showLegend && <Legend />}
+              {showLegend && <Legend data-cy="chart-legend" />}
               {bars.map((bar, index) => (
                 <Bar
                   key={bar.dataKey}
@@ -102,6 +106,7 @@ export function BarChart({
                   fill={bar.fill || defaultColors[index % defaultColors.length]}
                   name={bar.name || bar.dataKey}
                   radius={[2, 2, 0, 0]}
+                  data-cy={`chart-bar-${bar.dataKey}`}
                 />
               ))}
             </RechartsBarChart>

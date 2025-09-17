@@ -299,7 +299,7 @@ export default function BiasDetectionClient() {
       {activeTab === 0 && (
         <Grid container spacing={3}>
           {/* Reports List */}
-          <Grid xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -369,7 +369,7 @@ export default function BiasDetectionClient() {
           </Grid>
 
           {/* Report Details */}
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -433,7 +433,7 @@ export default function BiasDetectionClient() {
       {activeTab === 1 && (
         <Grid container spacing={3}>
           {fairnessAnalysis.map((analysis) => (
-            <Grid xs={12} md={6} key={analysis.attribute}>
+            <Grid size={{ xs: 12, md: 6 }} key={analysis.attribute}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -499,7 +499,7 @@ export default function BiasDetectionClient() {
 
       {activeTab === 2 && (
         <Grid container spacing={3}>
-          <Grid xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -534,7 +534,7 @@ export default function BiasDetectionClient() {
         <DialogContent>
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth>
                   <InputLabel>Model</InputLabel>
                   <Select
@@ -547,7 +547,7 @@ export default function BiasDetectionClient() {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <FormControl fullWidth>
                   <InputLabel>Sensitivity Level</InputLabel>
                   <Select

@@ -1,0 +1,211 @@
+{
+  "experiments": [
+    {
+      "id": "exp_001",
+      "name": "Model Performance A/B Test",
+      "type": "a-b-test",
+      "status": "completed",
+      "description": "Comparing Random Forest vs Neural Network for customer churn prediction",
+      "createdAt": "2025-01-10T10:00:00Z",
+      "completedAt": "2025-01-17T15:30:00Z",
+      "duration": 604800,
+      "models": [
+        {
+          "id": "model_001",
+          "name": "Random Forest Baseline",
+          "role": "control",
+          "trafficSplit": 50
+        },
+        {
+          "id": "model_006",
+          "name": "Neural Network Variant",
+          "role": "treatment",
+          "trafficSplit": 50
+        }
+      ],
+      "metrics": {
+        "primary": "accuracy",
+        "secondary": ["precision", "recall", "f1_score", "response_time"]
+      },
+      "results": {
+        "winner": "model_006",
+        "confidence": 0.95,
+        "improvement": 0.03,
+        "statisticalSignificance": true,
+        "pValue": 0.02,
+        "sampleSize": 50000,
+        "modelMetrics": {
+          "model_001": {
+            "accuracy": 0.94,
+            "precision": 0.91,
+            "recall": 0.89,
+            "f1_score": 0.90,
+            "response_time": 120
+          },
+          "model_006": {
+            "accuracy": 0.97,
+            "precision": 0.95,
+            "recall": 0.94,
+            "f1_score": 0.94,
+            "response_time": 180
+          }
+        }
+      },
+      "tags": ["churn-prediction", "production", "high-priority"]
+    },
+    {
+      "id": "exp_002",
+      "name": "Feature Importance Analysis",
+      "type": "feature-analysis",
+      "status": "running",
+      "description": "Evaluating impact of different feature sets on fraud detection accuracy",
+      "createdAt": "2025-01-15T14:20:00Z",
+      "estimatedCompletion": "2025-01-20T14:20:00Z",
+      "duration": null,
+      "progress": 65,
+      "models": [
+        {
+          "id": "model_007",
+          "name": "Full Feature Set",
+          "features": ["all"]
+        },
+        {
+          "id": "model_008",
+          "name": "Core Features Only",
+          "features": ["transaction_amount", "merchant_category", "time_of_day"]
+        },
+        {
+          "id": "model_009",
+          "name": "Extended Features",
+          "features": ["transaction_amount", "merchant_category", "time_of_day", "location", "user_history"]
+        }
+      ],
+      "metrics": {
+        "primary": "f1_score",
+        "secondary": ["accuracy", "precision", "recall", "training_time"]
+      },
+      "partialResults": {
+        "model_007": {
+          "f1_score": 0.91,
+          "accuracy": 0.93,
+          "training_time": 2400
+        },
+        "model_008": {
+          "f1_score": 0.87,
+          "accuracy": 0.89,
+          "training_time": 800
+        }
+      },
+      "tags": ["fraud-detection", "feature-engineering"]
+    },
+    {
+      "id": "exp_003",
+      "name": "Hyperparameter Optimization",
+      "type": "hyperparameter-tuning",
+      "status": "queued",
+      "description": "Grid search optimization for recommendation engine parameters",
+      "createdAt": "2025-01-17T09:30:00Z",
+      "estimatedStart": "2025-01-18T10:00:00Z",
+      "duration": null,
+      "models": [
+        {
+          "id": "model_005",
+          "name": "Recommendation Engine",
+          "baselineMetrics": {
+            "rmse": 0.85,
+            "mae": 0.67
+          }
+        }
+      ],
+      "searchSpace": {
+        "n_factors": [20, 50, 100],
+        "n_epochs": [10, 20, 30],
+        "lr_all": [0.002, 0.005, 0.01]
+      },
+      "metrics": {
+        "primary": "rmse",
+        "secondary": ["mae", "training_time"]
+      },
+      "tags": ["recommendation", "optimization"]
+    },
+    {
+      "id": "exp_004",
+      "name": "Multi-Model Ensemble Test",
+      "type": "ensemble",
+      "status": "failed",
+      "description": "Testing ensemble approach for price optimization",
+      "createdAt": "2025-01-16T11:15:00Z",
+      "failedAt": "2025-01-16T13:45:00Z",
+      "duration": 9000,
+      "models": [
+        {
+          "id": "model_003",
+          "name": "Linear Regression",
+          "weight": 0.4
+        },
+        {
+          "id": "model_010",
+          "name": "Random Forest",
+          "weight": 0.6
+        }
+      ],
+      "metrics": {
+        "primary": "mae",
+        "secondary": ["mse", "r2"]
+      },
+      "error": "Model model_010 failed during training. Check dataset compatibility.",
+      "tags": ["pricing", "ensemble"]
+    },
+    {
+      "id": "exp_005",
+      "name": "Cross-Validation Study",
+      "type": "validation",
+      "status": "completed",
+      "description": "5-fold cross-validation on sentiment analysis models",
+      "createdAt": "2025-01-14T16:30:00Z",
+      "completedAt": "2025-01-15T08:45:00Z",
+      "duration": 58500,
+      "models": [
+        {
+          "id": "model_011",
+          "name": "BERT-based Classifier",
+          "algorithm": "transformer"
+        }
+      ],
+      "metrics": {
+        "primary": "accuracy",
+        "secondary": ["precision", "recall", "f1_score"]
+      },
+      "results": {
+        "crossValidation": {
+          "folds": 5,
+          "meanAccuracy": 0.88,
+          "stdAccuracy": 0.03,
+          "meanPrecision": 0.86,
+          "stdPrecision": 0.04,
+          "meanRecall": 0.84,
+          "stdRecall": 0.05,
+          "meanF1Score": 0.85,
+          "stdF1Score": 0.04
+        }
+      },
+      "tags": ["sentiment-analysis", "validation"]
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "statusCounts": {
+      "completed": 2,
+      "running": 1,
+      "queued": 1,
+      "failed": 1
+    },
+    "typeCounts": {
+      "a-b-test": 1,
+      "feature-analysis": 1,
+      "hyperparameter-tuning": 1,
+      "ensemble": 1,
+      "validation": 1
+    }
+  }
+}

@@ -276,10 +276,10 @@ export default function ModelBuilderClient() {
         </Box>
 
         {/* Progress Stepper */}
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4 }} data-cy="model-builder-stepper">
           <Stepper activeStep={activeStep} alternativeLabel>
             {steps.map((label, index) => (
-              <Step key={label} completed={activeStep > index}>
+              <Step key={label} completed={activeStep > index} data-cy={`step-${index}-${label.toLowerCase().replace(/\s+/g, '-')}`}>
                 <StepLabel>{label}</StepLabel>
               </Step>
             ))}
@@ -288,16 +288,16 @@ export default function ModelBuilderClient() {
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)} data-cy="alert-error">
             {error}
           </Alert>
         )}
 
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 3 }}>
           {/* Step 1: Upload Data */}
-          <Card elevation={activeStep === 0 ? 3 : 1}>
+          <Card elevation={activeStep === 0 ? 3 : 1} data-cy="card-upload-data">
             <CardContent>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom data-cy="upload-title">
                 Step 1: Upload Training Data
               </Typography>
               <Paper
@@ -311,13 +311,14 @@ export default function ModelBuilderClient() {
                   backgroundColor: isDragActive ? 'action.hover' : 'inherit',
                   transition: 'all 0.3s ease'
                 }}
+                data-cy="form-upload-dropzone"
               >
-                <input {...getInputProps()} />
+                <input {...getInputProps()} data-cy="form-input-file" />
                 <UploadIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom data-cy="upload-instruction">
                   {isDragActive ? 'Drop the CSV file here' : 'Drag & drop a CSV file here, or click to select'}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" data-cy="upload-constraints">
                   Maximum file size: 50MB
                 </Typography>
               </Paper>
@@ -325,16 +326,16 @@ export default function ModelBuilderClient() {
           </Card>
 
           {isLoading && !trainingResult && (
-            <Card>
+            <Card data-cy="card-loading">
               <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CircularProgress size={20} sx={{ mr: 2 }} />
-                  <Typography>{trainingStatus || 'Processing...'}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }} data-cy="loading-container">
+                  <CircularProgress size={20} sx={{ mr: 2 }} data-cy="loading-spinner" />
+                  <Typography data-cy="loading-status">{trainingStatus || 'Processing...'}</Typography>
                 </Box>
                 {progress > 0 && (
-                  <Box sx={{ mt: 2 }}>
-                    <LinearProgress variant="determinate" value={progress} />
-                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                  <Box sx={{ mt: 2 }} data-cy="progress-container">
+                    <LinearProgress variant="determinate" value={progress} data-cy="progress-bar" />
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }} data-cy="progress-text">
                       {Math.round(progress)}% complete
                     </Typography>
                   </Box>
@@ -345,9 +346,9 @@ export default function ModelBuilderClient() {
 
           {/* Step 2: Configure & Preview */}
           {uploadedData && (
-            <Card elevation={activeStep === 1 ? 3 : 1}>
+            <Card elevation={activeStep === 1 ? 3 : 1} data-cy="card-configure-model">
               <CardContent>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom data-cy="configure-title">
                   Step 2: Configure Training Parameters
                 </Typography>
                 <Box sx={{
@@ -356,21 +357,22 @@ export default function ModelBuilderClient() {
                   gap: 2,
                   alignItems: 'center',
                   mb: 3
-                }}>
-                  <FormControl fullWidth>
+                }} data-cy="form-config-container">
+                  <FormControl fullWidth data-cy="form-field-target-column">
                     <InputLabel>Target Column</InputLabel>
                     <Select
                       name="targetColumn"
                       value={modelConfig.targetColumn || ''}
                       onChange={handleConfigChange}
+                      data-cy="form-select-target-column"
                     >
                       {uploadedData.headers.map(h => (
-                        <MenuItem key={h} value={h}>{h}</MenuItem>
+                        <MenuItem key={h} value={h} data-cy={`select-option-${h.toLowerCase().replace(/\s+/g, '-')}`}>{h}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
 
-                  <FormControl fullWidth>
+                  <FormControl fullWidth data-cy="form-field-algorithms">
                     <InputLabel>Algorithms</InputLabel>
                     <Select
                       name="algorithms"
@@ -379,10 +381,11 @@ export default function ModelBuilderClient() {
                       onChange={handleAlgorithmChange}
                       input={<OutlinedInput label="Algorithms" />}
                       renderValue={(selected) => (selected as string[]).join(', ')}
+                      data-cy="form-select-algorithms"
                     >
                       {availableAlgorithms.map((alg) => (
-                        <MenuItem key={alg} value={alg}>
-                          <Checkbox checked={(modelConfig.algorithms || []).indexOf(alg) > -1} />
+                        <MenuItem key={alg} value={alg} data-cy={`select-option-${alg}`}>
+                          <Checkbox checked={(modelConfig.algorithms || []).indexOf(alg) > -1} data-cy={`checkbox-${alg}`} />
                           <ListItemText primary={alg.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} />
                         </MenuItem>
                       ))}
@@ -397,15 +400,16 @@ export default function ModelBuilderClient() {
                     fullWidth
                     size="large"
                     startIcon={<StartIcon />}
+                    data-cy="btn-start-training"
                   >
                     Start Training
                   </Button>
                 </Box>
 
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom data-cy="data-preview-title">
                   Data Preview
                 </Typography>
-                <Box sx={{ height: 400, width: '100%' }}>
+                <Box sx={{ height: 400, width: '100%' }} data-cy="data-preview-container">
                   <DataGrid
                     rows={dataGridRows}
                     columns={dataGridCols}
@@ -414,6 +418,7 @@ export default function ModelBuilderClient() {
                       pagination: { paginationModel: { pageSize: 10 } }
                     }}
                     density="compact"
+                    data-cy="table-data-preview"
                   />
                 </Box>
               </CardContent>
@@ -422,25 +427,25 @@ export default function ModelBuilderClient() {
 
           {/* Step 3: Training Results */}
           {trainingResult && (
-            <Card elevation={3}>
+            <Card elevation={3} data-cy="card-training-results">
               <CardContent>
-                <Typography variant="h5" gutterBottom>
+                <Typography variant="h5" gutterBottom data-cy="training-complete-title">
                   Training Complete
                 </Typography>
 
-                <Alert severity="success" sx={{ mb: 3 }}>
-                  <Typography variant="h6">
+                <Alert severity="success" sx={{ mb: 3 }} data-cy="alert-best-model">
+                  <Typography variant="h6" data-cy="best-model-name">
                     Best Model: <strong>{trainingResult.bestAlgorithm}</strong>
                   </Typography>
-                  <Typography>
+                  <Typography data-cy="best-model-score">
                     Score: <strong>{trainingResult.bestScore.toFixed(4)}</strong>
                   </Typography>
                 </Alert>
 
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom data-cy="leaderboard-title">
                   Model Leaderboard
                 </Typography>
-                <Box sx={{ height: 400, width: '100%', mb: 3 }}>
+                <Box sx={{ height: 400, width: '100%', mb: 3 }} data-cy="leaderboard-container">
                   <DataGrid
                     rows={trainingResult.leaderboard.map(r => ({ ...r, id: r.modelId }))}
                     columns={[
@@ -470,13 +475,14 @@ export default function ModelBuilderClient() {
                       },
                     ]}
                     density="compact"
+                    data-cy="table-model-leaderboard"
                   />
                 </Box>
 
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom data-cy="feature-importance-title">
                   Feature Importance
                 </Typography>
-                <Box sx={{ height: 400 }}>
+                <Box sx={{ height: 400 }} data-cy="feature-importance-container">
                   <BarChart
                     dataset={trainingResult.featureImportance as any}
                     yAxis={[{ scaleType: 'band', dataKey: 'featureName' }]}
@@ -487,14 +493,16 @@ export default function ModelBuilderClient() {
                     }]}
                     layout="horizontal"
                     margin={{ left: 100, right: 40, top: 40, bottom: 40 }}
+                    data-cy="chart-feature-importance"
                   />
                 </Box>
 
-                <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+                <Box sx={{ mt: 3, display: 'flex', gap: 2 }} data-cy="training-actions">
                   <Button
                     variant="contained"
                     startIcon={<DownloadIcon />}
                     disabled
+                    data-cy="btn-download-model"
                   >
                     Download Model (Coming Soon)
                   </Button>
@@ -512,6 +520,7 @@ export default function ModelBuilderClient() {
                         ensembleMethods: true,
                       });
                     }}
+                    data-cy="btn-start-new-model"
                   >
                     Start New Model
                   </Button>

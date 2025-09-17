@@ -272,7 +272,7 @@ export default function ModelsClient() {
 
       {/* Metrics Cards */}
       <Grid container spacing={3} mb={3}>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="primary">{displayMetrics.totalModels}</Typography>
@@ -280,7 +280,7 @@ export default function ModelsClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="success.main">{displayMetrics.deployedModels}</Typography>
@@ -288,7 +288,7 @@ export default function ModelsClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="info.main">{displayMetrics.readyModels}</Typography>
@@ -296,7 +296,7 @@ export default function ModelsClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="warning.main">{displayMetrics.trainingModels}</Typography>
@@ -304,7 +304,7 @@ export default function ModelsClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="secondary.main">
@@ -314,7 +314,7 @@ export default function ModelsClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} sm={6} md={2}>
+        <Grid size={{ xs: 12, sm: 6, md: 2 }}>
           <Card>
             <CardContent sx={{ textAlign: 'center' }}>
               <Typography variant="h4" color="text.primary">
@@ -330,7 +330,7 @@ export default function ModelsClient() {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="Search models..."
@@ -339,7 +339,7 @@ export default function ModelsClient() {
                 size="small"
               />
             </Grid>
-            <Grid xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Type</InputLabel>
                 <Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
@@ -353,7 +353,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Status</InputLabel>
                 <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
@@ -366,7 +366,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Sort By</InputLabel>
                 <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -378,7 +378,7 @@ export default function ModelsClient() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth size="small">
                 <InputLabel>Order</InputLabel>
                 <Select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}>

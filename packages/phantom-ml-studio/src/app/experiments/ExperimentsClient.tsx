@@ -199,23 +199,23 @@ export default function ExperimentsClient() {
     <ExperimentsErrorBoundary>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }} data-cy="experiments-header">
+          <Box data-cy="experiments-info">
+            <Typography variant="h4" component="h1" gutterBottom data-cy="experiments-title">
               Experiments
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.secondary" data-cy="experiments-description">
               Track and manage your machine learning experiments
             </Typography>
             {lastUpdated && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }} data-cy="last-updated">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </Typography>
             )}
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1 }} data-cy="experiments-actions">
             <Tooltip title="Refresh experiments">
-              <IconButton onClick={handleRefresh} disabled={refreshing}>
+              <IconButton onClick={handleRefresh} disabled={refreshing} data-cy="btn-refresh">
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -223,6 +223,7 @@ export default function ExperimentsClient() {
               variant="contained"
               startIcon={<AddIcon />}
               disabled
+              data-cy="btn-new-experiment"
             >
               New Experiment (Coming Soon)
             </Button>
@@ -231,63 +232,65 @@ export default function ExperimentsClient() {
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)} data-cy="alert-error">
             {error}
           </Alert>
         )}
 
         {/* Refresh Indicator */}
         {refreshing && (
-          <Alert severity="info" sx={{ mb: 3 }}>
+          <Alert severity="info" sx={{ mb: 3 }} data-cy="alert-refreshing">
             Refreshing experiments...
           </Alert>
         )}
 
         {/* Experiments List */}
         {experiments.length === 0 ? (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Paper sx={{ p: 4, textAlign: 'center' }} data-cy="experiments-empty">
+            <Typography variant="h6" color="text.secondary" gutterBottom data-cy="empty-title">
               No experiments found
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" data-cy="empty-description">
               Create your first experiment to start tracking ML model performance
             </Typography>
           </Paper>
         ) : (
-          <Box sx={{ space: 2 }}>
+          <Box sx={{ space: 2 }} data-cy="experiments-list">
             {experiments.map((exp, index) => (
-              <Accordion key={exp.experimentId} defaultExpanded={index === 0}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Accordion key={exp.experimentId} defaultExpanded={index === 0} data-cy={`accordion-experiment-${exp.experimentId}`}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} data-cy={`accordion-header-${exp.experimentId}`}>
                   <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', mr: 2 }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6">{exp.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">
+                    <Box sx={{ flex: 1 }} data-cy="experiment-info">
+                      <Typography variant="h6" data-cy="experiment-name">{exp.name}</Typography>
+                      <Typography variant="caption" color="text.secondary" data-cy="experiment-meta">
                         ID: {exp.experimentId} • {exp.runs.length} run{exp.runs.length !== 1 ? 's' : ''}
                       </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ display: 'flex', gap: 1 }} data-cy="experiment-status">
                       <Chip
                         label={`${exp.runs.filter(r => r.status === 'completed').length} completed`}
                         size="small"
                         color="success"
                         variant="outlined"
+                        data-cy="chip-completed-runs"
                       />
                       <Chip
                         label={`${exp.runs.filter(r => r.status === 'running').length} running`}
                         size="small"
                         color="primary"
                         variant="outlined"
+                        data-cy="chip-running-runs"
                       />
                     </Box>
                   </Box>
                 </AccordionSummary>
-                <AccordionDetails>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                <AccordionDetails data-cy={`accordion-details-${exp.experimentId}`}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }} data-cy="experiment-description">
                     {exp.description}
                   </Typography>
 
                   {exp.runs.length > 0 ? (
-                    <Paper sx={{ height: 400, width: '100%' }}>
+                    <Paper sx={{ height: 400, width: '100%' }} data-cy="runs-table-container">
                       <DataGrid
                         rows={exp.runs.map(r => ({ ...r, id: r.runId }))}
                         columns={runCols}
@@ -296,20 +299,22 @@ export default function ExperimentsClient() {
                           pagination: { paginationModel: { pageSize: 10 } }
                         }}
                         density="compact"
+                        data-cy="table-experiment-runs"
                       />
                     </Paper>
                   ) : (
-                    <Alert severity="info">
+                    <Alert severity="info" data-cy="alert-no-runs">
                       No runs found for this experiment
                     </Alert>
                   )}
 
-                  <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                  <Box sx={{ mt: 2, display: 'flex', gap: 1 }} data-cy="experiment-actions">
                     <Button
                       variant="outlined"
                       startIcon={<RunIcon />}
                       size="small"
                       disabled
+                      data-cy="btn-new-run"
                     >
                       New Run (Coming Soon)
                     </Button>

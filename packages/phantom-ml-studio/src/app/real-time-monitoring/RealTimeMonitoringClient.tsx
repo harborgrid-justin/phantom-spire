@@ -212,7 +212,7 @@ export default function RealTimeMonitoringClient() {
 
       {/* System Metrics */}
       <Grid container spacing={3} mb={3}>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -231,7 +231,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -250,7 +250,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -269,7 +269,7 @@ export default function RealTimeMonitoringClient() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" mb={2}>
@@ -292,7 +292,7 @@ export default function RealTimeMonitoringClient() {
 
       {/* Model Performance */}
       <Grid container spacing={3}>
-        <Grid xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -337,7 +337,7 @@ export default function RealTimeMonitoringClient() {
         </Grid>
 
         {/* Active Alerts */}
-        <Grid xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>

@@ -92,7 +92,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
       const sectionItems = menuItems.filter(item => item.section === section);
       
       return (
-        <Box key={section}>
+        <Box key={section} data-cy={`nav-section-${section}`}>
           <Typography
             variant="overline"
             sx={{
@@ -105,12 +105,13 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
             }}
+            data-cy={`nav-section-title-${section}`}
           >
             {sectionTitles[section as keyof typeof sectionTitles]}
           </Typography>
           <List dense>
             {sectionItems.map((item) => (
-              <ListItem key={item.text} disablePadding>
+              <ListItem key={item.text} disablePadding data-cy={`nav-item-${item.text.toLowerCase().replace(/\s+/g, '-')}`}>
                 <Link href={item.path} passHref style={{ textDecoration: 'none', width: '100%' }}>
                   <ListItemButton
                     selected={pathname === item.path}
@@ -131,21 +132,24 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                         backgroundColor: 'action.hover',
                       },
                     }}
+                    data-cy={`nav-link-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     <ListItemIcon
                       sx={{
                         minWidth: 40,
                         color: pathname === item.path ? 'inherit' : 'text.secondary',
                       }}
+                      data-cy={`nav-icon-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                     >
                       {item.icon}
                     </ListItemIcon>
-                    <ListItemText 
+                    <ListItemText
                       primary={item.text}
                       primaryTypographyProps={{
                         fontSize: '0.875rem',
                         fontWeight: pathname === item.path ? 600 : 400,
                       }}
+                      data-cy={`nav-text-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                     />
                     {item.isNew && (
                       <Badge
@@ -160,6 +164,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                             fontWeight: 600,
                           },
                         }}
+                        data-cy={`nav-badge-new-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                       />
                     )}
                   </ListItemButton>
@@ -176,13 +181,13 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        <SecurityIcon sx={{ color: 'primary.main', fontSize: 32 }} />
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }} data-cy="nav-header">
+        <SecurityIcon sx={{ color: 'primary.main', fontSize: 32 }} data-cy="nav-logo-icon" />
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }} data-cy="nav-title">
             Phantom ML
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1 }} data-cy="nav-subtitle">
             Studio
           </Typography>
         </Box>
@@ -191,7 +196,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
       <Divider />
       
       {/* Navigation */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', py: 1 }} data-cy="nav-menu-container">
         {renderMenuItems()}
       </Box>
     </Box>
@@ -202,6 +207,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
       component="nav"
       sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
       aria-label="main navigation"
+      data-cy="nav-sidebar"
     >
       {/* Mobile drawer */}
       <Drawer
@@ -221,6 +227,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
             borderColor: 'divider',
           },
         }}
+        data-cy="nav-drawer-mobile"
       >
         {drawer}
       </Drawer>
@@ -239,6 +246,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
           },
         }}
         open
+        data-cy="nav-drawer-desktop"
       >
         {drawer}
       </Drawer>

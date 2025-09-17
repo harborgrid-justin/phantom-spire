@@ -15,7 +15,7 @@ import {
   Tooltip,
   Card,
   CardContent,
-  Grid
+  Grid2
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -143,7 +143,7 @@ export default function DeploymentsClient() {
       headerName: 'Deployment ID',
       width: 200,
       renderCell: (params) => (
-        <Typography variant="body2" fontFamily="monospace">
+        <Typography variant="body2" fontFamily="monospace" data-cy="deployment-id">
           {params.value}
         </Typography>
       )
@@ -152,9 +152,9 @@ export default function DeploymentsClient() {
       field: 'modelId',
       headerName: 'Model ID',
       width: 200,
-      valueGetter: (_params: any) => params.row.config.modelId,
+      valueGetter: (params: any) => params.row.config.modelId,
       renderCell: (params) => (
-        <Typography variant="body2" fontFamily="monospace">
+        <Typography variant="body2" fontFamily="monospace" data-cy="model-id">
           {params.value}
         </Typography>
       )
@@ -163,12 +163,13 @@ export default function DeploymentsClient() {
       field: 'status',
       headerName: 'Status',
       width: 120,
-      renderCell: (_params: GridRenderCellParams) => (
+      renderCell: (params: GridRenderCellParams) => (
         <Chip
           label={params.value}
           color={getStatusColor(params.value)}
           size="small"
           variant="outlined"
+          data-cy={`deployment-status-${params.value}`}
         />
       )
     },
@@ -176,12 +177,13 @@ export default function DeploymentsClient() {
       field: 'environment',
       headerName: 'Environment',
       width: 130,
-      valueGetter: (_params: any) => params.row.config.environment,
+      valueGetter: (params: any) => params.row.config.environment,
       renderCell: (params) => (
         <Chip
           label={params.value}
           color={getEnvironmentColor(params.value)}
           size="small"
+          data-cy={`deployment-environment-${params.value}`}
         />
       )
     },
@@ -189,23 +191,24 @@ export default function DeploymentsClient() {
       field: 'instanceType',
       headerName: 'Instance Type',
       width: 150,
-      valueGetter: (_params: any) => params.row.config.instanceType
+      valueGetter: (params: any) => params.row.config.instanceType
     },
     {
       field: 'endpointUrl',
       headerName: 'Endpoint',
       width: 300,
-      renderCell: (_params: GridRenderCellParams) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      renderCell: (params: GridRenderCellParams) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }} data-cy="endpoint-container">
           <Link
             href={params.value}
             target="_blank"
             rel="noopener noreferrer"
             sx={{ textDecoration: 'none', maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis' }}
+            data-cy="endpoint-link"
           >
             {params.value}
           </Link>
-          <IconButton size="small" href={params.value} target="_blank">
+          <IconButton size="small" href={params.value} target="_blank" data-cy="btn-open-endpoint">
             <LaunchIcon fontSize="small" />
           </IconButton>
         </Box>
@@ -215,7 +218,7 @@ export default function DeploymentsClient() {
       field: 'createdAt',
       headerName: 'Created At',
       width: 180,
-      valueFormatter: (_params: { value: any }) => new Date(params.value).toLocaleString()
+      valueFormatter: (params: { value: any }) => new Date(params.value).toLocaleString()
     },
     {
       field: 'actions',
@@ -223,16 +226,16 @@ export default function DeploymentsClient() {
       width: 120,
       sortable: false,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Box sx={{ display: 'flex', gap: 0.5 }} data-cy="deployment-actions">
           {params.row.status === 'active' ? (
             <Tooltip title="Stop deployment">
-              <IconButton size="small" color="error" disabled>
+              <IconButton size="small" color="error" disabled data-cy="btn-stop-deployment">
                 <StopIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           ) : (
             <Tooltip title="Start deployment">
-              <IconButton size="small" color="primary" disabled>
+              <IconButton size="small" color="primary" disabled data-cy="btn-start-deployment">
                 <StartIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -264,23 +267,23 @@ export default function DeploymentsClient() {
     <DeploymentsErrorBoundary>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }} data-cy="deployments-header">
+          <Box data-cy="deployments-info">
+            <Typography variant="h4" component="h1" gutterBottom data-cy="deployments-title">
               Deployments
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography variant="body1" color="text.secondary" data-cy="deployments-description">
               Manage and monitor your deployed ML models
             </Typography>
             {lastUpdated && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }} data-cy="last-updated">
                 Last updated: {lastUpdated.toLocaleTimeString()}
               </Typography>
             )}
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1 }} data-cy="deployments-actions">
             <Tooltip title="Refresh deployments">
-              <IconButton onClick={handleRefresh} disabled={refreshing}>
+              <IconButton onClick={handleRefresh} disabled={refreshing} data-cy="btn-refresh">
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -288,6 +291,7 @@ export default function DeploymentsClient() {
               variant="contained"
               startIcon={<AddIcon />}
               disabled
+              data-cy="btn-new-deployment"
             >
               New Deployment (Coming Soon)
             </Button>
@@ -296,96 +300,96 @@ export default function DeploymentsClient() {
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)} data-cy="alert-error">
             {error}
           </Alert>
         )}
 
         {/* Refresh Indicator */}
         {refreshing && (
-          <Alert severity="info" sx={{ mb: 3 }}>
+          <Alert severity="info" sx={{ mb: 3 }} data-cy="alert-refreshing">
             Refreshing deployments...
           </Alert>
         )}
 
         {/* Statistics Cards */}
         {deployments.length > 0 && (
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid xs={12} sm={6} md={2.4}>
-              <Card>
+          <Grid2 container spacing={3} sx={{ mb: 4 }} data-cy="deployment-stats-grid">
+            <Grid2 size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Card data-cy="deployment-stat-total">
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="primary.main">
+                  <Typography variant="h4" color="primary.main" data-cy="stat-value">
                     {stats.total}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" data-cy="stat-label">
                     Total Deployments
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid xs={12} sm={6} md={2.4}>
-              <Card>
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Card data-cy="deployment-stat-active">
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="success.main">
+                  <Typography variant="h4" color="success.main" data-cy="stat-value">
                     {stats.active || 0}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" data-cy="stat-label">
                     Active
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid xs={12} sm={6} md={2.4}>
-              <Card>
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Card data-cy="deployment-stat-inactive">
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="text.secondary">
+                  <Typography variant="h4" color="text.secondary" data-cy="stat-value">
                     {stats.inactive || 0}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" data-cy="stat-label">
                     Inactive
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid xs={12} sm={6} md={2.4}>
-              <Card>
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Card data-cy="deployment-stat-errors">
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="error.main">
+                  <Typography variant="h4" color="error.main" data-cy="stat-value">
                     {stats.error || 0}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" data-cy="stat-label">
                     Errors
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-            <Grid xs={12} sm={6} md={2.4}>
-              <Card>
+            </Grid2>
+            <Grid2 size={{ xs: 12, sm: 6, md: 2.4 }}>
+              <Card data-cy="deployment-stat-deploying">
                 <CardContent sx={{ textAlign: 'center' }}>
-                  <Typography variant="h4" color="primary.main">
+                  <Typography variant="h4" color="primary.main" data-cy="stat-value">
                     {stats.deploying || 0}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" data-cy="stat-label">
                     Deploying
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
-          </Grid>
+            </Grid2>
+          </Grid2>
         )}
 
         {/* Deployments Table */}
         {deployments.length === 0 ? (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Paper sx={{ p: 4, textAlign: 'center' }} data-cy="deployments-empty">
+            <Typography variant="h6" color="text.secondary" gutterBottom data-cy="empty-title">
               No deployments found
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" data-cy="empty-description">
               Deploy your first model to start serving predictions
             </Typography>
           </Paper>
         ) : (
-          <Paper sx={{ height: 600, width: '100%' }}>
+          <Paper sx={{ height: 600, width: '100%' }} data-cy="deployments-table-container">
             <DataGrid
               rows={deployments.map(d => ({ ...d, id: d.deploymentId }))}
               columns={columns}
@@ -395,6 +399,7 @@ export default function DeploymentsClient() {
               }}
               density="compact"
               disableRowSelectionOnClick
+              data-cy="table-deployments"
             />
           </Paper>
         )}

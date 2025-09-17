@@ -56,16 +56,16 @@ export function PieChart({
   }))
 
   return (
-    <Card className="ml-card">
+    <Card className="ml-card" data-cy="chart-pie-card">
       <CardContent>
         {title && (
-          <Typography variant="h6" gutterBottom className="font-semibold">
+          <Typography variant="h6" gutterBottom className="font-semibold" data-cy="chart-title">
             {title}
           </Typography>
         )}
-        <Box sx={{ width: '100%', height }}>
+        <Box sx={{ width: '100%', height }} data-cy="chart-container">
           <ResponsiveContainer width="100%" height="100%">
-            <RechartsPieChart>
+            <RechartsPieChart data-cy="chart-pie">
               <Pie
                 data={dataWithColors}
                 cx="50%"
@@ -74,9 +74,10 @@ export function PieChart({
                 outerRadius={outerRadius}
                 paddingAngle={2}
                 dataKey="value"
+                data-cy="chart-pie-slices"
               >
                 {dataWithColors.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} data-cy={`chart-pie-slice-${index}`} />
                 ))}
               </Pie>
               <Tooltip
@@ -87,12 +88,14 @@ export function PieChart({
                   color: theme.palette.text.primary
                 }}
                 formatter={(_value: number) => [value, 'Count']}
+                data-cy="chart-tooltip"
               />
               {showLegend && (
                 <Legend
                   verticalAlign="bottom"
                   height={36}
                   iconType="circle"
+                  data-cy="chart-legend"
                 />
               )}
             </RechartsPieChart>

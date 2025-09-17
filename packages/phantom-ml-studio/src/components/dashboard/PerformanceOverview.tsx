@@ -207,7 +207,7 @@ export function PerformanceOverview() {
         aria-label="System performance metrics"
       >
         {metrics.map((metric, index) => (
-          <Grid item xs={12} sm={6} lg={3} key={metric.title}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={metric.title}>
             <Box
               className="animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
@@ -294,7 +294,7 @@ export function PerformanceOverview() {
           </Typography>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Box className="text-center p-4 bg-green-50 rounded-lg">
                 <Typography variant="h3" className="font-bold text-green-600 mb-2">
                   {performanceStats.total_operations}
@@ -305,7 +305,7 @@ export function PerformanceOverview() {
               </Box>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Box className="text-center p-4 bg-blue-50 rounded-lg">
                 <Typography variant="h3" className="font-bold text-blue-600 mb-2">
                   {performanceStats.active_models}
@@ -316,7 +316,7 @@ export function PerformanceOverview() {
               </Box>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Box className="text-center p-4 bg-purple-50 rounded-lg">
                 <Typography variant="h3" className="font-bold text-purple-600 mb-2">
                   {Math.floor(performanceStats.uptime_seconds / 3600)}h

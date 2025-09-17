@@ -147,7 +147,7 @@ function FeaturesGrid() {
   return (
     <Grid container spacing={3}>
       {features.map((feature, index) => (
-        <Grid xs={12} sm={6} md={4} key={index}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
           <FeatureCard {...feature} />
         </Grid>
       ))}
@@ -242,7 +242,7 @@ function HomePage() {
         }}
       >
         <Grid container spacing={4} textAlign="center">
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="h2" color="primary.main" fontWeight="bold">
               32
             </Typography>
@@ -250,7 +250,7 @@ function HomePage() {
               Precision NAPI Modules
             </Typography>
           </Grid>
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="h2" color="primary.main" fontWeight="bold">
               19+
             </Typography>
@@ -258,7 +258,7 @@ function HomePage() {
               Security Intelligence Modules
             </Typography>
           </Grid>
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="h2" color="primary.main" fontWeight="bold">
               5
             </Typography>
@@ -266,7 +266,7 @@ function HomePage() {
               Multi-Database Support
             </Typography>
           </Grid>
-          <Grid xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <Typography variant="h2" color="primary.main" fontWeight="bold">
               99.9%
             </Typography>

@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * @fileoverview ML Experiments Page - Enterprise Experiment Tracking & Management Platform
  *
@@ -32,92 +34,17 @@
  * @subcategory Experiment Management
  */
 
-import type { Metadata, Viewport } from 'next';
-import { Suspense, ErrorBoundary } from 'react';
+// Metadata moved to layout.tsx
+import { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 import dynamicImport from 'next/dynamic';
-import { headers } from 'next/headers';
 
 // Dynamic imports for optimal experiment tracking interface loading
 const ExperimentsClient = dynamicImport(() => import('./ExperimentsClient'), {
   loading: () => <ExperimentsSkeleton />
 });
 
-/**
- * Comprehensive metadata configuration for ML research and academic visibility
- * Optimized for research community discovery and citation
- */
-export const metadata: Metadata = {
-  title: {
-    default: 'Experiments | Phantom ML Studio',
-    template: '%s | ML Experiments - Research Platform'
-  },
-  description: 'Enterprise ML experiment tracking platform featuring advanced statistical analysis, reproducible research workflows, hyperparameter optimization, distributed experiment orchestration, and comprehensive model performance comparison with research-grade rigor.',
-  keywords: [
-    'ML experiments', 'experiment tracking', 'hyperparameter optimization', 'model versioning',
-    'statistical testing', 'reproducible research', 'MLOps', 'experiment design',
-    'A/B testing', 'multi-armed bandit', 'Bayesian optimization', 'cross-validation',
-    'model comparison', 'performance analysis', 'distributed training', 'research platform',
-    'experiment orchestration', 'scientific computing', 'meta-learning', 'causal inference'
-  ],
-  authors: [{ name: 'Phantom ML Studio Research Team' }],
-  creator: 'Phantom ML Studio',
-  publisher: 'Phantom ML Studio',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: 'Phantom ML Studio',
-    title: 'ML Experiments - Research-Grade Tracking Platform',
-    description: 'Comprehensive experiment tracking with statistical analysis, hyperparameter optimization, and reproducible research workflows.',
-    url: 'https://phantom-ml.com/experiments',
-    images: [
-      {
-        url: '/og-experiments.png',
-        width: 1200,
-        height: 630,
-        alt: 'Phantom ML Studio Experiments Interface with Statistical Analysis',
-      },
-    ],
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@PhantomMLStudio',
-    creator: '@PhantomMLStudio',
-    title: 'ML Experiments - Research Platform',
-    description: 'Advanced experiment tracking with statistical analysis and reproducible workflows',
-    images: ['/twitter-experiments.png'],
-  },
-  alternates: {
-    canonical: 'https://phantom-ml.com/experiments',
-  },
-  category: 'Research',
-  classification: 'Machine Learning Operations',
-};
-
-/**
- * Advanced viewport configuration for experiment tracking interfaces
- */
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 3,
-  userScalable: true,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f9fafb' },
-    { media: '(prefers-color-scheme: dark)', color: '#111827' }
-  ],
-  colorScheme: 'light dark',
-};
+// Metadata and viewport moved to layout.tsx since this is now a client component
 
 /**
  * Performance configuration for real-time experiment tracking
@@ -310,7 +237,7 @@ function ExperimentsSkeleton() {
  * Error Boundary for Experiments Components
  * Provides comprehensive error recovery with experiment context preservation
  */
-function ExperimentsErrorFallback({ error, resetErrorBoundary }: any) {
+function ExperimentsErrorFallback() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-lg mx-auto text-center">
@@ -319,7 +246,7 @@ function ExperimentsErrorFallback({ error, resetErrorBoundary }: any) {
           <p className="text-red-600 mb-4">Unable to load experiment tracking interface</p>
           <div className="space-y-2 mb-4">
             <button
-              onClick={resetErrorBoundary}
+              onClick={() => window.location.reload()}
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
             >
               Retry Experiments
@@ -353,10 +280,9 @@ function ExperimentsErrorFallback({ error, resetErrorBoundary }: any) {
  *
  * @returns {JSX.Element} The complete experiment tracking interface
  */
-export default async function ExperimentsPage(): Promise<JSX.Element> {
-  // Extract user context for personalized experiment recommendations
-  const headersList = headers();
-  const userAgent = headersList.get('user-agent') || '';
+export default function ExperimentsPage(): JSX.Element {
+  // Extract user context for personalized experiment recommendations - client-side
+  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
   const isBot = /bot|crawler|spider/i.test(userAgent);
 
   // Optimize for search engine crawlers with research context
@@ -391,13 +317,7 @@ export default async function ExperimentsPage(): Promise<JSX.Element> {
 
   return (
     <main className="min-h-screen bg-gray-50" role="main">
-      <ErrorBoundary
-        FallbackComponent={ExperimentsErrorFallback}
-        onError={(error, errorInfo) => {
-          console.error('Experiments Error:', error, errorInfo);
-          // Here you would typically send to error tracking service with experiment context
-        }}
-      >
+      <ErrorBoundary fallback={<ExperimentsErrorFallback />}>
         <Suspense fallback={<ExperimentsSkeleton />}>
           <ExperimentsClient />
         </Suspense>

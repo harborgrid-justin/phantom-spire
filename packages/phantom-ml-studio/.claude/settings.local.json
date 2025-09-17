@@ -44,7 +44,11 @@
       "Bash(do echo \"Updating $file\")",
       "Bash(xargs sed:*)",
       "Bash(pkill:*)",
-      "Bash(PORT=3008 npm run dev)"
+      "Bash(PORT=3008 npm run dev)",
+      "Bash(npx cypress:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(timeout 60 npm run build)",
+      "Bash(timeout 30 npm run dev)"
     ],
     "deny": [],
     "ask": []
