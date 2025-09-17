@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Box, Container, Typography, Grid, Card, CardContent, Button } from '@mui/material'
+import { Box, Container, Typography, Card, CardContent, Button } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import {
   Dashboard as DashboardIcon,
   ModelTraining as ModelIcon,
@@ -118,7 +119,7 @@ export default function HomePage() {
           {features.map((feature, index) => {
             const IconComponent = feature.icon
             return (
-              <Grid item xs={12} md={6} lg={4} key={feature.title}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} key={feature.title}>
                 <Card
                   className={`ml-card h-full cursor-pointer transform hover:scale-105 transition-all duration-200 ${
                     isLoaded ? 'animate-fade-in' : 'opacity-0'

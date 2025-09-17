@@ -1,5 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import {
+  Box,
+  Typography,
+  Container,
+  Grid2 as Grid,
+  Card,
+  CardContent,
+  Chip,
+  Button,
+  LinearProgress,
+  Paper,
+  Stack
+} from '@mui/material';
 
 export const metadata: Metadata = {
   title: 'Phantom ML Studio - 32 Precision Modules Enterprise Platform',
@@ -28,28 +41,37 @@ function FeatureCard({ title, description, href, status = 'active' }: FeatureCar
   const isDisabled = status === 'coming-soon';
 
   const card = (
-    <div style={{
-      border: '1px solid #ddd',
-      borderRadius: '8px',
-      padding: '20px',
-      height: '100%',
-      backgroundColor: '#fff',
-      opacity: isDisabled ? 0.6 : 1
-    }}>
-      <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{title}</h3>
-      {status !== 'active' && (
-        <span style={{
-          background: status === 'beta' ? '#1976d2' : '#666',
-          color: 'white',
-          padding: '2px 8px',
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
-          {status === 'beta' ? 'Beta' : 'Coming Soon'}
-        </span>
-      )}
-      <p style={{ color: '#666', marginTop: '10px' }}>{description}</p>
-    </div>
+    <Card
+      sx={{
+        height: '100%',
+        opacity: isDisabled ? 0.6 : 1,
+        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        '&:hover': isDisabled ? {} : {
+          transform: 'translateY(-4px)',
+          boxShadow: 4
+        }
+      }}
+    >
+      <CardContent>
+        <Stack spacing={1}>
+          <Typography variant="h6" component="h3" gutterBottom>
+            {title}
+          </Typography>
+          {status !== 'active' && (
+            <Box>
+              <Chip
+                label={status === 'beta' ? 'Beta' : 'Coming Soon'}
+                color={status === 'beta' ? 'primary' : 'default'}
+                size="small"
+              />
+            </Box>
+          )}
+          <Typography variant="body2" color="text.secondary">
+            {description}
+          </Typography>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 
   return isDisabled ? card : (
@@ -125,7 +147,7 @@ function FeaturesGrid() {
   return (
     <Grid container spacing={3}>
       {features.map((feature, index) => (
-        <Grid item xs={12} sm={6} md={4} key={index}>
+        <Grid xs={12} sm={6} md={4} key={index}>
           <FeatureCard {...feature} />
         </Grid>
       ))}
@@ -135,93 +157,117 @@ function FeaturesGrid() {
 
 function HomePage() {
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 5 }}>
       {/* Hero Section */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+      <Box textAlign="center" mb={8}>
         <Typography
-          variant="h2"
+          variant="h1"
           component="h1"
-          gutterBottom
           sx={{
+            fontSize: { xs: '2.5rem', md: '3.5rem' },
             fontWeight: 'bold',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             backgroundClip: 'text',
             color: 'transparent',
-            mb: 2
+            mb: 3
           }}
         >
           Phantom ML Studio
         </Typography>
         <Typography
-          variant="h5"
+          variant="h4"
+          component="h2"
           color="text.secondary"
-          sx={{ mb: 4, maxWidth: '800px', mx: 'auto' }}
+          sx={{
+            maxWidth: '800px',
+            mx: 'auto',
+            mb: 4,
+            fontSize: { xs: '1.25rem', md: '1.5rem' }
+          }}
         >
           Enterprise-grade machine learning platform with advanced security features,
           AutoML capabilities, and seamless Hugging Face integration.
         </Typography>
-        <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap">
-          <Chip label="Enterprise Ready" color="primary" variant="outlined" />
-          <Chip label="Security First" color="secondary" variant="outlined" />
-          <Chip label="AutoML Powered" color="primary" variant="outlined" />
-          <Chip label="Hugging Face Integration" color="secondary" variant="outlined" />
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          flexWrap="wrap"
+          sx={{ gap: 1 }}
+        >
+          <Chip label="Enterprise Ready" variant="outlined" color="primary" />
+          <Chip label="Security First" variant="outlined" color="secondary" />
+          <Chip label="AutoML Powered" variant="outlined" color="primary" />
+          <Chip label="Hugging Face Integration" variant="outlined" color="secondary" />
         </Stack>
       </Box>
 
       {/* 32 Precision Modules Alert */}
-      <Alert severity="success" sx={{ mb: 4, borderRadius: 2 }}>
-        <Typography variant="h6" component="div" gutterBottom>
+      <Paper
+        sx={{
+          p: 3,
+          mb: 5,
+          backgroundColor: 'success.light',
+          borderLeft: 4,
+          borderColor: 'success.main'
+        }}
+      >
+        <Typography variant="h6" color="success.dark" gutterBottom>
           🚀 32 Precision Modules Integrated
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="body1" color="success.dark" paragraph>
           Complete frontend-backend integration achieved with 32 high-precision NAPI bindings:
-          8 Model Management, 8 Analytics & Insights, 6 Real-time Processing, 5 Enterprise Features, 
+          8 Model Management, 8 Analytics & Insights, 6 Real-time Processing, 5 Enterprise Features,
           and 5 Business Intelligence modules - all with enterprise-grade fallback support.
         </Typography>
-        <Box sx={{ mt: 2, mb: 1 }}>
-          <LinearProgress variant="determinate" value={100} color="success" />
-        </Box>
+        <LinearProgress
+          variant="determinate"
+          value={100}
+          color="success"
+          sx={{ mb: 1, height: 8, borderRadius: 4 }}
+        />
         <Typography variant="caption" color="text.secondary">
           Integration Status: 100% Complete (32/32 modules active)
         </Typography>
-      </Alert>
+      </Paper>
 
       {/* Statistics Section */}
       <Paper
         elevation={2}
         sx={{
-          p: 4,
-          mb: 6,
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+          p: 5,
+          mb: 8,
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          borderRadius: 2
         }}
       >
         <Grid container spacing={4} textAlign="center">
-          <Grid item xs={12} sm={3}>
-            <Typography variant="h3" color="primary" fontWeight="bold">
+          <Grid xs={12} sm={6} md={3}>
+            <Typography variant="h2" color="primary.main" fontWeight="bold">
               32
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Precision NAPI Modules
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <Typography variant="h3" color="primary" fontWeight="bold">
+          <Grid xs={12} sm={6} md={3}>
+            <Typography variant="h2" color="primary.main" fontWeight="bold">
               19+
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Security Intelligence Modules
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <Typography variant="h3" color="primary" fontWeight="bold">
+          <Grid xs={12} sm={6} md={3}>
+            <Typography variant="h2" color="primary.main" fontWeight="bold">
               5
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Multi-Database Support
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={3}>
-            <Typography variant="h3" color="primary" fontWeight="bold">
+          <Grid xs={12} sm={6} md={3}>
+            <Typography variant="h2" color="primary.main" fontWeight="bold">
               99.9%
             </Typography>
             <Typography variant="body1" color="text.secondary">
@@ -232,57 +278,65 @@ function HomePage() {
       </Paper>
 
       {/* Features Section */}
-      <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" component="h2" gutterBottom textAlign="center">
+      <Box mb={8}>
+        <Typography variant="h3" textAlign="center" gutterBottom color="text.primary">
           Platform Features
         </Typography>
-        <Typography variant="body1" color="text.secondary" textAlign="center" sx={{ mb: 4 }}>
+        <Typography variant="h6" textAlign="center" color="text.secondary" paragraph>
           Comprehensive ML tools designed for enterprise cybersecurity and intelligence applications
         </Typography>
-        <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>Loading features...</Box>}>
-          <FeaturesGrid />
-        </Suspense>
+        <FeaturesGrid />
       </Box>
 
       {/* CTA Section */}
       <Paper
-        elevation={3}
+        elevation={4}
         sx={{
-          p: 4,
+          p: 5,
           textAlign: 'center',
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white'
+          color: 'white',
+          borderRadius: 2
         }}
       >
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h3" gutterBottom>
           Ready to Get Started?
         </Typography>
-        <Typography variant="body1" sx={{ mb: 3 }}>
+        <Typography variant="h6" paragraph sx={{ mb: 4 }}>
           Begin your enterprise ML journey with powerful tools designed for security-first applications.
         </Typography>
-        <Stack direction="row" spacing={2} justifyContent="center">
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          justifyContent="center"
+        >
           <Button
-            variant="contained"
-            size="large"
             component={Link}
             href="/dashboard"
+            variant="contained"
+            size="large"
             sx={{
-              bgcolor: 'white',
+              backgroundColor: 'white',
               color: 'primary.main',
-              '&:hover': { bgcolor: 'grey.100' }
+              '&:hover': {
+                backgroundColor: 'grey.100'
+              }
             }}
           >
             View Dashboard
           </Button>
           <Button
-            variant="outlined"
-            size="large"
             component={Link}
             href="/model-builder"
+            variant="outlined"
+            size="large"
             sx={{
               borderColor: 'white',
               color: 'white',
-              '&:hover': { borderColor: 'grey.300', bgcolor: 'rgba(255,255,255,0.1)' }
+              '&:hover': {
+                borderColor: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              }
             }}
           >
             Start Building
@@ -294,9 +348,5 @@ function HomePage() {
 }
 
 export default function Page() {
-  return (
-    <Suspense fallback={<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading Phantom ML Studio...</Box>}>
-      <HomePage />
-    </Suspense>
-  );
+  return <HomePage />;
 }

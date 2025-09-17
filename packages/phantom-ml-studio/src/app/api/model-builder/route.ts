@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const result = await modelBuilderService.startTraining({
     id: 'start_training_req',
     type: 'startTraining',
-    data: { config, data },
+    data: { config, columns: data.columns || [] },
     metadata: { category: 'model-builder', module: 'model-builder-page', version: '1.0.0' },
     context: { environment: 'development' },
     timestamp: new Date(),
