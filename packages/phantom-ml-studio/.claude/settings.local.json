@@ -42,7 +42,8 @@
       "Bash(do echo \"Checking $file\")",
       "Bash(echo \"Needs update: $file\")",
       "Bash(do echo \"Updating $file\")",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

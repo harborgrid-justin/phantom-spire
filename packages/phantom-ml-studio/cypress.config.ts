@@ -4,7 +4,7 @@ import type { Configuration } from 'webpack';
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3005',
+    baseUrl: 'http://localhost:3008',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
