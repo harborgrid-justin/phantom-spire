@@ -1,29 +1,4 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Chip,
-  Stack,
-  Paper,
-  Alert,
-  LinearProgress
-} from '@mui/material';
-import {
-  Dashboard as DashboardIcon,
-  ModelTraining as ModelIcon,
-  Analytics as AnalyticsIcon,
-  Security as SecurityIcon,
-  Speed as PerformanceIcon,
-  AutoAwesome as AutoMLIcon,
-  Engineering as EngineeringIcon,
-  Business as BusinessIcon
-} from '@mui/icons-material';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -45,50 +20,36 @@ export const metadata: Metadata = {
 interface FeatureCardProps {
   title: string;
   description: string;
-  icon: React.ReactNode;
   href: string;
   status?: 'active' | 'beta' | 'coming-soon';
 }
 
-function FeatureCard({ title, description, icon, href, status = 'active' }: FeatureCardProps) {
+function FeatureCard({ title, description, href, status = 'active' }: FeatureCardProps) {
   const isDisabled = status === 'coming-soon';
 
   const card = (
-    <Card
-      sx={{
-        height: '100%',
-        transition: 'all 0.3s ease',
-        cursor: isDisabled ? 'default' : 'pointer',
-        opacity: isDisabled ? 0.6 : 1,
-        '&:hover': {
-          transform: isDisabled ? 'none' : 'translateY(-4px)',
-          boxShadow: isDisabled ? 'none' : 3
-        }
-      }}
-    >
-      <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Box sx={{ mr: 2, color: 'primary.main' }}>
-            {icon}
-          </Box>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" component="h3" gutterBottom>
-              {title}
-            </Typography>
-            {status !== 'active' && (
-              <Chip
-                label={status === 'beta' ? 'Beta' : 'Coming Soon'}
-                size="small"
-                color={status === 'beta' ? 'primary' : 'default'}
-              />
-            )}
-          </Box>
-        </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-          {description}
-        </Typography>
-      </CardContent>
-    </Card>
+    <div style={{
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      padding: '20px',
+      height: '100%',
+      backgroundColor: '#fff',
+      opacity: isDisabled ? 0.6 : 1
+    }}>
+      <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{title}</h3>
+      {status !== 'active' && (
+        <span style={{
+          background: status === 'beta' ? '#1976d2' : '#666',
+          color: 'white',
+          padding: '2px 8px',
+          borderRadius: '4px',
+          fontSize: '12px'
+        }}>
+          {status === 'beta' ? 'Beta' : 'Coming Soon'}
+        </span>
+      )}
+      <p style={{ color: '#666', marginTop: '10px' }}>{description}</p>
+    </div>
   );
 
   return isDisabled ? card : (
@@ -103,70 +64,59 @@ function FeaturesGrid() {
     {
       title: '32 Precision NAPI Demo',
       description: 'Interactive demonstration of all 32 precision NAPI bindings with complete frontend-backend integration.',
-      icon: <EngineeringIcon fontSize="large" />,
       href: '/precision-napi-demo',
       status: 'active'
     },
     {
       title: 'Enhanced Dashboard',
       description: 'Real-time monitoring with business intelligence using precision NAPI bindings for comprehensive metrics.',
-      icon: <DashboardIcon fontSize="large" />,
       href: '/dashboard'
     },
     {
       title: 'Enhanced Model Builder',
       description: 'AutoML with 32 precision bindings: advanced optimization, validation, and enterprise-grade model management.',
-      icon: <AutoMLIcon fontSize="large" />,
       href: '/model-builder'
     },
     {
       title: 'Real-time Analytics',
       description: 'Stream processing, batch analytics, and business intelligence with precision NAPI performance.',
-      icon: <AnalyticsIcon fontSize="large" />,
       href: '/real-time-monitoring'
     },
     {
       title: 'Data Explorer',
       description: 'Comprehensive data analysis with statistical summaries, correlation analysis, and quality assessment.',
-      icon: <AnalyticsIcon fontSize="large" />,
       href: '/data-explorer'
     },
     {
       title: 'Business Intelligence',
       description: 'ROI calculations, cost-benefit analysis, performance forecasting, and resource optimization.',
-      icon: <BusinessIcon fontSize="large" />,
       href: '/business-intelligence'
     },
     {
       title: 'Enterprise Security',
       description: 'Audit trails, compliance reporting, security scanning, backup systems, and disaster recovery.',
-      icon: <SecurityIcon fontSize="large" />,
       href: '/enterprise-security-compliance'
     },
     {
       title: 'Threat Intelligence',
       description: 'Advanced cybersecurity ML models integrated with the Phantom Spire security intelligence platform.',
-      icon: <SecurityIcon fontSize="large" />,
       href: '/threat-intelligence-marketplace'
     },
     {
       title: 'AutoML Pipeline',
       description: 'Visual pipeline builder for automated machine learning workflows.',
-      icon: <AutoMLIcon fontSize="large" />,
       href: '/automl-pipeline-visualizer',
       status: 'beta'
     },
     {
       title: 'Bias Detection',
       description: 'AI fairness tools to detect and mitigate bias in machine learning models.',
-      icon: <SecurityIcon fontSize="large" />,
       href: '/bias-detection-engine',
       status: 'beta'
     },
     {
       title: 'Explainable AI',
       description: 'Model interpretability and explanation tools for transparent AI decisions.',
-      icon: <AnalyticsIcon fontSize="large" />,
       href: '/explainable-ai-visualizer',
       status: 'coming-soon'
     }

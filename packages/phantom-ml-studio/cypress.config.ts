@@ -3,7 +3,7 @@ const webpackPreprocessor = require('@cypress/webpack-preprocessor');
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3003',
+    baseUrl: 'http://localhost:3004',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
