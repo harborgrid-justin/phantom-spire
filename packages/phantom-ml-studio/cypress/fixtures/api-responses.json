@@ -1,0 +1,59 @@
+{
+  "huggingface": {
+    "models": [
+      {
+        "id": "bert-base-uncased",
+        "name": "BERT Base Uncased",
+        "type": "text-classification",
+        "downloads": 5000000,
+        "likes": 1200
+      },
+      {
+        "id": "gpt2",
+        "name": "GPT-2",
+        "type": "text-generation",
+        "downloads": 3000000,
+        "likes": 800
+      }
+    ]
+  },
+  "deployments": {
+    "success": {
+      "id": "dep-123",
+      "status": "deployed",
+      "endpoint": "https://api.phantom-ml.com/models/test-model",
+      "instances": 3,
+      "health": "healthy"
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "accuracy": 0.92,
+      "latency": 45,
+      "throughput": 1000,
+      "error_rate": 0.02
+    },
+    "alerts": [
+      {
+        "id": "alert-1",
+        "type": "performance",
+        "message": "Model accuracy dropped below threshold",
+        "severity": "warning",
+        "timestamp": "2023-12-01T10:30:00Z"
+      }
+    ]
+  },
+  "experiments": {
+    "results": [
+      {
+        "id": "exp-1",
+        "name": "Random Forest vs SVM",
+        "models": ["rf-model-1", "svm-model-1"],
+        "metrics": {
+          "rf-model-1": { "accuracy": 0.85, "f1": 0.83 },
+          "svm-model-1": { "accuracy": 0.82, "f1": 0.80 }
+        }
+      }
+    ]
+  }
+}

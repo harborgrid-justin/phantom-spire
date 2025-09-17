@@ -1,0 +1,49 @@
+{
+  "algorithms": {
+    "randomForest": {
+      "name": "Random Forest",
+      "parameters": {
+        "n_estimators": [10, 50, 100],
+        "max_depth": [3, 5, 10],
+        "min_samples_split": [2, 5, 10]
+      }
+    },
+    "linearRegression": {
+      "name": "Linear Regression",
+      "parameters": {
+        "fit_intercept": [true, false],
+        "normalize": [true, false]
+      }
+    },
+    "svm": {
+      "name": "Support Vector Machine",
+      "parameters": {
+        "C": [0.1, 1, 10],
+        "kernel": ["linear", "rbf", "poly"],
+        "gamma": ["scale", "auto"]
+      }
+    }
+  },
+  "datasets": [
+    {
+      "name": "Employee Performance Dataset",
+      "features": ["Age", "Salary", "Department", "Experience"],
+      "target": "Performance_Score",
+      "type": "regression"
+    },
+    {
+      "name": "Iris Classification",
+      "features": ["sepal_length", "sepal_width", "petal_length", "petal_width"],
+      "target": "species",
+      "type": "classification"
+    }
+  ],
+  "experiments": [
+    {
+      "name": "Performance Prediction Experiment",
+      "description": "Predicting employee performance based on demographics and experience",
+      "algorithm": "randomForest",
+      "metrics": ["accuracy", "precision", "recall", "f1_score"]
+    }
+  ]
+}

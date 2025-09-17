@@ -14,7 +14,8 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands.ts'
+import './index.d.ts'
 
 // Handle React version conflicts and uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
