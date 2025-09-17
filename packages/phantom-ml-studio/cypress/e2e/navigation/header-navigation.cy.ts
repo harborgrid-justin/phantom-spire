@@ -4,7 +4,7 @@ describe('Header Navigation', () => {
   })
 
   it('should load the homepage successfully', () => {
-    cy.url().should('eq', 'http://localhost:3003/')
+    cy.url().should('eq', 'http://localhost:3008/')
     cy.get('body').should('be.visible')
   })
 

@@ -43,7 +43,8 @@
       "Bash(echo \"Needs update: $file\")",
       "Bash(do echo \"Updating $file\")",
       "Bash(xargs sed:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(PORT=3008 npm run dev)"
     ],
     "deny": [],
     "ask": []

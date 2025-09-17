@@ -54,14 +54,18 @@ export class EnterpriseCoreService implements PhantomMLCoreBindings {
   constructor() {
     // Load native module only on server side
     if (typeof window === 'undefined') {
-      try {
-        import mlModule from '@phantom-spire/ml-core';
-        this.mlCore = new mlModule.PhantomMLCore();
-        console.log('✅ Enterprise ML Core: Native module loaded successfully');
-      } catch (error) {
-        console.warn('⚠️ Enterprise ML Core: Using fallback mode:', error);
-        this.mlCore = null;
-      }
+      this.initializeMLCore();
+    }
+  }
+
+  private async initializeMLCore(): Promise<void> {
+    try {
+      const mlModule = await import('@phantom-spire/ml-core');
+      this.mlCore = new mlModule.PhantomMLCore();
+      console.log('✅ Enterprise ML Core: Native module loaded successfully');
+    } catch (error) {
+      console.warn('⚠️ Enterprise ML Core: Using fallback mode:', error);
+      this.mlCore = null;
     }
   }
 

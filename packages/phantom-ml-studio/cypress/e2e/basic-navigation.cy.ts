@@ -1,7 +1,7 @@
 describe('Basic Navigation Test', () => {
   it('should visit the homepage', () => {
     cy.visit('/')
-    cy.url().should('eq', 'http://localhost:3003/')
+    cy.url().should('eq', 'http://localhost:3000/')
   })
 
   it('should navigate to dashboard', () => {

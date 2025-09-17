@@ -333,7 +333,7 @@ function DataExplorerErrorFallback({ error: _error, resetErrorBoundary }: { erro
  */
 export default async function DataExplorerPage(): Promise<JSX.Element> {
   // Extract user context for personalized analysis recommendations
-  const headersList = headers();
+  const headersList = await headers();
   const userAgent = headersList.get('user-agent') || '';
   const isBot = /bot|crawler|spider/i.test(userAgent);
 

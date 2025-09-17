@@ -449,7 +449,7 @@ export default function EnterpriseSecurityCompliancePage() {
 
       {/* Compliance Overview Cards */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -464,7 +464,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -479,7 +479,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -494,7 +494,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -521,7 +521,7 @@ export default function EnterpriseSecurityCompliancePage() {
       {activeTab === 0 && (
         <Grid container spacing={3}>
           {/* Compliance Status Chart */}
-          <Grid xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -541,7 +541,7 @@ export default function EnterpriseSecurityCompliancePage() {
           </Grid>
 
           {/* Framework Summary */}
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -577,7 +577,7 @@ export default function EnterpriseSecurityCompliancePage() {
           </Grid>
 
           {/* Recent Activities */}
-          <Grid xs={12}>
+          <Grid size={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -649,7 +649,7 @@ export default function EnterpriseSecurityCompliancePage() {
 
       {activeTab === 1 && (
         <Grid container spacing={3}>
-          <Grid xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -694,7 +694,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
@@ -708,7 +708,7 @@ export default function EnterpriseSecurityCompliancePage() {
                 </Box>
 
                 <Grid container spacing={2} sx={{ mb: 3 }}>
-                  <Grid xs={6} md={3}>
+                  <Grid size={{ xs: 6, md: 3 }}>
                     <Typography variant="body2" color="text.secondary">
                       Overall Score
                     </Typography>
@@ -716,7 +716,7 @@ export default function EnterpriseSecurityCompliancePage() {
                       {selectedFramework.overallScore}%
                     </Typography>
                   </Grid>
-                  <Grid xs={6} md={3}>
+                  <Grid size={{ xs: 6, md: 3 }}>
                     <Typography variant="body2" color="text.secondary">
                       Risk Level
                     </Typography>
@@ -726,7 +726,7 @@ export default function EnterpriseSecurityCompliancePage() {
                       size="small"
                     />
                   </Grid>
-                  <Grid xs={6} md={3}>
+                  <Grid size={{ xs: 6, md: 3 }}>
                     <Typography variant="body2" color="text.secondary">
                       Last Audit
                     </Typography>
@@ -734,7 +734,7 @@ export default function EnterpriseSecurityCompliancePage() {
                       {new Date(selectedFramework.lastAudit).toLocaleDateString()}
                     </Typography>
                   </Grid>
-                  <Grid xs={6} md={3}>
+                  <Grid size={{ xs: 6, md: 3 }}>
                     <Typography variant="body2" color="text.secondary">
                       Next Audit
                     </Typography>
@@ -813,7 +813,7 @@ export default function EnterpriseSecurityCompliancePage() {
 
       {activeTab === 2 && (
         <Grid container spacing={3}>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -842,7 +842,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -926,14 +926,14 @@ export default function EnterpriseSecurityCompliancePage() {
             </Card>
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Model Security & Operational Security Metrics
                 </Typography>
                 <Grid container spacing={3}>
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Model Security
                     </Typography>
@@ -976,7 +976,7 @@ export default function EnterpriseSecurityCompliancePage() {
                     </List>
                   </Grid>
                   
-                  <Grid xs={12} md={6}>
+                  <Grid size={{ xs: 12, md: 6 }}>
                     <Typography variant="subtitle1" gutterBottom>
                       Operational Security
                     </Typography>
@@ -1028,14 +1028,14 @@ export default function EnterpriseSecurityCompliancePage() {
 
       {activeTab === 3 && (
         <Grid container spacing={3}>
-          <Grid xs={12}>
+          <Grid size={12}>
             <Alert severity="info" sx={{ mb: 3 }}>
               <AlertTitle>🤖 ML-Specific Governance</AlertTitle>
               Specialized compliance controls for machine learning and AI systems
             </Alert>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -1083,7 +1083,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </Card>
           </Grid>
 
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -1131,7 +1131,7 @@ export default function EnterpriseSecurityCompliancePage() {
             </Card>
           </Grid>
 
-          <Grid xs={12}>
+          <Grid size={12}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
