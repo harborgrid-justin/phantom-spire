@@ -1,0 +1,217 @@
+name: Security and Environment Audit
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # Run security audit daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  environment-audit:
+    runs-on: ubuntu-latest
+    name: Environment Variable Security Audit
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check for exposed secrets in repository
+      run: |
+        echo "🔍 Scanning for exposed secrets..."
+
+        # Check for common secret patterns
+        if grep -r -E "(AIza[0-9A-Za-z_-]{35}|sk-[0-9A-Za-z]{48}|ghp_[0-9A-Za-z]{36})" . --exclude-dir=node_modules --exclude-dir=.git; then
+          echo "❌ Potential API keys found in repository"
+          exit 1
+        fi
+
+        # Check for database URLs with credentials
+        if grep -r -E "postgresql://[^:]+:[^@]+@" . --exclude-dir=node_modules --exclude-dir=.git --exclude="*.example" --exclude="*.md"; then
+          echo "❌ Database URLs with credentials found"
+          exit 1
+        fi
+
+        # Check for AWS credentials
+        if grep -r -E "(AKIA[0-9A-Z]{16}|[0-9a-zA-Z/+=]{40})" . --exclude-dir=node_modules --exclude-dir=.git --exclude="*.example" --exclude="*.md"; then
+          echo "❌ Potential AWS credentials found"
+          exit 1
+        fi
+
+        echo "✅ No exposed secrets detected"
+
+    - name: Validate environment file structure
+      run: |
+        echo "🔍 Validating environment file structure..."
+
+        # Check for required environment files
+        required_files=(".env.example" ".env.development" ".env.production" ".env.test")
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Required file missing: $file"
+            exit 1
+          fi
+        done
+
+        # Check that .env.local is ignored (should not exist in repo)
+        if [ -f ".env.local" ]; then
+          echo "❌ .env.local should not be committed to repository"
+          exit 1
+        fi
+
+        # Check that .env files are in .gitignore
+        if ! grep -q "\.env\*" .gitignore; then
+          echo "❌ .env* pattern not found in .gitignore"
+          exit 1
+        fi
+
+        echo "✅ Environment file structure is valid"
+
+    - name: Validate NEXT_PUBLIC_ usage
+      run: |
+        echo "🔍 Validating NEXT_PUBLIC_ variable usage..."
+
+        # Check for sensitive data with NEXT_PUBLIC_ prefix
+        sensitive_patterns=("PASSWORD" "SECRET" "TOKEN" "KEY" "CREDENTIAL" "PRIVATE")
+        for pattern in "${sensitive_patterns[@]}"; do
+          if grep -r "NEXT_PUBLIC_.*$pattern" src/ --include="*.ts" --include="*.tsx"; then
+            echo "❌ Sensitive data found with NEXT_PUBLIC_ prefix: $pattern"
+            exit 1
+          fi
+        done
+
+        # Check that all NEXT_PUBLIC_ variables are actually intended for client
+        public_vars=$(grep -r "NEXT_PUBLIC_" src/ --include="*.ts" --include="*.tsx" | grep -o "NEXT_PUBLIC_[A-Z_]*" | sort -u)
+
+        echo "Found NEXT_PUBLIC_ variables:"
+        echo "$public_vars"
+
+        echo "✅ NEXT_PUBLIC_ usage validation passed"
+
+    - name: Check for hardcoded credentials
+      run: |
+        echo "🔍 Scanning for hardcoded credentials..."
+
+        # Check for hardcoded API keys
+        if grep -r -E "(api[_-]?key|secret|password|token)\s*[:=]\s*['\"][^'\"]{8,}" src/ --include="*.ts" --include="*.tsx" | grep -v "your_" | grep -v "test_" | grep -v "example" | grep -v "placeholder"; then
+          echo "❌ Potential hardcoded credentials found"
+          exit 1
+        fi
+
+        echo "✅ No hardcoded credentials detected"
+
+    - name: Build and check client bundle
+      run: |
+        echo "🔍 Building application and checking client bundle..."
+        npm run build
+
+        # Check for secrets in client bundles
+        if find .next/static -name "*.js" -exec grep -l -E "(AIza|sk-|ghp_)" {} \; 2>/dev/null | head -1; then
+          echo "❌ Secrets found in client bundle"
+          exit 1
+        fi
+
+        # Check for non-public environment variables in client
+        if find .next/static -name "*.js" -exec grep -l "process\.env\.[^N]" {} \; 2>/dev/null | head -1; then
+          echo "❌ Non-public environment variables found in client bundle"
+          exit 1
+        fi
+
+        echo "✅ Client bundle security check passed"
+
+    - name: Validate environment variable documentation
+      run: |
+        echo "🔍 Validating environment variable documentation..."
+
+        # Check that .env.example contains all variables used in code
+        env_vars_in_code=$(grep -r -o "process\.env\.[A-Z_]*" src/ --include="*.ts" --include="*.tsx" | grep -o "[A-Z_]*" | sort -u)
+
+        echo "Environment variables found in code:"
+        echo "$env_vars_in_code"
+
+        missing_vars=""
+        while IFS= read -r var; do
+          if [ "$var" != "NODE_ENV" ] && ! grep -q "^#.*$var\|^$var" .env.example; then
+            missing_vars="$missing_vars $var"
+          fi
+        done <<< "$env_vars_in_code"
+
+        if [ -n "$missing_vars" ]; then
+          echo "❌ Variables missing from .env.example:$missing_vars"
+          exit 1
+        fi
+
+        echo "✅ Environment variable documentation is complete"
+
+  dependency-security:
+    runs-on: ubuntu-latest
+    name: Dependency Security Audit
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run npm security audit
+      run: |
+        echo "🔍 Running dependency security audit..."
+        npm audit --audit-level moderate
+        echo "✅ Dependency security audit completed"
+
+    - name: Check for known vulnerable packages
+      run: |
+        echo "🔍 Checking for known vulnerable packages..."
+
+        # Check package-lock.json for known vulnerable patterns
+        if grep -E "(lodash.*4\.17\.[0-9]|minimist.*0\.)" package-lock.json; then
+          echo "⚠️ Potentially vulnerable packages detected - please review"
+        fi
+
+        echo "✅ Vulnerable package check completed"
+
+  security-report:
+    runs-on: ubuntu-latest
+    needs: [environment-audit, dependency-security]
+    if: always()
+
+    steps:
+    - name: Generate security report
+      run: |
+        echo "# Security Audit Report" > security-report.md
+        echo "Generated on: $(date)" >> security-report.md
+        echo "" >> security-report.md
+        echo "## Audit Results" >> security-report.md
+        echo "- Environment Audit: ${{ needs.environment-audit.result }}" >> security-report.md
+        echo "- Dependency Audit: ${{ needs.dependency-security.result }}" >> security-report.md
+        echo "" >> security-report.md
+        echo "## Security Status" >> security-report.md
+        if [ "${{ needs.environment-audit.result }}" = "success" ] && [ "${{ needs.dependency-security.result }}" = "success" ]; then
+          echo "✅ All security checks passed" >> security-report.md
+        else
+          echo "❌ Security issues detected - review required" >> security-report.md
+        fi
+
+    - name: Upload security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-audit-report
+        path: security-report.md

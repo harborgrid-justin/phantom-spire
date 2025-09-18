@@ -67,37 +67,58 @@ export function MitigationRecommendations({ report }: MitigationRecommendationsP
       immediate: recommendations.filter(r => 
         r.toLowerCase().includes('urgent') || 
         r.toLowerCase().includes('immediate') ||
+        (status === 'moderate' && r.toLowerCase().includes('review')) ||
         status === 'high_bias'
       ),
       dataModel: recommendations.filter(r => 
         r.toLowerCase().includes('retrain') || 
         r.toLowerCase().includes('data') || 
-        r.toLowerCase().includes('feature')
+        r.toLowerCase().includes('dataset') ||
+        r.toLowerCase().includes('feature') ||
+        r.toLowerCase().includes('collect')
       ),
       algorithmic: recommendations.filter(r => 
         r.toLowerCase().includes('post-processing') || 
         r.toLowerCase().includes('constraint') ||
-        r.toLowerCase().includes('apply')
+        r.toLowerCase().includes('apply') ||
+        r.toLowerCase().includes('algorithmic')
       ),
       monitoring: recommendations.filter(r => 
         r.toLowerCase().includes('monitor') || 
         r.toLowerCase().includes('audit') || 
-        r.toLowerCase().includes('regular')
+        r.toLowerCase().includes('regular') ||
+        r.toLowerCase().includes('continue')
       ),
       other: recommendations.filter(r => 
         !r.toLowerCase().includes('urgent') && 
         !r.toLowerCase().includes('immediate') &&
+        !(status === 'moderate' && r.toLowerCase().includes('review')) &&
         !r.toLowerCase().includes('retrain') && 
         !r.toLowerCase().includes('data') && 
+        !r.toLowerCase().includes('dataset') &&
         !r.toLowerCase().includes('feature') &&
+        !r.toLowerCase().includes('collect') &&
         !r.toLowerCase().includes('post-processing') && 
         !r.toLowerCase().includes('constraint') &&
         !r.toLowerCase().includes('apply') &&
+        !r.toLowerCase().includes('algorithmic') &&
         !r.toLowerCase().includes('monitor') && 
         !r.toLowerCase().includes('audit') && 
-        !r.toLowerCase().includes('regular')
+        !r.toLowerCase().includes('regular') &&
+        !r.toLowerCase().includes('continue') &&
+        status !== 'high_bias'
       )
     };
+    
+    // Fallback: if no categories match, put all in other for visibility
+    if (categories.immediate.length === 0 && 
+        categories.dataModel.length === 0 && 
+        categories.algorithmic.length === 0 && 
+        categories.monitoring.length === 0 && 
+        categories.other.length === 0) {
+      categories.other = recommendations;
+    }
+    
     return categories;
   };
 
@@ -121,7 +142,7 @@ export function MitigationRecommendations({ report }: MitigationRecommendationsP
   const categories = categorizeRecommendations(report.recommendations, report.status);
 
   return (
-    <Card>
+    <Card data-cy="recommendations">
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Bias Mitigation Recommendations
@@ -149,7 +170,7 @@ export function MitigationRecommendations({ report }: MitigationRecommendationsP
 
         {/* Immediate Actions */}
         {categories.immediate.length > 0 && (
-          <Box mb={3}>
+          <Box mb={3} data-cy="bias-mitigation-suggestions">
             <Typography variant="h6" color="error.main" gutterBottom>
               🚨 Immediate Actions Required
             </Typography>
@@ -180,7 +201,7 @@ export function MitigationRecommendations({ report }: MitigationRecommendationsP
 
         {/* Data & Model Improvements */}
         {categories.dataModel.length > 0 && (
-          <Box mb={3}>
+          <Box mb={3} data-cy="fairness-improvements">
             <Typography variant="h6" gutterBottom>
               📊 Data & Model Improvements
             </Typography>
@@ -273,7 +294,7 @@ export function MitigationRecommendations({ report }: MitigationRecommendationsP
 
         {/* Other Recommendations */}
         {categories.other.length > 0 && (
-          <Box>
+          <Box data-cy="action-items">
             <Typography variant="h6" gutterBottom>
               📋 Additional Recommendations
             </Typography>

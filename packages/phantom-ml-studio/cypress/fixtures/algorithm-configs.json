@@ -1,0 +1,112 @@
+{
+  "random-forest": {
+    "name": "Random Forest",
+    "description": "Ensemble learning method for classification and regression",
+    "hyperparameters": {
+      "n_estimators": {
+        "type": "integer",
+        "default": 100,
+        "min": 10,
+        "max": 1000,
+        "description": "Number of trees in the forest"
+      },
+      "max_depth": {
+        "type": "integer", 
+        "default": 10,
+        "min": 1,
+        "max": 50,
+        "description": "Maximum depth of the tree"
+      },
+      "min_samples_split": {
+        "type": "integer",
+        "default": 2,
+        "min": 2,
+        "max": 20,
+        "description": "Minimum number of samples required to split an internal node"
+      },
+      "min_samples_leaf": {
+        "type": "integer",
+        "default": 1,
+        "min": 1,
+        "max": 20,
+        "description": "Minimum number of samples required to be at a leaf node"
+      }
+    }
+  },
+  "neural-network": {
+    "name": "Neural Network",
+    "description": "Multi-layer perceptron for complex pattern recognition",
+    "hyperparameters": {
+      "hidden_layers": {
+        "type": "array",
+        "default": [64, 32],
+        "description": "Size of hidden layers"
+      },
+      "learning_rate": {
+        "type": "float",
+        "default": 0.001,
+        "min": 0.0001,
+        "max": 1.0,
+        "description": "Learning rate for gradient descent"
+      },
+      "epochs": {
+        "type": "integer",
+        "default": 100,
+        "min": 10,
+        "max": 1000,
+        "description": "Number of training epochs"
+      },
+      "batch_size": {
+        "type": "integer",
+        "default": 32,
+        "min": 1,
+        "max": 256,
+        "description": "Batch size for training"
+      }
+    }
+  },
+  "linear-regression": {
+    "name": "Linear Regression",
+    "description": "Linear approach to modeling relationships between variables",
+    "hyperparameters": {
+      "regularization": {
+        "type": "select",
+        "default": "none",
+        "options": ["none", "ridge", "lasso", "elastic_net"],
+        "description": "Regularization method"
+      },
+      "alpha": {
+        "type": "float",
+        "default": 1.0,
+        "min": 0.001,
+        "max": 100.0,
+        "description": "Regularization strength"
+      }
+    }
+  },
+  "svm": {
+    "name": "Support Vector Machine",
+    "description": "Support Vector Machine for classification and regression",
+    "hyperparameters": {
+      "kernel": {
+        "type": "select",
+        "default": "rbf",
+        "options": ["linear", "poly", "rbf", "sigmoid"],
+        "description": "Kernel function"
+      },
+      "C": {
+        "type": "float",
+        "default": 1.0,
+        "min": 0.001,
+        "max": 100.0,
+        "description": "Regularization parameter"
+      },
+      "gamma": {
+        "type": "select",
+        "default": "scale",
+        "options": ["scale", "auto"],
+        "description": "Kernel coefficient"
+      }
+    }
+  }
+}

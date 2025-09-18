@@ -1,6 +1,13 @@
 /**
- * AutoML Pipeline Client - Main Component
- * Phantom Spire Enterprise ML Platform
+ * AUTOML PIPELINE CLIENT - CLIENT COMPONENT
+ *
+ * This is a Next.js Client Component that handles:
+ * - Interactive AutoML pipeline configuration
+ * - State management for pipeline execution
+ * - Real-time monitoring and results display
+ *
+ * IMPORTANT: This component runs on the client and uses React hooks,
+ * event handlers, and browser APIs. Marked with 'use client' directive.
  */
 
 'use client';

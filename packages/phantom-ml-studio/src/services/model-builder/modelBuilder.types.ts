@@ -4,6 +4,7 @@
 
 import { BusinessLogicRequest, BusinessLogicResponse, DataObject, EngineeredFeature, SelectedFeature, EnsembleResult } from '../core';
 
+// Use existing DataObject type from core instead of defining DataRow
 export type DataRow = DataObject;
 
 export type TaskType = 'classification' | 'regression' | 'anomaly_detection' | 'security_threat_detection';
@@ -49,10 +50,6 @@ export interface AutoMLResult {
   ensembleResult?: EnsembleResult;
   trainingTimeSeconds: number;
   totalModelsTrained: number;
-}
-
-export interface DataRow {
-  [key: string]: string | number;
 }
 
 export interface UploadedData {

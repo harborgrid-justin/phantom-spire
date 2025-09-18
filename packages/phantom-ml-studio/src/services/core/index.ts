@@ -143,7 +143,7 @@ export class MLServiceFactory {
       region: process.env.AWS_REGION || 'us-east-1',
       apiEndpoints: {
         storage: process.env.MODEL_STORAGE_URL || 's3://phantom-ml-models',
-        database: process.env.DATABASE_URL || 'postgresql://localhost:5432/phantom_ml'
+        database: process.env.DATABASE_URL || 'postgresql://phantom_dev:dev_password@localhost:5432/phantom_ml_dev'
       },
       credentials: {
         awsAccessKey: process.env.AWS_ACCESS_KEY_ID || '',

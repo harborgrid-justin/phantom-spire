@@ -30,7 +30,7 @@ export function FairnessAnalysis({ analysis }: FairnessAnalysisProps) {
   const formatPercentage = (value: number) => `${(value * 100).toFixed(1)}%`;
 
   return (
-    <Box>
+    <Box data-cy="fairness-metrics">
       <Typography variant="h6" gutterBottom>
         Fairness Analysis by Protected Attributes
       </Typography>

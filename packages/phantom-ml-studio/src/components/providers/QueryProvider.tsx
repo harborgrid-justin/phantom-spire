@@ -1,3 +1,14 @@
+/**
+ * QUERY PROVIDER - CLIENT COMPONENT
+ *
+ * This is a Next.js Client Component that provides:
+ * - React Query client configuration and provider
+ * - Global state management for server state
+ * - Caching and background data synchronization
+ *
+ * IMPORTANT: This component runs on the client and manages query state.
+ * Marked with 'use client' directive.
+ */
 'use client'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'

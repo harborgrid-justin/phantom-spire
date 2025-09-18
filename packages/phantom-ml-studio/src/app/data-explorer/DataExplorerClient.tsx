@@ -37,7 +37,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { dataExplorerService } from '@/services/data-explorer';
 import { Dataset, Column, SampleData } from '@/services/data-explorer';
-import { ServiceContext } from '@/services/core';
+import { ServiceContext } from '@/services/core/types/service.types';
 
 // Error boundary component
 class DataExplorerErrorBoundary extends React.Component<
@@ -179,7 +179,7 @@ const DataExplorerClient: React.FC = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleDatasetChange = useCallback((_newDatasetId: number) => {
+  const handleDatasetChange = useCallback((newDatasetId: number) => {
     setSelectedDatasetId(newDatasetId);
     setSelectedTab(0); // Reset to overview tab
   }, []);

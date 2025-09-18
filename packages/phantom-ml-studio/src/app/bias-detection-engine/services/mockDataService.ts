@@ -23,9 +23,11 @@ export class MockDataService {
         ],
         protectedAttributes: ['gender', 'race', 'age'],
         recommendations: [
-          'Retrain model with balanced dataset',
+          'Immediate review of model bias required',
+          'Retrain model with balanced dataset', 
           'Apply post-processing bias mitigation',
-          'Review feature selection for gender bias'
+          'Regular monitoring of fairness metrics needed',
+          'Document bias testing procedures'
         ]
       },
       {

@@ -15,6 +15,8 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands.ts'
+// import './enhanced-commands.ts'  // Temporarily disabled
+import './types.ts'
 import './index.d.ts'
 
 // Handle React version conflicts and uncaught exceptions

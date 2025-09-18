@@ -94,6 +94,7 @@ export function RunAnalysisDialog({
                   value={config.modelId}
                   onChange={(e) => handleModelChange(e.target.value)}
                   label="Select Model"
+                  data-cy="model-selector"
                 >
                   {availableModels.map((model) => (
                     <MenuItem key={model.id} value={model.id}>
@@ -127,7 +128,7 @@ export function RunAnalysisDialog({
                 Select the attributes to analyze for potential bias (minimum 1 required)
               </Typography>
               
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }} data-cy="protected-attributes">
                 {protectedAttributeOptions.map((attribute) => (
                   <Chip
                     key={attribute}
@@ -137,6 +138,7 @@ export function RunAnalysisDialog({
                     variant={config.protectedAttributes.includes(attribute) ? 'filled' : 'outlined'}
                     size="small"
                     clickable
+                    data-cy={`attribute-${attribute}`}
                   />
                 ))}
               </Box>
@@ -237,6 +239,7 @@ export function RunAnalysisDialog({
           variant="contained"
           onClick={onRunAnalysis}
           disabled={!config.modelId || config.protectedAttributes.length === 0}
+          data-cy="start-analysis"
         >
           Run Analysis
         </Button>

@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Dashboard() {
   return (
     <div style={{ padding: '20px' }}>
@@ -9,9 +11,9 @@ export default function Dashboard() {
         <div data-cy="metric-card">Deployments: 5</div>
       </div>
       <nav data-cy="dashboard-nav">
-        <a href="/model-builder" data-cy="nav-link">Model Builder</a>
-        <a href="/data-explorer" data-cy="nav-link">Data Explorer</a>
-        <a href="/experiments" data-cy="nav-link">Experiments</a>
+        <Link href="/model-builder" data-cy="nav-link">Model Builder</Link>
+        <Link href="/data-explorer" data-cy="nav-link">Data Explorer</Link>
+        <Link href="/experiments" data-cy="nav-link">Experiments</Link>
       </nav>
     </div>
   );

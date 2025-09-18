@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run security check before commit
+echo "🔒 Running pre-commit security checks..."
+node scripts/pre-commit-security-check.js
+
+# Run linting
+echo "🔍 Running linter..."
+npm run lint
+
+# Run boundary checks if available
+if [ -f "scripts/check-boundaries.js" ]; then
+  echo "🏗️  Running component boundary checks..."
+  node scripts/check-boundaries.js
+fi
+
+echo "✅ Pre-commit checks completed successfully!"

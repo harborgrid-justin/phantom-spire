@@ -64,7 +64,7 @@ export function BiasReportTable({
   }
 
   return (
-    <Card>
+    <Card data-cy="bias-reports">
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Recent Bias Reports
@@ -92,6 +92,7 @@ export function BiasReportTable({
                     '&:hover': { backgroundColor: 'action.hover' },
                     backgroundColor: selectedReport?.id === report.id ? 'action.selected' : 'transparent'
                   }}
+                  data-cy="completed-analysis"
                 >
                   <TableCell>
                     <Typography variant="body2" fontWeight="medium">

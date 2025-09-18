@@ -52,7 +52,7 @@ export function BiasMetrics({ metrics }: BiasMetricsProps) {
   };
 
   return (
-    <Card>
+    <Card data-cy="bias-metrics">
       <CardContent>
         <Typography variant="h6" gutterBottom>
           Detailed Bias Metrics
@@ -62,10 +62,12 @@ export function BiasMetrics({ metrics }: BiasMetricsProps) {
         </Typography>
 
         <Grid container spacing={3}>
-          {metrics.map((metric) => (
-            <Grid size={{ xs: 12, md: 6 }} key={metric.metric}>
-              <Card variant="outlined" sx={{ height: '100%' }}>
-                <CardContent>
+          {metrics.map((metric) => {
+            const dataCyAttribute = metric.metric.toLowerCase().replace(/\s+/g, '-');
+            return (
+              <Grid size={{ xs: 12, md: 6 }} key={metric.metric}>
+                <Card variant="outlined" sx={{ height: '100%' }} data-cy={dataCyAttribute}>
+                  <CardContent>
                   {/* Metric Header */}
                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                     <Typography variant="h6" component="h3">
@@ -133,7 +135,8 @@ export function BiasMetrics({ metrics }: BiasMetricsProps) {
                 </CardContent>
               </Card>
             </Grid>
-          ))}
+            );
+          })}
         </Grid>
 
         {metrics.length === 0 && (

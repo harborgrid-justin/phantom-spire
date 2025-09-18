@@ -1,3 +1,14 @@
+/**
+ * CLIENT LAYOUT - CLIENT COMPONENT
+ *
+ * This is a Next.js Client Component that handles:
+ * - Interactive sidebar state management
+ * - Mobile responsive drawer toggle
+ * - Layout composition with sidebar and top bar
+ *
+ * IMPORTANT: This component runs on the client and can use React hooks,
+ * event handlers, and browser APIs. Marked with 'use client' directive.
+ */
 'use client';
 
 import React from 'react';

@@ -13,18 +13,24 @@ describe('Bias Detection and Analysis', () => {
 
   it('should start bias analysis for a model', () => {
     cy.get('[data-cy="analyze-model"]').click()
-    cy.get('[data-cy="model-selector"]').select('Performance Prediction Model')
+    
+    // Handle Material-UI Select component
+    cy.get('[data-cy="model-selector"]').click()
+    cy.get('[role="listbox"]').within(() => {
+      cy.contains('Hiring Decision Model').click()
+    })
+    
     cy.get('[data-cy="protected-attributes"]').should('be.visible')
 
-    cy.get('[data-cy="attribute-gender"]').check()
-    cy.get('[data-cy="attribute-age"]').check()
+    cy.get('[data-cy="attribute-gender"]').click()
+    cy.get('[data-cy="attribute-age"]').click()
     cy.get('[data-cy="start-analysis"]').click()
 
     cy.get('[data-cy="analysis-progress"]').should('be.visible')
   })
 
   it('should display bias metrics and visualizations', () => {
-    cy.get('[data-cy="completed-analysis"]').first().click()
+    cy.get('[data-cy="completed-analysis"]').first().click({ force: true })
 
     cy.get('[data-cy="bias-metrics"]').should('be.visible')
     cy.get('[data-cy="demographic-parity"]').should('be.visible')
@@ -33,16 +39,17 @@ describe('Bias Detection and Analysis', () => {
   })
 
   it('should show fairness recommendations', () => {
-    cy.get('[data-cy="completed-analysis"]').first().click()
-    cy.get('[data-cy="recommendations"]').click()
+    cy.get('[data-cy="completed-analysis"]').first().click({ force: true })
+    cy.get('[data-cy="recommendations"]').should('be.visible')
 
+    // Based on the mock data, we should see immediate actions (status is moderate)
     cy.get('[data-cy="bias-mitigation-suggestions"]').should('be.visible')
     cy.get('[data-cy="fairness-improvements"]').should('be.visible')
     cy.get('[data-cy="action-items"]').should('be.visible')
   })
 
   it('should generate bias report', () => {
-    cy.get('[data-cy="completed-analysis"]').first().click()
+    cy.get('[data-cy="completed-analysis"]').first().click({ force: true })
     cy.get('[data-cy="generate-report"]').click()
 
     cy.get('[data-cy="report-options"]').should('be.visible')

@@ -1,3 +1,13 @@
+/**
+ * HOME PAGE - SERVER COMPONENT
+ *
+ * This is a Next.js Server Component that renders the main landing page.
+ * Contains static content, metadata, and component composition.
+ *
+ * IMPORTANT: This component runs on the server and should not contain
+ * any client-side logic, browser APIs, or React hooks. All interactive
+ * functionality is handled by Child Client Components.
+ */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {

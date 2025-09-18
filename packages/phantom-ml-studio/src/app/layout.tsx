@@ -1,3 +1,14 @@
+/**
+ * ROOT LAYOUT - SERVER COMPONENT
+ *
+ * This is a Next.js Server Component that handles:
+ * - HTML document structure and metadata
+ * - Font loading and configuration
+ * - Provider composition for MUI theme, React Query, and layout
+ *
+ * IMPORTANT: This component runs on the server and should not contain
+ * any client-side logic, browser APIs, or React hooks.
+ */
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";

@@ -1,7 +1,11 @@
 describe('Data Preprocessing Features', () => {
   beforeEach(() => {
     cy.visit('/data-explorer')
-    cy.uploadFile('cypress/fixtures/test-data.csv', '[data-cy="file-upload-input"]')
+    // Wait for page to load and make sure file upload input exists
+    cy.get('[data-cy="file-upload-input"]', { timeout: 10000 }).should('exist')
+    cy.uploadFile('[data-cy="file-upload-input"]', 'cypress/fixtures/test-data.csv')
+    // Wait for file to be processed
+    cy.get('[data-cy="data-loaded"]', { timeout: 15000 }).should('be.visible')
   })
 
   it('should handle missing value imputation', () => {

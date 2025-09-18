@@ -4,140 +4,145 @@
 // ENHANCED CUSTOM COMMANDS FOR PHANTOM ML STUDIO - COMPREHENSIVE EDITION
 // **********************************************************************
 
+export {};
+
 declare global {
   namespace Cypress {
     interface Chainable {
       // ===== NAVIGATION COMMANDS =====
-      navigateToPage(pagePath: string): Chainable<void>;
-      navigateViaSidebar(menuItem: string): Chainable<void>;
-      login(credentials?: { username?: string; password?: string }): Chainable<void>;
-      logout(): Chainable<void>;
+      navigateToPage(pagePath: string): Chainable<Element>;
+      navigateViaSidebar(menuItem: string): Chainable<Element>;
+      login(credentials?: { username?: string; password?: string }): Chainable<Element>;
+      logout(): Chainable<Element>;
+
+      // ===== TEST ENVIRONMENT SETUP =====
+      setupTestEnvironment(environment?: string): Chainable<Element>;
 
       // ===== MATERIAL-UI SPECIFIC COMMANDS =====
-      muiClickButton(dataCy: string, options?: { timeout?: number; force?: boolean }): Chainable<void>;
-      muiSelectOption(dataCy: string, option: string | number, searchable?: boolean): Chainable<void>;
-      muiTypeInTextField(dataCy: string, text: string, options?: { clear?: boolean; delay?: number }): Chainable<void>;
-      muiToggleSwitch(dataCy: string, state?: boolean): Chainable<void>;
-      muiOpenDialog(triggerButton: string): Chainable<void>;
-      muiCloseDialog(method?: 'button' | 'escape' | 'backdrop'): Chainable<void>;
-      muiSelectTab(tabLabel: string | number): Chainable<void>;
-      muiExpandAccordion(dataCy: string, expand?: boolean): Chainable<void>;
-      muiSelectAutocomplete(dataCy: string, option: string, createOption?: boolean): Chainable<void>;
-      muiSelectDatePicker(dataCy: string, date: string): Chainable<void>;
-      muiSelectTimePicker(dataCy: string, time: string): Chainable<void>;
-      muiInteractWithSlider(dataCy: string, value: number): Chainable<void>;
-      muiSelectChip(dataCy: string, chipLabel: string): Chainable<void>;
-      muiDeleteChip(dataCy: string, chipLabel: string): Chainable<void>;
-      muiStepperNavigate(direction: 'next' | 'back' | 'step', stepNumber?: number): Chainable<void>;
+      muiClickButton(dataCy: string, options?: { timeout?: number; force?: boolean }): Chainable<Element>;
+      muiSelectOption(dataCy: string, option: string | number, searchable?: boolean): Chainable<Element>;
+      muiTypeInTextField(dataCy: string, text: string, options?: { clear?: boolean; delay?: number }): Chainable<Element>;
+      muiToggleSwitch(dataCy: string, state?: boolean): Chainable<Element>;
+      muiOpenDialog(triggerButton: string): Chainable<Element>;
+      muiCloseDialog(method?: 'button' | 'escape' | 'backdrop'): Chainable<Element>;
+      muiSelectTab(tabLabel: string | number): Chainable<Element>;
+      muiExpandAccordion(dataCy: string, expand?: boolean): Chainable<Element>;
+      muiSelectAutocomplete(dataCy: string, option: string, createOption?: boolean): Chainable<Element>;
+      muiSelectDatePicker(dataCy: string, date: string): Chainable<Element>;
+      muiSelectTimePicker(dataCy: string, time: string): Chainable<Element>;
+      muiInteractWithSlider(dataCy: string, value: number): Chainable<Element>;
+      muiSelectChip(dataCy: string, chipLabel: string): Chainable<Element>;
+      muiDeleteChip(dataCy: string, chipLabel: string): Chainable<Element>;
+      muiStepperNavigate(direction: 'next' | 'back' | 'step', stepNumber?: number): Chainable<Element>;
 
       // ===== ENHANCED CHART INTERACTION COMMANDS =====
-      waitForChart(chartSelector?: string, timeout?: number): Chainable<void>;
-      waitForRechart(dataCy: string, timeout?: number): Chainable<void>;
-      waitForPlotlyChart(dataCy: string, timeout?: number): Chainable<void>;
-      waitForMuiChart(dataCy: string, timeout?: number): Chainable<void>;
-      verifyChartData(dataCy: string, expectedDataPoints?: number): Chainable<void>;
-      interactWithChart(dataCy: string, action: 'hover' | 'click', coordinates?: { x: number; y: number }): Chainable<void>;
-      captureChartScreenshot(dataCy: string, name: string): Chainable<void>;
-      verifyChartTooltip(expectedContent: string): Chainable<void>;
-      verifyChartLegend(expectedItems: string[]): Chainable<void>;
-      toggleChartSeries(seriesName: string): Chainable<void>;
-      zoomChart(dataCy: string, zoomArea: { x1: number; y1: number; x2: number; y2: number }): Chainable<void>;
-      resetChartZoom(dataCy: string): Chainable<void>;
-      exportChart(dataCy: string, format: 'png' | 'svg' | 'pdf'): Chainable<void>;
+      waitForChart(chartSelector?: string, timeout?: number): Chainable<Element>;
+      waitForRechart(dataCy: string, timeout?: number): Chainable<Element>;
+      waitForPlotlyChart(dataCy: string, timeout?: number): Chainable<Element>;
+      waitForMuiChart(dataCy: string, timeout?: number): Chainable<Element>;
+      verifyChartData(dataCy: string, expectedDataPoints?: number): Chainable<Element>;
+      interactWithChart(dataCy: string, action: 'hover' | 'click', coordinates?: { x: number; y: number }): Chainable<Element>;
+      captureChartScreenshot(dataCy: string, name: string): Chainable<Element>;
+      verifyChartTooltip(expectedContent: string): Chainable<Element>;
+      verifyChartLegend(expectedItems: string[]): Chainable<Element>;
+      toggleChartSeries(seriesName: string): Chainable<Element>;
+      zoomChart(dataCy: string, zoomArea: { x1: number; y1: number; x2: number; y2: number }): Chainable<Element>;
+      resetChartZoom(dataCy: string): Chainable<Element>;
+      exportChart(dataCy: string, format: 'png' | 'svg' | 'pdf'): Chainable<Element>;
 
       // ===== ADVANCED FORM VALIDATION COMMANDS =====
-      fillForm(formData: Record<string, any>): Chainable<void>;
-      fillMuiForm(formData: Record<string, any>): Chainable<void>;
-      validateFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<void>;
-      validateMuiFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<void>;
-      submitForm(formSelector?: string): Chainable<void>;
-      resetForm(formSelector?: string): Chainable<void>;
-      validateFormSubmission(expectedResult: string, timeout?: number): Chainable<void>;
-      testFieldValidation(fieldName: string, testCases: Array<{ value: string; shouldBeValid: boolean; errorMessage?: string }>): Chainable<void>;
+      fillForm(formData: Record<string, any>): Chainable<Element>;
+      fillMuiForm(formData: Record<string, any>): Chainable<Element>;
+      validateFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<Element>;
+      validateMuiFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<Element>;
+      submitForm(formSelector?: string): Chainable<Element>;
+      resetForm(formSelector?: string): Chainable<Element>;
+      validateFormSubmission(expectedResult: string, timeout?: number): Chainable<Element>;
+      testFieldValidation(fieldName: string, testCases: Array<{ value: string; shouldBeValid: boolean; errorMessage?: string }>): Chainable<Element>;
 
       // ===== FILE UPLOAD/DOWNLOAD COMMANDS =====
-      uploadFile(fileSelector: string, filePath: string, mimeType?: string): Chainable<void>;
-      dragAndDropFile(dropZoneSelector: string, filePath: string, fileName?: string): Chainable<void>;
-      downloadFile(downloadTrigger: string, expectedFileName?: string): Chainable<void>;
-      verifyDownload(fileName: string, timeout?: number): Chainable<void>;
-      uploadCSVDataset(filePath: string, datasetName?: string): Chainable<void>;
-      uploadModelFile(filePath: string, modelName?: string): Chainable<void>;
+      uploadFile(fileSelector: string, filePath: string, mimeType?: string): Chainable<Element>;
+      dragAndDropFile(dropZoneSelector: string, filePath: string, fileName?: string): Chainable<Element>;
+      downloadFile(downloadTrigger: string, expectedFileName?: string): Chainable<Element>;
+      verifyDownload(fileName: string, timeout?: number): Chainable<Element>;
+      uploadCSVDataset(filePath: string, datasetName?: string): Chainable<Element>;
+      uploadModelFile(filePath: string, modelName?: string): Chainable<Element>;
 
       // ===== ENHANCED TABLE/DATA GRID COMMANDS =====
-      sortTable(columnSelector: string, direction?: 'asc' | 'desc'): Chainable<void>;
-      sortMuiDataGrid(columnName: string, direction?: 'asc' | 'desc'): Chainable<void>;
-      filterTable(filterValue: string, columnIndex?: number): Chainable<void>;
-      filterMuiDataGrid(columnName: string, filterValue: string, filterType?: 'contains' | 'equals' | 'startsWith'): Chainable<void>;
-      paginateTable(page: number): Chainable<void>;
-      selectTableRow(rowIndex: number, multiple?: boolean): Chainable<void>;
-      selectMuiDataGridRow(rowId: string | number, multiple?: boolean): Chainable<void>;
-      verifyTableData(expectedRowCount: number, columnVerifications?: Array<{ column: number; contains: string }>): Chainable<void>;
-      exportTableData(format: 'csv' | 'json' | 'xlsx'): Chainable<void>;
-      searchInTable(searchTerm: string): Chainable<void>;
+      sortTable(columnSelector: string, direction?: 'asc' | 'desc'): Chainable<Element>;
+      sortMuiDataGrid(columnName: string, direction?: 'asc' | 'desc'): Chainable<Element>;
+      filterTable(filterValue: string, columnIndex?: number): Chainable<Element>;
+      filterMuiDataGrid(columnName: string, filterValue: string, filterType?: 'contains' | 'equals' | 'startsWith'): Chainable<Element>;
+      paginateTable(page: number): Chainable<Element>;
+      selectTableRow(rowIndex: number, multiple?: boolean): Chainable<Element>;
+      selectMuiDataGridRow(rowId: string | number, multiple?: boolean): Chainable<Element>;
+      verifyTableData(expectedRowCount: number, columnVerifications?: Array<{ column: number; contains: string }>): Chainable<Element>;
+      exportTableData(format: 'csv' | 'json' | 'xlsx'): Chainable<Element>;
+      searchInTable(searchTerm: string): Chainable<Element>;
 
       // ===== API & DATA COMMANDS =====
-      mockApiResponse(endpoint: string, response: any, method?: string, statusCode?: number): Chainable<void>;
-      interceptApiCall(endpoint: string, alias: string, method?: string): Chainable<void>;
-      waitForApiResponse(alias: string, timeout?: number): Chainable<void>;
-      verifyApiCall(alias: string, expectedRequest?: any): Chainable<void>;
-      seedTestData(dataType: string, count?: number): Chainable<void>;
-      cleanupTestData(): Chainable<void>;
-      mockMLStudioAPI(): Chainable<void>;
-      mockHuggingFaceAPI(response?: any): Chainable<void>;
+      mockApiResponse(endpoint: string, response: any, method?: string, statusCode?: number): Chainable<Element>;
+      interceptApiCall(endpoint: string, alias: string, method?: string): Chainable<Element>;
+      waitForApiResponse(alias: string, timeout?: number): Chainable<Element>;
+      verifyApiCall(alias: string, expectedRequest?: any): Chainable<Element>;
+      seedTestData(dataType: string, count?: number): Chainable<Element>;
+      cleanupTestData(): Chainable<Element>;
+      mockMLStudioAPI(): Chainable<Element>;
+      mockHuggingFaceAPI(response?: any): Chainable<Element>;
 
       // ===== PERFORMANCE COMMANDS =====
-      measurePageLoad(): Chainable<void>;
-      measureApiResponse(apiAlias: string): Chainable<void>;
-      measureChartRender(chartSelector: string): Chainable<void>;
-      measureFormSubmission(formSelector: string): Chainable<void>;
-      verifyPagePerformance(thresholds?: { loadTime?: number; fcp?: number; lcp?: number }): Chainable<void>;
+      measurePageLoad(): Chainable<Element>;
+      measureApiResponse(apiAlias: string): Chainable<Element>;
+      measureChartRender(chartSelector: string): Chainable<Element>;
+      measureFormSubmission(formSelector: string): Chainable<Element>;
+      verifyPagePerformance(thresholds?: { loadTime?: number; fcp?: number; lcp?: number }): Chainable<Element>;
 
       // ===== ACCESSIBILITY COMMANDS =====
-      checkA11y(context?: string, options?: any): Chainable<void>;
-      injectAxe(): Chainable<void>;
-      checkColorContrast(minRatio?: number): Chainable<void>;
-      checkKeyboardNavigation(startElement?: string): Chainable<void>;
-      checkScreenReaderSupport(): Chainable<void>;
-      verifyAriaLabels(elements: Array<{ selector: string; expectedLabel?: string; expectedRole?: string }>): Chainable<void>;
+      checkA11y(context?: string, options?: any): Chainable<Element>;
+      injectAxe(): Chainable<Element>;
+      checkColorContrast(minRatio?: number): Chainable<Element>;
+      checkKeyboardNavigation(startElement?: string): Chainable<Element>;
+      checkScreenReaderSupport(): Chainable<Element>;
+      verifyAriaLabels(elements: Array<{ selector: string; expectedLabel?: string; expectedRole?: string }>): Chainable<Element>;
 
       // ===== WAIT & RETRY COMMANDS =====
-      waitForElement(selector: string, timeout?: number): Chainable<void>;
-      waitForText(text: string, timeout?: number): Chainable<void>;
-      waitForCondition(conditionFn: () => boolean, timeout?: number, interval?: number): Chainable<void>;
-      retryAction(actionFn: () => void, maxRetries?: number, delay?: number): Chainable<void>;
-      waitForStableElement(selector: string, timeout?: number): Chainable<void>;
-      waitForNetworkIdle(timeout?: number): Chainable<void>;
+      waitForElement(selector: string, timeout?: number): Chainable<Element>;
+      waitForText(text: string, timeout?: number): Chainable<Element>;
+      waitForCondition(conditionFn: () => boolean, timeout?: number, interval?: number): Chainable<Element>;
+      retryAction(actionFn: () => void, maxRetries?: number, delay?: number): Chainable<Element>;
+      waitForStableElement(selector: string, timeout?: number): Chainable<Element>;
+      waitForNetworkIdle(timeout?: number): Chainable<Element>;
 
       // ===== VISUAL TESTING COMMANDS =====
-      matchSnapshot(name: string, options?: any): Chainable<void>;
-      compareScreenshot(name: string, threshold?: number): Chainable<void>;
-      visuallyCompareElement(selector: string, name: string): Chainable<void>;
-      detectVisualRegression(baseline: string, current: string): Chainable<void>;
+      matchSnapshot(name: string, options?: any): Chainable<Element>;
+      compareScreenshot(name: string, threshold?: number): Chainable<Element>;
+      visuallyCompareElement(selector: string, name: string): Chainable<Element>;
+      detectVisualRegression(baseline: string, current: string): Chainable<Element>;
 
       // ===== ML STUDIO SPECIFIC COMMANDS =====
-      createModel(modelConfig: any): Chainable<void>;
-      trainModel(modelId: string, trainingConfig?: any): Chainable<void>;
-      runExperiment(experimentConfig: any): Chainable<void>;
-      deployModel(modelId: string, deploymentConfig?: any): Chainable<void>;
-      uploadDataset(filePath: string, datasetName?: string, datasetType?: string): Chainable<void>;
-      validateChartRender(chartType: 'line' | 'bar' | 'scatter' | 'pie' | 'heatmap'): Chainable<void>;
-      monitorModelPerformance(modelId: string): Chainable<void>;
-      runBiasDetection(datasetId: string, sensitiveAttributes: string[]): Chainable<void>;
+      createModel(modelConfig: any): Chainable<Element>;
+      trainModel(modelId: string, trainingConfig?: any): Chainable<Element>;
+      runExperiment(experimentConfig: any): Chainable<Element>;
+      deployModel(modelId: string, deploymentConfig?: any): Chainable<Element>;
+      uploadDataset(filePath: string, datasetName?: string, datasetType?: string): Chainable<Element>;
+      validateChartRender(chartType: 'line' | 'bar' | 'scatter' | 'pie' | 'heatmap'): Chainable<Element>;
+      monitorModelPerformance(modelId: string): Chainable<Element>;
+      runBiasDetection(datasetId: string, sensitiveAttributes: string[]): Chainable<Element>;
 
       // ===== ADVANCED INTERACTION COMMANDS =====
-      dragAndDrop(sourceSelector: string, targetSelector: string): Chainable<void>;
-      simulateKeyboardShortcut(shortcut: string): Chainable<void>;
-      simulateMouseGesture(gesture: 'double-click' | 'right-click' | 'long-press', selector: string): Chainable<void>;
-      simulateTouch(selector: string, gesture: 'tap' | 'swipe' | 'pinch'): Chainable<void>;
-      resizeElement(selector: string, dimensions: { width: number; height: number }): Chainable<void>;
+      dragAndDrop(sourceSelector: string, targetSelector: string): Chainable<Element>;
+      simulateKeyboardShortcut(shortcut: string): Chainable<Element>;
+      simulateMouseGesture(gesture: 'double-click' | 'right-click' | 'long-press', selector: string): Chainable<Element>;
+      simulateTouch(selector: string, gesture: 'tap' | 'swipe' | 'pinch'): Chainable<Element>;
+      resizeElement(selector: string, dimensions: { width: number; height: number }): Chainable<Element>;
 
       // ===== ERROR HANDLING & DEBUGGING =====
-      handleError(errorType: string, recoveryAction?: () => void): Chainable<void>;
-      debugElement(selector: string): Chainable<void>;
-      logTestStep(step: string, data?: any): Chainable<void>;
-      takeDebugScreenshot(name?: string): Chainable<void>;
-      savePageState(name: string): Chainable<void>;
-      restorePageState(name: string): Chainable<void>;
+      handleError(errorType: string, recoveryAction?: () => void): Chainable<Element>;
+      debugElement(selector: string): Chainable<Element>;
+      logTestStep(step: string, data?: any): Chainable<Element>;
+      takeDebugScreenshot(name?: string): Chainable<Element>;
+      savePageState(name: string): Chainable<Element>;
+      restorePageState(name: string): Chainable<Element>;
     }
   }
 }
@@ -145,6 +150,63 @@ declare global {
 // **********************************************************************
 // NAVIGATION COMMANDS
 // **********************************************************************
+
+Cypress.Commands.add('setupTestEnvironment', (environment = 'default') => {
+  cy.log(`Setting up test environment: ${environment}`);
+
+  // Mock common API endpoints based on environment
+  switch (environment) {
+    case 'ml-models':
+      // Mock ML-specific endpoints
+      cy.intercept('GET', '/api/models', { fixture: 'models.json' }).as('getModels');
+      cy.intercept('GET', '/api/datasets', { fixture: 'test-data.csv' }).as('getDatasets');
+      cy.intercept('GET', '/api/algorithms', { 
+        body: { algorithms: ['random-forest', 'neural-network', 'linear-regression', 'svm'] } 
+      }).as('getAlgorithms');
+      cy.intercept('POST', '/api/models/train', { statusCode: 202, body: { status: 'started' } }).as('trainModel');
+      cy.intercept('GET', '/api/models/*/status', { body: { status: 'completed' } }).as('getTrainingStatus');
+      cy.intercept('GET', '/api/experiments', { fixture: 'experiments.json' }).as('getExperiments');
+      break;
+
+    case 'dashboard':
+      // Mock dashboard-specific endpoints
+      cy.intercept('GET', '/api/dashboard/metrics', { fixture: 'dashboard-metrics.json' }).as('getDashboardMetrics');
+      cy.intercept('GET', '/api/dashboard/charts/**', { fixture: 'api-responses.json' }).as('getChartData');
+      break;
+
+    case 'default':
+    default:
+      // Mock basic endpoints for all tests
+      cy.intercept('GET', '/api/health', { body: { status: 'healthy' } }).as('healthCheck');
+      cy.intercept('GET', '/api/user/profile', { 
+        body: { id: 1, name: 'Test User', email: 'test@example.com' } 
+      }).as('getUserProfile');
+      break;
+  }
+
+  // Setup common test data in localStorage
+  cy.window().then((win) => {
+    win.localStorage.setItem('cypress_test_mode', 'true');
+    win.localStorage.setItem('test_environment', environment);
+  });
+
+  // Seed any required test data
+  cy.seedTestData('models', 5);
+  cy.seedTestData('experiments', 3);
+  cy.seedTestData('datasets', 10);
+
+  // Clear any existing notifications or modals
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-cy="notification"]').length) {
+      cy.get('[data-cy="notification-dismiss"]').click({ multiple: true });
+    }
+    if ($body.find('[role="dialog"]').length) {
+      cy.get('[role="dialog"] [aria-label="close"]').click({ multiple: true });
+    }
+  });
+
+  cy.log(`Test environment '${environment}' setup complete`);
+});
 
 Cypress.Commands.add('navigateToPage', (pagePath: string) => {
   cy.visit(pagePath);
@@ -451,6 +513,79 @@ Cypress.Commands.add('validateMuiFormField', (fieldName: string, expectedValidat
 });
 
 // **********************************************************************
+// FILE UPLOAD/DOWNLOAD COMMANDS
+// **********************************************************************
+
+Cypress.Commands.add('uploadFile', (fileSelector: string, filePath: string, mimeType?: string) => {
+  cy.log(`Uploading file ${filePath} to ${fileSelector}`)
+  cy.get(fileSelector).should('exist')
+  
+  const selectFileOptions: any = { force: true }
+  if (mimeType) {
+    selectFileOptions.mimeType = mimeType
+  }
+  
+  cy.get(fileSelector).selectFile(filePath, selectFileOptions)
+  cy.wait(1000) // Allow time for file processing
+  cy.log('File upload completed')
+})
+
+Cypress.Commands.add('dragAndDropFile', (dropZoneSelector: string, filePath: string, fileName?: string) => {
+  cy.get(dropZoneSelector).should('be.visible')
+  
+  cy.get(dropZoneSelector).selectFile(filePath, {
+    action: 'drag-drop',
+    force: true
+  })
+  
+  if (fileName) {
+    cy.log(`File ${fileName} dropped successfully`)
+  }
+  
+  cy.wait(1500) // Allow time for drag-drop processing
+})
+
+Cypress.Commands.add('downloadFile', (downloadTrigger: string, expectedFileName?: string) => {
+  cy.get(downloadTrigger).click()
+  
+  if (expectedFileName) {
+    cy.readFile(`cypress/downloads/${expectedFileName}`, { timeout: 10000 }).should('exist')
+  }
+})
+
+Cypress.Commands.add('verifyDownload', (fileName: string, timeout = 10000) => {
+  cy.readFile(`cypress/downloads/${fileName}`, { timeout }).should('exist')
+})
+
+Cypress.Commands.add('uploadCSVDataset', (filePath: string, datasetName?: string) => {
+  cy.navigateToPage('/data-explorer')
+  cy.muiClickButton('upload-dataset-button')
+  
+  cy.uploadFile('[data-cy="file-upload"]', filePath, 'text/csv')
+  
+  if (datasetName) {
+    cy.muiTypeInTextField('dataset-name', datasetName)
+  }
+  
+  cy.muiClickButton('save-dataset-button')
+  cy.waitForText('Dataset uploaded successfully')
+})
+
+Cypress.Commands.add('uploadModelFile', (filePath: string, modelName?: string) => {
+  cy.navigateToPage('/model-builder')
+  cy.muiClickButton('upload-model-button')
+  
+  cy.uploadFile('[data-cy="model-file-upload"]', filePath)
+  
+  if (modelName) {
+    cy.muiTypeInTextField('model-name', modelName)
+  }
+  
+  cy.muiClickButton('save-model-button')
+  cy.waitForText('Model uploaded successfully')
+})
+
+// **********************************************************************
 // ML STUDIO SPECIFIC COMMANDS
 // **********************************************************************
 
@@ -623,6 +758,14 @@ Cypress.Commands.add('checkA11y', (context?: string, options?: any) => {
 // **********************************************************************
 // ENHANCED WAIT COMMANDS
 // **********************************************************************
+
+Cypress.Commands.add('waitForElement', (selector: string, timeout = 10000) => {
+  cy.get(selector, { timeout }).should('exist').and('be.visible')
+})
+
+Cypress.Commands.add('waitForText', (text: string, timeout = 10000) => {
+  cy.contains(text, { timeout }).should('be.visible')
+})
 
 Cypress.Commands.add('waitForCondition', (conditionFn: () => boolean, timeout = 10000, interval = 100) => {
   const startTime = Date.now();

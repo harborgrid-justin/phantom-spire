@@ -1,4 +1,14 @@
-// src/theme/ThemeRegistry.tsx
+/**
+ * THEME REGISTRY - CLIENT COMPONENT
+ *
+ * This is a Next.js Client Component that provides:
+ * - MUI theme context and provider setup
+ * - CSS baseline normalization
+ * - App Router cache provider for MUI
+ *
+ * IMPORTANT: This component runs on the client and provides theme context
+ * to all child components. Marked with 'use client' directive.
+ */
 'use client';
 
 import React from 'react';
