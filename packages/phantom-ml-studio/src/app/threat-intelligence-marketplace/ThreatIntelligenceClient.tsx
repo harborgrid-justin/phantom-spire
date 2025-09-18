@@ -1,98 +1,42 @@
+/**
+ * Threat Intelligence Marketplace
+ * Comprehensive threat intelligence feed management and data analysis
+ */
+
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  
-  Button,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Alert,
+  Box,
+  Button,
   CircularProgress,
-  TextField,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Rating,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tabs,
   Tab,
-  Badge,
-  IconButton
+  Tabs,
+  Typography
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import { Security } from '@mui/icons-material';
+import { ThreatFeed, ThreatData } from './types';
 import {
-  Search,
-  Security,
-  ShoppingCart,
-  Star,
-  Download,
-  Visibility,
-  TrendingUp,
-  Warning,
-  CheckCircle,
-  Public,
-  Lock,
-  AttachMoney,
-  FilterList
-} from '@mui/icons-material';
-
-interface ThreatFeed {
-  id: string;
-  name: string;
-  provider: string;
-  description: string;
-  category: 'malware' | 'phishing' | 'botnet' | 'apt' | 'vulnerability' | 'ioc';
-  pricing: 'free' | 'paid' | 'freemium';
-  price?: number;
-  rating: number;
-  reviews: number;
-  updates: 'realtime' | 'hourly' | 'daily' | 'weekly';
-  format: 'json' | 'xml' | 'csv' | 'stix' | 'taxii';
-  coverage: string[];
-  confidence: number;
-  subscribed: boolean;
-  lastUpdate: Date;
-}
-
-interface ThreatData {
-  id: string;
-  type: string;
-  indicator: string;
-  confidence: number;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  source: string;
-  firstSeen: Date;
-  lastSeen: Date;
-  tags: string[];
-}
+  FeedCard,
+  FilterBar,
+  ThreatDataTable,
+  SubscriptionCard,
+  FeedDetailsDialog
+} from './components';
 
 export default function ThreatIntelligenceClient() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [threatFeeds, setThreatFeeds] = useState<ThreatFeed[]>([]);
   const [threatData, setThreatData] = useState<ThreatData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [pricingFilter, setPricingFilter] = useState<string>('all');
-  const [selectedFeed, setSelectedFeed] = useState<ThreatFeed | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [pricingFilter, setPricingFilter] = useState('all');
   const [feedDetailsOpen, setFeedDetailsOpen] = useState(false);
+  const [selectedFeed, setSelectedFeed] = useState<ThreatFeed | null>(null);
 
   useEffect(() => {
     fetchThreatFeeds();
@@ -101,98 +45,115 @@ export default function ThreatIntelligenceClient() {
 
   const fetchThreatFeeds = async () => {
     try {
-      // Mock data - replace with actual API calls
+      // Mock threat intelligence feeds data
       const mockFeeds: ThreatFeed[] = [
         {
           id: 'feed_1',
           name: 'Global Malware Intelligence',
-          provider: 'CyberThreat Corp',
-          description: 'Comprehensive malware indicators and family classifications',
+          description: 'Comprehensive malware indicators from multiple sources with real-time updates',
+          provider: 'CyberThreat Labs',
           category: 'malware',
           pricing: 'paid',
-          price: 299,
-          rating: 4.8,
-          reviews: 156,
-          updates: 'realtime',
-          format: 'json',
-          coverage: ['Windows', 'Linux', 'Android', 'iOS'],
+          price: '$99/month',
           confidence: 95,
-          subscribed: true,
-          lastUpdate: new Date(Date.now() - 3600000)
+          coverage: ['File Hashes', 'URLs', 'Domains'],
+          updates: 'Real-time',
+          lastUpdate: new Date(),
+          format: 'json',
+          subscribed: false,
+          subscribers: 1250,
+          rating: 4.8
         },
         {
-          id: 'feed_2',
+          id: 'feed_2', 
           name: 'Phishing URL Database',
-          provider: 'SecureWeb Solutions',
-          description: 'Real-time phishing URL detection and classification',
+          description: 'Curated database of phishing URLs and domains updated hourly',
+          provider: 'SecurityFirst Inc',
           category: 'phishing',
           pricing: 'freemium',
-          price: 99,
-          rating: 4.6,
-          reviews: 89,
-          updates: 'hourly',
+          confidence: 88,
+          coverage: ['URLs', 'Domains', 'Email Addresses'],
+          updates: 'Hourly',
+          lastUpdate: new Date(Date.now() - 3600000),
           format: 'csv',
-          coverage: ['Web', 'Email'],
-          confidence: 92,
-          subscribed: false,
-          lastUpdate: new Date(Date.now() - 1800000)
+          subscribed: true,
+          subscribers: 850,
+          rating: 4.5
         },
         {
           id: 'feed_3',
-          name: 'APT Indicators Feed',
-          provider: 'ThreatHunter Labs',
-          description: 'Advanced persistent threat indicators and TTPs',
-          category: 'apt',
+          name: 'Botnet C&C Tracker',
+          description: 'Command and control server tracking with botnet family attribution',
+          provider: 'ThreatIntel Pro',
+          category: 'botnet',
           pricing: 'paid',
-          price: 599,
-          rating: 4.9,
-          reviews: 234,
-          updates: 'daily',
-          format: 'stix',
-          coverage: ['Enterprise', 'Government'],
-          confidence: 98,
-          subscribed: true,
-          lastUpdate: new Date(Date.now() - 7200000)
+          price: '$149/month',
+          confidence: 92,
+          coverage: ['IP Addresses', 'Domains', 'Network Traffic'],
+          updates: 'Every 6 hours',
+          lastUpdate: new Date(Date.now() - 21600000),
+          format: 'xml',
+          subscribed: false,
+          subscribers: 320,
+          rating: 4.7
         },
         {
           id: 'feed_4',
-          name: 'Open Source IOCs',
-          provider: 'Community Contributors',
-          description: 'Community-driven indicators of compromise',
-          category: 'ioc',
-          pricing: 'free',
-          rating: 4.2,
-          reviews: 67,
-          updates: 'daily',
-          format: 'json',
-          coverage: ['General'],
-          confidence: 78,
+          name: 'APT Indicators Feed',
+          description: 'Advanced Persistent Threat indicators with campaign attribution',
+          provider: 'Elite Threat Research',
+          category: 'apt',
+          pricing: 'paid',
+          price: '$299/month',
+          confidence: 96,
+          coverage: ['All Indicator Types', 'TTPs', 'Campaign Data'],
+          updates: 'Daily',
+          lastUpdate: new Date(Date.now() - 86400000),
+          format: 'stix',
           subscribed: true,
-          lastUpdate: new Date(Date.now() - 14400000)
+          subscribers: 75,
+          rating: 4.9
         },
         {
           id: 'feed_5',
-          name: 'Botnet C&C Tracker',
-          provider: 'NetDefense Inc',
-          description: 'Command and control infrastructure tracking',
-          category: 'botnet',
-          pricing: 'paid',
-          price: 199,
-          rating: 4.7,
-          reviews: 112,
-          updates: 'realtime',
-          format: 'xml',
-          coverage: ['Network'],
-          confidence: 94,
+          name: 'Open Source Intelligence',
+          description: 'Community-driven threat intelligence from open sources',
+          provider: 'OSINT Collective',
+          category: 'ioc',
+          pricing: 'free',
+          confidence: 75,
+          coverage: ['Various IOCs', 'OSINT Reports'],
+          updates: 'Weekly',
+          lastUpdate: new Date(Date.now() - 604800000),
+          format: 'json',
           subscribed: false,
-          lastUpdate: new Date(Date.now() - 900000)
+          subscribers: 2100,
+          rating: 4.2
+        },
+        {
+          id: 'feed_6',
+          name: 'Vulnerability Exploit Database',
+          description: 'Real-time vulnerability and exploit intelligence',
+          provider: 'VulnTrack Systems',
+          category: 'vulnerability',
+          pricing: 'paid',
+          price: '$199/month',
+          confidence: 89,
+          coverage: ['CVE IDs', 'Exploit Code', 'PoC URLs'],
+          updates: 'Real-time',
+          lastUpdate: new Date(Date.now() - 1800000),
+          format: 'json',
+          subscribed: true,
+          subscribers: 540,
+          rating: 4.6
         }
       ];
 
       setThreatFeeds(mockFeeds);
-      setLoading(false);
-    } catch (_err) {
-      setError('Failed to fetch threat feeds');
+    } catch (err) {
+      console.error('Failed to fetch threat feeds:', err);
+      setError('Failed to load threat feeds');
+    } finally {
       setLoading(false);
     }
   };
@@ -247,7 +208,7 @@ export default function ThreatIntelligenceClient() {
       ];
 
       setThreatData(mockThreatData);
-    } catch (_err) {
+    } catch (err) {
       console.error('Failed to fetch threat data:', err);
     }
   };
@@ -262,46 +223,31 @@ export default function ThreatIntelligenceClient() {
     return matchesSearch && matchesCategory && matchesPricing;
   });
 
-  const handleSubscribe = async (_feedId: string) => {
+  const subscribedFeeds = threatFeeds.filter(feed => feed.subscribed);
+
+  const handleSubscribe = async (feedId: string) => {
     try {
       setThreatFeeds(feeds => feeds.map(feed =>
         feed.id === feedId ? { ...feed, subscribed: true } : feed
       ));
-    } catch (_err) {
+    } catch {
       setError('Failed to subscribe to feed');
     }
   };
 
-  const handleUnsubscribe = async (_feedId: string) => {
+  const handleUnsubscribe = async (feedId: string) => {
     try {
       setThreatFeeds(feeds => feeds.map(feed =>
         feed.id === feedId ? { ...feed, subscribed: false } : feed
       ));
-    } catch (_err) {
+    } catch {
       setError('Failed to unsubscribe from feed');
     }
   };
 
-  const getCategoryColor = (_category: string) => {
-    const colors: { [key: string]: any } = {
-      'malware': 'error',
-      'phishing': 'warning',
-      'botnet': 'info',
-      'apt': 'secondary',
-      'vulnerability': 'primary',
-      'ioc': 'success'
-    };
-    return colors[category] || 'default';
-  };
-
-  const getSeverityColor = (_severity: string) => {
-    switch (severity) {
-      case 'critical': return 'error';
-      case 'high': return 'warning';
-      case 'medium': return 'info';
-      case 'low': return 'success';
-      default: return 'default';
-    }
+  const handleViewDetails = (feed: ThreatFeed) => {
+    setSelectedFeed(feed);
+    setFeedDetailsOpen(true);
   };
 
   if (loading) {
@@ -342,314 +288,76 @@ export default function ThreatIntelligenceClient() {
       {/* Available Feeds Tab */}
       {activeTab === 0 && (
         <Box>
-          {/* Filters */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Grid container spacing={2} alignItems="center">
-                <Grid size={{ xs: 12, md: 4 }}>
-                  <TextField
-                    fullWidth
-                    placeholder="Search feeds..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Search />
-                        </InputAdornment>
-                      )
-                    }}
-                  />
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Category</InputLabel>
-                    <Select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-                      <MenuItem value="all">All Categories</MenuItem>
-                      <MenuItem value="malware">Malware</MenuItem>
-                      <MenuItem value="phishing">Phishing</MenuItem>
-                      <MenuItem value="botnet">Botnet</MenuItem>
-                      <MenuItem value="apt">APT</MenuItem>
-                      <MenuItem value="vulnerability">Vulnerability</MenuItem>
-                      <MenuItem value="ioc">IOC</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 12, md: 3 }}>
-                  <FormControl fullWidth>
-                    <InputLabel>Pricing</InputLabel>
-                    <Select value={pricingFilter} onChange={(e) => setPricingFilter(e.target.value)}>
-                      <MenuItem value="all">All Pricing</MenuItem>
-                      <MenuItem value="free">Free</MenuItem>
-                      <MenuItem value="freemium">Freemium</MenuItem>
-                      <MenuItem value="paid">Paid</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+          <FilterBar
+            searchTerm={searchTerm}
+            categoryFilter={categoryFilter}
+            pricingFilter={pricingFilter}
+            onSearchChange={setSearchTerm}
+            onCategoryChange={setCategoryFilter}
+            onPricingChange={setPricingFilter}
+          />
 
-          {/* Feeds Grid */}
           <Grid container spacing={3}>
             {filteredFeeds.map((feed) => (
               <Grid size={{ xs: 12, md: 6, lg: 4 }} key={feed.id}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="start" mb={2}>
-                      <Typography variant="h6" component="h3" gutterBottom>
-                        {feed.name}
-                      </Typography>
-                      <Chip
-                        label={feed.category}
-                        color={getCategoryColor(feed.category)}
-                        size="small"
-                      />
-                    </Box>
-
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      by {feed.provider}
-                    </Typography>
-
-                    <Typography variant="body2" paragraph>
-                      {feed.description}
-                    </Typography>
-
-                    <Box display="flex" alignItems="center" mb={2}>
-                      <Rating value={feed.rating} precision={0.1} readOnly size="small" />
-                      <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                        ({feed.reviews} reviews)
-                      </Typography>
-                    </Box>
-
-                    <Box mb={2}>
-                      <Typography variant="body2" color="text.secondary">
-                        Updates: <strong>{feed.updates}</strong>
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Confidence: <strong>{feed.confidence}%</strong>
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Format: <strong>{feed.format.toUpperCase()}</strong>
-                      </Typography>
-                    </Box>
-
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Box>
-                        {feed.pricing === 'free' ? (
-                          <Chip label="FREE" color="success" size="small" />
-                        ) : feed.pricing === 'freemium' ? (
-                          <Chip label="FREEMIUM" color="warning" size="small" />
-                        ) : (
-                          <Chip
-                            label={`$${feed.price}/month`}
-                            color="primary"
-                            size="small"
-                            icon={<AttachMoney />}
-                          />
-                        )}
-                      </Box>
-                      <Box>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            setSelectedFeed(feed);
-                            setFeedDetailsOpen(true);
-                          }}
-                        >
-                          <Visibility />
-                        </IconButton>
-                        {feed.subscribed ? (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            color="error"
-                            onClick={() => handleUnsubscribe(feed.id)}
-                          >
-                            Unsubscribe
-                          </Button>
-                        ) : (
-                          <Button
-                            size="small"
-                            variant="contained"
-                            onClick={() => handleSubscribe(feed.id)}
-                          >
-                            Subscribe
-                          </Button>
-                        )}
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
+                <FeedCard
+                  feed={feed}
+                  onSubscribe={handleSubscribe}
+                  onUnsubscribe={handleUnsubscribe}
+                  onViewDetails={handleViewDetails}
+                />
               </Grid>
             ))}
           </Grid>
+
+          {filteredFeeds.length === 0 && (
+            <Box textAlign="center" py={8}>
+              <Typography variant="h6" color="text.secondary">
+                No feeds found matching your criteria
+              </Typography>
+            </Box>
+          )}
         </Box>
       )}
 
       {/* My Subscriptions Tab */}
       {activeTab === 1 && (
-        <Grid container spacing={3}>
-          {threatFeeds.filter(feed => feed.subscribed).map((feed) => (
-            <Grid size={{ xs: 12 }} key={feed.id}>
-              <Card>
-                <CardContent>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Typography variant="h6">{feed.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {feed.provider}
-                      </Typography>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 2 }}>
-                      <Chip
-                        label={feed.category}
-                        color={getCategoryColor(feed.category)}
-                        size="small"
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 2 }}>
-                      <Typography variant="body2">
-                        Updates: {feed.updates}
-                      </Typography>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 2 }}>
-                      <Typography variant="body2">
-                        Last Update: {feed.lastUpdate.toLocaleString()}
-                      </Typography>
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 3 }}>
-                      <Box display="flex" gap={1}>
-                        <Button size="small" startIcon={<Download />}>
-                          Download
-                        </Button>
-                        <Button size="small" variant="outlined" color="error">
-                          Unsubscribe
-                        </Button>
-                      </Box>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            </Grid>
+        <Grid container spacing={2}>
+          {subscribedFeeds.map((feed) => (
+            <SubscriptionCard
+              key={feed.id}
+              feed={feed}
+              onUnsubscribe={handleUnsubscribe}
+            />
           ))}
+
+          {subscribedFeeds.length === 0 && (
+            <Grid size={{ xs: 12 }}>
+              <Box textAlign="center" py={8}>
+                <Typography variant="h6" color="text.secondary">
+                  No active subscriptions
+                </Typography>
+                <Typography variant="body2" color="text.secondary" mt={1}>
+                  Browse available feeds to start subscribing
+                </Typography>
+              </Box>
+            </Grid>
+          )}
         </Grid>
       )}
 
       {/* Threat Data Tab */}
       {activeTab === 2 && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Recent Threat Indicators
-            </Typography>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Indicator</TableCell>
-                    <TableCell>Severity</TableCell>
-                    <TableCell>Confidence</TableCell>
-                    <TableCell>Source</TableCell>
-                    <TableCell>First Seen</TableCell>
-                    <TableCell>Tags</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {threatData.map((threat) => (
-                    <TableRow key={threat.id}>
-                      <TableCell>{threat.type}</TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {threat.indicator}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={threat.severity}
-                          color={getSeverityColor(threat.severity) as any}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{threat.confidence}%</TableCell>
-                      <TableCell>{threat.source}</TableCell>
-                      <TableCell>{threat.firstSeen.toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Box>
-                          {threat.tags.map((tag) => (
-                            <Chip key={tag} label={tag} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-                          ))}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
-        </Card>
+        <ThreatDataTable threatData={threatData} />
       )}
 
       {/* Feed Details Dialog */}
-      <Dialog open={feedDetailsOpen} onClose={() => setFeedDetailsOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{selectedFeed?.name}</DialogTitle>
-        <DialogContent>
-          {selectedFeed && (
-            <Box>
-              <Typography variant="body1" paragraph>
-                {selectedFeed.description}
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Provider:</strong> {selectedFeed.provider}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Category:</strong> {selectedFeed.category}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Updates:</strong> {selectedFeed.updates}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Format:</strong> {selectedFeed.format.toUpperCase()}
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Confidence:</strong> {selectedFeed.confidence}%
-                  </Typography>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Typography variant="body2">
-                    <strong>Coverage:</strong> {selectedFeed.coverage.join(', ')}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFeedDetailsOpen(false)}>Close</Button>
-          {selectedFeed && !selectedFeed.subscribed && (
-            <Button
-              variant="contained"
-              onClick={() => {
-                handleSubscribe(selectedFeed.id);
-                setFeedDetailsOpen(false);
-              }}
-            >
-              Subscribe
-            </Button>
-          )}
-        </DialogActions>
-      </Dialog>
+      <FeedDetailsDialog
+        feed={selectedFeed}
+        open={feedDetailsOpen}
+        onClose={() => setFeedDetailsOpen(false)}
+        onSubscribe={handleSubscribe}
+      />
     </Box>
   );
 }

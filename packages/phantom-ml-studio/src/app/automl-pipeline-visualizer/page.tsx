@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 function AutoMLPipelineSkeleton() {
   return (
-    <div className="animate-pulse space-y-6 p-4">
+    <div className="animate-pulse space-y-6 p-4" data-cy="page-loading">
       <div className="h-8 bg-gray-200 rounded w-72"></div>
       <div className="flex gap-4">
         <div className="w-64 bg-gray-200 rounded-lg h-96"></div>

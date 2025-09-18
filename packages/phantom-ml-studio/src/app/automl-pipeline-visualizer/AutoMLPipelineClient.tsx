@@ -1,95 +1,102 @@
+/**
+ * AutoML Pipeline Client - Main Component
+ * Phantom Spire Enterprise ML Platform
+ */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
-  Button,
-  LinearProgress,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Alert,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Stepper,
-  Step,
-  StepLabel
+  Snackbar,
+  Button
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import {
-  PlayArrow,
-  Pause,
-  Stop,
-  Refresh
-} from '@mui/icons-material';
 
-interface Pipeline {
-  id: string;
-  name: string;
-  status: 'running' | 'completed' | 'failed' | 'paused' | 'pending';
-  progress: number;
-  currentStep: string;
-  algorithm: string;
-  accuracy: number;
-  startTime: Date;
-  estimatedTime: number;
-  datasetId: string;
-}
+// Component imports
+import PipelineTemplates from './components/PipelineTemplates';
+import RecentPipelines from './components/RecentPipelines';
+import PipelineOverview from './components/PipelineOverview';
+import PipelineSteps from './components/PipelineSteps';
+import AlgorithmPerformanceComponent from './components/AlgorithmPerformance';
 
-interface PipelineStep {
-  id: string;
-  name: string;
-  status: 'completed' | 'running' | 'pending' | 'failed';
-  duration: number;
-  metrics?: Record<string, number>;
-}
-
-interface AlgorithmPerformance {
-  algorithm: string;
-  accuracy: number;
-  f1Score: number;
-  precision: number;
-  recall: number;
-  trainingTime: number;
-  status: 'completed' | 'running' | 'failed';
-}
+// Type imports
+import type {
+  Pipeline,
+  PipelineStep,
+  AlgorithmPerformance,
+  PipelineConfig,
+  PipelineTemplate,
+  ExecutionState,
+  DialogStates,
+  NotificationStates
+} from './types';
 
 export default function AutoMLPipelineClient() {
+  // State management
   const [pipelines, setPipelines] = useState<Pipeline[]>([]);
   const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
   const [pipelineSteps, setPipelineSteps] = useState<PipelineStep[]>([]);
   const [algorithmPerformance, setAlgorithmPerformance] = useState<AlgorithmPerformance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [newPipelineConfig, setNewPipelineConfig] = useState({
+  
+  // Dialog states - for future dialog implementations
+  const [dialogStates, setDialogStates] = useState<DialogStates>({
+    createDialogOpen: false,
+    cloneDialogOpen: false,
+    templateDetailsOpen: false,
+    draftNameDialog: false,
+    estimationDialog: false,
+    executionConfirmOpen: false
+  });
+  
+  // Notification states
+  const [notificationStates, setNotificationStates] = useState<NotificationStates>({
+    showTemplateApplied: false,
+    showPipelineCloned: false,
+    showDraftSaved: false,
+    showCreationError: false,
+    showTimeEstimation: false,
+    showDatasetPreview: false,
+    uploadProgress: false,
+    uploadSuccess: false
+  });
+  
+  // Execution states - for future execution monitoring
+  const [executionState, setExecutionState] = useState<ExecutionState>({
+    isExecuting: false,
+    executionPaused: false,
+    executionComplete: false,
+    executionError: false
+  });
+  
+  // Pipeline configuration - for future create dialog
+  const [newPipelineConfig, setNewPipelineConfig] = useState<PipelineConfig>({
     name: '',
     datasetId: '',
     maxTrainingTime: 60,
-    algorithms: [] as string[]
+    algorithms: [],
+    objective: '',
+    targetColumn: '',
+    optimizationMetric: 'accuracy',
+    timeConstraint: 60,
+    memoryConstraint: 8,
+    modelComplexity: 'medium',
+    interpretabilityLevel: 'high'
   });
 
+  // Effect for data fetching
   useEffect(() => {
     fetchPipelines();
     const interval = setInterval(fetchPipelines, 5000);
     return () => clearInterval(interval);
   }, []);
 
+  // Data fetching function
   const fetchPipelines = async () => {
     try {
       // Mock data - replace with actual API calls
@@ -102,8 +109,8 @@ export default function AutoMLPipelineClient() {
           currentStep: 'Feature Engineering',
           algorithm: 'Random Forest',
           accuracy: 0.87,
-          startTime: new Date(Date.now() - 1800000), // 30 minutes ago
-          estimatedTime: 900000, // 15 minutes
+          startTime: new Date(Date.now() - 1800000),
+          estimatedTime: 900000,
           datasetId: 'dataset_customer_churn'
         },
         {
@@ -114,7 +121,7 @@ export default function AutoMLPipelineClient() {
           currentStep: 'Model Validation',
           algorithm: 'Gradient Boosting',
           accuracy: 0.94,
-          startTime: new Date(Date.now() - 3600000), // 1 hour ago
+          startTime: new Date(Date.now() - 3600000),
           estimatedTime: 0,
           datasetId: 'dataset_fraud'
         },
@@ -126,9 +133,21 @@ export default function AutoMLPipelineClient() {
           currentStep: 'Model Training',
           algorithm: 'XGBoost',
           accuracy: 0.0,
-          startTime: new Date(Date.now() - 2400000), // 40 minutes ago
+          startTime: new Date(Date.now() - 2400000),
           estimatedTime: 0,
           datasetId: 'dataset_revenue'
+        },
+        {
+          id: 'pipeline_4',
+          name: 'Employee Performance Prediction',
+          status: 'pending',
+          progress: 0,
+          currentStep: 'Ready to Execute',
+          algorithm: 'Not Selected',
+          accuracy: 0.0,
+          startTime: new Date(),
+          estimatedTime: 0,
+          datasetId: 'dataset_employee_performance'
         }
       ];
 
@@ -142,10 +161,42 @@ export default function AutoMLPipelineClient() {
       ];
 
       const mockAlgorithmPerformance: AlgorithmPerformance[] = [
-        { algorithm: 'Random Forest', accuracy: 0.87, f1Score: 0.85, precision: 0.88, recall: 0.83, trainingTime: 45000, status: 'completed' },
-        { algorithm: 'Gradient Boosting', accuracy: 0.89, f1Score: 0.87, precision: 0.90, recall: 0.85, trainingTime: 62000, status: 'completed' },
-        { algorithm: 'XGBoost', accuracy: 0.91, f1Score: 0.89, precision: 0.92, recall: 0.87, trainingTime: 78000, status: 'running' },
-        { algorithm: 'Neural Network', accuracy: 0.0, f1Score: 0.0, precision: 0.0, recall: 0.0, trainingTime: 0, status: 'running' }
+        { 
+          algorithm: 'Random Forest', 
+          accuracy: 0.87, 
+          f1Score: 0.85, 
+          precision: 0.88, 
+          recall: 0.83, 
+          trainingTime: 45000, 
+          status: 'completed' 
+        },
+        { 
+          algorithm: 'Gradient Boosting', 
+          accuracy: 0.89, 
+          f1Score: 0.87, 
+          precision: 0.90, 
+          recall: 0.85, 
+          trainingTime: 62000, 
+          status: 'completed' 
+        },
+        { 
+          algorithm: 'XGBoost', 
+          accuracy: 0.91, 
+          f1Score: 0.89, 
+          precision: 0.92, 
+          recall: 0.87, 
+          trainingTime: 78000, 
+          status: 'running' 
+        },
+        { 
+          algorithm: 'Neural Network', 
+          accuracy: 0.0, 
+          f1Score: 0.0, 
+          precision: 0.0, 
+          recall: 0.0, 
+          trainingTime: 0, 
+          status: 'running' 
+        }
       ];
 
       setPipelines(mockPipelines);
@@ -153,51 +204,50 @@ export default function AutoMLPipelineClient() {
       setAlgorithmPerformance(mockAlgorithmPerformance);
       setSelectedPipeline(mockPipelines[0]);
       setLoading(false);
-    } catch (_err) {
+    } catch {
       setError('Failed to fetch pipeline data');
       setLoading(false);
     }
   };
 
-  const handlePipelineAction = async (pipelineId: string, action: 'start' | 'pause' | 'stop') => {
-    try {
-      // Mock API call
-      console.log(`${action} pipeline ${pipelineId}`);
-      await fetchPipelines();
-    } catch (_err) {
-      setError(`Failed to ${action} pipeline`);
+  // Event handlers
+  const handlePipelineSelect = (pipeline: Pipeline) => {
+    setSelectedPipeline(pipeline);
+  };
+
+  const handlePipelineAction = (pipeline: Pipeline, action: 'start' | 'pause' | 'stop' | 'clone') => {
+    console.log(`${action} pipeline ${pipeline.id}`);
+    
+    if (action === 'clone') {
+      setDialogStates(prev => ({ ...prev, cloneDialogOpen: true }));
+    } else {
+      // Handle other actions
+      fetchPipelines();
     }
   };
 
-  const handleCreatePipeline = async () => {
-    try {
-      // Mock API call
-      console.log('Creating pipeline:', newPipelineConfig);
-      setCreateDialogOpen(false);
-      setNewPipelineConfig({ name: '', datasetId: '', maxTrainingTime: 60, algorithms: [] });
-      await fetchPipelines();
-    } catch (_err) {
-      setError('Failed to create pipeline');
-    }
+  const handleTemplateSelect = (template: PipelineTemplate) => {
+    // Update configuration with template settings
+    setNewPipelineConfig(prev => ({
+      ...prev,
+      ...template.defaultConfig
+    }));
+    setNotificationStates(prev => ({ ...prev, showTemplateApplied: true }));
+    setTimeout(() => {
+      setNotificationStates(prev => ({ ...prev, showTemplateApplied: false }));
+    }, 3000);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'running': return 'primary';
-      case 'completed': return 'success';
-      case 'failed': return 'error';
-      case 'paused': return 'warning';
-      case 'pending': return 'default';
-      default: return 'default';
-    }
+  const handleShowTemplateDetails = (template: PipelineTemplate) => {
+    console.log('Show template details:', template);
+    setDialogStates(prev => ({ ...prev, templateDetailsOpen: true }));
   };
 
-  const formatDuration = (ms: number) => {
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    return `${minutes}m ${seconds}s`;
+  const handleCreatePipeline = () => {
+    setDialogStates(prev => ({ ...prev, createDialogOpen: true }));
   };
 
+  // Loading state
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -206,316 +256,84 @@ export default function AutoMLPipelineClient() {
     );
   }
 
-  return (
-    <Box sx={{ p: 3 }}>
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+  // Error state
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-      )}
+        <Button variant="contained" onClick={fetchPipelines}>
+          Retry
+        </Button>
+      </Box>
+    );
+  }
 
+  return (
+    <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1" fontWeight="bold">
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" fontWeight="bold" data-cy="automl-title">
           AutoML Pipeline Visualizer
         </Typography>
-        <Box>
-          <Button
-            variant="outlined"
-            startIcon={<Refresh />}
-            onClick={fetchPipelines}
-            sx={{ mr: 2 }}
-          >
-            Refresh
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<PlayArrow />}
-            onClick={() => setCreateDialogOpen(true)}
-          >
-            Create Pipeline
-          </Button>
-        </Box>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
+          Create, monitor, and optimize machine learning pipelines with automated model selection
+        </Typography>
       </Box>
 
       <Grid container spacing={3}>
-        {/* Pipeline Overview */}
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Active Pipelines
-              </Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Progress</TableCell>
-                      <TableCell>Current Step</TableCell>
-                      <TableCell>Algorithm</TableCell>
-                      <TableCell>Accuracy</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {pipelines.map((pipeline) => (
-                      <TableRow
-                        key={pipeline.id}
-                        onClick={() => setSelectedPipeline(pipeline)}
-                        sx={{ cursor: 'pointer', '&:hover': { backgroundColor: 'action.hover' } }}
-                      >
-                        <TableCell>{pipeline.name}</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={pipeline.status}
-                            color={getStatusColor(pipeline.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
-                            size="small"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Box display="flex" alignItems="center">
-                            <LinearProgress
-                              variant="determinate"
-                              value={pipeline.progress}
-                              sx={{ width: 100, mr: 1 }}
-                            />
-                            <Typography variant="body2">{pipeline.progress}%</Typography>
-                          </Box>
-                        </TableCell>
-                        <TableCell>{pipeline.currentStep}</TableCell>
-                        <TableCell>{pipeline.algorithm}</TableCell>
-                        <TableCell>
-                          {pipeline.accuracy > 0 ? `${(pipeline.accuracy * 100).toFixed(1)}%` : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <Box>
-                            {pipeline.status === 'running' && (
-                              <>
-                                <Button
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePipelineAction(pipeline.id, 'pause');
-                                  }}
-                                >
-                                  <Pause />
-                                </Button>
-                                <Button
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handlePipelineAction(pipeline.id, 'stop');
-                                  }}
-                                >
-                                  <Stop />
-                                </Button>
-                              </>
-                            )}
-                            {pipeline.status === 'paused' && (
-                              <Button
-                                size="small"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePipelineAction(pipeline.id, 'start');
-                                }}
-                              >
-                                <PlayArrow />
-                              </Button>
-                            )}
-                          </Box>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
+        {/* Pipeline Templates */}
+        <Grid size={{ xs: 12 }}>
+          <PipelineTemplates
+            onCreatePipeline={handleCreatePipeline}
+            onTemplateSelect={handleTemplateSelect}
+            onShowTemplateDetails={handleShowTemplateDetails}
+          />
         </Grid>
 
-        {/* Pipeline Details */}
-        <Grid size={{ xs: 12, md: 4 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Pipeline Details
-              </Typography>
-              {selectedPipeline ? (
-                <Box>
-                  <Typography variant="subtitle1" gutterBottom>
-                    {selectedPipeline.name}
-                  </Typography>
-                  <Box mb={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Status: <Chip label={selectedPipeline.status} color={getStatusColor(selectedPipeline.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'} size="small" />
-                    </Typography>
-                  </Box>
-                  <Box mb={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Started: {selectedPipeline.startTime.toLocaleString()}
-                    </Typography>
-                  </Box>
-                  {selectedPipeline.estimatedTime > 0 && (
-                    <Box mb={2}>
-                      <Typography variant="body2" color="text.secondary">
-                        Est. Remaining: {formatDuration(selectedPipeline.estimatedTime)}
-                      </Typography>
-                    </Box>
-                  )}
-                  <Box mb={2}>
-                    <Typography variant="body2" color="text.secondary">
-                      Dataset: {selectedPipeline.datasetId}
-                    </Typography>
-                  </Box>
-                </Box>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  Select a pipeline to view details
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
+        {/* Recent Pipelines */}
+        <Grid size={{ xs: 12 }}>
+          <RecentPipelines
+            pipelines={pipelines}
+            selectedPipeline={selectedPipeline}
+            onPipelineSelect={handlePipelineSelect}
+            onPipelineAction={handlePipelineAction}
+          />
+        </Grid>
+
+        {/* Pipeline Overview */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <PipelineOverview pipeline={selectedPipeline} />
         </Grid>
 
         {/* Pipeline Steps */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Pipeline Steps
-              </Typography>
-              <Stepper orientation="vertical">
-                {pipelineSteps.map((step) => (
-                  <Step key={step.id} active={step.status === 'running'} completed={step.status === 'completed'}>
-                    <StepLabel
-                      error={step.status === 'failed'}
-                      StepIconProps={{
-                        sx: {
-                          color: step.status === 'running' ? 'primary.main' :
-                                step.status === 'completed' ? 'success.main' :
-                                step.status === 'failed' ? 'error.main' : 'grey.300'
-                        }
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="body1">{step.name}</Typography>
-                        {step.duration > 0 && (
-                          <Typography variant="body2" color="text.secondary">
-                            Duration: {formatDuration(step.duration)}
-                          </Typography>
-                        )}
-                        {step.status === 'running' && (
-                          <LinearProgress sx={{ mt: 1, width: 200 }} />
-                        )}
-                      </Box>
-                    </StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </CardContent>
-          </Card>
+          <PipelineSteps steps={pipelineSteps} />
         </Grid>
 
         {/* Algorithm Performance */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Algorithm Performance
-              </Typography>
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Algorithm</TableCell>
-                      <TableCell>Accuracy</TableCell>
-                      <TableCell>F1 Score</TableCell>
-                      <TableCell>Time</TableCell>
-                      <TableCell>Status</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {algorithmPerformance.map((algo) => (
-                      <TableRow key={algo.algorithm}>
-                        <TableCell>{algo.algorithm}</TableCell>
-                        <TableCell>
-                          {algo.accuracy > 0 ? `${(algo.accuracy * 100).toFixed(1)}%` : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {algo.f1Score > 0 ? algo.f1Score.toFixed(3) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          {algo.trainingTime > 0 ? formatDuration(algo.trainingTime) : '-'}
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={algo.status}
-                            color={getStatusColor(algo.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
-                            size="small"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
+        <Grid size={{ xs: 12 }}>
+          <AlgorithmPerformanceComponent performance={algorithmPerformance} />
         </Grid>
       </Grid>
 
-      {/* Create Pipeline Dialog */}
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Create New AutoML Pipeline</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2 }}>
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  label="Pipeline Name"
-                  value={newPipelineConfig.name}
-                  onChange={(e) => setNewPipelineConfig({ ...newPipelineConfig, name: e.target.value })}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Dataset</InputLabel>
-                  <Select
-                    value={newPipelineConfig.datasetId}
-                    onChange={(e) => setNewPipelineConfig({ ...newPipelineConfig, datasetId: e.target.value })}
-                  >
-                    <MenuItem value="dataset_customer_churn">Customer Churn Dataset</MenuItem>
-                    <MenuItem value="dataset_fraud">Fraud Detection Dataset</MenuItem>
-                    <MenuItem value="dataset_revenue">Revenue Forecasting Dataset</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Max Training Time (minutes)"
-                  type="number"
-                  value={newPipelineConfig.maxTrainingTime}
-                  onChange={(e) => setNewPipelineConfig({ ...newPipelineConfig, maxTrainingTime: parseInt(e.target.value) })}
-                />
-              </Grid>
-            </Grid>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={handleCreatePipeline}
-            disabled={!newPipelineConfig.name || !newPipelineConfig.datasetId}
-          >
-            Create Pipeline
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Notifications */}
+      <Snackbar
+        open={notificationStates.showTemplateApplied}
+        autoHideDuration={3000}
+        onClose={() => setNotificationStates(prev => ({ ...prev, showTemplateApplied: false }))}
+      >
+        <Alert severity="success">Template applied successfully!</Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={notificationStates.showCreationError}
+        autoHideDuration={5000}
+        onClose={() => setNotificationStates(prev => ({ ...prev, showCreationError: false }))}
+      >
+        <Alert severity="error">Failed to create pipeline</Alert>
+      </Snackbar>
     </Box>
   );
 }
