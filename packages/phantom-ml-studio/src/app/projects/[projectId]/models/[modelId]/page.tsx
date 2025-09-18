@@ -8,6 +8,7 @@
 
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 
 interface PageProps {
   params: { projectId: string; modelId: string };
@@ -56,9 +57,9 @@ export default function ProjectModelPage({ params }: PageProps): JSX.Element {
             <li>projects</li>
             <span className="mx-2">/</span>
             <li className="text-blue-600">
-              <a href={`/projects/${projectId}`} className="hover:underline">
+              <Link href={`/projects/${projectId}`} className="hover:underline">
                 {projectId}
-              </a>
+              </Link>
             </li>
             <span className="mx-2">/</span>
             <li>models</li>

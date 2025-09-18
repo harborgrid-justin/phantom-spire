@@ -40,7 +40,8 @@ import {
   Assessment as ABTestingIcon,
   Business as ComplianceIcon,
 } from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const drawerWidth = 240;
 
@@ -58,8 +59,8 @@ interface MenuItem {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -101,8 +102,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
-              selected={location.pathname === item.path}
-              onClick={() => navigate(item.path)}
+              selected={pathname === item.path}
+              onClick={() => router.push(item.path)}
               sx={{
                 mx: 1,
                 borderRadius: 1,
@@ -160,7 +161,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: theme.palette.text.primary }}>
-            {menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+            {menuItems.find(item => item.path === pathname)?.text || 'Dashboard'}
           </Typography>
           <IconButton color="inherit">
             <Badge badgeContent={3} color="error">
