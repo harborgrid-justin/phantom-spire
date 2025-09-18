@@ -10,15 +10,22 @@ import {
   Box,
   Card,
   CardContent,
+  CardActions,
   Typography,
   Chip,
-  LinearProgress
+  LinearProgress,
+  Button
 } from '@mui/material';
+import { PlayArrow, Pause, Stop, Replay } from '@mui/icons-material';
 import Grid from '@mui/material/Grid2';
 import { Pipeline } from '../types';
 
 interface PipelineOverviewProps {
   pipeline: Pipeline | null;
+  onExecute?: () => void;
+  onPause?: () => void;
+  onResume?: () => void;
+  onStop?: () => void;
 }
 
 const getStatusColor = (status: Pipeline['status']) => {
@@ -59,7 +66,13 @@ const getEstimatedTimeRemaining = (pipeline: Pipeline) => {
   return remaining > 0 ? formatDuration(remaining) : 'Calculating...';
 };
 
-export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
+export default function PipelineOverview({ 
+  pipeline, 
+  onExecute, 
+  onPause, 
+  onResume, 
+  onStop 
+}: PipelineOverviewProps) {
   if (!pipeline) {
     return (
       <Card>
@@ -81,6 +94,27 @@ export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
         <Typography variant="h6" gutterBottom>
           Pipeline Overview
         </Typography>
+        
+        {/* Execution Status Indicators */}
+        {pipeline.status === 'running' && (
+          <Box sx={{ mb: 2 }} data-cy="pipeline-executing">
+            <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold' }}>
+              🔄 Pipeline Executing
+            </Typography>
+          </Box>
+        )}
+        
+        {pipeline.status === 'paused' && (
+          <Box sx={{ mb: 2 }} data-cy="execution-paused">
+            <Typography variant="body2" color="warning.main" sx={{ fontWeight: 'bold' }}>
+              ⏸️ Execution Paused
+            </Typography>
+            <Typography variant="caption" color="text.secondary" data-cy="pause-reason">
+              Manual pause requested by user
+            </Typography>
+          </Box>
+        )}
+        
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box data-cy="pipeline-basic-info">
@@ -95,7 +129,7 @@ export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
                   size="small" 
                 />
               </Box>
-              <Typography variant="body2" sx={{ mb: 1 }}>
+              <Typography variant="body2" sx={{ mb: 1 }} data-cy="current-step">
                 Current Step: {pipeline.currentStep}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
@@ -120,7 +154,7 @@ export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
                 Elapsed Time: {getElapsedTime(pipeline.startTime)}
               </Typography>
               {getEstimatedTimeRemaining(pipeline) && (
-                <Typography variant="body2" sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }} data-cy="estimated-time-remaining">
                   Estimated Remaining: {getEstimatedTimeRemaining(pipeline)}
                 </Typography>
               )}
@@ -131,11 +165,12 @@ export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
               <Typography variant="subtitle2" gutterBottom>
                 Progress
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }} data-cy="execution-progress">
                 <LinearProgress 
                   variant="determinate" 
                   value={pipeline.progress} 
                   sx={{ flexGrow: 1, height: 8, borderRadius: 4 }}
+                  data-cy="progress-bar"
                 />
                 <Typography variant="body2" sx={{ minWidth: 40 }}>
                   {pipeline.progress}%
@@ -145,6 +180,59 @@ export default function PipelineOverview({ pipeline }: PipelineOverviewProps) {
           </Grid>
         </Grid>
       </CardContent>
+      
+      <CardActions sx={{ justifyContent: 'flex-end', p: 2, pt: 0 }}>
+        {pipeline.status === 'pending' && onExecute && (
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<PlayArrow />}
+            data-cy="execute-pipeline"
+            size="small"
+            onClick={onExecute}
+          >
+            Execute Pipeline
+          </Button>
+        )}
+        
+        {pipeline.status === 'running' && onPause && (
+          <Button
+            variant="outlined"
+            startIcon={<Pause />}
+            data-cy="pause-execution"
+            size="small"
+            onClick={onPause}
+          >
+            Pause
+          </Button>
+        )}
+        
+        {pipeline.status === 'running' && onStop && (
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<Stop />}
+            data-cy="cancel-execution"
+            size="small"
+            onClick={onStop}
+            sx={{ ml: 1 }}
+          >
+            Cancel
+          </Button>
+        )}
+        
+        {pipeline.status === 'paused' && onResume && (
+          <Button
+            variant="contained"
+            startIcon={<PlayArrow />}
+            data-cy="resume-execution"
+            size="small"
+            onClick={onResume}
+          >
+            Resume
+          </Button>
+        )}
+      </CardActions>
     </Card>
   );
 }

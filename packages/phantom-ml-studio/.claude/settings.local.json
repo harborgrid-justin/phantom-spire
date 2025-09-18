@@ -48,7 +48,8 @@
       "Bash(npx cypress:*)",
       "WebFetch(domain:localhost)",
       "Bash(timeout 60 npm run build)",
-      "Bash(timeout 30 npm run dev)"
+      "Bash(timeout 30 npm run dev)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

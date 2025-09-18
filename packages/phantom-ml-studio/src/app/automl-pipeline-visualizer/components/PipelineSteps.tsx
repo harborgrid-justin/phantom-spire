@@ -84,21 +84,35 @@ export default function PipelineSteps({ steps }: PipelineStepsProps) {
         <Typography variant="h6" gutterBottom>
           Pipeline Steps
         </Typography>
-        <Stepper activeStep={activeStep} orientation="vertical">
-          {steps.map((step) => (
-            <Step key={step.id} data-cy={`pipeline-step-${step.id}`}>
-              <StepLabel icon={getStepIcon(step.status)}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="subtitle2">
-                    {step.name}
-                  </Typography>
-                  <Chip 
-                    label={step.status} 
-                    color={getStepColor(step.status)}
-                    size="small" 
-                  />
-                </Box>
-              </StepLabel>
+        <Stepper activeStep={activeStep} orientation="vertical" data-cy="step-status-list">
+          {steps.map((step, index) => {
+            // Map step names to test-friendly identifiers
+            const stepTestId = step.name.toLowerCase()
+              .replace(/\s+/g, '-')
+              .replace(/[^a-z0-9-]/g, '');
+            
+            return (
+              <Step 
+                key={step.id} 
+                data-cy={`pipeline-step-${step.id}`}
+                className={step.status === 'running' ? 'executing' : step.status}
+              >
+                <StepLabel 
+                  icon={getStepIcon(step.status)}
+                  data-cy={`step-${stepTestId}`}
+                  className={step.status === 'running' ? 'executing' : step.status}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="subtitle2">
+                      {step.name}
+                    </Typography>
+                    <Chip 
+                      label={step.status} 
+                      color={getStepColor(step.status)}
+                      size="small" 
+                    />
+                  </Box>
+                </StepLabel>
               <StepContent>
                 <Box sx={{ pb: 2 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -163,7 +177,8 @@ export default function PipelineSteps({ steps }: PipelineStepsProps) {
                 </Box>
               </StepContent>
             </Step>
-          ))}
+            );
+          })}
         </Stepper>
         
         {steps.length === 0 && (
