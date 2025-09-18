@@ -144,7 +144,7 @@ export default function ExperimentsClient() {
       field: 'bestScore',
       headerName: 'Best Score',
       width: 150,
-      valueGetter: (_params: any) => {
+      valueGetter: (_params: unknown) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -156,7 +156,7 @@ export default function ExperimentsClient() {
       field: 'bestAlgorithm',
       headerName: 'Best Algorithm',
       width: 200,
-      valueGetter: (_params: any) => {
+      valueGetter: (_params: unknown) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -167,7 +167,7 @@ export default function ExperimentsClient() {
       field: 'startTime',
       headerName: 'Start Time',
       width: 200,
-      valueFormatter: (_params: { value: any }) => {
+      valueFormatter: (_params: { value: unknown }) => {
         if (!params || !params.value) {
           return 'N/A';
         }
@@ -178,7 +178,7 @@ export default function ExperimentsClient() {
       field: 'endTime',
       headerName: 'End Time',
       width: 200,
-      valueFormatter: (_params: { value: any }) => {
+      valueFormatter: (_params: { value: unknown }) => {
         if (!params || !params.value) {
           return 'Running...';
         }

@@ -96,7 +96,7 @@ function FeaturesGrid() {
     {
       title: '32 Precision NAPI Demo',
       description: 'Interactive demonstration of all 32 precision NAPI bindings with complete frontend-backend integration.',
-      href: '/precision-napi-demo',
+      href: '/napiDemo',
       status: 'active'
     },
     {
@@ -107,17 +107,17 @@ function FeaturesGrid() {
     {
       title: 'Enhanced Model Builder',
       description: 'AutoML with 32 precision bindings: advanced optimization, validation, and enterprise-grade model management.',
-      href: '/model-builder'
+      href: '/modelBuilder'
     },
     {
       title: 'Real-time Analytics',
       description: 'Stream processing, batch analytics, and business intelligence with precision NAPI performance.',
-      href: '/real-time-monitoring'
+      href: '/monitoring'
     },
     {
       title: 'Data Explorer',
       description: 'Comprehensive data analysis with statistical summaries, correlation analysis, and quality assessment.',
-      href: '/data-explorer'
+      href: '/dataExplorer'
     },
     {
       title: 'Business Intelligence',
@@ -127,29 +127,29 @@ function FeaturesGrid() {
     {
       title: 'Enterprise Security',
       description: 'Audit trails, compliance reporting, security scanning, backup systems, and disaster recovery.',
-      href: '/enterprise-security-compliance'
+      href: '/compliance'
     },
     {
       title: 'Threat Intelligence',
       description: 'Advanced cybersecurity ML models integrated with the Phantom Spire security intelligence platform.',
-      href: '/threat-intelligence-marketplace'
+      href: '/threatIntelligence'
     },
     {
       title: 'AutoML Pipeline',
       description: 'Visual pipeline builder for automated machine learning workflows.',
-      href: '/automl-pipeline-visualizer',
+      href: '/automlPipeline',
       status: 'beta'
     },
     {
       title: 'Bias Detection',
       description: 'AI fairness tools to detect and mitigate bias in machine learning models.',
-      href: '/bias-detection-engine',
+      href: '/biasDetection',
       status: 'beta'
     },
     {
       title: 'Explainable AI',
       description: 'Model interpretability and explanation tools for transparent AI decisions.',
-      href: '/explainable-ai-visualizer',
+      href: '/explainableAi',
       status: 'coming-soon'
     }
   ];
@@ -337,7 +337,7 @@ function HomePage() {
           </Button>
           <Button
             component={Link}
-            href="/model-builder"
+            href="/modelBuilder"
             variant="outlined"
             size="large"
             sx={{

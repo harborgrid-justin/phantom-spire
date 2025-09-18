@@ -51,24 +51,24 @@ interface SidebarProps {
 const menuItems: MenuItem[] = [
   // Core Features
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/', section: 'core' },
-  { text: 'Data Explorer', icon: <DataIcon />, path: '/data-explorer', section: 'core' },
-  { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/model-builder', section: 'core' },
+  { text: 'Data Explorer', icon: <DataIcon />, path: '/dataExplorer', section: 'core' },
+  { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/modelBuilder', section: 'core' },
   { text: 'Experiments', icon: <ExperimentIcon />, path: '/experiments', section: 'core' },
   { text: 'Models', icon: <ModelIcon />, path: '/models', section: 'core' },
   { text: 'Deployments', icon: <DeployIcon />, path: '/deployments', section: 'core' },
   
   // Advanced Features
-  { text: 'Real-time Monitoring', icon: <MonitoringIcon />, path: '/real-time-monitoring', isNew: true, section: 'advanced' },
-  { text: 'AutoML Pipeline', icon: <PipelineIcon />, path: '/automl-pipeline-visualizer', isNew: true, section: 'advanced' },
-  { text: 'Feature Engineering', icon: <EngineeringIcon />, path: '/interactive-feature-engineering', isNew: true, section: 'advanced' },
+  { text: 'Real-time Monitoring', icon: <MonitoringIcon />, path: '/monitoring', isNew: true, section: 'advanced' },
+  { text: 'AutoML Pipeline', icon: <PipelineIcon />, path: '/automlPipeline', isNew: true, section: 'advanced' },
+  { text: 'Feature Engineering', icon: <EngineeringIcon />, path: '/featureEngineering', isNew: true, section: 'advanced' },
   { text: 'Model Comparison', icon: <CompareIcon />, path: '/model-comparison', section: 'advanced' },
-  { text: 'A/B Testing', icon: <ABTestingIcon />, path: '/multi-model-ab-testing', isNew: true, section: 'advanced' },
-  { text: 'Explainable AI', icon: <ExplainableIcon />, path: '/explainable-ai-visualizer', isNew: true, section: 'advanced' },
+  { text: 'A/B Testing', icon: <ABTestingIcon />, path: '/abTesting', isNew: true, section: 'advanced' },
+  { text: 'Explainable AI', icon: <ExplainableIcon />, path: '/explainableAi', isNew: true, section: 'advanced' },
   
   // Security & Compliance
-  { text: 'Bias Detection', icon: <ShieldIcon />, path: '/bias-detection-engine', isNew: true, section: 'security' },
-  { text: 'Threat Intelligence', icon: <MarketplaceIcon />, path: '/threat-intelligence-marketplace', isNew: true, section: 'security' },
-  { text: 'Enterprise Compliance', icon: <ComplianceIcon />, path: '/enterprise-security-compliance', isNew: true, section: 'security' },
+  { text: 'Bias Detection', icon: <ShieldIcon />, path: '/biasDetection', isNew: true, section: 'security' },
+  { text: 'Threat Intelligence', icon: <MarketplaceIcon />, path: '/threatIntelligence', isNew: true, section: 'security' },
+  { text: 'Enterprise Compliance', icon: <ComplianceIcon />, path: '/compliance', isNew: true, section: 'security' },
   
   // System
   { text: 'Analytics', icon: <AnalyticsIcon />, path: '/h2o-comparison', section: 'system' },

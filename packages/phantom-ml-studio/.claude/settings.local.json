@@ -53,7 +53,9 @@
       "Bash(timeout 15 npm run cypress:open)",
       "Bash(timeout 30 npm run cypress:run)",
       "Bash(timeout 20 npm run cypress:run)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(xargs dirname:*)",
+      "Bash(timeout 30s npm run dev)"
     ],
     "deny": [],
     "ask": []

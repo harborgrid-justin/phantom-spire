@@ -20,22 +20,22 @@ const LoadingFallback = ({ message = 'Loading...' }: { message?: string }) => (
 
 // Lazy load all major page components for code splitting
 export const Dashboard = lazy(() => import('@/app/dashboard/page'));
-export const ModelBuilder = lazy(() => import('@/app/model-builder/page'));
-export const DataExplorer = lazy(() => import('@/app/data-explorer/page'));
+export const ModelBuilder = lazy(() => import('@/app/modelBuilder/page'));
+export const DataExplorer = lazy(() => import('@/app/dataExplorer/page'));
 export const Experiments = lazy(() => import('@/app/experiments/page'));
 export const Models = lazy(() => import('@/app/models/page'));
 export const Deployments = lazy(() => import('@/app/deployments/page'));
 export const Settings = lazy(() => import('@/app/settings/page'));
 
 // Advanced feature pages - loaded on demand
-export const AutoMLPipelineVisualizer = lazy(() => import('@/app/automl-pipeline-visualizer/page'));
-export const BiasDetectionEngine = lazy(() => import('@/app/bias-detection-engine/page'));
-export const EnterpriseSecurityCompliance = lazy(() => import('@/app/enterprise-security-compliance/page'));
-export const ExplainableAIVisualizer = lazy(() => import('@/app/explainable-ai-visualizer/page'));
-export const InteractiveFeatureEngineering = lazy(() => import('@/app/interactive-feature-engineering/page'));
-export const MultiModelABTesting = lazy(() => import('@/app/multi-model-ab-testing/page'));
-export const RealTimeMonitoring = lazy(() => import('@/app/real-time-monitoring/page'));
-export const ThreatIntelligenceMarketplace = lazy(() => import('@/app/threat-intelligence-marketplace/page'));
+export const AutoMLPipelineVisualizer = lazy(() => import('@/app/automlPipeline/page'));
+export const BiasDetectionEngine = lazy(() => import('@/app/biasDetection/page'));
+export const EnterpriseSecurityCompliance = lazy(() => import('@/app/compliance/page'));
+export const ExplainableAIVisualizer = lazy(() => import('@/app/explainableAi/page'));
+export const InteractiveFeatureEngineering = lazy(() => import('@/app/featureEngineering/page'));
+export const MultiModelABTesting = lazy(() => import('@/app/abTesting/page'));
+export const RealTimeMonitoring = lazy(() => import('@/app/monitoring/page'));
+export const ThreatIntelligenceMarketplace = lazy(() => import('@/app/threatIntelligence/page'));
 
 // Bundle analyzer friendly exports
 export {

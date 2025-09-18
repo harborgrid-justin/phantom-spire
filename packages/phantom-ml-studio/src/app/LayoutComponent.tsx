@@ -65,24 +65,24 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const menuItems: MenuItem[] = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
-    { text: 'Data Explorer', icon: <DataIcon />, path: '/data-explorer' },
-    { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/model-builder' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Data Explorer', icon: <DataIcon />, path: '/dataExplorer' },
+    { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/modelBuilder' },
     { text: 'Experiments', icon: <ExperimentIcon />, path: '/experiments' },
     { text: 'Models', icon: <ModelIcon />, path: '/models' },
-    { text: 'Model Compare', icon: <CompareIcon />, path: '/model-comparison' },
-    { text: 'H2O.ai Analysis', icon: <AnalyticsIcon />, path: '/h2o-comparison' },
     { text: 'Deployments', icon: <DeployIcon />, path: '/deployments' },
     { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-    // 8 New Advanced Competitive Features
-    { text: '🚀 Live Monitoring', icon: <MonitoringIcon />, path: '/real-time-monitoring', isNew: true },
-    { text: '🔬 Pipeline Studio', icon: <PipelineIcon />, path: '/automl-pipeline-visualizer', isNew: true },
-    { text: '🛡️ Bias Detection', icon: <ShieldIcon />, path: '/bias-detection-engine', isNew: true },
-    { text: '🔧 Feature Engine', icon: <EngineeringIcon />, path: '/interactive-feature-engineering', isNew: true },
-    { text: '🏪 Threat Models', icon: <MarketplaceIcon />, path: '/threat-intelligence-marketplace', isNew: true },
-    { text: '🔍 Explainable AI', icon: <ExplainableIcon />, path: '/explainable-ai-visualizer', isNew: true },
-    { text: '⚖️ A/B Testing', icon: <ABTestingIcon />, path: '/multi-model-ab-testing', isNew: true },
-    { text: '🏢 Compliance', icon: <ComplianceIcon />, path: '/enterprise-security-compliance', isNew: true },
+    // Advanced Features
+    { text: '🚀 Live Monitoring', icon: <MonitoringIcon />, path: '/monitoring', isNew: true },
+    { text: '🔬 Pipeline Studio', icon: <PipelineIcon />, path: '/automlPipeline', isNew: true },
+    { text: '🛡️ Bias Detection', icon: <ShieldIcon />, path: '/biasDetection', isNew: true },
+    { text: '🔧 Feature Engine', icon: <EngineeringIcon />, path: '/featureEngineering', isNew: true },
+    { text: '🏪 Threat Intelligence', icon: <MarketplaceIcon />, path: '/threatIntelligence', isNew: true },
+    { text: '🔍 Explainable AI', icon: <ExplainableIcon />, path: '/explainableAi', isNew: true },
+    { text: '⚖️ A/B Testing', icon: <ABTestingIcon />, path: '/abTesting', isNew: true },
+    { text: '🏢 Compliance', icon: <ComplianceIcon />, path: '/compliance', isNew: true },
+    { text: '🧪 Training', icon: <ExperimentIcon />, path: '/training' },
+    { text: '🚀 NAPI Demo', icon: <EngineeringIcon />, path: '/napiDemo' },
   ];
 
   const drawer = (

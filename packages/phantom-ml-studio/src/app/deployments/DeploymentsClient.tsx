@@ -152,7 +152,7 @@ export default function DeploymentsClient() {
       field: 'modelId',
       headerName: 'Model ID',
       width: 200,
-      valueGetter: (params: any) => params.row.config.modelId,
+      valueGetter: (params: { row: { config: { modelId: string } } }) => params.row.config.modelId,
       renderCell: (params) => (
         <Typography variant="body2" fontFamily="monospace" data-cy="model-id">
           {params.value}
@@ -177,7 +177,7 @@ export default function DeploymentsClient() {
       field: 'environment',
       headerName: 'Environment',
       width: 130,
-      valueGetter: (params: any) => params.row.config.environment,
+      valueGetter: (params: { row: { config: { environment: string } } }) => params.row.config.environment,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -191,7 +191,7 @@ export default function DeploymentsClient() {
       field: 'instanceType',
       headerName: 'Instance Type',
       width: 150,
-      valueGetter: (params: any) => params.row.config.instanceType
+      valueGetter: (params: { row: { config: { instanceType: string } } }) => params.row.config.instanceType
     },
     {
       field: 'endpointUrl',
@@ -218,7 +218,7 @@ export default function DeploymentsClient() {
       field: 'createdAt',
       headerName: 'Created At',
       width: 180,
-      valueFormatter: (params: { value: any }) => new Date(params.value).toLocaleString()
+      valueFormatter: (params: { value: string | number | Date }) => new Date(params.value).toLocaleString()
     },
     {
       field: 'actions',

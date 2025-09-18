@@ -24,8 +24,8 @@ export default function Dashboard(props: PageProps): JSX.Element {
         <div data-cy="metric-card" role="region" aria-label="Deployments count">Deployments: 5</div>
       </section>
       <nav data-cy="dashboard-nav" aria-label="Main navigation">
-        <Link href="/model-builder" data-cy="nav-link" aria-label="Go to Model Builder">Model Builder</Link>
-        <Link href="/data-explorer" data-cy="nav-link" aria-label="Go to Data Explorer">Data Explorer</Link>
+        <Link href="/modelBuilder" data-cy="nav-link" aria-label="Go to Model Builder">Model Builder</Link>
+        <Link href="/dataExplorer" data-cy="nav-link" aria-label="Go to Data Explorer">Data Explorer</Link>
         <Link href="/experiments" data-cy="nav-link" aria-label="Go to Experiments">Experiments</Link>
       </nav>
     </main>

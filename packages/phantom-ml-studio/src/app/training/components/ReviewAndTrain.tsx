@@ -34,7 +34,7 @@ import {
   Dataset as DatasetIcon,
   Psychology as AlgorithmIcon,
   Tune as ParametersIcon,
-  Features as FeaturesIcon,
+  ViewColumn as FeaturesIcon,
   ExpandMore as ExpandIcon,
   Schedule as TimeIcon,
   Memory as ResourceIcon
