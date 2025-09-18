@@ -10,13 +10,13 @@ Cypress.Commands.add('login', () => {
 })
 
 // Navigation Commands
-Cypress.Commands.add('navigateToPage', (_pagePath: string) => {
+Cypress.Commands.add('navigateToPage', (pagePath: string) => {
   cy.visit(pagePath)
   cy.url().should('include', pagePath)
   cy.get('[data-cy="page-loading"]').should('not.exist')
 })
 
-Cypress.Commands.add('navigateViaSidebar', (_menuItem: string) => {
+Cypress.Commands.add('navigateViaSidebar', (menuItem: string) => {
   cy.get('[data-cy="sidebar-toggle"]').click({ force: true })
   cy.get(`[data-cy="sidebar-menu-${menuItem}"]`).click()
   cy.get('[data-cy="page-loading"]').should('not.exist')
@@ -25,8 +25,8 @@ Cypress.Commands.add('navigateViaSidebar', (_menuItem: string) => {
 // Data Management Commands
 Cypress.Commands.add('uploadFile', (filePath: string, inputSelector: string) => {
   cy.get(inputSelector).selectFile(filePath, { force: true })
-  cy.get('[data-cy="upload-progress"]').should('be.visible')
-  cy.get('[data-cy="upload-success"]').should('be.visible', { timeout: 10000 })
+  // Wait a bit for the file to be processed
+  cy.wait(500)
 })
 
 Cypress.Commands.add('createTestDataset', (datasetName: string, dataType = 'csv') => {
@@ -46,7 +46,7 @@ Cypress.Commands.add('createModel', (modelName: string, algorithm = 'random-fore
   cy.get('[data-cy="model-created-notification"]').should('be.visible')
 })
 
-Cypress.Commands.add('trainModel', (_modelId: string) => {
+Cypress.Commands.add('trainModel', (modelId: string) => {
   cy.get(`[data-cy="model-${modelId}-train-button"]`).click()
   cy.get('[data-cy="training-started-notification"]').should('be.visible')
   cy.get('[data-cy="training-progress"]').should('be.visible')

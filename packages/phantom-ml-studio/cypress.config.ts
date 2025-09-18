@@ -2,6 +2,7 @@ import { defineConfig } from 'cypress';
 import webpackPreprocessor from '@cypress/webpack-preprocessor';
 import type { Configuration } from 'webpack';
 import { cpus } from 'os';
+import path from 'path';
 
 // Determine optimal parallel configuration
 const numCPUs = cpus().length;
@@ -9,7 +10,7 @@ const optimalWorkers = Math.max(2, Math.floor(numCPUs * 0.75));
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3001',
+    baseUrl: 'http://localhost:3000',
     viewportWidth: 1280,
     viewportHeight: 720,
     video: false,
@@ -50,7 +51,7 @@ export default defineConfig({
         mode: process.env.NODE_ENV === 'test' ? 'production' : 'development',
         cache: {
           type: 'filesystem',
-          cacheDirectory: '.cypress-cache',
+          cacheDirectory: path.resolve(config.projectRoot, '.cypress-cache'),
         },
         module: {
           rules: [
@@ -109,7 +110,7 @@ export default defineConfig({
       // Enhanced task management for parallel execution
       on('task', {
         // Database operations with connection pooling
-        async seedDatabase(data?: any) {
+        async seedDatabase(data?: Record<string, unknown>) {
           // Implement thread-safe database seeding
           const { seed } = await import('./cypress/support/database');
           return seed(data);
@@ -128,7 +129,7 @@ export default defineConfig({
         },
 
         // Performance metrics collection
-        async collectMetrics(metrics: any) {
+        async collectMetrics(metrics: Record<string, unknown>) {
           const { saveMetrics } = await import('./cypress/support/metrics');
           return saveMetrics(metrics);
         },
@@ -145,9 +146,9 @@ export default defineConfig({
         },
 
         // Test result aggregation
-        async aggregateResults(results: any) {
+        async aggregateResults(results: unknown[]) {
           const { aggregate } = await import('./cypress/support/results');
-          return aggregate(results);
+          return aggregate(results as import('./cypress/support/results').TestResult[]);
         },
 
         log(message: string) {
@@ -200,6 +201,7 @@ export default defineConfig({
       webpackConfig: {
         cache: {
           type: 'filesystem',
+          cacheDirectory: path.resolve(process.cwd(), '.cypress-cache'),
         },
       },
     },
@@ -207,9 +209,17 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // Component testing specific setup
       on('task', {
-        async componentMetrics(metrics: any) {
+        async componentMetrics(metrics: Record<string, unknown>) {
           const { saveComponentMetrics } = await import('./cypress/support/componentMetrics');
-          return saveComponentMetrics(metrics);
+          // Type assertion for metrics object
+          const typedMetrics = {
+            testName: metrics.testName as string,
+            renderTime: metrics.renderTime as number,
+            interactionTime: metrics.interactionTime as number,
+            memoryUsage: metrics.memoryUsage as number,
+            timestamp: new Date(metrics.timestamp as string | number | Date),
+          };
+          return saveComponentMetrics(typedMetrics);
         },
       });
 

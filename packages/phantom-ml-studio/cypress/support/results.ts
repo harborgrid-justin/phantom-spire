@@ -2,7 +2,7 @@
  * Test results aggregation utilities
  */
 
-interface TestResult {
+export interface TestResult {
   name: string;
   file: string;
   duration: number;

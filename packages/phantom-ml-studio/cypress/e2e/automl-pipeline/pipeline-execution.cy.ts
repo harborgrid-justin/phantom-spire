@@ -1,7 +1,9 @@
 describe('AutoML Pipeline Execution', () => {
   beforeEach(() => {
     cy.visit('/automl-pipeline-visualizer')
-    cy.get('[data-cy="existing-pipeline"]').first().click()
+    cy.get('[data-cy="page-loading"]').should('not.exist')
+    // Click on a pipeline row to select it
+    cy.get('tbody tr').first().click()
   })
 
   it('should start pipeline execution', () => {
