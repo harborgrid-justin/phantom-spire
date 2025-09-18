@@ -1,7 +1,12 @@
 /**
- * Run Analysis Dialog Component
+ * Run Analysis Dialog Component - CLIENT COMPONENT
  * Modal dialog for configuring and running bias analysis
+ *
+ * IMPORTANT: This component requires 'use client' due to interactive
+ * elements (dialog controls, form handling)
  */
+
+'use client';
 
 import React from 'react';
 import {

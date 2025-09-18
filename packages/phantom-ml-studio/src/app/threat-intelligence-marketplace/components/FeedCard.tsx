@@ -1,7 +1,12 @@
 /**
- * FeedCard Component
+ * FeedCard Component - CLIENT COMPONENT
  * Displays individual threat intelligence feed information with subscription controls
+ *
+ * IMPORTANT: This component requires 'use client' due to interactive
+ * elements (buttons, event handlers)
  */
+
+'use client';
 
 import React from 'react';
 import {

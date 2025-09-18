@@ -1,7 +1,12 @@
 /**
- * FeedDetailsDialog Component
+ * FeedDetailsDialog Component - CLIENT COMPONENT
  * Modal dialog showing detailed information about a threat intelligence feed
+ *
+ * IMPORTANT: This component requires 'use client' due to interactive
+ * elements (dialog controls, buttons)
  */
+
+'use client';
 
 import React from 'react';
 import {

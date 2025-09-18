@@ -230,7 +230,6 @@ export default function EnterpriseSecurityCompliancePage() {
   };
 
   const handleGenerateReport = (frameworkId: string) => {
-    console.log(`Generating report for framework: ${frameworkId}`);
     setSuccessMessage('Report generation started');
     setShowSuccess(true);
   };

@@ -1,7 +1,12 @@
 /**
- * SubscriptionCard Component
+ * SubscriptionCard Component - CLIENT COMPONENT
  * Displays subscribed threat intelligence feeds with management controls
+ *
+ * IMPORTANT: This component requires 'use client' due to interactive
+ * elements (buttons, management controls)
  */
+
+'use client';
 
 import React from 'react';
 import {

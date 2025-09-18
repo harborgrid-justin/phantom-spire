@@ -15,7 +15,14 @@ export async function GET(
     // Simulate different pipeline states based on ID for testing
     let status = 'running';
     let progress = 0.45;
-    let steps: any[] = [
+    let steps: Array<{
+      id: string;
+      name: string;
+      status: string;
+      duration?: number;
+      progress?: number;
+      metrics?: Record<string, number>;
+    }> = [
       {
         id: 'data-preprocessing',
         name: 'Data Preprocessing',

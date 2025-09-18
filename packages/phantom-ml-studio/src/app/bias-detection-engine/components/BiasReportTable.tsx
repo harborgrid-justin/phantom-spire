@@ -1,7 +1,12 @@
 /**
- * Bias Report Table Component
+ * Bias Report Table Component - CLIENT COMPONENT
  * Displays bias detection reports in a structured table format
+ *
+ * IMPORTANT: This component requires 'use client' due to interactive
+ * elements (onClick handlers, event handling)
  */
+
+'use client';
 
 import React from 'react';
 import {

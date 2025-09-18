@@ -20,7 +20,7 @@ import { interactiveFeatureEngineeringService } from '@/services/interactive-fea
 import { FeatureEngineeringPipeline } from '@/services/interactive-feature-engineering';
 import { ServiceContext } from '@/services/core';
 
-export default function InteractiveFeatureEngineeringPage() {
+export default function InteractiveFeatureEngineeringPage(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [pipeline, setPipeline] = useState<FeatureEngineeringPipeline | null>(null);
