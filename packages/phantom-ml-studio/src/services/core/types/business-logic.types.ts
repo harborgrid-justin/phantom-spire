@@ -390,3 +390,200 @@ export interface EnvironmentConfig {
   apiEndpoints: Record<string, string>;
   credentials: Record<string, string>;
 }
+
+// Missing ML-specific types
+export interface Dataset {
+  id: string;
+  name: string;
+  description?: string;
+  source: string;
+  format: 'csv' | 'json' | 'parquet' | 'avro';
+  schema: DatasetSchema;
+  size: number;
+  rows: number;
+  columns: number;
+  createdAt: Date;
+  updatedAt: Date;
+  metadata: Record<string, unknown>;
+}
+
+export interface DatasetSchema {
+  columns: ColumnDefinition[];
+  primaryKey?: string;
+  indexes?: string[];
+}
+
+export interface ColumnDefinition {
+  name: string;
+  type: 'string' | 'number' | 'boolean' | 'date' | 'array' | 'object';
+  nullable: boolean;
+  description?: string;
+  constraints?: Record<string, unknown>;
+}
+
+export interface DataTransformation {
+  id: string;
+  name: string;
+  type: 'filter' | 'map' | 'aggregate' | 'join' | 'sort' | 'custom' | 'scaling' | 'encoding' | 'feature_selection';
+  config: Record<string, unknown>;
+  inputColumns: string[];
+  outputColumns: string[];
+  description?: string;
+}
+
+export interface FeatureEngineering {
+  id: string;
+  name: string;
+  features: EngineeringFeature[];
+  metadata: FeatureEngineeringMetadata;
+}
+
+export interface EngineeringFeature {
+  name: string;
+  type: 'polynomial' | 'interaction' | 'binning' | 'encoding';
+  sourceColumns: string[];
+  description: string;
+  config: Record<string, unknown>;
+}
+
+export interface Deployment {
+  id: string;
+  modelId: string;
+  environment: DeploymentEnvironment;
+  version?: string;
+  status: 'pending' | 'deploying' | 'active' | 'inactive' | 'failed' | 'updating' | 'running' | 'terminating' | 'deployed' | 'rolling_back';
+  endpoint?: string;
+  replicas?: number;
+  resources?: DeploymentResources;
+  config?: {
+    replicas?: number;
+    resources?: {
+      cpu: string;
+      memory: string;
+      gpu?: string;
+    };
+    autoscaling?: boolean;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+  metadata?: Record<string, unknown>;
+}
+
+export interface DeploymentEnvironment {
+  name: 'development' | 'staging' | 'production';
+  region: string;
+  cluster: string;
+  namespace?: string;
+}
+
+export interface DeploymentResources {
+  cpu: string;
+  memory: string;
+  gpu?: string;
+  storage: string;
+}
+
+export interface Model {
+  id: string;
+  name: string;
+  version: string;
+  algorithm: string;
+  framework: 'tensorflow' | 'pytorch' | 'scikit-learn' | 'xgboost' | 'lightgbm' | 'huggingface';
+  type: 'classification' | 'regression' | 'clustering' | 'nlp' | 'computer-vision';
+  status: 'training' | 'trained' | 'validated' | 'deployed' | 'archived';
+  metrics: ModelMetrics;
+  artifacts: ModelArtifacts;
+  createdAt: Date;
+  updatedAt: Date;
+  metadata: Record<string, unknown>;
+}
+
+export interface ModelMetrics {
+  accuracy?: number;
+  precision?: number;
+  recall?: number;
+  f1Score?: number;
+  rmse?: number;
+  mae?: number;
+  r2Score?: number;
+  customMetrics?: Record<string, number>;
+}
+
+export interface TrainingConfig {
+  algorithm: string;
+  hyperparameters: Record<string, unknown>;
+  datasetId: string;
+  validationSplit: number;
+  testSplit: number;
+  epochs?: number;
+  batchSize?: number;
+  learningRate?: number;
+  optimizer?: string;
+  lossFunction?: string;
+  callbacks?: TrainingCallback[];
+  distributed?: boolean;
+  resources: TrainingResources;
+}
+
+export interface TrainingCallback {
+  type: 'early_stopping' | 'model_checkpoint' | 'reduce_lr' | 'tensorboard' | 'custom';
+  config: Record<string, unknown>;
+}
+
+export interface TrainingResources {
+  cpu: string;
+  memory: string;
+  gpu?: string;
+  gpuCount?: number;
+  maxDuration?: number;
+}
+
+export interface TrainingJob {
+  id: string;
+  name: string;
+  modelId?: string;
+  config: TrainingConfig;
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled' | 'pending' | 'paused';
+  progress: TrainingProgress;
+  startTime?: Date;
+  endTime?: Date;
+  duration?: number;
+  logs: string[];
+  metrics: TrainingMetrics;
+  artifacts: ModelArtifacts;
+  error?: string;
+  metadata: Record<string, unknown>;
+  updatedAt?: Date;
+}
+
+export interface TrainingProgress {
+  currentEpoch: number;
+  totalEpochs: number;
+  loss: number;
+  accuracy: number;
+  startTime: Date;
+  lastUpdateTime: Date;
+}
+
+export interface TrainingMetrics {
+  loss: number[];
+  accuracy?: number[];
+  validationLoss?: number[];
+  validationAccuracy?: number[];
+  customMetrics?: Record<string, number[]>;
+  currentEpoch?: number;
+  totalEpochs?: number;
+}
+
+export interface ModelArtifacts {
+  modelFile: string;
+  weightsFile?: string;
+  configFile: string;
+  preprocessorFile?: string;
+  metricsFile: string;
+  logsFile: string;
+  checkpointFiles?: string[];
+  size: number;
+  format: string;
+  metadata: Record<string, unknown>;
+}

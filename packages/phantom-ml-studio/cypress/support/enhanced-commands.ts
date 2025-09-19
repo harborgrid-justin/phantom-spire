@@ -51,8 +51,8 @@ declare global {
       exportChart(dataCy: string, format: 'png' | 'svg' | 'pdf'): Chainable<Element>;
 
       // ===== ADVANCED FORM VALIDATION COMMANDS =====
-      fillForm(formData: Record<string, any>): Chainable<Element>;
-      fillMuiForm(formData: Record<string, any>): Chainable<Element>;
+      fillForm(formData: Record<string, string | number | boolean>): Chainable<Element>;
+      fillMuiForm(formData: Record<string, string | number | boolean | string[] | { type: string; value: unknown; createOption?: boolean }>): Chainable<Element>;
       validateFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<Element>;
       validateMuiFormField(fieldName: string, expectedValidation: 'valid' | 'invalid', errorMessage?: string): Chainable<Element>;
       submitForm(formSelector?: string): Chainable<Element>;
@@ -81,14 +81,14 @@ declare global {
       searchInTable(searchTerm: string): Chainable<Element>;
 
       // ===== API & DATA COMMANDS =====
-      mockApiResponse(endpoint: string, response: any, method?: string, statusCode?: number): Chainable<Element>;
+      mockApiResponse(endpoint: string, response: Record<string, unknown>, method?: string, statusCode?: number): Chainable<Element>;
       interceptApiCall(endpoint: string, alias: string, method?: string): Chainable<Element>;
       waitForApiResponse(alias: string, timeout?: number): Chainable<Element>;
-      verifyApiCall(alias: string, expectedRequest?: any): Chainable<Element>;
+      verifyApiCall(alias: string, expectedRequest?: Record<string, unknown>): Chainable<Element>;
       seedTestData(dataType: string, count?: number): Chainable<Element>;
       cleanupTestData(): Chainable<Element>;
       mockMLStudioAPI(): Chainable<Element>;
-      mockHuggingFaceAPI(response?: any): Chainable<Element>;
+      mockHuggingFaceAPI(response?: Record<string, unknown>): Chainable<Element>;
 
       // ===== PERFORMANCE COMMANDS =====
       measurePageLoad(): Chainable<Element>;
@@ -112,16 +112,16 @@ declare global {
       waitForNetworkIdle(timeout?: number): Chainable<Element>;
 
       // ===== VISUAL TESTING COMMANDS =====
-      matchSnapshot(name: string, options?: any): Chainable<Element>;
+      matchSnapshot(name: string, options?: { threshold?: number; capture?: string }): Chainable<Element>;
       compareScreenshot(name: string, threshold?: number): Chainable<Element>;
       visuallyCompareElement(selector: string, name: string): Chainable<Element>;
       detectVisualRegression(baseline: string, current: string): Chainable<Element>;
 
       // ===== ML STUDIO SPECIFIC COMMANDS =====
-      createModel(modelConfig: any): Chainable<Element>;
-      trainModel(modelId: string, trainingConfig?: any): Chainable<Element>;
-      runExperiment(experimentConfig: any): Chainable<Element>;
-      deployModel(modelId: string, deploymentConfig?: any): Chainable<Element>;
+      createModel(modelConfig: { name?: string; algorithm?: string; dataset?: string; parameters?: Record<string, unknown> }): Chainable<Element>;
+      trainModel(modelId: string, trainingConfig?: Record<string, unknown>): Chainable<Element>;
+      runExperiment(experimentConfig: { name?: string; type?: string; models?: string[] }): Chainable<Element>;
+      deployModel(modelId: string, deploymentConfig?: { environment?: string; instanceType?: string }): Chainable<Element>;
       uploadDataset(filePath: string, datasetName?: string, datasetType?: string): Chainable<Element>;
       validateChartRender(chartType: 'line' | 'bar' | 'scatter' | 'pie' | 'heatmap'): Chainable<Element>;
       monitorModelPerformance(modelId: string): Chainable<Element>;
@@ -137,7 +137,7 @@ declare global {
       // ===== ERROR HANDLING & DEBUGGING =====
       handleError(errorType: string, recoveryAction?: () => void): Chainable<Element>;
       debugElement(selector: string): Chainable<Element>;
-      logTestStep(step: string, data?: any): Chainable<Element>;
+      logTestStep(step: string, data?: unknown): Chainable<Element>;
       takeDebugScreenshot(name?: string): Chainable<Element>;
       savePageState(name: string): Chainable<Element>;
       restorePageState(name: string): Chainable<Element>;
@@ -461,7 +461,7 @@ Cypress.Commands.add('verifyChartLegend', (expectedItems: string[]) => {
 // ENHANCED FORM VALIDATION COMMANDS
 // **********************************************************************
 
-Cypress.Commands.add('fillMuiForm', (formData: Record<string, any>) => {
+Cypress.Commands.add('fillMuiForm', (formData: Record<string, string | number | boolean | string[] | { type: string; value: unknown; createOption?: boolean }>) => {
   Object.entries(formData).forEach(([field, value]) => {
     if (typeof value === 'boolean') {
       cy.muiToggleSwitch(field, value);
@@ -470,20 +470,20 @@ Cypress.Commands.add('fillMuiForm', (formData: Record<string, any>) => {
       value.forEach(option => {
         cy.muiSelectOption(field, option);
       });
-    } else if (typeof value === 'object' && value.type) {
+    } else if (typeof value === 'object' && value !== null && 'type' in value && typeof value.type === 'string') {
       // Handle special field types
       switch (value.type) {
         case 'date':
-          cy.muiSelectDatePicker(field, value.value);
+          cy.muiSelectDatePicker(field, String(value.value));
           break;
         case 'time':
-          cy.muiSelectTimePicker(field, value.value);
+          cy.muiSelectTimePicker(field, String(value.value));
           break;
         case 'slider':
-          cy.muiInteractWithSlider(field, value.value);
+          cy.muiInteractWithSlider(field, Number(value.value));
           break;
         case 'autocomplete':
-          cy.muiSelectAutocomplete(field, value.value, value.createOption);
+          cy.muiSelectAutocomplete(field, String(value.value), value.createOption);
           break;
         default:
           cy.muiTypeInTextField(field, String(value.value));
@@ -499,7 +499,7 @@ Cypress.Commands.add('validateMuiFormField', (fieldName: string, expectedValidat
 
   if (expectedValidation === 'invalid') {
     // Check for MUI error state
-    field.should('have.class', 'Mui-error').or('have.attr', 'aria-invalid', 'true');
+    field.should('have.class', 'Mui-error');
 
     if (errorMessage) {
       cy.get(`[data-cy="${fieldName}-error"], [data-cy="${fieldName}"] ~ .MuiFormHelperText-root.Mui-error`)
@@ -518,7 +518,7 @@ Cypress.Commands.add('uploadFile', (fileSelector: string, filePath: string, mime
   cy.log(`Uploading file ${filePath} to ${fileSelector}`)
   cy.get(fileSelector).should('exist')
   
-  const selectFileOptions: any = { force: true }
+  const selectFileOptions: { force: boolean; mimeType?: string } = { force: true }
   if (mimeType) {
     selectFileOptions.mimeType = mimeType
   }
@@ -587,7 +587,7 @@ Cypress.Commands.add('uploadModelFile', (filePath: string, modelName?: string) =
 // ML STUDIO SPECIFIC COMMANDS
 // **********************************************************************
 
-Cypress.Commands.add('createModel', (modelConfig: any) => {
+Cypress.Commands.add('createModel', (modelConfig: { name?: string; algorithm?: string; dataset?: string; parameters?: Record<string, unknown> }) => {
   cy.navigateToPage('/model-builder');
   cy.muiClickButton('create-model-button');
 
@@ -601,7 +601,7 @@ Cypress.Commands.add('createModel', (modelConfig: any) => {
     cy.muiSelectOption('dataset-select', modelConfig.dataset);
   }
   if (modelConfig.parameters) {
-    cy.fillMuiForm(modelConfig.parameters);
+    cy.fillMuiForm(modelConfig.parameters as Record<string, string | number | boolean | string[] | { type: string; value: unknown; createOption?: boolean }>);
   }
 
   cy.muiClickButton('save-model-button');
@@ -612,14 +612,14 @@ Cypress.Commands.add('trainModel', (modelId: string, trainingConfig = {}) => {
   cy.get(`[data-cy="model-${modelId}-train-button"]`).click();
 
   if (Object.keys(trainingConfig).length > 0) {
-    cy.fillMuiForm(trainingConfig);
+    cy.fillMuiForm(trainingConfig as Record<string, string | number | boolean | string[] | { type: string; value: unknown; createOption?: boolean }>);
   }
 
   cy.muiClickButton('start-training-button');
   cy.waitForText('Training started');
 });
 
-Cypress.Commands.add('runExperiment', (experimentConfig: any) => {
+Cypress.Commands.add('runExperiment', (experimentConfig: { name?: string; type?: string; models?: string[] }) => {
   cy.navigateToPage('/experiments');
   cy.muiClickButton('create-experiment-button');
 
@@ -802,7 +802,7 @@ Cypress.Commands.add('handleError', (errorType: string, recoveryAction?: () => v
   });
 });
 
-Cypress.Commands.add('logTestStep', (step: string, data?: any) => {
+Cypress.Commands.add('logTestStep', (step: string, data?: unknown) => {
   cy.task('log', `Test Step: ${step}${data ? ` - Data: ${JSON.stringify(data)}` : ''}`);
 });
 

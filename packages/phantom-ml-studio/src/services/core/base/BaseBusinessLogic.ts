@@ -113,13 +113,13 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
     };
   }
 
-  protected async withRetry<T>(_operation: () => Promise<T>,
+  protected async withRetry<T>(operation: () => Promise<T>,
     options: {
       maxRetries?: number;
       baseDelay?: number;
       maxDelay?: number;
       backoffMultiplier?: number;
-      retryCondition?: (_error: Error) => boolean;
+      retryCondition?: (error: Error) => boolean;
     } = {}
   ): Promise<T> {
     const {
@@ -376,7 +376,7 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
   }
 
   protected async executeWithContext<T>(
-    context: unknown,
+    context: Record<string, unknown> & { requestId?: string },
     operationName: string,
     operation: () => Promise<T>
   ): Promise<T> {

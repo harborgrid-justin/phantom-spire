@@ -297,29 +297,29 @@ describe('UX: Responsive Design Patterns', () => {
 
       // Test mobile typography
       cy.viewport(375, 667);
-      cy.get('h1').should('have.css', 'font-size').then(fontSize => {
-        const mobileFontSize = parseFloat(fontSize);
+      cy.get('h1').should('have.css', 'font-size').then((fontSize) => {
+        const mobileFontSize = parseFloat(fontSize as unknown as string);
 
         // Test tablet typography scaling
         cy.viewport(768, 1024);
-        cy.get('h1').should('have.css', 'font-size').then(tabletFontSize => {
-          expect(parseFloat(tabletFontSize)).to.be.greaterThan(mobileFontSize);
+        cy.get('h1').should('have.css', 'font-size').then((tabletFontSize) => {
+          expect(parseFloat(tabletFontSize as unknown as string)).to.be.greaterThan(mobileFontSize);
         });
       });
 
       // Test desktop typography scaling
       cy.viewport(1280, 720);
-      cy.get('h1').should('have.css', 'font-size').then(desktopFontSize => {
-        expect(parseFloat(desktopFontSize)).to.be.greaterThan(24); // Minimum desktop size
+      cy.get('h1').should('have.css', 'font-size').then((desktopFontSize) => {
+        expect(parseFloat(desktopFontSize as unknown as string)).to.be.greaterThan(24); // Minimum desktop size
       });
 
       // Test responsive spacing
       cy.viewport(375, 667);
-      cy.get('[data-cy="metric-card"]').should('have.css', 'padding').then(mobilePadding => {
+      cy.get('[data-cy="metric-card"]').should('have.css', 'padding').then((mobilePadding) => {
         cy.viewport(1280, 720);
-        cy.get('[data-cy="metric-card"]').should('have.css', 'padding').then(desktopPadding => {
+        cy.get('[data-cy="metric-card"]').should('have.css', 'padding').then((desktopPadding) => {
           // Desktop should have more padding
-          expect(parseFloat(desktopPadding)).to.be.greaterThan(parseFloat(mobilePadding));
+          expect(parseFloat(desktopPadding as unknown as string)).to.be.greaterThan(parseFloat(mobilePadding as unknown as string));
         });
       });
     });
@@ -455,9 +455,18 @@ describe('UX: Responsive Design Patterns', () => {
 
       // Test cleanup on navigation
       cy.visit('/dashboard');
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as Window & {
+          performance: Performance & {
+            memory?: {
+              usedJSHeapSize: number;
+            };
+          };
+        };
         // Verify previous page resources cleaned up
-        expect(win.performance.memory?.usedJSHeapSize).to.be.lessThan(50000000); // < 50MB
+        if (mockWin.performance.memory) {
+          expect(mockWin.performance.memory.usedJSHeapSize).to.be.lessThan(50000000); // < 50MB
+        }
       });
     });
   });

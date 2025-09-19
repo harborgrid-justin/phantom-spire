@@ -133,7 +133,7 @@ export abstract class BaseService extends EventEmitter implements ServiceLifecyc
   async getHealth(): Promise<ServiceHealth> {
     const checks = [];
     
-    for (const [name, checkFn] of this.healthChecks) {
+    for (const [name, checkFn] of Array.from(this.healthChecks)) {
       const startTime = Date.now();
       try {
         const healthy = await checkFn();

@@ -115,9 +115,12 @@ Cypress.Commands.add('createTestDataset', (datasetName: string, dataType = 'csv'
 })
 
 // Model Management Commands
-Cypress.Commands.add('createModel', (modelName: string, algorithm = 'random-forest') => {
+Cypress.Commands.add('createModel', (modelConfig: { name?: string; algorithm?: string; dataset?: string; parameters?: Record<string, unknown> }) => {
   cy.get('[data-cy="create-model-button"]').click()
-  cy.get('[data-cy="model-name-input"]').type(modelName)
+  if (modelConfig.name) {
+    cy.get('[data-cy="model-name-input"]').type(modelConfig.name)
+  }
+  const algorithm = modelConfig.algorithm || 'random-forest'
   cy.get(`[data-cy="algorithm-${algorithm}"]`).click()
   cy.get('[data-cy="create-model-confirm"]').click()
   cy.get('[data-cy="model-created-notification"]').should('be.visible')
@@ -129,7 +132,8 @@ Cypress.Commands.add('trainModel', (modelId: string) => {
   cy.get('[data-cy="training-progress"]').should('be.visible')
 })
 
-Cypress.Commands.add('deployModel', (modelId: string, environment = 'staging') => {
+Cypress.Commands.add('deployModel', (modelId: string, deploymentConfig: { environment?: string; instanceType?: string } = {}) => {
+  const environment = deploymentConfig.environment || 'staging'
   cy.get(`[data-cy="model-${modelId}-deploy-button"]`).click()
   cy.get(`[data-cy="deployment-environment-${environment}"]`).click()
   cy.get('[data-cy="deploy-confirm"]').click()
@@ -143,11 +147,11 @@ Cypress.Commands.add('waitForChart', (chartSelector = '[data-cy="chart"]', timeo
   cy.wait(1000) // Allow time for chart animation
 })
 
-Cypress.Commands.add('validateChartData', (_expectedDataPoints: unknown[]) => {
+Cypress.Commands.add('validateChartData', (expectedDataPoints: unknown[]) => {
   const chartSelector = '[data-cy="chart"]'
   cy.get(chartSelector).should('be.visible')
   // Validate that the chart contains expected number of data points
-  cy.get(`${chartSelector} .recharts-area-dot`).should('have.length', _expectedDataPoints.length)
+  cy.get(`${chartSelector} .recharts-area-dot`).should('have.length', expectedDataPoints.length)
 })
 
 // Interact with chart elements (hover, click)
@@ -163,7 +167,7 @@ Cypress.Commands.add('interactWithChart', (chartSelector: string, action: 'hover
     }
   } else if (action === 'click') {
     if (coordinates) {
-      cy.get(chartSelector).click(coordinates)
+      cy.get(chartSelector).click(coordinates.x, coordinates.y)
     } else {
       cy.get(`${chartSelector} .recharts-line, ${chartSelector} .recharts-bar, ${chartSelector} .recharts-area`).first().click()
     }
@@ -496,4 +500,3 @@ Cypress.Commands.add('useAdvancedTasks', () => {
   // Clean up after tests
   cy.task('cleanupTestArtifacts')
 })
-

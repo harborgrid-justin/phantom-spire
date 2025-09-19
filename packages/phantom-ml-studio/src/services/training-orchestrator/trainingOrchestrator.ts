@@ -733,9 +733,9 @@ export class TrainingOrchestrator extends EventEmitter {
     try {
       // Set up progress tracking
       model.on('trainingProgress', (_progress: TrainingProgress) => {
-        job.progress = progress;
-        this.recordMetrics(job.id, progress);
-        this.emit('trainingProgress', { job, progress });
+        job.progress = _progress;
+        this.recordMetrics(job.id, _progress);
+        this.emit('trainingProgress', { job, progress: _progress });
       });
 
       // Set up checkpointing
@@ -748,7 +748,7 @@ export class TrainingOrchestrator extends EventEmitter {
       }
 
       // Start training
-      await model.startTraining(dataset, job.config);
+      await model.startTraining(dataset as Record<string, unknown>[], job.config);
       
       // Training completed successfully
       job.status = 'completed';
@@ -998,23 +998,28 @@ export class TrainingOrchestrator extends EventEmitter {
 
   private async stopRunningJob(_jobId: string): Promise<void> {
     // Stop running training job
+    console.log(`Stopping job: ${_jobId}`);
   }
 
   private async freeJobResources(_jobId: string): Promise<void> {
     // Free allocated resources
+    console.log(`Freeing resources for job: ${_jobId}`);
   }
 
   private isJobRunningOnNode(_jobId: string, _nodeId: string): boolean {
     // Check if job is running on specific node
+    console.log(`Checking if job ${_jobId} is running on node ${_nodeId}`);
     return false;
   }
 
   private async migrateJob(_jobId: string, _fromNodeId: string): Promise<void> {
     // Migrate job from one node to another
+    console.log(`Migrating job ${_jobId} from node ${_fromNodeId}`);
   }
 
   private async reserveNodeResources(node: TrainingNode, job: TrainingJob): Promise<ResourceAllocation> {
     // Reserve resources on node
+    console.log(`Reserving resources on node ${node.id} for job ${job.id}`);
     return {
       jobId: job.id,
       nodeId: node.id,
@@ -1033,10 +1038,12 @@ export class TrainingOrchestrator extends EventEmitter {
 
   private async releaseNodeResources(_nodeId: string, _jobId: string): Promise<void> {
     // Release node resources
+    console.log(`Releasing resources on node ${_nodeId} for job ${_jobId}`);
   }
 
   private async prepareTrainingEnvironment(_job: TrainingJob): Promise<void> {
     // Set up training environment
+    console.log(`Preparing training environment for job: ${_job.id}`);
   }
 
   private async loadModel(modelId: string): Promise<HuggingFaceModelBase> {
@@ -1057,32 +1064,39 @@ export class TrainingOrchestrator extends EventEmitter {
 
   private async setupCheckpointing(_job: TrainingJob): Promise<void> {
     // Set up checkpointing system
+    console.log(`Setting up checkpointing for job: ${_job.id}`);
   }
 
   private async setupMonitoring(_job: TrainingJob): Promise<void> {
     // Set up monitoring and alerting
+    console.log(`Setting up monitoring for job: ${_job.id}`);
   }
 
   private shouldCreateCheckpoint(_job: TrainingJob): boolean {
     // Determine if checkpoint should be created
+    console.log(`Checking if checkpoint should be created for job: ${_job.id}`);
     return true;
   }
 
   private async saveTrainedModel(_job: TrainingJob, _model: HuggingFaceModelBase): Promise<void> {
     // Save trained model
+    console.log(`Saving trained model for job: ${_job.id}`);
   }
 
   private async uploadCheckpointToRemote(_checkpoint: CheckpointInfo, _config: Record<string, unknown>): Promise<string> {
     // Upload checkpoint to remote storage
+    console.log(`Uploading checkpoint ${_checkpoint.checkpointId} to remote storage`);
     return 'https://remote-storage/checkpoint-url';
   }
 
   private async cleanupOldCheckpoints(_jobId: string, _maxCheckpoints: number): Promise<void> {
     // Clean up old checkpoints
+    console.log(`Cleaning up old checkpoints for job ${_jobId}, keeping max ${_maxCheckpoints}`);
   }
 
   private getMetricValue(metrics: TrainingMetrics, _metricName: string): number | undefined {
     // Extract metric value by name
+    console.log(`Getting metric value for ${_metricName}`);
     return metrics.trainingLoss;
   }
 
@@ -1144,7 +1158,7 @@ export class TrainingOrchestrator extends EventEmitter {
     return Array.from(this.allocations.values());
   }
 
-  getSystemStats(): { cpu: number; memory: number; disk: number; gpu?: number } {
+  getSystemStats(): Record<string, unknown> {
     const jobs = Array.from(this.jobs.values());
     const nodes = Array.from(this.nodes.values());
     

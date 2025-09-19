@@ -231,9 +231,12 @@ describe('UX: Performance Optimization', () => {
       cy.get('[data-cy="training-started"]', { timeout: 10000 }).should('be.visible');
 
       // Test offline handling
-      cy.window().then(win => {
+      cy.window().then((win) => {
         // Simulate offline
-        win.navigator.onLine = false;
+        Object.defineProperty(win.navigator, 'onLine', {
+          writable: true,
+          value: false
+        });
         win.dispatchEvent(new Event('offline'));
       });
 
@@ -245,8 +248,11 @@ describe('UX: Performance Optimization', () => {
       cy.get('[data-cy="queued-for-sync"]').should('be.visible');
 
       // Restore online
-      cy.window().then(win => {
-        win.navigator.onLine = true;
+      cy.window().then((win) => {
+        Object.defineProperty(win.navigator, 'onLine', {
+          writable: true,
+          value: true
+        });
         win.dispatchEvent(new Event('online'));
       });
 
@@ -324,7 +330,7 @@ describe('UX: Performance Optimization', () => {
 
       // Test chart rendering with data sampling
       const chartStart = Date.now();
-      cy.waitForRechart('performance-trends-chart').then(() => {
+      cy.waitForChart('[data-cy="performance-trends-chart"]').then(() => {
         const chartTime = Date.now() - chartStart;
         expect(chartTime).to.be.lessThan(3000); // Chart renders within 3s
       });
@@ -362,15 +368,24 @@ describe('UX: Performance Optimization', () => {
       cy.visit('/model-builder');
 
       // Check memory cleanup
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as Window & {
+          gc?: () => void;
+          performance: Performance & {
+            memory?: {
+              usedJSHeapSize: number;
+            };
+          };
+        };
+        
         // Force garbage collection if available
-        if (win.gc) {
-          win.gc();
+        if (mockWin.gc) {
+          mockWin.gc();
         }
 
         // Memory should be reasonable after cleanup
-        if (win.performance.memory) {
-          expect(win.performance.memory.usedJSHeapSize).to.be.lessThan(100000000); // < 100MB
+        if (mockWin.performance.memory) {
+          expect(mockWin.performance.memory.usedJSHeapSize).to.be.lessThan(100000000); // < 100MB
         }
       });
 
@@ -384,22 +399,28 @@ describe('UX: Performance Optimization', () => {
       cy.get('[data-cy="analysis-dialog"]').should('not.exist');
 
       // Test event listener cleanup
-      cy.window().then(win => {
-        const listenerCount = Object.keys(win.eventListeners || {}).length;
+      cy.window().then((win) => {
+        const mockWin = win as Window & {
+          eventListeners?: Record<string, unknown>;
+        };
+        const listenerCount = Object.keys(mockWin.eventListeners || {}).length;
         expect(listenerCount).to.be.lessThan(50); // Reasonable listener count
       });
 
       // Test interval/timeout cleanup
       cy.visit('/real-time-monitoring');
-      cy.window().then(win => {
+      cy.window().then((win) => {
         const intervalId = win.setInterval(() => {}, 1000);
         expect(intervalId).to.be.a('number');
       });
 
       cy.visit('/dashboard');
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as Window & {
+          activeIntervals?: unknown[];
+        };
         // Active intervals should be cleaned up
-        expect(win.activeIntervals?.length || 0).to.be.lessThan(5);
+        expect(mockWin.activeIntervals?.length || 0).to.be.lessThan(5);
       });
     });
   });
@@ -447,7 +468,7 @@ describe('UX: Performance Optimization', () => {
       cy.visit('/dashboard');
 
       // Test predictive navigation preloading
-      cy.get('[data-cy="nav-link-data-explorer"]').hover();
+      cy.get('[data-cy="nav-link-data-explorer"]').trigger('mouseover');
       cy.get('[data-cy="preload-indicator-data-explorer"]').should('exist');
 
       // Test critical resource preloading

@@ -281,7 +281,10 @@ export class DashboardPage extends BasePage {
   testOfflineBehavior(): this {
     cy.window().then((win) => {
       // Simulate offline
-      win.navigator.onLine = false;
+      Object.defineProperty(win.navigator, 'onLine', {
+        writable: true,
+        value: false
+      });
       win.dispatchEvent(new Event('offline'));
     });
 
@@ -289,7 +292,10 @@ export class DashboardPage extends BasePage {
 
     cy.window().then((win) => {
       // Simulate back online
-      win.navigator.onLine = true;
+      Object.defineProperty(win.navigator, 'onLine', {
+        writable: true,
+        value: true
+      });
       win.dispatchEvent(new Event('online'));
     });
 

@@ -1,37 +1,37 @@
-// Core ML services with NAPI integration
-export * from './phantom-ml-core';
+// Core ML services with NAPI integration (export first to establish base types)
 export * from './core';
+export * from './phantom-ml-core';
 
-// ML Pipeline services  
-export * from './automl-pipeline-visualizer';
-export * from './training-orchestrator';
-export * from './model-builder';
-export * from './models';
+// ML Pipeline services (be specific to avoid conflicts)
+export { automlPipelineVisualizerService } from './automl-pipeline-visualizer';
+export { TrainingOrchestrator } from './training-orchestrator';
+export { modelBuilderService, enhancedModelBuilderService } from './model-builder';
+export { modelsService } from './models';
 
-// Analytics and insights services
-export * from './bias-detection-engine';
-export * from './explainable-ai-visualizer';
-export * from './data-explorer';
+// Analytics and insights services  
+export { biasDetectionEngineService } from './bias-detection-engine';
+export { explainableAiVisualizerService } from './explainable-ai-visualizer';
+export { dataExplorerService } from './data-explorer';
 
 // Deployment and monitoring services
-export * from './deployments';
-export * from './real-time-monitoring';
-export * from './multi-model-ab-testing';
+export { deploymentsService } from './deployments';
+export { realTimeMonitoringService } from './real-time-monitoring';
+export { multiModelAbTestingService } from './multi-model-ab-testing';
 
 // Feature engineering and interactive tools
-export * from './interactive-feature-engineering';
+export { interactiveFeatureEngineeringService } from './interactive-feature-engineering';
 
 // Experiments and testing
-export * from './experiments';
+export { experimentsService } from './experiments';
 
 // Threat intelligence integration
-export * from './threat-intelligence-marketplace';
+export { threatIntelligenceMarketplaceService } from './threat-intelligence-marketplace';
 
 // Dashboard services
-export * from './dashboard';
+export { dashboardService } from './dashboard';
 
 // Configuration and settings
-export * from './settings';
+export { settingsService } from './settings';
 
 // Shared utilities
 export * from './shared';

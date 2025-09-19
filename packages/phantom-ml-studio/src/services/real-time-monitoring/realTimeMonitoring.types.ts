@@ -23,7 +23,7 @@ export interface RealTimeEvent {
   model: string;
   message: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PerformanceDataPoint {

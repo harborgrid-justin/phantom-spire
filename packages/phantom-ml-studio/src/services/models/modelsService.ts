@@ -21,10 +21,39 @@ const MODELS_SERVICE_DEFINITION: ServiceDefinition = {
     config: {
         enabled: true,
         autoStart: true,
-        retryPolicy: { maxRetries: 3, baseDelay: 150 },
-        timeouts: { request: 8000, connection: 2500 },
-        caching: { enabled: true, ttl: 300000 },
-        monitoring: { metricsEnabled: true, tracingEnabled: true },
+        retryPolicy: { 
+            maxRetries: 3, 
+            baseDelay: 150,
+            maxDelay: 30000,
+            exponentialBackoff: true,
+            jitter: true,
+            retryableErrors: ['TIMEOUT', 'CONNECTION_ERROR', 'SERVICE_UNAVAILABLE']
+        },
+        timeouts: { request: 8000, connection: 2500, idle: 60000 },
+        caching: { 
+            enabled: true, 
+            provider: 'memory' as const,
+            ttl: 300000,
+            maxSize: 1000,
+            compressionEnabled: false
+        },
+        monitoring: { 
+            metricsEnabled: true, 
+            tracingEnabled: true,
+            healthCheckEnabled: true,
+            alerting: {
+                enabled: true,
+                errorRate: { warning: 0.05, critical: 0.1, evaluationWindow: 300 },
+                responseTime: { warning: 1000, critical: 5000, evaluationWindow: 300 },
+                throughput: { warning: 100, critical: 50, evaluationWindow: 300 },
+                availability: { warning: 0.95, critical: 0.90, evaluationWindow: 300 }
+            },
+            sampling: {
+                rate: 0.1,
+                maxTracesPerSecond: 100,
+                slowRequestThreshold: 1000
+            }
+        },
     },
 };
 
@@ -48,7 +77,7 @@ class ModelsService extends BusinessLogicBase {
     async calculateMetrics(filters?: Record<string, unknown>): Promise<MetricResult> { throw new Error('Method not implemented.'); }
     async predictTrends(data: unknown[]): Promise<TrendPrediction> { throw new Error('Method not implemented.'); }
     async performFeatureEngineering(data: unknown[], context?: ServiceContext): Promise<FeatureEngineeringResult> { throw new Error('Not applicable for ModelsService.'); }
-    async performFeatureSelection(features: any[], context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Not applicable for ModelsService.'); }
+    async performFeatureSelection(features: unknown[], context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Not applicable for ModelsService.'); }
     async triggerWorkflows(eventType: string, data: unknown): Promise<void> { /* For triggering notifications */ }
     async integrateWithExternalSystems(data: unknown): Promise<IntegrationResult> { throw new Error('Method not implemented.'); }
     async notifyStakeholders(event: string, data: unknown): Promise<void> { /* For sending notifications */ }
@@ -71,14 +100,14 @@ class ModelsService extends BusinessLogicBase {
             const { name, description, trainingResults, tags } = request.data;
             const newModel = this._registerModel(name, description, trainingResults, tags);
             return this.createSuccessResponse(request, newModel);
-        }) as Promise<RegisterModelResponse>;
+        }) as unknown as Promise<RegisterModelResponse>;
     }
 
     public async getModels(request: GetModelsRequest, context: ServiceContext): Promise<GetModelsResponse> {
         return this.executeWithContext(context, 'getModels', async () => {
             const models = Array.from(this.models.values());
             return this.createSuccessResponse(request, { models });
-        }) as Promise<GetModelsResponse>;
+        }) as unknown as Promise<GetModelsResponse>;
     }
 
     public async getModel(request: GetModelRequest, context: ServiceContext): Promise<GetModelResponse> {
@@ -86,7 +115,7 @@ class ModelsService extends BusinessLogicBase {
             const model = this.models.get(request.data.modelId);
             if (!model) throw new Error('Model not found.');
             return this.createSuccessResponse(request, model);
-        }) as Promise<GetModelResponse>;
+        }) as unknown as Promise<GetModelResponse>;
     }
 
     public async createModelVersion(request: CreateModelVersionRequest, context: ServiceContext): Promise<CreateModelVersionResponse> {
@@ -94,7 +123,7 @@ class ModelsService extends BusinessLogicBase {
             const { modelId, description, trainingResults } = request.data;
             const newVersion = this._createModelVersion(modelId, description, trainingResults);
             return this.createSuccessResponse(request, newVersion);
-        }) as Promise<CreateModelVersionResponse>;
+        }) as unknown as Promise<CreateModelVersionResponse>;
     }
 
     public async updateModelVersionStatus(request: UpdateModelVersionStatusRequest, context: ServiceContext): Promise<UpdateModelVersionStatusResponse> {
@@ -102,7 +131,7 @@ class ModelsService extends BusinessLogicBase {
             const { modelId, versionId, status } = request.data;
             const updatedVersion = this._updateModelVersionStatus(modelId, versionId, status);
             return this.createSuccessResponse(request, updatedVersion);
-        }) as Promise<UpdateModelVersionStatusResponse>;
+        }) as unknown as Promise<UpdateModelVersionStatusResponse>;
     }
 
     // --- Private Helper Methods ---

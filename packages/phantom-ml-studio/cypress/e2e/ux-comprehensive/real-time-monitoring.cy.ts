@@ -22,10 +22,10 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="realtime-indicator"]').should('have.class', 'pulse-animation');
 
       // Mock WebSocket connection
-      cy.window().then(win => {
+      cy.window().then((win) => {
         const mockSocket = {
           readyState: 1, // OPEN
-          onmessage: null,
+          onmessage: null as ((event: MessageEvent) => void) | null,
           send: cy.stub(),
           close: cy.stub()
         };
@@ -45,11 +45,11 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
                 },
                 timestamp: new Date().toISOString()
               })
-            });
+            } as MessageEvent);
           }
         }, 1000);
 
-        win.mockWebSocket = mockSocket;
+        (win as unknown as Window & { mockWebSocket: typeof mockSocket }).mockWebSocket = mockSocket;
       });
 
       // Verify live metric updates
@@ -63,8 +63,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="latency-trend"]').should('be.visible');
 
       // Test alert thresholds
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'performance_update',
             modelId: 'model-123',
@@ -74,7 +79,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
             },
             alerts: ['accuracy_degradation', 'high_error_rate']
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="alert-accuracy-degradation"]').should('be.visible');
@@ -88,17 +93,22 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="chart-auto-scroll"]').should('be.checked');
 
       // Mock streaming data points
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
         for (let i = 0; i < 5; i++) {
           setTimeout(() => {
-            win.mockWebSocket.onmessage({
+            mockWin.mockWebSocket.onmessage({
               data: JSON.stringify({
                 type: 'metric_point',
                 timestamp: new Date(Date.now() + i * 1000).toISOString(),
                 accuracy: 0.90 + Math.random() * 0.05,
                 latency: 40 + Math.random() * 20
               })
-            });
+            } as MessageEvent);
           }, i * 500);
         }
       });
@@ -124,8 +134,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
     it('should handle connection interruptions gracefully', () => {
       // Test connection loss handling
-      cy.window().then(win => {
-        win.mockWebSocket.readyState = 3; // CLOSED
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            readyState: number;
+          };
+        };
+        mockWin.mockWebSocket.readyState = 3; // CLOSED
         win.dispatchEvent(new CustomEvent('websocket-disconnected'));
       });
 
@@ -139,8 +154,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="reconnect-attempt-count"]').should('be.visible');
 
       // Mock successful reconnection
-      cy.window().then(win => {
-        win.mockWebSocket.readyState = 1; // OPEN
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            readyState: number;
+          };
+        };
+        mockWin.mockWebSocket.readyState = 1; // OPEN
         win.dispatchEvent(new CustomEvent('websocket-connected'));
       });
 
@@ -148,8 +168,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="reconnect-success-toast"]').should('be.visible');
 
       // Test manual reconnection
-      cy.window().then(win => {
-        win.mockWebSocket.readyState = 3; // CLOSED
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            readyState: number;
+          };
+        };
+        mockWin.mockWebSocket.readyState = 3; // CLOSED
         win.dispatchEvent(new CustomEvent('websocket-disconnected'));
       });
 
@@ -178,7 +203,12 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="live-training-metrics"]').should('be.visible');
 
       // Mock training progress updates
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
         const progressUpdates = [
           { epoch: 1, loss: 0.8, accuracy: 0.65, progress: 10 },
           { epoch: 5, loss: 0.6, accuracy: 0.78, progress: 25 },
@@ -189,14 +219,14 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
         progressUpdates.forEach((update, index) => {
           setTimeout(() => {
-            win.mockWebSocket.onmessage({
+            mockWin.mockWebSocket.onmessage({
               data: JSON.stringify({
                 type: 'training_progress',
                 trainingId: 'training-123',
                 ...update,
                 timestamp: new Date().toISOString()
               })
-            });
+            } as MessageEvent);
           }, index * 1000);
         });
       });
@@ -226,9 +256,14 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="resource-monitoring"]').should('be.visible');
 
       // Mock resource updates
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
         setInterval(() => {
-          win.mockWebSocket.onmessage({
+          mockWin.mockWebSocket.onmessage({
             data: JSON.stringify({
               type: 'resource_update',
               resources: {
@@ -238,7 +273,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
                 disk: 20 + Math.random() * 10
               }
             })
-          });
+          } as MessageEvent);
         }, 2000);
       });
 
@@ -248,14 +283,19 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="gpu-gauge"]').should('be.visible');
 
       // Test resource alerts
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'resource_update',
             resources: { memory: 95 }, // High memory usage
             alerts: ['high_memory_usage']
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="alert-high-memory"]').should('be.visible');
@@ -274,8 +314,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="monitor-overfitting"]').should('be.checked');
 
       // Mock overfitting detection
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'training_alert',
             alert: 'overfitting_detected',
@@ -283,7 +328,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
             validation_loss: 0.45,
             training_loss: 0.25
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="overfitting-alert"]').should('be.visible');
@@ -324,8 +369,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="online-users"]').should('be.visible');
 
       // Mock other user joining
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'user_joined',
             user: {
@@ -335,7 +385,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
               cursor: { x: 100, y: 200 }
             }
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="user-jane-doe"]').should('be.visible');
@@ -343,14 +393,19 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
       // Test real-time cursor tracking
       cy.get('[data-cy="experiment-description"]').click();
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'cursor_move',
             userId: 'user-456',
             position: { x: 300, y: 150 }
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="user-cursor-jane"]').should('have.css', 'left', '300px');
@@ -359,8 +414,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.muiTypeInTextField('experiment-description', 'Testing collaboration');
 
       // Mock other user's edit
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'text_edit',
             userId: 'user-456',
@@ -371,7 +431,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
               text: ' features'
             }
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="experiment-description"]').should('have.value', 'Testing collaboration features');
@@ -387,7 +447,12 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="activity-feed"]').should('be.visible');
 
       // Mock activity updates
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
         const activities = [
           { user: 'John Smith', action: 'modified', target: 'hyperparameters', timestamp: new Date().toISOString() },
           { user: 'Jane Doe', action: 'added', target: 'comment', timestamp: new Date().toISOString() },
@@ -396,12 +461,12 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
         activities.forEach((activity, index) => {
           setTimeout(() => {
-            win.mockWebSocket.onmessage({
+            mockWin.mockWebSocket.onmessage({
               data: JSON.stringify({
                 type: 'activity_update',
                 activity
               })
-            });
+            } as MessageEvent);
           }, index * 500);
         });
       });
@@ -429,8 +494,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.muiClickButton('post-comment');
 
       // Mock comment from another user
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'new_comment',
             comment: {
@@ -441,7 +511,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
               reactions: []
             }
           })
-        });
+        } as MessageEvent);
       });
 
       // Verify real-time comment appears
@@ -454,14 +524,19 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="reaction-thumbs-up"]').click();
 
       // Mock reaction from another user
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'comment_reaction',
             commentId: 'comment-456',
             reaction: { emoji: '👍', userId: 'user-789', userName: 'Bob Wilson' }
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="reaction-count-thumbs-up"]').should('contain', '2');
@@ -481,10 +556,15 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.visit('/real-time-monitoring');
 
       // Test high-frequency updates
-      cy.window().then(win => {
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
         // Simulate 10 updates per second
         setInterval(() => {
-          win.mockWebSocket.onmessage({
+          mockWin.mockWebSocket.onmessage({
             data: JSON.stringify({
               type: 'high_frequency_update',
               metrics: {
@@ -492,7 +572,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
                 value: Math.random() * 100
               }
             })
-          });
+          } as MessageEvent);
         }, 100);
       });
 
@@ -506,9 +586,16 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
       // Test memory management with streaming data
       cy.wait(5000);
-      cy.window().then(win => {
-        if (win.performance.memory) {
-          expect(win.performance.memory.usedJSHeapSize).to.be.lessThan(100000000); // < 100MB
+      cy.window().then((win) => {
+        const mockWin = win as Window & {
+          performance: Performance & {
+            memory?: {
+              usedJSHeapSize: number;
+            };
+          };
+        };
+        if (mockWin.performance.memory) {
+          expect(mockWin.performance.memory.usedJSHeapSize).to.be.lessThan(100000000); // < 100MB
         }
       });
     });
@@ -553,8 +640,13 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
       cy.get('[data-cy="sample-representation"]').should('contain', '99%');
 
       // Test real-time alerts at scale
-      cy.window().then(win => {
-        win.mockWebSocket.onmessage({
+      cy.window().then((win) => {
+        const mockWin = win as unknown as Window & {
+          mockWebSocket: {
+            onmessage: (event: MessageEvent) => void;
+          };
+        };
+        mockWin.mockWebSocket.onmessage({
           data: JSON.stringify({
             type: 'bulk_alert',
             alerts: Array.from({ length: 50 }, (_, i) => ({
@@ -563,7 +655,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
               severity: 'medium'
             }))
           })
-        });
+        } as MessageEvent);
       });
 
       cy.get('[data-cy="alert-summary"]').should('contain', '50 alerts');

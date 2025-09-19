@@ -6,7 +6,7 @@
 import { faker } from '@faker-js/faker';
 
 interface TestDataCache {
-  [key: string]: any;
+  data: unknown;
   timestamp: number;
 }
 
@@ -25,7 +25,7 @@ class TestDataGenerator {
   /**
    * Generate test data with caching
    */
-  async generate(type: string, options: any = {}): Promise<any> {
+  async generate(type: string, options: Record<string, unknown> = {}): Promise<unknown> {
     const cacheKey = `${type}-${JSON.stringify(options)}`;
 
     // Check cache
@@ -51,7 +51,7 @@ class TestDataGenerator {
   /**
    * Generate fresh test data
    */
-  private async generateFresh(type: string, options: any = {}): Promise<any> {
+  private async generateFresh(type: string, options: Record<string, unknown> = {}): Promise<unknown> {
     switch (type) {
       case 'user':
         return this.generateUser(options);
@@ -72,7 +72,7 @@ class TestDataGenerator {
     }
   }
 
-  private generateUser(options: any = {}) {
+  private generateUser(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       email: faker.internet.email(),
@@ -84,7 +84,7 @@ class TestDataGenerator {
     };
   }
 
-  private generateModel(options: any = {}) {
+  private generateModel(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       name: faker.commerce.productName() + ' Model',
@@ -98,7 +98,7 @@ class TestDataGenerator {
     };
   }
 
-  private generateDataset(options: any = {}) {
+  private generateDataset(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       name: faker.commerce.productName() + ' Dataset',
@@ -112,7 +112,7 @@ class TestDataGenerator {
     };
   }
 
-  private generateExperiment(options: any = {}) {
+  private generateExperiment(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       name: 'Experiment ' + faker.commerce.productAdjective(),
@@ -135,7 +135,7 @@ class TestDataGenerator {
     };
   }
 
-  private generateDeployment(options: any = {}) {
+  private generateDeployment(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       modelId: faker.string.uuid(),
@@ -151,8 +151,8 @@ class TestDataGenerator {
     };
   }
 
-  private generateTimeSeries(options: any = {}) {
-    const points = options.points || 100;
+  private generateTimeSeries(options: Record<string, unknown> = {}) {
+    const points = (options.points as number) || 100;
     const data = [];
     let value = faker.number.float({ min: 50, max: 100 });
 
@@ -169,7 +169,7 @@ class TestDataGenerator {
     return data;
   }
 
-  private generateMetrics(options: any = {}) {
+  private generateMetrics(options: Record<string, unknown> = {}) {
     return {
       cpu: faker.number.float({ min: 0, max: 100, fractionDigits: 1 }),
       memory: faker.number.float({ min: 0, max: 100, fractionDigits: 1 }),
@@ -193,7 +193,7 @@ class TestDataGenerator {
     };
   }
 
-  private generateGeneric(options: any = {}) {
+  private generateGeneric(options: Record<string, unknown> = {}) {
     return {
       id: faker.string.uuid(),
       name: faker.commerce.productName(),
@@ -217,7 +217,7 @@ const generator = TestDataGenerator.getInstance();
 /**
  * Generate test data
  */
-export async function generateData(type?: string): Promise<any> {
+export async function generateData(type?: string): Promise<unknown> {
   if (!type) {
     // Generate complete test suite data
     return {
@@ -235,7 +235,7 @@ export async function generateData(type?: string): Promise<any> {
 /**
  * Generate batch test data
  */
-export async function generateBatch(type: string, count: number): Promise<any[]> {
+export async function generateBatch(type: string, count: number): Promise<unknown[]> {
   return Promise.all([...Array(count)].map(() => generator.generate(type)));
 }
 

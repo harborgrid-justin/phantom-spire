@@ -51,21 +51,21 @@ class SettingsService extends BusinessLogicBase {
     }
 
     // --- Core Business Logic Interface Implementation ---
-    async validateData(data: unknown, context?: ServiceContext): Promise<ValidationResult> { return Promise.resolve({ isValid: true, errors: [] }); }
-    async processCreation(data: unknown, context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like createApiKey.'); }
-    async processUpdate(id: string, data: unknown, context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like updateSettings.'); }
-    async processDeletion(id: string, context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like deleteApiKey.'); }
-    async enforceBusinessRules(data: unknown, context?: ServiceContext): Promise<RuleEnforcementResult> { return Promise.resolve({ passed: true, violations: [], warnings: [], appliedRules: [] }); }
-    async validatePermissions(userId: string, operation: string, resource?: string): Promise<boolean> { return Promise.resolve(true); }
-    async auditOperation(operation: string, data: unknown, userId: string): Promise<void> { /* For logging/auditing */ }
-    async generateInsights(timeframe?: string, filters?: Record<string, unknown>): Promise<InsightResult> { throw new Error('Method not implemented.'); }
-    async calculateMetrics(filters?: Record<string, unknown>): Promise<MetricResult> { throw new Error('Method not implemented.'); }
-    async predictTrends(data: unknown[]): Promise<TrendPrediction> { throw new Error('Method not implemented.'); }
-    async performFeatureEngineering(data: unknown[], context?: ServiceContext): Promise<FeatureEngineeringResult> { throw new Error('Not applicable for SettingsService.'); }
-    async performFeatureSelection(features: any[], context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Not applicable for SettingsService.'); }
-    async triggerWorkflows(eventType: string, data: unknown): Promise<void> { /* For triggering notifications */ }
-    async integrateWithExternalSystems(data: unknown): Promise<IntegrationResult> { throw new Error('Method not implemented.'); }
-    async notifyStakeholders(event: string, data: unknown): Promise<void> { /* For sending notifications */ }
+    async validateData(_data: unknown, _context?: ServiceContext): Promise<ValidationResult> { return Promise.resolve({ isValid: true, errors: [] }); }
+    async processCreation(_data: unknown, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like createApiKey.'); }
+    async processUpdate(_id: string, _data: unknown, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like updateSettings.'); }
+    async processDeletion(_id: string, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Use specific methods like deleteApiKey.'); }
+    async enforceBusinessRules(_data: unknown, _context?: ServiceContext): Promise<RuleEnforcementResult> { return Promise.resolve({ passed: true, violations: [], warnings: [], appliedRules: [] }); }
+    async validatePermissions(_userId: string, _operation: string, _resource?: string): Promise<boolean> { return Promise.resolve(true); }
+    async auditOperation(_operation: string, _data: unknown, _userId: string): Promise<void> { /* For logging/auditing */ }
+    async generateInsights(_timeframe?: string, _filters?: Record<string, unknown>): Promise<InsightResult> { throw new Error('Method not implemented.'); }
+    async calculateMetrics(_filters?: Record<string, unknown>): Promise<MetricResult> { throw new Error('Method not implemented.'); }
+    async predictTrends(_data: unknown[]): Promise<TrendPrediction> { throw new Error('Method not implemented.'); }
+    async performFeatureEngineering(_data: unknown[], _context?: ServiceContext): Promise<FeatureEngineeringResult> { throw new Error('Not applicable for SettingsService.'); }
+    async performFeatureSelection(_features: unknown[], _context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Not applicable for SettingsService.'); }
+    async triggerWorkflows(_eventType: string, _data: unknown): Promise<void> { /* For triggering notifications */ }
+    async integrateWithExternalSystems(_data: unknown): Promise<IntegrationResult> { throw new Error('Method not implemented.'); }
+    async notifyStakeholders(_event: string, _data: unknown): Promise<void> { /* For sending notifications */ }
 
     protected async processBusinessLogic(request: BusinessLogicRequest, context: ServiceContext): Promise<unknown> {
         switch (request.type) {
@@ -81,15 +81,29 @@ class SettingsService extends BusinessLogicBase {
 
     public async getSettings(request: GetSettingsRequest, context: ServiceContext): Promise<GetSettingsResponse> {
         return this.executeWithContext(context, 'getSettings', async () => {
-            return this.createSuccessResponse(request, this.settings);
-        }) as Promise<GetSettingsResponse>;
+            return {
+                id: request.id,
+                success: true,
+                data: this.settings,
+                metadata: request.metadata,
+                performance: { executionTime: 0 },
+                timestamp: new Date()
+            };
+        });
     }
 
     public async updateSettings(request: UpdateSettingsRequest, context: ServiceContext): Promise<UpdateSettingsResponse> {
         return this.executeWithContext(context, 'updateSettings', async () => {
             this.settings = { ...this.settings, ...request.data.updates };
-            return this.createSuccessResponse(request, this.settings);
-        }) as Promise<UpdateSettingsResponse>;
+            return {
+                id: request.id,
+                success: true,
+                data: this.settings,
+                metadata: request.metadata,
+                performance: { executionTime: 0 },
+                timestamp: new Date()
+            };
+        });
     }
 
     public async createApiKey(request: CreateApiKeyRequest, context: ServiceContext): Promise<CreateApiKeyResponse> {
@@ -101,15 +115,29 @@ class SettingsService extends BusinessLogicBase {
                 lastUsed: 'Never',
             };
             this.settings.apiKeys.push(newKey);
-            return this.createSuccessResponse(request, newKey);
-        }) as Promise<CreateApiKeyResponse>;
+            return {
+                id: request.id,
+                success: true,
+                data: newKey,
+                metadata: request.metadata,
+                performance: { executionTime: 0 },
+                timestamp: new Date()
+            };
+        });
     }
 
     public async deleteApiKey(request: DeleteApiKeyRequest, context: ServiceContext): Promise<DeleteApiKeyResponse> {
         return this.executeWithContext(context, 'deleteApiKey', async () => {
             this.settings.apiKeys = this.settings.apiKeys.filter(k => k.key !== request.data.key);
-            return this.createSuccessResponse(request, { success: true });
-        }) as Promise<DeleteApiKeyResponse>;
+            return {
+                id: request.id,
+                success: true,
+                data: { success: true },
+                metadata: request.metadata,
+                performance: { executionTime: 0 },
+                timestamp: new Date()
+            };
+        });
     }
 }
 

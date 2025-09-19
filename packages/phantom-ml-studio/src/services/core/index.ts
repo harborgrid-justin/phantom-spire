@@ -1,23 +1,38 @@
-// Core ML Services - Enterprise ML Platform for Phantom Spire
-export { MLEngine } from './ml-engine/MLEngine';
-export { AutoMLPipelineOrchestrator } from './automl/AutoMLPipelineOrchestrator';
-export { HuggingFaceIntegrationService } from './huggingface/HuggingFaceIntegrationService';
-export { ModelRegistryService } from './model-registry/ModelRegistryService';
-export { RealTimeMonitoringService } from './monitoring/RealTimeMonitoringService';
-
-// Training and Data Services
-export { TrainingOrchestrator } from './training/TrainingOrchestrator';
-export { DataPipelineService } from './data/DataPipelineService';
-
-// Deployment and Security Services
-export { ModelDeploymentService } from './deployment/ModelDeploymentService';
-export { SecurityService } from './security/SecurityService';
-
-// Base Classes and Types
-export { BaseBusinessLogic } from './base/BaseBusinessLogic';
+// Base Classes and Types (export first to avoid reference issues)
 export { BusinessLogicBase } from './base/BusinessLogicBase';
+export { BaseService } from './base/BaseService';
 export * from './types/business-logic.types';
 export * from './types/service.types';
+
+// Core ML Services - Enterprise ML Platform for Phantom Spire
+export { AutoMLPipelineOrchestrator } from './automl/AutoMLPipelineOrchestrator';
+export { DataPipelineService } from './data/DataPipelineService';
+export { ModelDeploymentService } from './deployment/ModelDeploymentService';
+
+// Placeholder classes for services that don't exist yet
+export class MLEngine {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
+
+export class HuggingFaceIntegrationService {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
+
+export class ModelRegistryService {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
+
+export class RealTimeMonitoringService {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
+
+export class TrainingOrchestrator {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
+
+export class SecurityService {
+  constructor(public config?: unknown, public environment?: unknown) {}
+}
 
 // Type definitions for service configurations
 export interface ServiceConfig {

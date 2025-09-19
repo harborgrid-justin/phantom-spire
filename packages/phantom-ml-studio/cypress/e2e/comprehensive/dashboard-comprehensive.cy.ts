@@ -7,7 +7,7 @@ describe('Dashboard - Comprehensive Test Suite', () => {
 
   beforeEach(() => {
     dashboardPage = new DashboardPage();
-    cy.setupTestEnvironment('default');
+    cy.setupTestEnvironment('dashboard');
 
     // Mock real-time data updates
     cy.intercept('GET', '/api/dashboard/realtime', {
@@ -17,19 +17,45 @@ describe('Dashboard - Comprehensive Test Suite', () => {
     // Mock WebSocket connection for real-time updates
     cy.window().then((win) => {
       // Mock WebSocket for real-time features
-      win.WebSocket = class MockWebSocket {
-        constructor(url: string) {
+      const MockWebSocket = class implements WebSocket {
+        static readonly CONNECTING = 0;
+        static readonly OPEN = 1;
+        static readonly CLOSING = 2;
+        static readonly CLOSED = 3;
+        
+        readonly CONNECTING = 0;
+        readonly OPEN = 1;
+        readonly CLOSING = 2;
+        readonly CLOSED = 3;
+        
+        readyState = 1; // OPEN
+        url = '';
+        protocol = '';
+        extensions = '';
+        binaryType: BinaryType = 'blob';
+        bufferedAmount = 0;
+        
+        constructor(url: string | URL) {
+          this.url = typeof url === 'string' ? url : url.toString();
           setTimeout(() => {
-            this.onopen && this.onopen({});
+            this.onopen && this.onopen(new Event('open'));
           }, 100);
         }
-        onopen: ((event: any) => void) | null = null;
-        onmessage: ((event: any) => void) | null = null;
-        onerror: ((event: any) => void) | null = null;
-        onclose: ((event: any) => void) | null = null;
+        
+        onopen: ((this: WebSocket, ev: Event) => void) | null = null;
+        onmessage: ((this: WebSocket, ev: MessageEvent) => void) | null = null;
+        onerror: ((this: WebSocket, ev: Event) => void) | null = null;
+        onclose: ((this: WebSocket, ev: CloseEvent) => void) | null = null;
+        
         send = cy.stub();
         close = cy.stub();
+        
+        addEventListener = cy.stub();
+        removeEventListener = cy.stub();
+        dispatchEvent = cy.stub().returns(true);
       };
+      
+      (win as Window & { WebSocket: typeof WebSocket }).WebSocket = MockWebSocket as unknown as typeof WebSocket;
     });
   });
 
@@ -127,7 +153,10 @@ describe('Dashboard - Comprehensive Test Suite', () => {
 
       // Simulate connection loss
       cy.window().then((win) => {
-        win.navigator.onLine = false;
+        Object.defineProperty(win.navigator, 'onLine', {
+          writable: true,
+          value: false
+        });
         win.dispatchEvent(new Event('offline'));
       });
 
@@ -136,7 +165,10 @@ describe('Dashboard - Comprehensive Test Suite', () => {
 
       // Simulate reconnection
       cy.window().then((win) => {
-        win.navigator.onLine = true;
+        Object.defineProperty(win.navigator, 'onLine', {
+          writable: true,
+          value: true
+        });
         win.dispatchEvent(new Event('online'));
       });
 

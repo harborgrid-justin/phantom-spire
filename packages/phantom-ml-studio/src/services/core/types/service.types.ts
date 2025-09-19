@@ -14,6 +14,7 @@ export interface ServiceDefinition {
   config: ServiceConfiguration;
   status: ServiceStatus;
   metadata: ServiceMetadata;
+  capabilities?: string[];
 }
 
 export type ServiceCategory = 
@@ -227,7 +228,7 @@ export interface EventHandlerOptions {
 }
 
 // Service Execution Context
-export interface ServiceContext {
+export interface ServiceContext extends Record<string, unknown> {
   requestId: string;
   userId?: string;
   sessionId?: string;
@@ -236,10 +237,10 @@ export interface ServiceContext {
   startTime: Date;
   timeout: number;
   metadata: Record<string, unknown>;
-  trace: TraceContext;
+  trace: ServiceTraceContext;
 }
 
-export interface TraceContext {
+export interface ServiceTraceContext {
   traceId: string;
   spanId: string;
   parentSpanId?: string;

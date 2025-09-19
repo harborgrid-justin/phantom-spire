@@ -17,7 +17,7 @@ export const preloadCriticalComponents = async () => {
     // Preload dashboard and model builder as they're likely to be accessed first
     const criticalComponents = [
       () => import('@/app/dashboard/page'),
-      () => import('@/app/model-builder/page'),
+      () => import('../app/modelBuilder/page'),
     ];
     
     await Promise.all(criticalComponents.map(preloadComponent));
@@ -30,10 +30,10 @@ export const preloadCriticalComponents = async () => {
 export const preloadAdvancedFeatures = async () => {
   try {
     const advancedComponents = [
-      () => import('@/app/automl-pipeline-visualizer/page'),
-      () => import('@/app/bias-detection-engine/page'),
-      () => import('@/app/explainable-ai-visualizer/page'),
-      () => import('@/app/real-time-monitoring/page'),
+      () => import('../app/automlPipeline/page'),
+      () => import('../app/biasDetection/page'),
+      () => import('../app/explainableAi/page'),
+      () => import('../app/monitoring/page'),
     ];
     
     await Promise.all(advancedComponents.map(preloadComponent));

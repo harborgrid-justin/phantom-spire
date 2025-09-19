@@ -66,21 +66,21 @@ class ExplainableAiVisualizerService extends BusinessLogicBase {
     }
 
     // --- Core Business Logic Interface Implementation ---
-    async validateData(data: unknown, context?: ServiceContext): Promise<ValidationResult> { return Promise.resolve({ isValid: true, errors: [] }); }
-    async processCreation(data: unknown, context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
-    async processUpdate(id: string, data: unknown, context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
-    async processDeletion(id: string, context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
-    async enforceBusinessRules(data: unknown, context?: ServiceContext): Promise<RuleEnforcementResult> { return Promise.resolve({ passed: true, violations: [], warnings: [], appliedRules: [] }); }
-    async validatePermissions(userId: string, operation: string, resource?: string): Promise<boolean> { return Promise.resolve(true); }
-    async auditOperation(operation: string, data: unknown, userId: string): Promise<void> { console.log(`Auditing operation: ${operation} by user ${userId}`, data); return Promise.resolve(); }
-    async generateInsights(timeframe?: string, filters?: Record<string, unknown>): Promise<InsightResult> { throw new Error('Method not implemented.'); }
-    async calculateMetrics(filters?: Record<string, unknown>): Promise<MetricResult> { throw new Error('Method not implemented.'); }
-    async predictTrends(data: unknown[]): Promise<TrendPrediction> { throw new Error('Method not implemented.'); }
-    async triggerWorkflows(eventType: string, data: unknown): Promise<void> { console.log(`Triggering workflow for event: ${eventType}`, data); return Promise.resolve(); }
-    async integrateWithExternalSystems(data: unknown): Promise<IntegrationResult> { throw new Error('Method not implemented.'); }
-    async notifyStakeholders(event: string, data: unknown): Promise<void> { console.log(`Notifying stakeholders for event: ${event}`, data); return Promise.resolve(); }
-    async performFeatureEngineering(data: unknown[], context?: ServiceContext): Promise<FeatureEngineeringResult> { throw new Error('Method not implemented.'); }
-    async performFeatureSelection(features: EngineeredFeature[], context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Method not implemented.'); }
+    async validateData(_data: unknown, _context?: ServiceContext): Promise<ValidationResult> { return Promise.resolve({ isValid: true, errors: [] }); }
+    async processCreation(_data: unknown, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
+    async processUpdate(_id: string, _data: unknown, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
+    async processDeletion(_id: string, _context: ServiceContext): Promise<ProcessResult> { throw new Error('Method not implemented.'); }
+    async enforceBusinessRules(_data: unknown, _context?: ServiceContext): Promise<RuleEnforcementResult> { return Promise.resolve({ passed: true, violations: [], warnings: [], appliedRules: [] }); }
+    async validatePermissions(_userId: string, _operation: string, _resource?: string): Promise<boolean> { return Promise.resolve(true); }
+    async auditOperation(_operation: string, _data: unknown, _userId: string): Promise<void> { console.log(`Auditing operation: ${_operation} by user ${_userId}`, _data); return Promise.resolve(); }
+    async generateInsights(_timeframe?: string, _filters?: Record<string, unknown>): Promise<InsightResult> { throw new Error('Method not implemented.'); }
+    async calculateMetrics(_filters?: Record<string, unknown>): Promise<MetricResult> { throw new Error('Method not implemented.'); }
+    async predictTrends(_data: unknown[]): Promise<TrendPrediction> { throw new Error('Method not implemented.'); }
+    async triggerWorkflows(_eventType: string, _data: unknown): Promise<void> { console.log(`Triggering workflow for event: ${_eventType}`, _data); return Promise.resolve(); }
+    async integrateWithExternalSystems(_data: unknown): Promise<IntegrationResult> { throw new Error('Method not implemented.'); }
+    async notifyStakeholders(_event: string, _data: unknown): Promise<void> { console.log(`Notifying stakeholders for event: ${_event}`, _data); return Promise.resolve(); }
+    async performFeatureEngineering(_data: unknown[], _context?: ServiceContext): Promise<FeatureEngineeringResult> { throw new Error('Method not implemented.'); }
+    async performFeatureSelection(_features: EngineeredFeature[], _context?: ServiceContext): Promise<FeatureSelectionResult> { throw new Error('Method not implemented.'); }
 
     protected async processBusinessLogic(request: BusinessLogicRequest, context: ServiceContext): Promise<unknown> {
         switch (request.type) {
@@ -109,7 +109,7 @@ class ExplainableAiVisualizerService extends BusinessLogicBase {
                 securityContext: { threatIntelligenceUsed: [], complianceImplications: [], riskAssessment: 'high', biasAnalysis: { detected: false, areas: [], mitigation: [] } }
             };
             return this.createSuccessResponse(request, mockExplanation);
-        }) as Promise<GetModelExplanationResponse>;
+        }) as unknown as Promise<GetModelExplanationResponse>;
     }
 
     // --- Lifecycle Methods ---

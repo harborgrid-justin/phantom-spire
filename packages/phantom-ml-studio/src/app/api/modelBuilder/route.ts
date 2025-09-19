@@ -49,7 +49,7 @@ export async function POST(request: Request) {
           sampled: true,
           baggage: {},
       }
-    }, (progress) => {
+    }, (progress: number) => {
         // Progress callback - avoid logging in production
         if (process.env.NODE_ENV === 'development') {
           console.log(`Training progress: ${progress}%`);

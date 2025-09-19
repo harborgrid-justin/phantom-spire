@@ -338,7 +338,7 @@ export abstract class BusinessLogicBase extends BaseService {
 
   protected async validateBusinessRules(): Promise<void> {
     // Validate that all required business rules are properly configured
-    for (const rule of this.businessRules.values()) {
+    for (const rule of Array.from(this.businessRules.values())) {
       if (!rule.condition) {
         throw new Error(`Business rule ${rule.id} is missing condition`);
       }

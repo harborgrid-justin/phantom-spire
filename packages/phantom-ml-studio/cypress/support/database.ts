@@ -4,17 +4,54 @@
  */
 
 interface SeedData {
-  users?: any[];
-  models?: any[];
-  experiments?: any[];
-  deployments?: any[];
-  [key: string]: any;
+  users?: UserSeedData[];
+  models?: ModelSeedData[];
+  experiments?: ExperimentSeedData[];
+  deployments?: DeploymentSeedData[];
+  [key: string]: unknown[] | undefined;
+}
+
+interface UserSeedData {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+interface ModelSeedData {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  accuracy?: number;
+}
+
+interface ExperimentSeedData {
+  id: string;
+  name: string;
+  modelId: string;
+  status: string;
+  metrics?: Record<string, number>;
+}
+
+interface DeploymentSeedData {
+  id: string;
+  modelId: string;
+  environment: string;
+  status: string;
+  endpoint?: string;
+}
+
+interface DatabaseConnection {
+  id: string;
+  isConnected: boolean;
+  query: (sql: string) => Promise<{ rows: unknown[]; rowCount: number }>;
 }
 
 // Mock database connection pool
 class DatabasePool {
   private static instance: DatabasePool;
-  private connections: Map<string, any> = new Map();
+  private connections: Map<string, DatabaseConnection> = new Map();
   private locks: Map<string, Promise<void>> = new Map();
 
   static getInstance(): DatabasePool {
@@ -42,7 +79,7 @@ class DatabasePool {
     };
   }
 
-  async getConnection(workerId: string = '0'): Promise<any> {
+  async getConnection(workerId: string = '0'): Promise<DatabaseConnection | undefined> {
     if (!this.connections.has(workerId)) {
       // Create mock connection for worker
       this.connections.set(workerId, {
@@ -131,7 +168,7 @@ export async function seed(data?: SeedData): Promise<boolean> {
     for (const [collection, items] of Object.entries(seedData)) {
       if (Array.isArray(items)) {
         for (const item of items) {
-          await insertDocument(collection, item);
+          await insertDocument(collection, item as Record<string, unknown>);
         }
       }
     }
@@ -190,7 +227,7 @@ async function clearCollections(collections: string[]): Promise<void> {
 /**
  * Insert document into collection
  */
-async function insertDocument(collection: string, document: any): Promise<void> {
+async function insertDocument(collection: string, document: Record<string, unknown>): Promise<void> {
   // Mock implementation
   console.log(`Inserting into ${collection}:`, document.id || document.name);
 }
@@ -198,8 +235,8 @@ async function insertDocument(collection: string, document: any): Promise<void> 
 /**
  * Get test data by type
  */
-export async function getTestData(type: string): Promise<any> {
-  const testData: Record<string, any> = {
+export async function getTestData(type: string): Promise<Record<string, unknown> | null> {
+  const testData: Record<string, Record<string, unknown>> = {
     user: {
       id: 'test-user',
       email: 'test@phantom-ml.com',

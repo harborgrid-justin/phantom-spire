@@ -11,6 +11,7 @@ interface TestMetric {
   testFile?: string;
   browser?: string;
   viewport?: { width: number; height: number };
+  metadata?: Record<string, unknown>;
 }
 
 class MetricsCollector {
@@ -47,16 +48,20 @@ class MetricsCollector {
       testName,
       testFile,
       metadata: { passed },
-    } as any);
+    });
   }
 
   addMetric(metric: TestMetric): void {
     // Add browser and viewport info
     if (typeof window !== 'undefined' && window.Cypress) {
-      metric.browser = (Cypress as any).browser?.name;
+      const cypressConfig = Cypress as unknown as {
+        browser?: { name: string };
+        config: (key: string) => number;
+      };
+      metric.browser = cypressConfig.browser?.name;
       metric.viewport = {
-        width: (Cypress as any).config('viewportWidth'),
-        height: (Cypress as any).config('viewportHeight'),
+        width: cypressConfig.config('viewportWidth'),
+        height: cypressConfig.config('viewportHeight'),
       };
     }
 
@@ -79,7 +84,7 @@ class MetricsCollector {
       unit: 'ms',
       timestamp: Date.now(),
       metadata: { status },
-    } as any);
+    });
   }
 
   trackCustom(name: string, value: number, unit: string = 'ms'): void {
@@ -111,7 +116,7 @@ export const metricsCollector = MetricsCollector.getInstance();
 /**
  * Save metrics to storage
  */
-export async function saveMetrics(metrics: any): Promise<boolean> {
+export async function saveMetrics(metrics: TestMetric): Promise<boolean> {
   try {
     metricsCollector.addMetric(metrics);
     await metricsCollector.saveToFile(`cypress/results/metrics-${Date.now()}.json`);
@@ -126,17 +131,17 @@ export async function saveMetrics(metrics: any): Promise<boolean> {
  * Cypress command to track metrics
  */
 if (typeof Cypress !== 'undefined') {
-  Cypress.Commands.add('trackMetric', (name: string, value: number, unit?: string) => {
+  // Note: Custom commands are defined in commands.ts to avoid typing conflicts
+  // These are helper functions that can be called directly
+  (window as unknown as Record<string, unknown>).trackMetric = (name: string, value: number, unit?: string) => {
     metricsCollector.trackCustom(name, value, unit);
-  });
+  };
 
-  Cypress.Commands.add('trackPageLoad', (pageName: string) => {
+  (window as unknown as Record<string, unknown>).trackPageLoad = (pageName: string) => {
     const startTime = performance.now();
-    cy.window().then(() => {
-      const loadTime = performance.now() - startTime;
-      metricsCollector.trackPageLoad(pageName, loadTime);
-    });
-  });
+    const loadTime = performance.now() - startTime;
+    metricsCollector.trackPageLoad(pageName, loadTime);
+  };
 
   // Hook into test lifecycle
   beforeEach(function() {

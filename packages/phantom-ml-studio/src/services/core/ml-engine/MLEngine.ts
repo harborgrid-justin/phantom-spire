@@ -11,7 +11,7 @@
 
 import { BaseBusinessLogic } from '../base/BaseBusinessLogic';
 import { ServiceDefinition, ServiceContext } from '../types/service.types';
-import { BusinessLogicRequest, BusinessLogicResponse } from '../types/business-logic.types';
+import { BusinessLogicRequest, BusinessLogicResponse, BusinessLogicConfig, EnvironmentConfig } from '../types/business-logic.types';
 import { ServiceConfig, ServiceEnvironment } from '../index';
 
 // Enhanced ML Types for H2O.ai Competition
@@ -301,9 +301,27 @@ export class MLEngine extends BaseBusinessLogic {
   private availableAlgorithms: Map<string, MLAlgorithm> = new Map();
   private runningJobs: Map<string, AutoMLJob> = new Map();
   private modelRegistry: Map<string, MLModel> = new Map();
+  public version = '1.0.0';
 
   constructor(config: ServiceConfig, environment: ServiceEnvironment) {
-    super(config, environment);
+    // Convert ServiceConfig to BusinessLogicConfig
+    const businessConfig: BusinessLogicConfig = {
+      enableLogging: config.enableLogging ?? true,
+      enableMetrics: config.enableMetrics ?? true,
+      enableEvents: config.enableEvents ?? true,
+      retryAttempts: config.retryAttempts ?? 3,
+      timeoutMs: config.timeoutMs ?? 30000
+    };
+
+    // Convert ServiceEnvironment to EnvironmentConfig
+    const envConfig: EnvironmentConfig = {
+      name: environment.name,
+      region: environment.region,
+      apiEndpoints: environment.apiEndpoints,
+      credentials: environment.credentials
+    };
+
+    super(businessConfig, envConfig);
     this.initializeAlgorithms();
   }
 
@@ -478,7 +496,7 @@ export class MLEngine extends BaseBusinessLogic {
   }
 
   // Private implementation methods
-  private async initializeAlgorithms(): void {
+  private async initializeAlgorithms(): Promise<void> {
     // Initialize comprehensive algorithm library
     const algorithms: MLAlgorithm[] = [
       // Tree-based algorithms

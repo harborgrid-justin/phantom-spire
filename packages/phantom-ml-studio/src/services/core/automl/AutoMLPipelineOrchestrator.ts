@@ -112,13 +112,64 @@ export class AutoMLPipelineOrchestrator extends BaseService {
   private ensembleBuilder: EnsembleBuilder;
   private performanceOptimizer: PerformanceOptimizer;
 
-  constructor() {
+  constructor(config?: unknown, environment?: unknown) {
     const definition: ServiceDefinition = {
       id: 'automl-pipeline-orchestrator',
       name: 'AutoML Pipeline Orchestrator',
       version: '2.0.0',
+      category: 'analytics' as const,
       description: 'Advanced AutoML pipeline orchestration surpassing H2O.ai',
       dependencies: ['ml-engine', 'feature-store', 'model-registry', 'compute-cluster'],
+      config: {
+        enabled: true,
+        autoStart: true,
+        retryPolicy: {
+          maxRetries: 3,
+          baseDelay: 1000,
+          maxDelay: 10000,
+          exponentialBackoff: true,
+          jitter: true,
+          retryableErrors: ['TIMEOUT', 'CONNECTION_ERROR']
+        },
+        timeouts: {
+          request: 30000,
+          connection: 5000,
+          idle: 60000
+        },
+        caching: {
+          enabled: true,
+          provider: 'memory' as const,
+          ttl: 300000,
+          maxSize: 1000,
+          compressionEnabled: false
+        },
+        monitoring: {
+          metricsEnabled: true,
+          tracingEnabled: true,
+          healthCheckEnabled: true,
+          alerting: {
+            enabled: true,
+            errorRate: { warning: 0.05, critical: 0.1, evaluationWindow: 300 },
+            responseTime: { warning: 5000, critical: 10000, evaluationWindow: 300 },
+            throughput: { warning: 10, critical: 5, evaluationWindow: 300 },
+            availability: { warning: 0.99, critical: 0.95, evaluationWindow: 300 }
+          },
+          sampling: {
+            rate: 0.1,
+            maxTracesPerSecond: 100,
+            slowRequestThreshold: 1000
+          }
+        }
+      },
+      status: 'initializing' as const,
+      metadata: {
+        author: 'Phantom ML Studio',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        tags: ['automl', 'pipeline', 'orchestration', 'ml-engine'],
+        documentation: 'Advanced AutoML pipeline orchestration service',
+        supportContact: 'support@phantomlstudio.com'
+      },
       capabilities: [
         'intelligent-algorithm-selection',
         'adaptive-feature-engineering',
@@ -152,7 +203,7 @@ export class AutoMLPipelineOrchestrator extends BaseService {
 
   protected async onStop(): Promise<void> {
     // Gracefully stop all active pipelines
-    for (const [id, execution] of this.activeExecutions) {
+    for (const [id, execution] of Array.from(this.activeExecutions)) {
       await this.stopPipeline(id);
     }
   }

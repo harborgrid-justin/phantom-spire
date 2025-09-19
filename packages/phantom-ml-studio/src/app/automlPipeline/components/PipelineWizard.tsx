@@ -182,7 +182,7 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               label="Time Constraint (minutes)"
               type="number"
               value={config.timeConstraint}
-              onChange={(e) => setConfig(prev => ({ ...prev, timeConstraint: parseInt(e.target.value) }))}
+              onChange={(e) => setConfig(prev => ({ ...prev, timeConstraint: parseInt(e.target.value) || 0 }))}
               sx={{ mb: 2 }}
               data-cy="time-constraint"
             />
@@ -191,7 +191,7 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               label="Memory Constraint (GB)"
               type="number"
               value={config.memoryConstraint}
-              onChange={(e) => setConfig(prev => ({ ...prev, memoryConstraint: parseInt(e.target.value) }))}
+              onChange={(e) => setConfig(prev => ({ ...prev, memoryConstraint: parseInt(e.target.value) || 0 }))}
               sx={{ mb: 2 }}
               data-cy="memory-constraint"
             />
@@ -199,7 +199,7 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               <InputLabel>Model Complexity</InputLabel>
               <Select
                 value={config.modelComplexity}
-                onChange={(e) => setConfig(prev => ({ ...prev, modelComplexity: e.target.value }))}
+                onChange={(e) => setConfig(prev => ({ ...prev, modelComplexity: e.target.value as string }))}
                 data-cy="model-complexity"
               >
                 <MenuItem value="low">Low</MenuItem>
@@ -211,7 +211,7 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               <InputLabel>Interpretability Level</InputLabel>
               <Select
                 value={config.interpretabilityLevel}
-                onChange={(e) => setConfig(prev => ({ ...prev, interpretabilityLevel: e.target.value }))}
+                onChange={(e) => setConfig(prev => ({ ...prev, interpretabilityLevel: e.target.value as string }))}
                 data-cy="interpretability-level"
               >
                 <MenuItem value="low">Low</MenuItem>

@@ -51,7 +51,7 @@ export interface PhantomMLCoreBindings {
 
   // ==================== ENTERPRISE EXTENSIONS ====================
   // High-level workflow methods
-  quickStart(useCase: string, data: string, config?: any): Promise<string>;
+  quickStart(useCase: string, data: string, config?: Record<string, unknown>): Promise<string>;
   runFullAnalytics(modelId: string, data?: string): Promise<string>;
   getSystemStatus(): Promise<string>;
   getDashboardData(): Promise<string>;
@@ -271,7 +271,7 @@ class PhantomMLCoreService implements PhantomMLCoreBindings {
 
   // ==================== ENTERPRISE EXTENSIONS ====================
 
-  async quickStart(useCase: string, data: string, config: any = {}): Promise<string> {
+  async quickStart(useCase: string, data: string, config: Record<string, unknown> = {}): Promise<string> {
     await this.ensureInitialized();
     return await this.enterprisePlatform.quickStart(useCase, data, config);
   }

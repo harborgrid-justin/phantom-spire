@@ -115,7 +115,7 @@ describe('UX: Dashboard & Data Visualization', () => {
 
       // Measure chart rendering time
       const start = Date.now();
-      cy.waitForRechart('performance-trends-chart').then(() => {
+      cy.waitForChart('[data-cy="performance-trends-chart"]').then(() => {
         const renderTime = Date.now() - start;
         expect(renderTime).to.be.lessThan(2000); // < 2 seconds
       });
@@ -230,7 +230,7 @@ describe('UX: Dashboard & Data Visualization', () => {
       // Mock WebSocket connection for real-time updates
       cy.window().then((win) => {
         const mockSocket = {
-          onmessage: null,
+          onmessage: null as ((event: MessageEvent) => void) | null,
           send: cy.stub(),
           close: cy.stub()
         };
@@ -246,11 +246,11 @@ describe('UX: Dashboard & Data Visualization', () => {
                   deployments: { value: 13, trend: 'up' }
                 }
               })
-            });
+            } as MessageEvent);
           }
         }, 1000);
 
-        win.mockWebSocket = mockSocket;
+        (win as unknown as Window & { mockWebSocket: typeof mockSocket }).mockWebSocket = mockSocket;
       });
 
       // Verify real-time updates
@@ -267,8 +267,13 @@ describe('UX: Dashboard & Data Visualization', () => {
     it('should gracefully handle connection interruptions', () => {
       // Simulate connection loss
       cy.window().then((win) => {
-        if (win.mockWebSocket) {
-          win.mockWebSocket.close();
+        const mockWin = win as Window & { 
+          mockWebSocket?: { 
+            close: () => void; 
+          }; 
+        };
+        if (mockWin.mockWebSocket) {
+          mockWin.mockWebSocket.close();
         }
       });
 
@@ -331,7 +336,7 @@ describe('UX: Dashboard & Data Visualization', () => {
       cy.get('[data-cy="chart-retry-performance-trends"]').click();
 
       cy.get('[data-cy="chart-error-performance-trends"]').should('not.exist');
-      cy.waitForRechart('performance-trends-chart');
+      cy.waitForChart('[data-cy="performance-trends-chart"]');
     });
   });
 

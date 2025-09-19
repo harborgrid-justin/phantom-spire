@@ -5,23 +5,50 @@
  */
 
 import { defineConfig } from 'cypress';
+import * as fs from 'fs';
+import * as path from 'path';
+import axios from 'axios';
+
+interface ApiRequestOptions {
+  url: string;
+  method?: string;
+  body?: unknown;
+  headers?: Record<string, string>;
+}
+
+interface TestDataGenerator {
+  type: string;
+  count: number;
+}
+
+interface TestDataItem {
+  id: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+// Using dynamic import to avoid require() for faker
+async function getFaker(): Promise<Record<string, unknown> | null> {
+  try {
+    return await import('faker');
+  } catch {
+    return null;
+  }
+}
 
 module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) => {
   // R.12: Custom cy.task implementations for advanced testing
   on('task', {
     // Database operations for integration testing
-    seedDatabase(data: any) {
+    seedDatabase(data: Record<string, unknown>) {
       console.log('Seeding test database with:', data);
       // In a real implementation, this would seed the database
       return Promise.resolve(data);
     },
 
     // File system operations
-    writeTestFile({ path, content }: { path: string; content: string }) {
-      const fs = require('fs');
-      const pathModule = require('path');
-
-      const fullPath = pathModule.resolve(path);
+    writeTestFile({ path: filePath, content }: { path: string; content: string }) {
+      const fullPath = path.resolve(filePath);
       fs.writeFileSync(fullPath, content);
 
       return Promise.resolve({ path: fullPath, size: content.length });
@@ -47,19 +74,17 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
     },
 
     // API testing utilities
-    makeApiRequest({ url, method, body, headers }: any) {
-      const axios = require('axios');
-
+    makeApiRequest(options: ApiRequestOptions) {
       return axios({
-        url,
-        method: method || 'GET',
-        data: body,
-        headers: headers || {}
-      }).then((response: any) => ({
+        url: options.url,
+        method: options.method || 'GET',
+        data: options.body,
+        headers: options.headers || {}
+      }).then((response) => ({
         status: response.status,
         data: response.data,
         headers: response.headers
-      })).catch((error: any) => ({
+      })).catch((error) => ({
         status: error.response?.status || 500,
         error: error.message
       }));
@@ -67,28 +92,26 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
 
     // Test data generation
     generateTestData({ type, count }: { type: string; count: number }) {
-      const faker = require('faker');
-
-      const generators: Record<string, () => any> = {
+      const generators: Record<string, () => TestDataItem> = {
         user: () => ({
-          id: faker.datatype.uuid(),
-          name: faker.name.findName(),
-          email: faker.internet.email(),
-          createdAt: faker.date.recent()
+          id: `user-${Math.random().toString(36).substr(2, 9)}`,
+          name: `Test User ${Math.floor(Math.random() * 1000)}`,
+          email: `test${Math.floor(Math.random() * 1000)}@example.com`,
+          createdAt: new Date().toISOString()
         }),
         model: () => ({
-          id: faker.datatype.uuid(),
-          name: faker.hacker.noun(),
-          algorithm: faker.random.arrayElement(['random-forest', 'neural-network', 'svm']),
-          accuracy: faker.datatype.float({ min: 0.7, max: 0.99, precision: 0.01 }),
-          createdAt: faker.date.recent()
+          id: `model-${Math.random().toString(36).substr(2, 9)}`,
+          name: `Test Model ${Math.floor(Math.random() * 1000)}`,
+          algorithm: ['random-forest', 'neural-network', 'svm'][Math.floor(Math.random() * 3)],
+          accuracy: Math.random() * 0.3 + 0.7, // 0.7 to 1.0
+          createdAt: new Date().toISOString()
         }),
         dataset: () => ({
-          id: faker.datatype.uuid(),
-          name: faker.company.companyName() + ' Dataset',
-          size: faker.datatype.number({ min: 1000, max: 1000000 }),
-          format: faker.random.arrayElement(['csv', 'json', 'parquet']),
-          createdAt: faker.date.recent()
+          id: `dataset-${Math.random().toString(36).substr(2, 9)}`,
+          name: `Test Dataset ${Math.floor(Math.random() * 1000)}`,
+          size: Math.floor(Math.random() * 999000) + 1000, // 1000 to 1000000
+          format: ['csv', 'json', 'parquet'][Math.floor(Math.random() * 3)],
+          createdAt: new Date().toISOString()
         })
       };
 
@@ -102,9 +125,6 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
 
     // Cleanup operations
     cleanupTestArtifacts() {
-      const fs = require('fs');
-      const path = require('path');
-
       const artifactDirs = [
         'cypress/downloads',
         'cypress/screenshots',
@@ -127,12 +147,12 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
     },
 
     // Log aggregation
-    log(message: any) {
+    log(message: unknown) {
       console.log('[Cypress Task]', message);
       return null;
     },
 
-    table(data: any) {
+    table(data: unknown) {
       console.table(data);
       return null;
     }
@@ -157,8 +177,8 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   on('after:run', (results) => {
     console.log('Cypress run completed:', results);
 
-    // Generate performance report
-    if (results.totalPassed && results.totalFailed !== undefined) {
+    // Generate performance report for successful runs only
+    if ('totalPassed' in results && 'totalFailed' in results) {
       const successRate = (results.totalPassed / (results.totalPassed + results.totalFailed)) * 100;
       console.log(`Test Success Rate: ${successRate.toFixed(2)}%`);
     }

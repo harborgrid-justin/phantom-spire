@@ -4,6 +4,9 @@
 
 import { BusinessLogicRequest, BusinessLogicResponse, DataObject, EngineeredFeature, SelectedFeature, EnsembleResult } from '../core';
 
+// Re-export EnsembleResult so it can be imported from this module
+export type { EnsembleResult } from '../core';
+
 // Use existing DataObject type from core instead of defining DataRow
 export type DataRow = DataObject;
 

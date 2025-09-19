@@ -220,7 +220,9 @@ export class ModelDeploymentService extends BaseBusinessLogic {
     const deployment = this.deployments.get(deploymentId);
     if (!deployment) throw new Error(`Deployment ${deploymentId} not found`);
 
-    deployment.config.replicas = replicas;
+    if (deployment.config) {
+      deployment.config.replicas = replicas;
+    }
     deployment.updatedAt = new Date();
 
     // Execute scaling
@@ -239,7 +241,7 @@ export class ModelDeploymentService extends BaseBusinessLogic {
     this.deployments.delete(deploymentId);
 
     // Remove associated endpoints
-    for (const [endpointId, endpoint] of this.endpoints.entries()) {
+    for (const [endpointId, endpoint] of Array.from(this.endpoints.entries())) {
       if (endpoint.deploymentId === deploymentId) {
         this.endpoints.delete(endpointId);
       }
@@ -286,7 +288,7 @@ export class ModelDeploymentService extends BaseBusinessLogic {
     const deployment: Deployment = {
       id: deploymentId,
       modelId: optimizedModelId,
-      environment: 'edge' as DeploymentEnvironment,
+      environment: { name: 'development', region: 'edge', cluster: 'edge-cluster' } as DeploymentEnvironment,
       status: 'deployed',
       config: {
         replicas: 1,

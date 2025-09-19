@@ -83,7 +83,7 @@ export interface BatchJob {
   };
   results: {
     outputPath?: string;
-    summary?: Record<string, any>;
+    summary?: Record<string, unknown>;
     errorLog?: string;
   };
 }
@@ -102,7 +102,7 @@ export interface AlertRule {
   severity: 'low' | 'medium' | 'high' | 'critical';
   actions: Array<{
     type: 'email' | 'webhook' | 'slack' | 'pagerduty';
-    config: Record<string, never>;
+    config: Record<string, unknown>;
   }>;
   cooldown: number; // milliseconds to prevent spam
   lastTriggered?: Date;
@@ -111,14 +111,14 @@ export interface AlertRule {
 export interface EventProcessorConfig {
   processorId: string;
   eventTypes: string[];
-  filters: Record<string, never>;
+  filters: Record<string, unknown>;
   transformations: Array<{
     type: 'map' | 'filter' | 'aggregate' | 'enrich';
-    config: Record<string, never>;
+    config: Record<string, unknown>;
   }>;
   sinks: Array<{
     type: 'kafka' | 'webhook' | 'database' | 'file';
-    config: Record<string, never>;
+    config: Record<string, unknown>;
   }>;
   bufferSize: number;
   flushInterval: number;
@@ -130,7 +130,7 @@ export class StreamProcessor extends EventEmitter {
   private streamId: string;
   private config: StreamConfig;
   private isRunning = false;
-  private buffer: never[] = [];
+  private buffer: Array<{ data: unknown; timestamp: number; id: string }> = [];
   private metrics: StreamMetrics;
   private lastCheckpoint = Date.now();
   private intervalId?: NodeJS.Timeout;
@@ -192,7 +192,7 @@ export class StreamProcessor extends EventEmitter {
     console.log(`⏹️  Stream processor ${this.streamId} stopped`);
   }
 
-  async ingest(data: never): Promise<void> {
+  async ingest(data: unknown): Promise<void> {
     if (!this.isRunning) {
       throw new Error(`Stream ${this.streamId} is not running`);
     }
@@ -301,7 +301,12 @@ export class StreamProcessor extends EventEmitter {
     }
   }
 
-  private async processSingleItem(item: never): Promise<never> {
+  private async processSingleItem(item: { data: unknown; timestamp: number; id: string }): Promise<{
+    id: string;
+    timestamp: number;
+    prediction: unknown;
+    processingTime: number;
+  }> {
     try {
       const prediction = await mlCoreManager.getPredictions(
         this.config.modelId,
@@ -332,7 +337,7 @@ export class StreamProcessor extends EventEmitter {
     this.metrics.latency.p99 = latency * 1.5; // Simplified
   }
 
-  private async handleFailedItems(failedItems: any[]): Promise<void> {
+  private async handleFailedItems(failedItems: unknown[]): Promise<void> {
     // Implement retry logic or dead letter queue
     this.emit('failed_items', { count: failedItems.length, items: failedItems });
   }
@@ -681,7 +686,19 @@ export class AlertEngine extends EventEmitter {
     }
   }
 
-  private async executeAction(action: any, alert: any): Promise<void> {
+  private async executeAction(action: {
+    type: 'email' | 'webhook' | 'slack' | 'pagerduty';
+    config: Record<string, unknown>;
+  }, alert: {
+    ruleId: string;
+    ruleName: string;
+    severity: string;
+    metric: string;
+    value: number;
+    threshold: number;
+    timestamp: Date;
+    description: string;
+  }): Promise<void> {
     switch (action.type) {
       case 'email':
         // Would implement email sending
@@ -863,7 +880,7 @@ export class RealTimeProcessingService extends EventEmitter {
     this.emit('stream_stopped', { streamId, timestamp: new Date() });
   }
 
-  async ingestData(streamId: string, data: any): Promise<void> {
+  async ingestData(streamId: string, data: unknown): Promise<void> {
     const processor = this.streamProcessors.get(streamId);
     if (!processor) {
       throw new Error(`Stream ${streamId} not found`);
