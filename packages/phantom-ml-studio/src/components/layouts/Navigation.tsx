@@ -45,37 +45,43 @@ const navigationItems = [
     title: 'Home',
     href: '/',
     icon: HomeIcon,
-    description: 'Platform overview and quick access'
+    description: 'Platform overview and quick access',
+    isResourceHeavy: false
   },
   {
     title: 'Dashboard',
     href: '/dashboard',
     icon: DashboardIcon,
-    description: 'ML operations dashboard and monitoring'
+    description: 'ML operations dashboard and monitoring',
+    isResourceHeavy: false
   },
   {
     title: 'Models',
     href: '/models',
     icon: ModelIcon,
-    description: 'Model management and deployment'
+    description: 'Model management and deployment',
+    isResourceHeavy: false
   },
   {
     title: 'Training',
     href: '/training',
     icon: AnalyticsIcon,
-    description: 'Model training and optimization'
+    description: 'Model training and optimization',
+    isResourceHeavy: true
   },
   {
     title: 'Datasets',
     href: '/datasets',
     icon: DataIcon,
-    description: 'Data management and preprocessing'
+    description: 'Data management and preprocessing',
+    isResourceHeavy: true
   },
   {
     title: 'Experiments',
     href: '/experiments',
     icon: ExperimentIcon,
-    description: 'Experiment tracking and comparison'
+    description: 'Experiment tracking and comparison',
+    isResourceHeavy: false
   }
 ]
 
@@ -172,7 +178,7 @@ export function Navigation() {
 
           return (
             <ListItem key={item.title} disablePadding sx={{ mb: 0.5 }}>
-              <Link href={item.href} style={{ textDecoration: 'none', width: '100%' }}>
+              <Link href={item.href} prefetch={!item.isResourceHeavy} style={{ textDecoration: 'none', width: '100%' }}>
                 <ListItemButton
                   selected={isActive}
                   sx={{
@@ -215,7 +221,7 @@ export function Navigation() {
 
       <List sx={{ px: 1, py: 1 }}>
         <ListItem disablePadding>
-          <Link href="/settings" style={{ textDecoration: 'none', width: '100%' }}>
+          <Link href="/settings" prefetch={true} style={{ textDecoration: 'none', width: '100%' }}>
             <ListItemButton sx={{ borderRadius: 2, mx: 1 }}>
               <ListItemIcon>
                 <SettingsIcon />
@@ -268,7 +274,7 @@ export function Navigation() {
               {navigationItems.slice(0, 4).map((item) => {
                 const isActive = pathname === item.href
                 return (
-                  <Link key={item.title} href={item.href} style={{ textDecoration: 'none' }}>
+                  <Link key={item.title} href={item.href} prefetch={!item.isResourceHeavy} style={{ textDecoration: 'none' }}>
                     <Button
                       variant={isActive ? 'contained' : 'text'}
                       color="primary"

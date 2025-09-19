@@ -180,6 +180,99 @@ Simple PostCSS setup with Tailwind CSS and Autoprefixer in `postcss.config.mjs`.
 - **Caching**: Use React Query caching for API responses
 - **Monitoring**: Built-in performance monitoring in business logic layer
 
+### Prefetching Strategy
+
+The application implements a sophisticated prefetching strategy to optimize navigation performance while respecting user bandwidth and device constraints:
+
+#### Automatic Prefetching
+- **Default Behavior**: All standard Next.js `<Link>` components have automatic prefetching enabled in production
+- **Viewport-based**: Only links visible in the viewport are automatically prefetched
+- **TTL**: Prefetched content is cached for 5 minutes or until app reload
+
+#### Resource-Heavy Route Management
+Routes marked as `isResourceHeavy: true` have prefetching disabled to prevent unnecessary bandwidth usage:
+- **Data Explorer** (`/dataExplorer`) - Large dataset processing
+- **Deployments** (`/deployments`) - Heavy deployment management interface
+- **Real-time Monitoring** (`/monitoring`) - Live data streams
+- **AutoML Pipeline** (`/automlPipeline`) - Complex pipeline visualization
+- **Feature Engineering** (`/featureEngineering`) - Data transformation interfaces
+- **Model Comparison** (`/model-comparison`) - Multi-model analysis views
+- **Explainable AI** (`/explainableAi`) - Complex visualization components
+- **Threat Intelligence** (`/threatIntelligence`) - Large security datasets
+- **Analytics** (`/h2o-comparison`) - Heavy analytical dashboards
+
+#### Connection-Aware Prefetching
+The application includes connection-aware prefetching that automatically adjusts behavior based on network conditions:
+
+```typescript
+// Usage in components
+import { useConnectionAwarePrefetch } from '@/hooks/useConnectionAwarePrefetch';
+
+const { shouldPrefetch, reason } = useConnectionAwarePrefetch();
+```
+
+**Automatic Prefetch Disabling:**
+- **Data Saver Mode**: Respects user's data saver preference
+- **Slow Connections**: Disabled on 2G and slow-2G connections
+- **Low Bandwidth**: Disabled when downlink < 0.5 Mbps
+- **Connection Changes**: Dynamically adjusts when network conditions change
+
+#### Loading States
+Dynamic routes include optimized loading states to improve perceived performance during prefetch boundaries:
+- `src/app/projects/[projectId]/loading.tsx` - Project loading skeleton
+- `src/app/projects/[projectId]/models/[modelId]/loading.tsx` - Model detail loading
+- `src/app/users/[id]/loading.tsx` - User profile loading
+- `src/app/docs/[...slug]/loading.tsx` - Documentation loading
+- `src/app/blog/[[...slug]]/loading.tsx` - Blog content loading
+
+#### Best Practices for Developers
+
+**When to Disable Prefetching:**
+```typescript
+// For resource-heavy routes
+<Link href="/heavy-dashboard" prefetch={false}>
+  Heavy Dashboard
+</Link>
+
+// For rarely visited pages
+<Link href="/admin/advanced-settings" prefetch={false}>
+  Advanced Settings
+</Link>
+```
+
+**Connection-Aware Components:**
+```typescript
+import { ConnectionAwareLink } from '@/components/common/ConnectionAwareLink';
+
+// Automatically adjusts prefetching based on connection
+<ConnectionAwareLink href="/data-intensive-page">
+  Data Page
+</ConnectionAwareLink>
+
+// Force prefetching regardless of connection
+<ConnectionAwareLink href="/critical-page" forcePrefetch={true}>
+  Critical Page
+</ConnectionAwareLink>
+```
+
+**Monitoring Prefetch Decisions:**
+In development mode, prefetch decisions are logged with debug attributes:
+- `data-prefetch-enabled`: Whether prefetching is active
+- `data-prefetch-reason`: Reason for prefetch decision
+- `data-connection-type`: Current connection type
+
+#### Security Considerations
+- **No Sensitive Data**: Prefetching never includes routes with sensitive data
+- **Authentication Routes**: Login/logout routes use default prefetching
+- **Privacy Compliance**: Respects user's data saver and privacy preferences
+
+#### Performance Monitoring
+The application tracks prefetch effectiveness through:
+- Navigation timing metrics
+- Failed prefetch logs
+- Connection-aware decision analytics
+- Cache hit rates for prefetched content
+
 ## Security
 
 - **Metadata Configuration**: Disabled search engine indexing for security

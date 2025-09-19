@@ -40,6 +40,7 @@ interface MenuItem {
   path: string;
   isNew?: boolean;
   section?: string;
+  isResourceHeavy?: boolean; // For disabling prefetch on resource-intensive routes
 }
 
 interface SidebarProps {
@@ -51,27 +52,27 @@ interface SidebarProps {
 const menuItems: MenuItem[] = [
   // Core Features
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/', section: 'core' },
-  { text: 'Data Explorer', icon: <DataIcon />, path: '/dataExplorer', section: 'core' },
+  { text: 'Data Explorer', icon: <DataIcon />, path: '/dataExplorer', section: 'core', isResourceHeavy: true },
   { text: 'AutoML Builder', icon: <AutoMLIcon />, path: '/modelBuilder', section: 'core' },
   { text: 'Experiments', icon: <ExperimentIcon />, path: '/experiments', section: 'core' },
   { text: 'Models', icon: <ModelIcon />, path: '/models', section: 'core' },
-  { text: 'Deployments', icon: <DeployIcon />, path: '/deployments', section: 'core' },
-  
+  { text: 'Deployments', icon: <DeployIcon />, path: '/deployments', section: 'core', isResourceHeavy: true },
+
   // Advanced Features
-  { text: 'Real-time Monitoring', icon: <MonitoringIcon />, path: '/monitoring', isNew: true, section: 'advanced' },
-  { text: 'AutoML Pipeline', icon: <PipelineIcon />, path: '/automlPipeline', isNew: true, section: 'advanced' },
-  { text: 'Feature Engineering', icon: <EngineeringIcon />, path: '/featureEngineering', isNew: true, section: 'advanced' },
-  { text: 'Model Comparison', icon: <CompareIcon />, path: '/model-comparison', section: 'advanced' },
+  { text: 'Real-time Monitoring', icon: <MonitoringIcon />, path: '/monitoring', isNew: true, section: 'advanced', isResourceHeavy: true },
+  { text: 'AutoML Pipeline', icon: <PipelineIcon />, path: '/automlPipeline', isNew: true, section: 'advanced', isResourceHeavy: true },
+  { text: 'Feature Engineering', icon: <EngineeringIcon />, path: '/featureEngineering', isNew: true, section: 'advanced', isResourceHeavy: true },
+  { text: 'Model Comparison', icon: <CompareIcon />, path: '/model-comparison', section: 'advanced', isResourceHeavy: true },
   { text: 'A/B Testing', icon: <ABTestingIcon />, path: '/abTesting', isNew: true, section: 'advanced' },
-  { text: 'Explainable AI', icon: <ExplainableIcon />, path: '/explainableAi', isNew: true, section: 'advanced' },
-  
+  { text: 'Explainable AI', icon: <ExplainableIcon />, path: '/explainableAi', isNew: true, section: 'advanced', isResourceHeavy: true },
+
   // Security & Compliance
   { text: 'Bias Detection', icon: <ShieldIcon />, path: '/biasDetection', isNew: true, section: 'security' },
-  { text: 'Threat Intelligence', icon: <MarketplaceIcon />, path: '/threatIntelligence', isNew: true, section: 'security' },
+  { text: 'Threat Intelligence', icon: <MarketplaceIcon />, path: '/threatIntelligence', isNew: true, section: 'security', isResourceHeavy: true },
   { text: 'Enterprise Compliance', icon: <ComplianceIcon />, path: '/compliance', isNew: true, section: 'security' },
-  
+
   // System
-  { text: 'Analytics', icon: <AnalyticsIcon />, path: '/h2o-comparison', section: 'system' },
+  { text: 'Analytics', icon: <AnalyticsIcon />, path: '/h2o-comparison', section: 'system', isResourceHeavy: true },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings', section: 'system' },
 ];
 
@@ -112,63 +113,67 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
           <List dense>
             {sectionItems.map((item) => (
               <ListItem key={item.text} disablePadding data-cy={`nav-item-${item.text.toLowerCase().replace(/\s+/g, '-')}`}>
-                <Link href={item.path} passHref style={{ textDecoration: 'none', width: '100%' }}>
-                  <ListItemButton
-                    selected={pathname === item.path}
-                    sx={{
-                      mx: 1,
-                      borderRadius: 2,
-                      '&.Mui-selected': {
-                        backgroundColor: 'primary.main',
+                <ListItemButton
+                  component={Link}
+                  href={item.path}
+                  prefetch={!item.isResourceHeavy}
+                  selected={pathname === item.path}
+                  sx={{
+                    mx: 1,
+                    borderRadius: 2,
+                    textDecoration: 'none',
+                    width: '100%',
+                    '&.Mui-selected': {
+                      backgroundColor: 'primary.main',
+                      color: 'primary.contrastText',
+                      '& .MuiListItemIcon-root': {
                         color: 'primary.contrastText',
-                        '& .MuiListItemIcon-root': {
-                          color: 'primary.contrastText',
-                        },
-                        '&:hover': {
-                          backgroundColor: 'primary.dark',
-                        },
                       },
                       '&:hover': {
-                        backgroundColor: 'action.hover',
+                        backgroundColor: 'primary.dark',
                       },
+                    },
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                    },
+                  }}
+                  data-cy={`nav-link-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-prefetch-disabled={item.isResourceHeavy ? 'true' : 'false'}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 40,
+                      color: pathname === item.path ? 'inherit' : 'text.secondary',
                     }}
-                    data-cy={`nav-link-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-cy={`nav-icon-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                   >
-                    <ListItemIcon
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    primaryTypographyProps={{
+                      fontSize: '0.875rem',
+                      fontWeight: pathname === item.path ? 600 : 400,
+                    }}
+                    data-cy={`nav-text-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                  />
+                  {item.isNew && (
+                    <Badge
+                      badgeContent="NEW"
+                      color="secondary"
                       sx={{
-                        minWidth: 40,
-                        color: pathname === item.path ? 'inherit' : 'text.secondary',
+                        '& .MuiBadge-badge': {
+                          fontSize: '0.6rem',
+                          height: 18,
+                          minWidth: 32,
+                          borderRadius: 1,
+                          fontWeight: 600,
+                        },
                       }}
-                      data-cy={`nav-icon-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
-                    >
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.text}
-                      primaryTypographyProps={{
-                        fontSize: '0.875rem',
-                        fontWeight: pathname === item.path ? 600 : 400,
-                      }}
-                      data-cy={`nav-text-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                      data-cy={`nav-badge-new-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
                     />
-                    {item.isNew && (
-                      <Badge
-                        badgeContent="NEW"
-                        color="secondary"
-                        sx={{
-                          '& .MuiBadge-badge': {
-                            fontSize: '0.6rem',
-                            height: 18,
-                            minWidth: 32,
-                            borderRadius: 1,
-                            fontWeight: 600,
-                          },
-                        }}
-                        data-cy={`nav-badge-new-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
-                      />
-                    )}
-                  </ListItemButton>
-                </Link>
+                  )}
+                </ListItemButton>
               </ListItem>
             ))}
           </List>

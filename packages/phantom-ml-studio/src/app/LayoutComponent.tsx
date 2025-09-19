@@ -99,41 +99,43 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
-            <Link href={item.path} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
-              <ListItemButton
-                selected={pathname === item.path}
-                sx={{
-                  mx: 1,
-                  borderRadius: 1,
-                  '&.Mui-selected': {
-                    backgroundColor: muiTheme.palette.primary.main,
+            <ListItemButton
+              component={Link}
+              href={item.path}
+              selected={pathname === item.path}
+              sx={{
+                mx: 1,
+                borderRadius: 1,
+                textDecoration: 'none',
+                color: 'inherit',
+                '&.Mui-selected': {
+                  backgroundColor: muiTheme.palette.primary.main,
+                  color: 'white',
+                  '& .MuiListItemIcon-root': {
                     color: 'white',
-                    '& .MuiListItemIcon-root': {
-                      color: 'white',
-                    },
-                    '&:hover': {
-                      backgroundColor: muiTheme.palette.primary.dark,
-                    },
                   },
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-                {item.isNew && (
-                  <Badge
-                    badgeContent="NEW"
-                    color="secondary"
-                    sx={{
-                      '& .MuiBadge-badge': {
-                        fontSize: '0.5rem',
-                        height: 16,
-                        minWidth: 16,
-                      },
-                    }}
-                  />
-                )}
-              </ListItemButton>
-            </Link>
+                  '&:hover': {
+                    backgroundColor: muiTheme.palette.primary.dark,
+                  },
+                },
+              }}
+            >
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
+              {item.isNew && (
+                <Badge
+                  badgeContent="NEW"
+                  color="secondary"
+                  sx={{
+                    '& .MuiBadge-badge': {
+                      fontSize: '0.5rem',
+                      height: 16,
+                      minWidth: 16,
+                    },
+                  }}
+                />
+              )}
+            </ListItemButton>
           </ListItem>
         ))}
       </List>
