@@ -254,35 +254,143 @@ describe('Dashboard Filters and Controls', () => {
   })
 
   it('should handle advanced filter combinations', () => {
+    cy.log('Testing advanced filter combinations')
+    
+    // Ensure we stay on the dashboard page
+    cy.url().should('include', '/dashboard')
+    
     // Look for advanced filter controls
     cy.get('body').then($body => {
-      const advancedElements = $body.find('[data-cy*="advanced"], .advanced-filter, .advanced-control')
+      const advancedSelectors = [
+        '[data-cy*="advanced"]:not([href])',  // Exclude links that would navigate away
+        '.advanced-filter:not(a)',
+        '.advanced-control:not(a)',
+        '[data-cy*="filter-advanced"]',
+        '.filter-advanced'
+      ]
       
-      if (advancedElements.length > 0) {
-        cy.log('Testing advanced filter functionality')
-        
-        // Try to expand advanced filters
-        cy.get('[data-cy*="advanced"], .advanced-filter').first().click()
-        cy.wait(500)
-        
-        // Look for range inputs
-        cy.get('input[type="range"], input[type="number"], [data-cy*="range"]').then($rangeInputs => {
-          if ($rangeInputs.length > 0) {
-            cy.get('input[type="range"], input[type="number"]').first().clear().type('0.8')
-            cy.wait(500)
+      let advancedFound = false
+      
+      advancedSelectors.forEach(selector => {
+        const elements = $body.find(selector)
+        if (elements.length > 0 && !advancedFound) {
+          cy.log(`Found advanced filter control: ${selector}`)
+          
+          // Check if it's a button/control, not a navigation link
+          cy.get(selector).first().then($el => {
+            const tagName = $el.prop('tagName').toLowerCase()
+            const href = $el.attr('href')
             
-            if ($rangeInputs.length > 1) {
-              cy.get('input[type="range"], input[type="number"]').eq(1).clear().type('0.95')
+            if (!href && (tagName === 'button' || tagName === 'div' || $el.hasClass('filter'))) {
+              cy.log('Clicking advanced filter control (non-navigation)')
+              cy.get(selector).first().click()
               cy.wait(500)
+              
+              // Verify we're still on dashboard after clicking
+              cy.url().should('include', '/dashboard')
+              
+              advancedFound = true
+              
+              // Look for additional filter controls that appear after clicking
+              cy.get('body').then($bodyAfter => {
+                // Look for range inputs with graceful fallback
+                const rangeSelectors = [
+                  'input[type="range"]',
+                  'input[type="number"]',
+                  '[data-cy*="range"]',
+                  '.range-slider',
+                  '[role="slider"]'
+                ]
+                
+                let rangeFound = false
+                rangeSelectors.forEach(rangeSelector => {
+                  if ($bodyAfter.find(rangeSelector).length > 0 && !rangeFound) {
+                    cy.get(rangeSelector).first().then($range => {
+                      if ($range.is('input[type="number"]')) {
+                        cy.get(rangeSelector).first().clear().type('0.8')
+                      } else if ($range.is('input[type="range"]')) {
+                        cy.get(rangeSelector).first().invoke('val', '0.8').trigger('input')
+                      }
+                      cy.wait(500)
+                      cy.log('✅ Advanced filter range applied')
+                      rangeFound = true
+                    })
+                  }
+                })
+                
+                // Look for additional filter options
+                const additionalSelectors = [
+                  'select[data-cy*="advanced"]',
+                  '.advanced-select',
+                  'input[type="checkbox"]:not(:checked)',
+                  '[data-cy*="advanced-option"]'
+                ]
+                
+                additionalSelectors.forEach(addSelector => {
+                  if ($bodyAfter.find(addSelector).length > 0) {
+                    cy.get(addSelector).first().then($el => {
+                      if ($el.is('select')) {
+                        cy.get(addSelector).first().select(0)
+                        cy.log('✅ Advanced select filter applied')
+                      } else if ($el.is('input[type="checkbox"]')) {
+                        cy.get(addSelector).first().check()
+                        cy.log('✅ Advanced checkbox filter applied')
+                      }
+                      cy.wait(500)
+                    })
+                  }
+                })
+                
+                if (!rangeFound) {
+                  cy.log('ℹ️ No range inputs found in advanced filters - this is acceptable')
+                }
+              })
+            } else {
+              cy.log(`⚠️ Element is a navigation link (${href}) - skipping to avoid page change`)
             }
-            
-            cy.log('✅ Advanced filter ranges applied')
+          })
+        }
+      })
+      
+      if (!advancedFound) {
+        cy.log('ℹ️ No non-navigation advanced filter controls found - testing basic combination filters')
+        
+        // Fallback: test combination of basic filters if available
+        const basicFilterTypes = ['select', 'input[type="date"]', 'input[type="text"]']
+        let filtersApplied = 0
+        
+        basicFilterTypes.forEach(filterType => {
+          if ($body.find(filterType).length > 0 && filtersApplied < 2) {
+            cy.get(filterType).first().then($filter => {
+              if ($filter.is('select')) {
+                cy.get(filterType).first().select(0)
+                filtersApplied++
+                cy.log(`✅ Applied ${filterType} filter`)
+              } else if ($filter.is('input[type="date"]')) {
+                cy.get(filterType).first().type('2024-01-01')
+                filtersApplied++
+                cy.log(`✅ Applied ${filterType} filter`)
+              } else if ($filter.is('input[type="text"]')) {
+                cy.get(filterType).first().type('test')
+                filtersApplied++
+                cy.log(`✅ Applied ${filterType} filter`)
+              }
+              cy.wait(500)
+            })
           }
         })
-      } else {
-        cy.log('ℹ️ No advanced filter controls found - skipping advanced test')
+        
+        if (filtersApplied > 1) {
+          cy.log('✅ Multiple basic filters combined successfully')
+        } else {
+          cy.log('ℹ️ Advanced filter combination test completed (limited filters available)')
+        }
       }
     })
+    
+    // Ensure we end on the dashboard page
+    cy.url().should('include', '/dashboard')
+    cy.log('✅ Advanced filter test completed while staying on dashboard')
   })
 
   it('should remember filter state on page reload', () => {
