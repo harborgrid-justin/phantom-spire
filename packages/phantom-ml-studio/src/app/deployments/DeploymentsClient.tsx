@@ -28,46 +28,6 @@ import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { deploymentsService } from '@/services/deployments';
 import { Deployment } from '@/services/deployments';
 
-// Error boundary component
-class DeploymentsErrorBoundary extends React.Component<
-  { children: React.ReactNode },
-  { hasError: boolean; error?: Error }
-> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Deployments Error:', error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Alert
-            severity="error"
-            action={
-              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
-                Refresh Page
-              </Button>
-            }
-          >
-            Something went wrong with deployments. Please try refreshing the page.
-          </Alert>
-        </Container>
-      );
-    }
-
-    return this.props.children;
-  }
-}
-
 export default function DeploymentsClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,7 +77,7 @@ export default function DeploymentsClient() {
     fetchDeployments(true);
   }, [fetchDeployments]);
 
-  const getStatusColor = (_status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'success';
       case 'inactive': return 'default';
@@ -128,7 +88,7 @@ export default function DeploymentsClient() {
     }
   };
 
-  const getEnvironmentColor = (_environment: string) => {
+  const getEnvironmentColor = (environment: string) => {
     switch (environment) {
       case 'production': return 'error';
       case 'staging': return 'warning';
@@ -264,8 +224,7 @@ export default function DeploymentsClient() {
   }
 
   return (
-    <DeploymentsErrorBoundary>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }} data-cy="deployments-header">
           <Box data-cy="deployments-info">
@@ -404,6 +363,5 @@ export default function DeploymentsClient() {
           </Paper>
         )}
       </Container>
-    </DeploymentsErrorBoundary>
   );
 }

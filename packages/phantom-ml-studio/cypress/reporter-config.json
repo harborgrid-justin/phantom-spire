@@ -1,0 +1,13 @@
+{
+  "reporterEnabled": "mochawesome, cypress-multi-reporters",
+  "mochawesomeReporterOptions": {
+    "reportDir": "cypress/results/mochawesome",
+    "overwrite": false,
+    "html": true,
+    "json": true,
+    "timestamp": "yyyy-mm-dd_HH-MM-ss"
+  },
+  "cypressMultiReportersReporterOptions": {
+    "configFile": "cypress/reporter-config.json"
+  }
+}

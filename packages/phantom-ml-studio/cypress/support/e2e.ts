@@ -50,3 +50,28 @@ Cypress.on('uncaught:exception', (err) => {
   // Allow other errors to fail the test
   return true;
 })
+
+// Global test setup - runs before each test
+beforeEach(() => {
+  // Clear localStorage between tests for isolation
+  cy.window().then((win) => {
+    win.localStorage.clear();
+  });
+
+  // Clear cookies between tests
+  cy.clearCookies();
+
+  // Clear session storage
+  cy.window().then((win) => {
+    win.sessionStorage.clear();
+  });
+});
+
+// Global test cleanup - runs after each test
+afterEach(() => {
+  // Clean up any test data
+  cy.cleanupTestData();
+
+  // Take screenshot on failure - Cypress handles this automatically
+  // but we can add custom logic here if needed
+});

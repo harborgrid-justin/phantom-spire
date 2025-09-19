@@ -83,8 +83,27 @@ export default function ExperimentsClient() {
       setError(null);
 
       const response = await experimentsService.getExperiments(
-        { id: 'get_exps_req', type: 'getExperiments' as const },
-        {}
+        { 
+          id: 'get_exps_req', 
+          type: 'getExperiments' as const,
+          data: {},
+          metadata: { source: 'experiments-client' },
+          context: { userId: 'user-1', permissions: [] },
+          timestamp: new Date()
+        },
+        {
+          requestId: `req-${Date.now()}`,
+          startTime: new Date(),
+          timeout: 30000,
+          permissions: [],
+          metadata: {},
+          trace: {
+            traceId: `trace-${Date.now()}`,
+            spanId: `span-${Date.now()}`,
+            sampled: true,
+            baggage: {}
+          }
+        }
       );
 
       if (response.success && response.data) {
@@ -115,7 +134,7 @@ export default function ExperimentsClient() {
     fetchExperiments(true);
   }, [fetchExperiments]);
 
-  const getStatusColor = (_status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'success';
       case 'running': return 'primary';
@@ -144,7 +163,7 @@ export default function ExperimentsClient() {
       field: 'bestScore',
       headerName: 'Best Score',
       width: 150,
-      valueGetter: (_params: unknown) => {
+      valueGetter: (params: any) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -156,7 +175,7 @@ export default function ExperimentsClient() {
       field: 'bestAlgorithm',
       headerName: 'Best Algorithm',
       width: 200,
-      valueGetter: (_params: unknown) => {
+      valueGetter: (params: any) => {
         if (!params || !params.row || !params.row.results) {
           return 'N/A';
         }
@@ -167,22 +186,22 @@ export default function ExperimentsClient() {
       field: 'startTime',
       headerName: 'Start Time',
       width: 200,
-      valueFormatter: (_params: { value: unknown }) => {
+      valueFormatter: (params: any) => {
         if (!params || !params.value) {
           return 'N/A';
         }
-        return new Date(params.value).toLocaleString();
+        return new Date(params.value as string).toLocaleString();
       }
     },
     {
       field: 'endTime',
       headerName: 'End Time',
       width: 200,
-      valueFormatter: (_params: { value: unknown }) => {
+      valueFormatter: (params: any) => {
         if (!params || !params.value) {
           return 'Running...';
         }
-        return new Date(params.value).toLocaleString();
+        return new Date(params.value as string).toLocaleString();
       }
     },
   ];

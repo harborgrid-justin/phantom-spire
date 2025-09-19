@@ -37,10 +37,10 @@
 // Metadata moved to layout.tsx
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
-import dynamicImport from 'next/dynamic';
+import dynamic from 'next/dynamic';
 
 // Dynamic imports for optimal experiment tracking interface loading
-const ExperimentsClient = dynamicImport(() => import('./ExperimentsClient'), {
+const ExperimentsClient = dynamic(() => import('./ExperimentsClient'), {
   loading: () => <ExperimentsSkeleton />
 });
 
@@ -48,11 +48,9 @@ const ExperimentsClient = dynamicImport(() => import('./ExperimentsClient'), {
 
 /**
  * Performance configuration for real-time experiment tracking
- * Ensures live updates for running experiments and metrics
+ * Note: These exports are not valid in client components
+ * Configuration moved to layout.tsx for server-side handling
  */
-export const dynamic = 'force-dynamic';
-export const revalidate = 0; // Real-time experiment data
-export const runtime = 'nodejs';
 
 /**
  * Advanced loading skeleton for experiment tracking interface

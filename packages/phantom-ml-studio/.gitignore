@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cypress assets and sensitive files
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/
+cypress/results/
+cypress.env.json
+cypress/fixtures/secrets.json
+cypress/fixtures/credentials.json
+cypress/fixtures/auth-tokens.json

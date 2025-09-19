@@ -18,10 +18,10 @@
 
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-import dynamicImport from 'next/dynamic';
+import dynamic from 'next/dynamic';
 
 // Dynamic import for client component to optimize bundle splitting
-const ModelBuilderClient = dynamicImport(() => import('./ModelBuilderClient'), {
+const ModelBuilderClient = dynamic(() => import('./ModelBuilderClient'), {
   loading: () => <ModelBuilderSkeleton />
 });
 
@@ -103,7 +103,7 @@ export const viewport: Viewport = {
  * Performance optimization: Force dynamic rendering for real-time data updates
  * This ensures fresh model training data and real-time pipeline status
  */
-export const dynamic = 'force-dynamic';
+export const pageDynamic = 'force-dynamic';
 
 /**
  * Revalidation strategy for static generation with incremental updates

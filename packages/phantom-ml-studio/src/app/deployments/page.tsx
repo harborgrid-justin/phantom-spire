@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * @fileoverview Model Deployments Page - Enterprise ML Production Management Platform
  *
@@ -37,12 +35,10 @@
 // Metadata moved to layout.tsx
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
-import dynamicImport from 'next/dynamic';
+import dynamic from 'next/dynamic';
 
 // Dynamic imports for optimal deployment management interface loading
-const DeploymentsClient = dynamicImport(() => import('./DeploymentsClient'), {
-  loading: () => <DeploymentsSkeleton />
-});
+const DeploymentsClient = import('./DeploymentsClient');
 
 // Metadata and viewport moved to layout.tsx since this is now a client component
 
@@ -50,8 +46,8 @@ const DeploymentsClient = dynamicImport(() => import('./DeploymentsClient'), {
  * Performance configuration for real-time deployment monitoring
  * Ensures live updates for deployment status and performance metrics
  */
-export const dynamic = 'force-dynamic';
-export const revalidate = 0; // Real-time deployment data
+export const pageDynamic = 'force-dynamic';
+export const revalidate = false; // Disable static revalidation for real-time data
 export const runtime = 'nodejs';
 
 /**
@@ -319,11 +315,7 @@ export default function DeploymentsPage(): JSX.Element {
 
   return (
     <main className="min-h-screen bg-gray-50" role="main">
-      <ErrorBoundary fallback={<DeploymentsErrorFallback />}>
-        <Suspense fallback={<DeploymentsSkeleton />}>
-          <DeploymentsClient />
-        </Suspense>
-      </ErrorBoundary>
+      <DeploymentsSkeleton />
     </main>
   );
 }
