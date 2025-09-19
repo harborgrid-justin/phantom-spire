@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
+/**
+ * NAPI Demo Page - Server Component
+ * 
+ * Demonstrates high-performance Rust integration capabilities.
+ * Metadata and configuration is handled in layout.tsx.
+ */
 import PrecisionNAPIDemo from '../../components/PrecisionNAPIDemo';
 
-export const metadata: Metadata = {
-  title: '32 Precision NAPI Bindings Demo - Phantom ML Studio',
-  description: 'Interactive demonstration of all 32 precision NAPI bindings with complete frontend-backend integration.',
-};
-
-export default function PrecisionNAPIDemoPage() {
+export default function PrecisionNAPIDemoPage(): JSX.Element {
   return <PrecisionNAPIDemo />;
 }

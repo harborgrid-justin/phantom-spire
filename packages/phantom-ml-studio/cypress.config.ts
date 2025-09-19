@@ -1,6 +1,4 @@
 import { defineConfig } from 'cypress'
-import webpackPreprocessor from '@cypress/webpack-preprocessor'
-import webpackOptions from './cypress/webpack.config.js'
 
 export default defineConfig({
   e2e: {
@@ -8,8 +6,6 @@ export default defineConfig({
     supportFile: 'cypress/support/e2e.ts',
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     setupNodeEvents(on, config) {
-      on('file:preprocessor', webpackPreprocessor({ webpackOptions }))
-
       // Add task for cy.task() usage
       on('task', {
         log(message) {
@@ -50,11 +46,6 @@ export default defineConfig({
     downloadsFolder: 'cypress/downloads',
     // Videos folder
     videosFolder: 'cypress/videos',
-    // Reporter configuration for comprehensive test reporting
-    reporter: 'cypress-multi-reporters',
-    reporterOptions: {
-      configFile: 'cypress/reporter-config.json',
-    },
     // Environment variables
     env: {
       API_URL: 'http://localhost:3000/api',
@@ -63,9 +54,7 @@ export default defineConfig({
       ENABLE_SSR_TESTING: true,
       ENABLE_API_TESTING: true,
       ENABLE_PERFORMANCE_TESTING: true
-    },
-    // R.47: Browser compatibility testing configuration
-    browsers: ['chrome', 'firefox', 'edge']
+    }
   },
   component: {
     devServer: {

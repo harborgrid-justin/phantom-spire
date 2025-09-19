@@ -1,18 +1,11 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * Models Page - Server Component
+ * 
+ * Model management and registry page.
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import ModelsClient from './ModelsClient';
-
-export const metadata: Metadata = {
-  title: 'Models | Phantom ML Studio',
-  description: 'Manage and version your machine learning models with comprehensive model registry, versioning, and performance tracking.',
-  keywords: ['ML models', 'model registry', 'model versioning', 'model management', 'MLOps'],
-  openGraph: {
-    title: 'Models - Phantom ML Studio',
-    description: 'Comprehensive ML model management and registry',
-  },
-};
-
-export const dynamic = 'force-dynamic';
 
 function ModelsSkeleton() {
   return (
@@ -26,7 +19,7 @@ function ModelsSkeleton() {
   );
 }
 
-export default function ModelsPage() {
+export default function ModelsPage(): JSX.Element {
   return (
     <Suspense fallback={<ModelsSkeleton />}>
       <ModelsClient />

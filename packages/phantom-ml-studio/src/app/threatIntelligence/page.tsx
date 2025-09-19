@@ -1,18 +1,10 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * ThreatIntelligence Page - Server Component
+ * 
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import ThreatIntelligenceClient from './ThreatIntelligenceClient';
-
-export const metadata: Metadata = {
-  title: 'Threat Intelligence Marketplace | Phantom ML Studio',
-  description: 'Advanced cybersecurity ML models for threat detection, intelligence analysis, and security automation.',
-  keywords: ['threat intelligence', 'cybersecurity ML', 'threat detection', 'security automation', 'cyber analytics'],
-  openGraph: {
-    title: 'Threat Intelligence Marketplace - Phantom ML Studio',
-    description: 'Enterprise cybersecurity ML models and threat intelligence',
-  },
-};
-
-export const dynamic = 'force-dynamic';
 
 function ThreatIntelligenceSkeleton() {
   return (
@@ -27,7 +19,7 @@ function ThreatIntelligenceSkeleton() {
   );
 }
 
-export default function ThreatIntelligenceMarketplacePage() {
+export default function ThreatIntelligenceMarketplacePage(): JSX.Element {
   return (
     <Suspense fallback={<ThreatIntelligenceSkeleton />}>
       <ThreatIntelligenceClient />

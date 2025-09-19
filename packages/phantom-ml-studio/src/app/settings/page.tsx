@@ -1,18 +1,10 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * Settings Page - Server Component
+ * 
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import SettingsClient from './SettingsClient';
-
-export const metadata: Metadata = {
-  title: 'Settings | Phantom ML Studio',
-  description: 'Configure your ML platform settings, user preferences, security options, and system configurations.',
-  keywords: ['settings', 'configuration', 'preferences', 'security', 'system admin'],
-  openGraph: {
-    title: 'Settings - Phantom ML Studio',
-    description: 'Platform configuration and settings',
-  },
-};
-
-export const dynamic = 'force-dynamic';
 
 function SettingsSkeleton() {
   return (
@@ -26,7 +18,7 @@ function SettingsSkeleton() {
   );
 }
 
-export default function SettingsPage() {
+export default function SettingsPage(): JSX.Element {
   return (
     <Suspense fallback={<SettingsSkeleton />}>
       <SettingsClient />

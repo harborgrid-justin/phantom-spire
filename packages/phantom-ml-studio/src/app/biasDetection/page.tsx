@@ -1,18 +1,10 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * BiasDetection Page - Server Component
+ * 
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import BiasDetectionClient from './BiasDetectionClient';
-
-export const metadata: Metadata = {
-  title: 'Bias Detection Engine | Phantom ML Studio',
-  description: 'AI fairness tools to detect and mitigate bias in machine learning models with comprehensive analysis and reporting.',
-  keywords: ['AI bias', 'fairness', 'ML ethics', 'bias detection', 'algorithmic fairness'],
-  openGraph: {
-    title: 'Bias Detection Engine - Phantom ML Studio',
-    description: 'Advanced AI fairness and bias detection tools',
-  },
-};
-
-export const dynamic = 'force-dynamic';
 
 function BiasDetectionSkeleton() {
   return (
@@ -26,7 +18,7 @@ function BiasDetectionSkeleton() {
   );
 }
 
-export default function BiasDetectionPage() {
+export default function BiasDetectionPage(): JSX.Element {
   return (
     <Suspense fallback={<BiasDetectionSkeleton />}>
       <BiasDetectionClient />

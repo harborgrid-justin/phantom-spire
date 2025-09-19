@@ -453,9 +453,9 @@ export default function SettingsClient() {
                     primary={apiKey.name}
                     secondary={
                       <Box>
-                        <Typography variant="body2">Key: {apiKey.key}</Typography>
-                        <Typography variant="body2">Created: {apiKey.created}</Typography>
-                        <Typography variant="body2">Last Used: {apiKey.lastUsed}</Typography>
+                        <Typography variant="body2" component="span" display="block">Key: {apiKey.key}</Typography>
+                        <Typography variant="body2" component="span" display="block">Created: {apiKey.created}</Typography>
+                        <Typography variant="body2" component="span" display="block">Last Used: {apiKey.lastUsed}</Typography>
                         <Box mt={1}>
                           {apiKey.permissions.map((permission) => (
                             <Chip key={permission} label={permission} size="small" sx={{ mr: 0.5 }} />

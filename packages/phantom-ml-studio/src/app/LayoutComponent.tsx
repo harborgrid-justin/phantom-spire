@@ -16,6 +16,7 @@ import {
   Avatar,
   Divider,
   useTheme,
+  LinearProgress,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,

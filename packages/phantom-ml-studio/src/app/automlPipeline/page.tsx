@@ -1,18 +1,11 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * AutoML Pipeline Page - Server Component
+ * 
+ * Visual pipeline builder for automated machine learning.
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import AutoMLPipelineClient from './AutoMLPipelineClient';
-
-export const metadata: Metadata = {
-  title: 'AutoML Pipeline Visualizer | Phantom ML Studio',
-  description: 'Visual pipeline builder for automated machine learning workflows with drag-and-drop interface and real-time visualization.',
-  keywords: ['AutoML pipeline', 'visual ML', 'workflow builder', 'pipeline automation', 'ML orchestration'],
-  openGraph: {
-    title: 'AutoML Pipeline Visualizer - Phantom ML Studio',
-    description: 'Visual AutoML pipeline builder and orchestration',
-  },
-};
-
-export const dynamic = 'force-dynamic';
 
 function AutoMLPipelineSkeleton() {
   return (
@@ -26,7 +19,7 @@ function AutoMLPipelineSkeleton() {
   );
 }
 
-export default function AutoMLPipelineVisualizerPage() {
+export default function AutoMLPipelineVisualizerPage(): JSX.Element {
   return (
     <Suspense fallback={<AutoMLPipelineSkeleton />}>
       <AutoMLPipelineClient />

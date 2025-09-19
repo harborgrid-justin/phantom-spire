@@ -1,18 +1,12 @@
+/**
+ * Dashboard Page - Server Component
+ * 
+ * Main dashboard for ML operations monitoring.
+ * Metadata and configuration is handled in layout.tsx.
+ */
 import Link from 'next/link';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Dashboard - Phantom ML Studio',
-  description: 'Machine learning dashboard with model metrics, experiments overview, and deployment status for enterprise ML operations.',
-  keywords: ['dashboard', 'ML metrics', 'model monitoring', 'experiments', 'deployments']
-};
-
-interface PageProps {
-  params: Record<string, string>;
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default function Dashboard(props: PageProps): JSX.Element {
+export default function Dashboard(): JSX.Element {
   return (
     <main style={{ padding: '20px' }} role="main" aria-labelledby="dashboard-title">
       <h1 id="dashboard-title" data-cy="page-title">Dashboard</h1>

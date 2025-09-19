@@ -1,19 +1,10 @@
-import type { Metadata } from 'next';
-import { Suspense } from 'react';
+/**
+ * Monitoring Page - Server Component
+ * 
+ * Metadata and configuration is handled in layout.tsx.
+ */
+import React, { Suspense } from 'react';
 import RealTimeMonitoringClient from './RealTimeMonitoringClient';
-
-export const metadata: Metadata = {
-  title: 'Real-Time Monitoring | Phantom ML Studio',
-  description: 'Monitor ML model performance, data drift, and system health in real-time with advanced alerting and analytics.',
-  keywords: ['ML monitoring', 'real-time analytics', 'data drift', 'model performance', 'system health'],
-  openGraph: {
-    title: 'Real-Time Monitoring - Phantom ML Studio',
-    description: 'Advanced real-time ML monitoring and alerting',
-  },
-};
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 function MonitoringSkeleton() {
   return (
@@ -32,7 +23,7 @@ function MonitoringSkeleton() {
   );
 }
 
-export default function RealTimeMonitoringPage() {
+export default function RealTimeMonitoringPage(): JSX.Element {
   return (
     <Suspense fallback={<MonitoringSkeleton />}>
       <RealTimeMonitoringClient />

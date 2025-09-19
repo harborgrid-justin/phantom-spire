@@ -1,31 +1,9 @@
-'use client';
-
 /**
- * @fileoverview ML Experiments Page - Enterprise Experiment Tracking & Management Platform
+ * ML Experiments Page - Server Component
  *
- * This module implements a comprehensive ML experiment tracking system following
- * research-grade experimental design principles and enterprise MLOps best practices.
- *
- * Core architectural patterns:
- * - Experimental Design Framework: Support for A/B testing, multi-armed bandits, and factorial designs
- * - Reproducibility Engine: Complete experiment lineage with versioned code, data, and environments
- * - Statistical Analysis Pipeline: Automated hypothesis testing with significance analysis
- * - Distributed Experiment Orchestration: Multi-GPU and cluster experiment coordination
- * - Collaborative Research Platform: Team-based experiment sharing and peer review workflows
- *
- * Advanced capabilities:
- * - Hyperparameter Optimization: Bayesian optimization, genetic algorithms, and population-based methods
- * - Experiment Comparison Engine: Statistical testing for model performance differences
- * - Resource Optimization: Intelligent compute allocation and cost optimization
- * - Real-time Monitoring: Live experiment tracking with early stopping and anomaly detection
- * - Integration Hub: Support for MLflow, Weights & Biases, TensorBoard, and custom loggers
- *
- * Research-grade features:
- * - Cross-validation strategies with statistical power analysis
- * - Meta-learning for hyperparameter transfer across experiments
- * - Causal inference support for treatment effect analysis
- * - Publication-ready visualization with LaTeX integration
- * - Research compliance with data governance and audit trails
+ * This is a Next.js Server Component that provides the main experiments page.
+ * All metadata and configuration is handled in the layout.tsx file.
+ * Client-side interactivity is handled by child client components.
  *
  * @author Phantom ML Studio Research Team
  * @version 3.5.0
@@ -34,23 +12,13 @@
  * @subcategory Experiment Management
  */
 
-// Metadata moved to layout.tsx
-import { Suspense } from 'react';
-import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
+import React from 'react';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for optimal experiment tracking interface loading
 const ExperimentsClient = dynamic(() => import('./ExperimentsClient'), {
   loading: () => <ExperimentsSkeleton />
 });
-
-// Metadata and viewport moved to layout.tsx since this is now a client component
-
-/**
- * Performance configuration for real-time experiment tracking
- * Note: These exports are not valid in client components
- * Configuration moved to layout.tsx for server-side handling
- */
 
 /**
  * Advanced loading skeleton for experiment tracking interface
@@ -232,41 +200,9 @@ function ExperimentsSkeleton() {
 }
 
 /**
- * Error Boundary for Experiments Components
- * Provides comprehensive error recovery with experiment context preservation
- */
-function ExperimentsErrorFallback() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-lg mx-auto text-center">
-        <div className="bg-red-50 rounded-lg p-6 border border-red-200">
-          <h2 className="text-lg font-semibold text-red-800 mb-2">Experiment Tracking Error</h2>
-          <p className="text-red-600 mb-4">Unable to load experiment tracking interface</p>
-          <div className="space-y-2 mb-4">
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
-            >
-              Retry Experiments
-            </button>
-            <button
-              onClick={() => window.location.href = '/dashboard'}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Return to Dashboard
-            </button>
-          </div>
-          <p className="text-sm text-red-500">Running experiments will continue in the background</p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
  * ML Experiments Page Component
  *
- * Implements research-grade experiment tracking platform with:
+ * Server component that provides structure for experiment tracking with:
  * - Advanced statistical analysis with hypothesis testing
  * - Reproducible experiment workflows with complete lineage
  * - Real-time experiment monitoring with anomaly detection
@@ -279,47 +215,11 @@ function ExperimentsErrorFallback() {
  * @returns {JSX.Element} The complete experiment tracking interface
  */
 export default function ExperimentsPage(): JSX.Element {
-  // Extract user context for personalized experiment recommendations - client-side
-  const userAgent = typeof window !== 'undefined' ? window.navigator.userAgent : '';
-  const isBot = /bot|crawler|spider/i.test(userAgent);
-
-  // Optimize for search engine crawlers with research context
-  if (isBot) {
-    return (
-      <main className="min-h-screen bg-gray-50" role="main">
-        <div className="max-w-7xl mx-auto p-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            ML Experiments - Research Platform
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Comprehensive experiment tracking platform with statistical analysis, reproducible workflows, and advanced research capabilities.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="font-semibold mb-2">Experiment Tracking</h2>
-              <p className="text-gray-600">Complete experiment lineage with versioned code, data, and environments</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="font-semibold mb-2">Statistical Analysis</h2>
-              <p className="text-gray-600">Advanced hypothesis testing and performance comparison with significance analysis</p>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <h2 className="font-semibold mb-2">Hyperparameter Optimization</h2>
-              <p className="text-gray-600">Bayesian optimization and intelligent search strategies for optimal model performance</p>
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-gray-50" role="main">
-      <ErrorBoundary fallback={<ExperimentsErrorFallback />}>
-        <Suspense fallback={<ExperimentsSkeleton />}>
-          <ExperimentsClient />
-        </Suspense>
-      </ErrorBoundary>
+      <React.Suspense fallback={<ExperimentsSkeleton />}>
+        <ExperimentsClient />
+      </React.Suspense>
     </main>
   );
 }
