@@ -143,22 +143,6 @@ Cypress.Commands.add('waitForChart', (chartSelector = '[data-cy="chart"]', timeo
   cy.wait(1000) // Allow time for chart animation
 })
 
-// Temporarily commented out due to TypeScript compilation issues
-// Cypress.Commands.add('interactWithChart', (action: string, coordinates?: { x: number; y: number }) => {
-//   const chartSelector = '[data-cy="chart"]'
-//   cy.get(chartSelector).should('be.visible')
-
-//   if (action === 'hover' && coordinates) {
-//     cy.get(chartSelector).trigger('mouseover', coordinates.x, coordinates.y)
-//   } else if (action === 'click' && coordinates) {
-//     cy.get(chartSelector).click(coordinates.x, coordinates.y)
-//   } else if (action === 'hover') {
-//     cy.get(`${chartSelector} .recharts-area-dot`).first().trigger('mouseover')
-//   } else if (action === 'click') {
-//     cy.get(`${chartSelector} .recharts-area-dot`).first().click()
-//   }
-// })
-
 Cypress.Commands.add('validateChartData', (_expectedDataPoints: unknown[]) => {
   const chartSelector = '[data-cy="chart"]'
   cy.get(chartSelector).should('be.visible')
@@ -381,16 +365,6 @@ Cypress.Commands.add('confirmDialog', (action: 'accept' | 'cancel') => {
   cy.get('[data-cy="dialog"]').should('not.exist')
 })
 
-// Accessibility Commands with mock axe implementation
-Cypress.Commands.add('injectAxe', () => {
-  cy.window({ log: false }).then((win) => {
-    // Mock axe implementation for tests without cypress-axe
-    (win as unknown as Window & { axe: { run: () => Promise<{ violations: unknown[] }> } }).axe = {
-      run: () => Promise.resolve({ violations: [] })
-    }
-  })
-})
-
 // Tab navigation command
 Cypress.Commands.add('tab', { prevSubject: ['element'] }, (subject) => {
   cy.wrap(subject).trigger('keydown', { keyCode: 9 })
@@ -411,5 +385,94 @@ Cypress.Commands.add('pressKey', { prevSubject: ['element'] }, (subject, key: st
 
   cy.wrap(subject).trigger('keydown', { keyCode })
   return cy.wrap(subject)
+})
+
+// R.42: Enhanced authentication testing commands
+Cypress.Commands.add('testAuthenticationFlow', (userType: 'admin' | 'user' | 'guest' = 'user') => {
+  cy.log(`Testing authentication flow for ${userType}`)
+
+  // Visit protected route
+  cy.visit('/dashboard')
+
+  // Verify authentication state
+  cy.window().then((win) => {
+    const isAuthenticated = win.localStorage.getItem('authenticated') === 'true'
+    if (!isAuthenticated && userType !== 'guest') {
+      // Simulate authentication
+      win.localStorage.setItem('authenticated', 'true')
+      win.localStorage.setItem('userType', userType)
+      cy.reload()
+    }
+  })
+
+  // Verify appropriate access level
+  if (userType === 'admin') {
+    cy.get('[data-cy="admin-panel"]').should('be.visible')
+  } else if (userType === 'guest') {
+    cy.get('[data-cy="login-required"]').should('be.visible')
+  }
+})
+
+// R.47: Cross-browser testing utilities
+Cypress.Commands.add('testCrossBrowserCompatibility', (features: string[]) => {
+  features.forEach(feature => {
+    cy.log(`Testing ${feature} cross-browser compatibility`)
+
+    // Test feature based on browser
+    cy.window().then((win) => {
+      const browser = Cypress.browser.name
+
+      switch (feature) {
+        case 'css-grid':
+          cy.get('[data-cy="grid-layout"]').should('be.visible')
+          break
+        case 'flexbox':
+          cy.get('[data-cy="flex-container"]').should('be.visible')
+          break
+        case 'web-apis':
+          if (browser === 'chrome') {
+            expect(win.fetch).to.exist
+            expect(win.localStorage).to.exist
+          }
+          break
+      }
+    })
+  })
+})
+
+// R.50: Next.js specific testing commands
+Cypress.Commands.add('testNextJSFeatures', () => {
+  cy.log('Testing Next.js specific features')
+
+  // Test App Router navigation
+  cy.get('[data-cy="nav-link"]').first().click()
+  cy.url().should('not.include', '#')
+
+  // Test loading states
+  cy.get('[data-cy="loading-state"]').should('not.exist')
+
+  // Test error boundaries
+  cy.window().then((win) => {
+    expect(win.__NEXT_DATA__).to.exist
+  })
+
+  // Test hydration
+  cy.get('[data-cy="hydrated-content"]').should('be.visible')
+})
+
+// R.12: Advanced cy.task usage
+Cypress.Commands.add('useAdvancedTasks', () => {
+  // Generate test data
+  cy.task('generateTestData', { type: 'model', count: 5 }).then((data) => {
+    cy.log(`Generated ${data.length} test models`)
+  })
+
+  // Measure performance
+  cy.task('measureMemoryUsage').then((usage) => {
+    cy.log(`Memory usage: ${usage.heapUsed} bytes`)
+  })
+
+  // Clean up after tests
+  cy.task('cleanupTestArtifacts')
 })
 

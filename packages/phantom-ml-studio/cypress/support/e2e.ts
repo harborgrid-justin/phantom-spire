@@ -15,9 +15,9 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands.ts'
-// import './enhanced-commands.ts'  // Temporarily disabled
 import './types.ts'
 import './index.d.ts'
+import 'cypress-axe'
 
 // Handle React version conflicts and uncaught exceptions
 Cypress.on('uncaught:exception', (err) => {
@@ -69,9 +69,6 @@ beforeEach(() => {
 
 // Global test cleanup - runs after each test
 afterEach(() => {
-  // Clean up any test data
-  cy.cleanupTestData();
-
   // Take screenshot on failure - Cypress handles this automatically
   // but we can add custom logic here if needed
 });

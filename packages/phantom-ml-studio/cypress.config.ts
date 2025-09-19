@@ -58,8 +58,14 @@ export default defineConfig({
     // Environment variables
     env: {
       API_URL: 'http://localhost:3000/api',
-      TEST_ENV: 'development'
-    }
+      TEST_ENV: 'development',
+      // R.20: Documented test configuration
+      ENABLE_SSR_TESTING: true,
+      ENABLE_API_TESTING: true,
+      ENABLE_PERFORMANCE_TESTING: true
+    },
+    // R.47: Browser compatibility testing configuration
+    browsers: ['chrome', 'firefox', 'edge']
   },
   component: {
     devServer: {
