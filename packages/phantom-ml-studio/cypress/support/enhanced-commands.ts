@@ -98,8 +98,6 @@ declare global {
       verifyPagePerformance(thresholds?: { loadTime?: number; fcp?: number; lcp?: number }): Chainable<Element>;
 
       // ===== ACCESSIBILITY COMMANDS =====
-      checkA11y(context?: string, options?: any): Chainable<Element>;
-      injectAxe(): Chainable<Element>;
       checkColorContrast(minRatio?: number): Chainable<Element>;
       checkKeyboardNavigation(startElement?: string): Chainable<Element>;
       checkScreenReaderSupport(): Chainable<Element>;
@@ -722,38 +720,7 @@ Cypress.Commands.add('measureChartRender', (chartSelector: string) => {
 // **********************************************************************
 // ACCESSIBILITY COMMANDS
 // **********************************************************************
-
-Cypress.Commands.add('injectAxe', () => {
-  cy.window({ log: false }).then((win) => {
-    if (!win.axe) {
-      const axeScript = win.document.createElement('script');
-      axeScript.src = '/node_modules/axe-core/axe.min.js';
-      axeScript.onload = () => {
-        cy.log('Axe-core injected successfully');
-      };
-      win.document.head.appendChild(axeScript);
-    }
-  });
-});
-
-Cypress.Commands.add('checkA11y', (context?: string, options?: any) => {
-  if (Cypress.env('accessibility')?.runAxeChecks) {
-    cy.injectAxe();
-    cy.wait(1000); // Allow axe to load
-
-    cy.window().then((win) => {
-      if (win.axe) {
-        win.axe.run(context || document, options || {}).then((results) => {
-          const violations = results.violations;
-          if (violations.length > 0 && Cypress.env('accessibility')?.failOnViolations) {
-            throw new Error(`Accessibility violations found: ${violations.length}`);
-          }
-          cy.task('log', `Accessibility check completed. Violations: ${violations.length}`);
-        });
-      }
-    });
-  }
-});
+// checkA11y and injectAxe are already implemented in commands.ts
 
 // **********************************************************************
 // ENHANCED WAIT COMMANDS

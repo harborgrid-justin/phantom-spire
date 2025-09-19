@@ -46,6 +46,12 @@ export interface PipelineConfig {
   memoryConstraint: number;
   modelComplexity: string;
   interpretabilityLevel: string;
+  preprocessing?: {
+    scaling: boolean;
+    encoding: boolean;
+    missingValues: string;
+    featureSelection: boolean;
+  };
 }
 
 export interface PipelineTemplate {

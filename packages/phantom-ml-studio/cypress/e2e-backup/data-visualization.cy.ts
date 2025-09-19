@@ -110,7 +110,7 @@ describe('Data Visualization', () => {
     cy.get('[data-cy="generate-chart"]').click()
 
     cy.waitForChart('[data-cy="scatter-plot"]')
-    cy.interactWithChart('hover')
+    cy.interactWithChart('[data-cy="visualization-chart"]', 'hover')
     cy.get('[data-cy="chart-tooltip"]').should('be.visible')
 
     cy.get('[data-cy="enable-zoom"]').click()

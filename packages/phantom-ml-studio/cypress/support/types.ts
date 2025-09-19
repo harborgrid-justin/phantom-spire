@@ -68,7 +68,7 @@ declare global {
       /**
        * Accessibility commands
        */
-      checkA11y(context?: string, options?: { rules?: Record<string, { enabled: boolean }> }): Chainable<void>;
+      // checkA11y is declared in cypress-axe and commands.ts
       checkColorContrast(): Chainable<void>;
 
       /**

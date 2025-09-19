@@ -97,7 +97,7 @@ export class DashboardPage extends BasePage {
   interactWithPerformanceChart(): this {
     cy.get(this.selectors.performanceChart).should('be.visible');
     cy.waitForChart(this.selectors.performanceChart);
-    cy.interactWithChart('hover');
+    cy.interactWithChart('[data-cy="metrics-chart"]', 'hover');
     return this;
   }
 

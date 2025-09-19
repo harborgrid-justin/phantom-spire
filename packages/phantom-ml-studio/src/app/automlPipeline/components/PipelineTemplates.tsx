@@ -5,14 +5,19 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
-  Chip
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { PipelineTemplate } from '../types';
@@ -67,6 +72,23 @@ export default function PipelineTemplates({
   onTemplateSelect,
   onShowTemplateDetails
 }: PipelineTemplatesProps) {
+  const [selectedTemplate, setSelectedTemplate] = useState<PipelineTemplate | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showApplied, setShowApplied] = useState(false);
+
+  const handleTemplateClick = (template: PipelineTemplate) => {
+    setSelectedTemplate(template);
+    setShowDetails(true);
+  };
+
+  const handleUseTemplate = () => {
+    if (selectedTemplate) {
+      onTemplateSelect(selectedTemplate);
+      setShowDetails(false);
+      setShowApplied(true);
+      setTimeout(() => setShowApplied(false), 3000);
+    }
+  };
   return (
     <Card data-cy="pipeline-templates">
       <CardContent>
@@ -81,7 +103,7 @@ export default function PipelineTemplates({
                   cursor: 'pointer', 
                   '&:hover': { backgroundColor: 'action.hover' } 
                 }}
-                onClick={() => onTemplateSelect(template)}
+                onClick={() => handleTemplateClick(template)}
                 data-cy={`template-${template.id}`}
               >
                 <CardContent sx={{ p: 2 }}>
@@ -118,12 +140,83 @@ export default function PipelineTemplates({
           <Button 
             variant="contained" 
             onClick={onCreatePipeline}
-            data-cy="create-custom-pipeline"
+            data-cy="create-pipeline"
           >
             Create Custom Pipeline
           </Button>
         </Box>
       </CardContent>
+      
+      {/* Template Applied Alert */}
+      {showApplied && (
+        <Box sx={{ p: 2 }}>
+          <Alert severity="success" data-cy="template-applied">
+            Template applied successfully!
+          </Alert>
+        </Box>
+      )}
+      
+      {/* Template Details Dialog */}
+      <Dialog 
+        open={selectedTemplate !== null} 
+        onClose={() => setSelectedTemplate(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        {selectedTemplate && (
+          <>
+            <DialogTitle>
+              {selectedTemplate.name} Template
+            </DialogTitle>
+            <DialogContent data-cy="template-details">
+              <Typography variant="body1" gutterBottom>
+                {selectedTemplate.description}
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Supported Algorithms:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {selectedTemplate.algorithms.map((algorithm) => (
+                    <Chip 
+                      key={algorithm}
+                      label={algorithm}
+                      variant="outlined"
+                      size="small"
+                    />
+                  ))}
+                </Box>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Default Configuration:
+                </Typography>
+                <Typography variant="body2">
+                  Optimization Metric: {selectedTemplate.defaultConfig.optimizationMetric}
+                </Typography>
+                <Typography variant="body2">
+                  Model Complexity: {selectedTemplate.defaultConfig.modelComplexity}
+                </Typography>
+                <Typography variant="body2">
+                  Interpretability: {selectedTemplate.defaultConfig.interpretabilityLevel}
+                </Typography>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setSelectedTemplate(null)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={handleUseTemplate}
+                data-cy="use-template"
+              >
+                Use Template
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Card>
   );
 }

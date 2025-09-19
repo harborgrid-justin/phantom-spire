@@ -103,7 +103,7 @@ export default function RecentPipelines({
                   selected={selectedPipeline?.id === pipeline.id}
                   onClick={() => onPipelineSelect(pipeline)}
                   sx={{ cursor: 'pointer' }}
-                  data-cy={`pipeline-row-${pipeline.id}`}
+                  data-cy={`pipeline-item`}
                 >
                   <TableCell>
                     <Typography variant="subtitle2">
@@ -211,7 +211,7 @@ export default function RecentPipelines({
                           e.stopPropagation();
                           onPipelineAction(pipeline, 'clone');
                         }}
-                        data-cy={`clone-pipeline-${pipeline.id}`}
+                        data-cy="clone-pipeline"
                       >
                         <MoreVert />
                       </IconButton>

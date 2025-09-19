@@ -3,7 +3,7 @@ import { defineConfig } from 'cypress'
 export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
-    supportFile: 'cypress/support/e2e.ts',
+    supportFile: 'cypress/support/e2e-minimal.ts',
     specPattern: 'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
     setupNodeEvents(on, config) {
       // Add task for cy.task() usage

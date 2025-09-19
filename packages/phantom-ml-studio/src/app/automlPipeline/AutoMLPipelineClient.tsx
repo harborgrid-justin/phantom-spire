@@ -33,6 +33,7 @@ import ExecutionDialog from './components/ExecutionDialog';
 import ExecutionMonitor from './components/ExecutionMonitor';
 import CancelConfirmationDialog from './components/CancelConfirmationDialog';
 import SaveResultsDialog from './components/SaveResultsDialog';
+import PipelineWizard from './components/PipelineWizard';
 
 // Type imports
 import type {
@@ -262,6 +263,30 @@ export default function AutoMLPipelineClient() {
 
   const handleCreatePipeline = () => {
     setDialogStates(prev => ({ ...prev, createDialogOpen: true }));
+  };
+
+  const handlePipelineCreated = (config: PipelineConfig) => {
+    // Create new pipeline with the configuration
+    const newPipeline: Pipeline = {
+      id: `pipeline_${Date.now()}`,
+      name: config.name || 'New Pipeline',
+      status: 'pending',
+      progress: 0,
+      currentStep: 'Ready to Execute',
+      algorithm: 'Not Selected',
+      accuracy: 0.0,
+      startTime: new Date(),
+      estimatedTime: 0,
+      datasetId: config.datasetId || 'default'
+    };
+
+    // Add to pipelines list
+    setPipelines(prev => [newPipeline, ...prev]);
+    setSelectedPipeline(newPipeline);
+    
+    // Close dialog and show success notification
+    setDialogStates(prev => ({ ...prev, createDialogOpen: false }));
+    setNotificationStates(prev => ({ ...prev, showDraftSaved: true }));
   };
 
   // Execution handlers
@@ -682,6 +707,13 @@ export default function AutoMLPipelineClient() {
         pipeline={selectedPipeline}
         onClose={() => setSaveResultsDialogOpen(false)}
         onSave={handleSaveResults}
+      />
+      
+      {/* Pipeline Creation Wizard */}
+      <PipelineWizard
+        open={dialogStates.createDialogOpen}
+        onClose={() => setDialogStates(prev => ({ ...prev, createDialogOpen: false }))}
+        onComplete={handlePipelineCreated}
       />
     </Box>
   );

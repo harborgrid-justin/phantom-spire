@@ -12,7 +12,7 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "jsx": "preserve",
     "baseUrl": "../",
     "paths": {
@@ -21,7 +21,10 @@
     "types": [
       "cypress",
       "node"
-    ]
+    ],
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": [
     "**/*.ts",

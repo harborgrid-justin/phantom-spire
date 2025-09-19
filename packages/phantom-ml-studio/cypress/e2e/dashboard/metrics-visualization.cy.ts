@@ -24,7 +24,7 @@ describe('Dashboard Metrics Visualization', () => {
 
   it('should interact with chart tooltips on hover', () => {
     cy.waitForChart('[data-cy="model-performance-chart"]')
-    cy.interactWithChart('hover', { x: 100, y: 100 })
+    cy.interactWithChart('[data-cy="performance-chart"]', 'hover', { x: 100, y: 100 })
     cy.get('[data-cy="chart-tooltip"]').should('be.visible')
     cy.get('[data-cy="tooltip-value"]').should('contain.match', /\d+\.?\d*/)
   })

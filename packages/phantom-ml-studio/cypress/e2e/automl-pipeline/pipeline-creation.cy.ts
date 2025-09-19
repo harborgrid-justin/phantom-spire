@@ -1,6 +1,6 @@
 describe('AutoML Pipeline Creation', () => {
   beforeEach(() => {
-    cy.visit('/automl-pipeline-visualizer')
+    cy.visit('/automlPipeline')
     cy.get('[data-cy="page-loading"]').should('not.exist')
   })
 

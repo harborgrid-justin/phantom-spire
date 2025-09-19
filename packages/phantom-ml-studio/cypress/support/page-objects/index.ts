@@ -1,5 +1,14 @@
 /// <reference types="cypress" />
 
+// Import all Page Object Models
+import { BasePage } from './BasePage';
+import { DashboardPage } from './DashboardPage';
+import { DataExplorerPage } from './DataExplorerPage';
+import { ModelBuilderPage } from './ModelBuilderPage';
+import { ExperimentsPage } from './ExperimentsPage';
+import { DeploymentsPage } from './DeploymentsPage';
+import { BiasDetectionPage } from './BiasDetectionPage';
+
 // Export all Page Object Models for easy importing
 export { BasePage } from './BasePage';
 export { DashboardPage } from './DashboardPage';
