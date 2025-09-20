@@ -1,0 +1,21 @@
+{
+  "name": "phantom-xdr-test-app",
+  "version": "1.0.0",
+  "description": "Enterprise XDR Test Application - Real-world threat detection and response scenarios",
+  "main": "xdr-enterprise-test.js",
+  "scripts": {
+    "test": "node xdr-enterprise-test.js",
+    "threat-simulation": "node threat-simulation.js",
+    "soc-dashboard": "node soc-dashboard.js",
+    "incident-response": "node incident-response.js"
+  },
+  "dependencies": {
+    "phantom-xdr-core": "file:..",
+    "colors": "^1.4.0",
+    "cli-table3": "^0.6.3",
+    "inquirer": "^9.2.0"
+  },
+  "keywords": ["xdr", "cybersecurity", "threat-detection", "enterprise", "phantom-spire"],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT"
+}

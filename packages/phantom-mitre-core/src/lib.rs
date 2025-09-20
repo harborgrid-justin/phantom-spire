@@ -25,7 +25,11 @@ pub use models::*;
 pub use config::*;
 pub use storage::{MitreStorage, LocalStorage, StorageFactory, create_default_storage, create_sample_storage};
 pub use core::MitreCore;
+
+// Export NAPI bindings for Node.js integration
+#[cfg(feature = "napi")]
 pub use napi_bindings::MitreCoreNapi;
+
 
 // Re-export unified data layer interface for backward compatibility (temporarily commented out)
 // pub use unified::*;

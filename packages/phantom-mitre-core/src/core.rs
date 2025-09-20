@@ -29,7 +29,7 @@ impl MitreCore {
 
     /// Create a new MITRE Core instance with default local storage
     pub async fn new_with_local_storage(config: Option<MitreConfig>) -> StorageResult<Self> {
-        let storage = crate::storage::create_default_storage().await?;
+        let storage = crate::storage::create_default_storage_with_init().await?;
         Ok(Self::new(storage, config))
     }
 

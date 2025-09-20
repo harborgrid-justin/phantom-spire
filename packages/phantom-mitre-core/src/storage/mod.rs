@@ -59,8 +59,16 @@ impl StorageFactory {
     }
 }
 
-/// Helper function to create a default storage instance
-pub async fn create_default_storage() -> StorageResult<Box<dyn MitreStorage>> {
+/// Helper function to create a default storage instance (synchronous)
+pub fn create_default_storage() -> Box<dyn MitreStorage> {
+    let config = StorageConfig::default();
+    let storage = StorageFactory::create_storage(&config)
+        .expect("Failed to create default storage");
+    storage
+}
+
+/// Helper function to create a default storage instance with initialization (async)
+pub async fn create_default_storage_with_init() -> StorageResult<Box<dyn MitreStorage>> {
     let config = StorageConfig::default();
     let mut storage = StorageFactory::create_storage(&config)?;
     storage.initialize().await?;
