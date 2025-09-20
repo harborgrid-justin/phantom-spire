@@ -18,7 +18,7 @@ pub struct TTPEvolutionModule {
     ttp_database: RwLock<HashMap<String, TTPProfile>>,
     evolution_patterns: RwLock<Vec<EvolutionPattern>>,
     adaptation_history: RwLock<Vec<AdaptationEvent>>,
-    predictive_models: RwLock<HashMap<String, PredictiveModel>>,
+    predictive_models: RwLock<HashMap<String, String>>, // Simplified for compilation
     correlation_engine: TTPCorrelationEngine,
     pattern_recognizer: PatternRecognizer,
     evolution_tracker: EvolutionTracker,

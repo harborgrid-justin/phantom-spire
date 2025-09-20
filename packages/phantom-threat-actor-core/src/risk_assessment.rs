@@ -1140,7 +1140,7 @@ impl ImpactAnalyzer {
 
 /// Impact model
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct ImpactModel {
+pub struct ImpactModel {
     model_id: String,
     name: String,
     impact_factors: Vec<String>,

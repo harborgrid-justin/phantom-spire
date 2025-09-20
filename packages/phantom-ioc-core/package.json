@@ -1,7 +1,7 @@
 {
   "name": "@phantom-spire/ioc-core",
-  "version": "1.0.0",
-  "description": "Advanced IOC processing core with threat intelligence and indicator correlation - Part of the Phantom Spire CTI Platform",
+  "version": "1.0.1",
+  "description": "Enterprise IOC (Indicators of Compromise) processing core with advanced threat correlation and ML-driven analysis",
   "main": "index.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
@@ -16,11 +16,13 @@
   "napi": {
     "name": "phantom-ioc-core",
     "triples": {
+      "defaults": true,
       "additional": [
+        "x86_64-pc-windows-msvc",
+        "x86_64-apple-darwin",
         "aarch64-apple-darwin",
-        "aarch64-unknown-linux-gnu",
-        "aarch64-pc-windows-msvc",
-        "x86_64-unknown-linux-musl"
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu"
       ]
     }
   },
@@ -66,8 +68,15 @@
     "npm": ">=8.0.0"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^3.2.0",
+    "@napi-rs/cli": "^2.18.0",
     "rimraf": "^6.0.1"
+  },
+  "optionalDependencies": {
+    "@phantom-spire/ioc-core-win32-x64-msvc": "1.0.1",
+    "@phantom-spire/ioc-core-darwin-x64": "1.0.1",
+    "@phantom-spire/ioc-core-darwin-arm64": "1.0.1",
+    "@phantom-spire/ioc-core-linux-x64-gnu": "1.0.1",
+    "@phantom-spire/ioc-core-linux-arm64-gnu": "1.0.1"
   },
   "publishConfig": {
     "access": "public"

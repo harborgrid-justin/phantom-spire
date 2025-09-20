@@ -73,7 +73,20 @@
       "Bash(timeout 30 npx tsx test-app.ts)",
       "Bash(set \"NODE_LIB_FILE=C:\\Users\\justi\\AppData\\Local\\node-gyp\\Cache\\22.19.0\\x64\\node.lib\")",
       "Bash(timeout 10s npm run express)",
-      "Bash(mklink:*)"
+      "Bash(mklink:*)",
+      "Bash(timeout 60 npm test)",
+      "Bash(timeout 30 npm run test:core)",
+      "Bash(timeout 10 npm start)",
+      "Bash(timeout 15 npm run dashboard)",
+      "Bash(timeout 30 npm test)",
+      "Bash(timeout 15 npm start)",
+      "Bash(timeout 10 npm run dashboard)",
+      "Bash(timeout 10 npm test)",
+      "Bash(timeout 30s npm start)",
+      "Bash(timeout 30s npm test)",
+      "Bash(timeout 30s npm run demo)",
+      "Bash(timeout 30s npm run performance)",
+      "Bash(timeout 30s npm run enterprise)"
     ],
     "deny": [],
     "ask": []

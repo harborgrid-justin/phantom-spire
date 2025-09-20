@@ -617,11 +617,6 @@ pub struct BehavioralPattern {
     pub first_seen: DateTime<Utc>,
     pub id: String,
     pub user_agents: Vec<String>,
-    pub source_ips: Vec<String>,
-    pub affected_users: Vec<String>,
-    pub last_seen: DateTime<Utc>,
-    pub first_seen: DateTime<Utc>,
-    pub id: String,
 }
 
 /// Pattern types

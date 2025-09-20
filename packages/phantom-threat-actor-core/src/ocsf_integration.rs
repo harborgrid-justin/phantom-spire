@@ -121,7 +121,7 @@ pub mod geographic_ocsf {
 
     /// Generate OCSF events from geographic analysis
     pub fn generate_geographic_events(
-        locations: &[crate::geographic_analysis::GeographicLocation],
+        locations: &[crate::infrastructure_analysis::GeographicLocation],
         integration: &mut ThreatActorOcsfIntegration,
     ) -> Vec<network_activity::NetworkActivityEvent> {
         let mut events = Vec::new();
@@ -585,7 +585,7 @@ impl ThreatIntelEventGenerator {
     }
 
     /// Generate events from geographic analysis
-    pub fn generate_from_geographic_analysis(&mut self, locations: &[crate::geographic_analysis::GeographicLocation]) {
+    pub fn generate_from_geographic_analysis(&mut self, locations: &[crate::infrastructure_analysis::GeographicLocation]) {
         // Note: This would create network activity events, but we're collecting them as security findings for consistency
         let network_events = geographic_ocsf::generate_geographic_events(locations, &mut self.integration);
         // Convert network events to security findings for unified collection

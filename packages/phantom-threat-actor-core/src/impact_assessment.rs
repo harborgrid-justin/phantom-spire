@@ -14,7 +14,7 @@ use anyhow::Result;
 #[derive(Debug)]
 pub struct ImpactAssessmentModule {
     assessment_config: AssessmentConfig,
-    impact_models: HashMap<String, ImpactModel>,
+    impact_models: HashMap<String, crate::risk_assessment::ImpactModel>,
     quantification_engine: QuantificationEngine,
     business_impact_analyzer: BusinessImpactAnalyzer,
     recovery_planner: RecoveryPlanner,
