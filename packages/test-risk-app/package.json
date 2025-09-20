@@ -1,7 +1,7 @@
 {
-  "name": "test-incident-app",
+  "name": "test-risk-app",
   "version": "1.0.0",
-  "description": "Test application for Phantom Incident Response Core - Enterprise incident response and security automation",
+  "description": "Test application for Phantom Risk Core - Enterprise risk assessment and management system",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -12,14 +12,14 @@
   },
   "keywords": [
     "cybersecurity",
-    "incident-response",
+    "risk-management",
     "phantom-spire",
-    "security-automation",
-    "enterprise-security"
+    "enterprise-risk",
+    "risk-analytics"
   ],
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "dependencies": {
-    "@phantom-spire/incident-response-core": "file:../phantom-incident-response-core"
+    "@phantom-spire/risk-core": "file:../phantom-risk-core"
   }
 }

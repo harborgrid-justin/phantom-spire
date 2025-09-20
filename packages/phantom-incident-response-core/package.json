@@ -2,7 +2,7 @@
   "name": "@phantom-spire/incident-response-core",
   "version": "1.0.0",
   "description": "Advanced incident response management system with comprehensive forensic analysis, response automation, and recovery coordination capabilities - Part of the Phantom Spire CTI Platform",
-  "main": "index.js",
+  "main": "incident-wrapper.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
   "repository": {
@@ -25,6 +25,7 @@
     }
   },
   "files": [
+    "incident-wrapper.js",
     "index.js",
     "index.d.ts",
     "*.node",

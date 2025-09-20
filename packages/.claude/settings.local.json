@@ -90,7 +90,13 @@
       "Bash(timeout 60s npm run performance)",
       "Bash(timeout 30 npm start)",
       "Bash(timeout 30 npm run enterprise)",
-      "Bash(timeout 30 npm run demo)"
+      "Bash(timeout 30 npm run demo)",
+      "Bash(timeout 15s npm start)",
+      "Bash(timeout 10s npm test)",
+      "Bash(timeout 15s npm test)",
+      "Bash(timeout 10s npm start)",
+      "Bash(timeout 20s npm run enterprise)",
+      "Bash(timeout 60s npm start)"
     ],
     "deny": [],
     "ask": []

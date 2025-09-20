@@ -1,8 +1,8 @@
 {
   "name": "@phantom-spire/risk-core",
-  "version": "1.0.0",
-  "description": "Risk assessment and vulnerability prioritization core with business impact analysis - Part of the Phantom Spire CTI Platform",
-  "main": "index.js",
+  "version": "1.0.1",
+  "description": "Advanced enterprise risk assessment and management system with comprehensive risk analytics, predictive modeling, and automated governance capabilities",
+  "main": "risk-wrapper.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
   "repository": {
@@ -25,9 +25,11 @@
     }
   },
   "files": [
-    "index.js",
+    "risk-wrapper.js",
+    "phantom_risk_core.node",
+    "phantom-risk-core.win32-x64-msvc.node",
+    "phantom-risk-core.win32-x64-gnu.node",
     "index.d.ts",
-    "*.node",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
