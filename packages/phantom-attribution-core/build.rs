@@ -1,5 +1,9 @@
+#[cfg(feature = "napi")]
 extern crate napi_build;
 
 fn main() {
-    napi_build::setup();
+    #[cfg(feature = "napi")]
+    {
+        napi_build::setup();
+    }
 }

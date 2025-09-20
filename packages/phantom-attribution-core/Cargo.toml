@@ -11,14 +11,19 @@ documentation = "https://docs.rs/phantom-attribution-core"
 keywords = ["cybersecurity", "phantom-spire", "security", "attribution"]
 categories = ["web-programming", "api-bindings"]
 
+# NAPI-RS specific metadata
+[package.metadata.napi]
+name = "phantom-attribution-core"
+triples = ["x86_64-pc-windows-msvc", "x86_64-apple-darwin", "aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+
 [lib]
 name = "phantom_attribution_core"
 crate-type = ["cdylib"]
 
 [dependencies]
-# Core NAPI dependencies - standardized versions
-napi = { version = "3.3.0", default-features = false, features = ["napi6", "serde-json", "tokio_rt"], optional = true }
-napi-derive = { version = "3.2.5", optional = true }
+# Core NAPI dependencies - stable versions that work on Windows
+napi = { version = "2.16", default-features = false, features = ["napi4"], optional = true }
+napi-derive = { version = "2.16", default-features = false, optional = true }
 
 # Core serialization and data handling - required for all packages
 serde = { version = "1.0", features = ["derive"] }
@@ -82,9 +87,7 @@ phantom-enterprise-standards = { path = "../phantom-enterprise-standards", optio
 
 [features]
 default = ["local"]
-
-# Core features
-napi = ["dep:napi", "dep:napi-derive"]
+napi = ["dep:napi", "dep:napi-derive", "dep:napi-build", "napi-derive/type-def"]
 local = []
 
 # Database backends
@@ -109,5 +112,16 @@ advanced-config = []
 # Bundled feature sets
 enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
+
+# NAPI-specific profiles for optimized Node.js builds
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+panic = "abort"
+
 [build-dependencies]
-napi-build = "2.1.0"
+napi-build = { version = "2.0", optional = true }

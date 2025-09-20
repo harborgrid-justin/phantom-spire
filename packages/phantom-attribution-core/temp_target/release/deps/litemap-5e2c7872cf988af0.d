@@ -1,0 +1,11 @@
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\litemap-5e2c7872cf988af0.d: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\map.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\mod.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\slice_impl.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\vec_impl.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\liblitemap-5e2c7872cf988af0.rlib: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\map.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\mod.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\slice_impl.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\vec_impl.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\liblitemap-5e2c7872cf988af0.rmeta: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\map.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\mod.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\slice_impl.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\vec_impl.rs
+
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\lib.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\map.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\mod.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\slice_impl.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\litemap-0.8.0\src\store\vec_impl.rs:

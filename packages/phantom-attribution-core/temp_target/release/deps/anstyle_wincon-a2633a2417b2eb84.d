@@ -1,0 +1,10 @@
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\anstyle_wincon-a2633a2417b2eb84.d: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\ansi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\stream.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libanstyle_wincon-a2633a2417b2eb84.rlib: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\ansi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\stream.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libanstyle_wincon-a2633a2417b2eb84.rmeta: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\ansi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\stream.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\windows.rs
+
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\lib.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\ansi.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\stream.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\anstyle-wincon-3.0.10\src\windows.rs:

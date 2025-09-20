@@ -1,0 +1,11 @@
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\socket2-4acf0889f781f677.d: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockaddr.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\socket.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockref.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sys\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libsocket2-4acf0889f781f677.rlib: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockaddr.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\socket.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockref.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sys\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libsocket2-4acf0889f781f677.rmeta: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockaddr.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\socket.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockref.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sys\windows.rs
+
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\lib.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockaddr.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\socket.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sockref.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\socket2-0.6.0\src\sys\windows.rs:

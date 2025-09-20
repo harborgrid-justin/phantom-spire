@@ -1,13 +1,17 @@
 // phantom-attribution-core/src/lib.rs
 // Threat attribution and actor profiling library
 
+#[cfg(feature = "napi")]
 use napi::bindgen_prelude::*;
+#[cfg(feature = "napi")]
 use napi_derive::napi;
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "napi", napi(object))]
 pub struct ThreatActor {
     pub id: String,
     pub name: String,
@@ -20,14 +24,16 @@ pub struct ThreatActor {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "napi", napi(object))]
 pub struct Attribution {
     pub indicator: String,
     pub actor_matches: Vec<ActorMatch>,
     pub confidence_score: f64,
-    pub analysis_date: DateTime<Utc>,
+    pub analysis_date: String, // Use String for NAPI compatibility
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "napi", napi(object))]
 pub struct ActorMatch {
     pub actor_id: String,
     pub match_score: f64,
@@ -85,16 +91,18 @@ impl AttributionCore {
             indicator: indicators.join(","),
             actor_matches,
             confidence_score,
-            analysis_date: Utc::now(),
+            analysis_date: Utc::now().to_rfc3339(),
         })
     }
 }
 
+#[cfg(feature = "napi")]
 #[napi]
 pub struct AttributionCoreNapi {
     inner: AttributionCore,
 }
 
+#[cfg(feature = "napi")]
 #[napi]
 impl AttributionCoreNapi {
     #[napi(constructor)]
@@ -105,7 +113,13 @@ impl AttributionCoreNapi {
     }
 
     #[napi]
-    pub fn analyze_attribution(&self, indicators: Vec<String>) -> Result<String> {
+    pub fn analyze_attribution(&self, indicators: Vec<String>) -> Result<Attribution> {
+        self.inner.analyze_attribution(indicators)
+            .map_err(|e| napi::Error::from_reason(format!("Failed to analyze attribution: {}", e)))
+    }
+
+    #[napi]
+    pub fn analyze_attribution_json(&self, indicators: Vec<String>) -> Result<String> {
         let attribution = self.inner.analyze_attribution(indicators)
             .map_err(|e| napi::Error::from_reason(format!("Failed to analyze attribution: {}", e)))?;
 
@@ -114,11 +128,17 @@ impl AttributionCoreNapi {
     }
 
     #[napi]
+    pub fn get_threat_actors(&self) -> Result<Vec<ThreatActor>> {
+        Ok(self.inner.actors.values().cloned().collect())
+    }
+
+    #[napi]
     pub fn get_health_status(&self) -> Result<String> {
         let status = serde_json::json!({
             "status": "healthy",
             "timestamp": chrono::Utc::now().to_rfc3339(),
-            "version": env!("CARGO_PKG_VERSION")
+            "version": env!("CARGO_PKG_VERSION"),
+            "actor_count": self.inner.actors.len()
         });
 
         serde_json::to_string(&status)

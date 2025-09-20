@@ -1,0 +1,5 @@
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-L", "C:\\Users\\justi\\AppData\\Local\\node-gyp\\Cache\\22.19.0\\x64"]
+
+[env]
+LIB = "C:\\Users\\justi\\AppData\\Local\\node-gyp\\Cache\\22.19.0\\x64"

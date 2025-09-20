@@ -1,0 +1,29 @@
+{
+  "name": "phantom-attribution-test-app",
+  "version": "1.0.0",
+  "description": "Test application for phantom-attribution-core Node.js package",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js",
+    "demo": "node demo.js",
+    "express": "node express-server.js"
+  },
+  "keywords": [
+    "phantom-attribution-core",
+    "threat-intelligence",
+    "cybersecurity",
+    "test"
+  ],
+  "author": "Test Developer",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "phantom-attribution-core": "file:../phantom-attribution-core"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

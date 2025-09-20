@@ -1,0 +1,11 @@
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\napi_build-0d76ce575cf42b91.d: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\android.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\macos.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\wasi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libnapi_build-0d76ce575cf42b91.rlib: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\android.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\macos.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\wasi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\windows.rs
+
+C:\phantom-spire\packages\phantom-attribution-core\temp_target\release\deps\libnapi_build-0d76ce575cf42b91.rmeta: C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\lib.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\android.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\macos.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\wasi.rs C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\windows.rs
+
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\lib.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\android.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\macos.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\wasi.rs:
+C:\Users\justi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\napi-build-2.2.3\src\windows.rs:
