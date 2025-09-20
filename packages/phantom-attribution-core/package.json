@@ -2,7 +2,7 @@
   "name": "phantom-attribution-core",
   "version": "1.0.1",
   "description": "Threat attribution and actor profiling core with advanced behavioral analysis and campaign tracking - Part of the Phantom Spire CTI Platform",
-  "main": "index.js",
+  "main": "attribution-wrapper.js",
   "types": "index.d.ts",
   "bin": {
     "phantom-attribution-example": "./example.js"
@@ -28,7 +28,7 @@
     }
   },
   "files": [
-    "index.js",
+    "attribution-wrapper.js",
     "index.d.ts",
     "*.node",
     "example.js",
@@ -40,15 +40,15 @@
   ],
   "scripts": {
     "artifacts": "napi artifacts",
-    "build": "napi build --platform --release",
-    "build:debug": "napi build --platform",
+    "build": "napi build --platform --release --features napi",
+    "build:debug": "napi build --platform --features napi",
     "build:enterprise": "napi build --platform --release --features enterprise",
     "build:full": "napi build --platform --release --features full",
     "clean": "rimraf dist target",
     "prepublishOnly": "napi prepublish -t npm",
     "test": "cargo test",
     "test:native": "cargo test --all-features",
-    "test:node": "node -e \"const pkg = require('./index.js'); console.log('Package loads successfully:', typeof pkg.AttributionCoreNapi)\"",
+    "test:node": "node -e \"const pkg = require('./attribution-wrapper.js'); console.log('Package loads successfully:', typeof pkg.PhantomAttributionCore)\"",
     "test:package": "node test-package.js",
     "universal": "napi universal",
     "version": "napi version",
@@ -85,6 +85,9 @@
     "rimraf": "^6.0.1",
     "tsx": "^4.20.5",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@node-rs/helper": "^1.3.0"
   },
   "publishConfig": {
     "access": "public"

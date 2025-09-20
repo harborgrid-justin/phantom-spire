@@ -1,0 +1,26 @@
+{
+  "name": "test-secop-app",
+  "version": "1.0.0",
+  "description": "Test application for Phantom SecOp Core - Enterprise security operations and incident response system",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node performance/benchmark.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "secops",
+    "incident-response",
+    "phantom-spire",
+    "security-automation",
+    "threat-hunting"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-spire/secop-core": "file:../phantom-secop-core"
+  }
+}

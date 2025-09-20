@@ -1,8 +1,8 @@
 {
   "name": "@phantom-spire/secop-core",
-  "version": "1.0.0",
-  "description": "Advanced Security Operations (SecOps) engine for comprehensive incident response, automation, and security orchestration - Part of the Phantom Spire CTI Platform",
-  "main": "index.js",
+  "version": "1.0.1",
+  "description": "Advanced Security Operations (SecOps) system for incident response, orchestration, automation, and operational intelligence with enterprise-grade capabilities",
+  "main": "secop-wrapper.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
   "repository": {
@@ -25,9 +25,11 @@
     }
   },
   "files": [
-    "index.js",
+    "secop-wrapper.js",
+    "phantom_secop_core.node",
+    "phantom-secop-core.win32-x64-msvc.node",
+    "phantom-secop-core.win32-x64-gnu.node",
     "index.d.ts",
-    "*.node",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
