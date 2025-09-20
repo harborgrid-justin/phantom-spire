@@ -21,6 +21,6 @@
   "author": "Phantom Spire Security Team",
   "license": "MIT",
   "dependencies": {
-    "@phantom-spire/attribution-core": "file:../phantom-attribution-core"
+    "phantom-attribution-core": "file:../phantom-attribution-core"
   }
 }
