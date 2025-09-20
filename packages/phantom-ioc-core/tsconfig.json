@@ -10,7 +10,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
+    }
   },
   "include": ["src-ts/**/*"],
   "exclude": ["node_modules", "dist", "src"]

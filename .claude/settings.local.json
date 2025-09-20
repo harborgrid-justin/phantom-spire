@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(node:*)",
+      "Bash(for pkg in phantom-attribution-core phantom-compliance-core phantom-crypto-core phantom-cve-core phantom-feeds-core phantom-forensics-core phantom-hunting-core phantom-incident-response-core phantom-intel-core phantom-ioc-core phantom-malware-core phantom-mitre-core phantom-reputation-core phantom-risk-core phantom-sandbox-core phantom-secop-core phantom-threat-actor-core phantom-vulnerability-core phantom-xdr-core)",
+      "Bash(do echo \"=== $pkg ===\")",
+      "Bash(if [ -f \"packages/$pkg/tsconfig.json\" ])",
+      "Bash(then echo \"✓ tsconfig.json found\")",
+      "Bash(else echo \"✗ tsconfig.json missing\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(for pkg in phantom-attribution-core phantom-compliance-core phantom-crypto-core phantom-feeds-core phantom-forensics-core phantom-hunting-core phantom-malware-core phantom-reputation-core phantom-risk-core phantom-sandbox-core phantom-vulnerability-core phantom-xdr-core)",
+      "Bash(if [ -f \"packages/$pkg/package.json\" ])",
+      "Bash(then echo \"✓ package.json found\")",
+      "Bash(else echo \"✗ package.json missing\")",
+      "Bash(for pkg in phantom-cve-core phantom-incident-response-core phantom-intel-core phantom-ioc-core phantom-mitre-core phantom-secop-core phantom-threat-actor-core)",
+      "Bash(if [ -d \"packages/$pkg/src-ts\" ])",
+      "Bash(then echo \"✓ src-ts directory found\")",
+      "Bash(ls:*)",
+      "Bash(else echo \"✗ src-ts directory missing\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx tsc:*)",
+      "Bash(find:*)",
+      "Bash(powershell:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -27,7 +27,11 @@
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
+    }
   },
   "include": [
     "src-ts/**/*"

@@ -1,20 +1,21 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
-    "module": "commonjs",
     "lib": ["ES2020"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src-ts",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "paths": {
       "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
@@ -26,6 +27,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ]
 }

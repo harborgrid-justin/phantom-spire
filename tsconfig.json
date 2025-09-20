@@ -35,7 +35,8 @@
       "@/types/*": ["frontend/types/*"],
       "@/context/*": ["frontend/context/*"],
       "@/views/*": ["frontend/views/*"],
-      "@/services/*": ["services/*"]
+      "@/services/*": ["services/*"],
+      "@phantom-spire/ml-core": ["packages/phantom-ml-core/nextgen"]
     }
   },
   "include": ["src/**/*", "packages/**/*"],

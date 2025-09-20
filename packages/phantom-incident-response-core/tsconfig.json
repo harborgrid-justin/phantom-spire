@@ -25,7 +25,11 @@
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false
+    "noUncheckedIndexedAccess": false,
+    "baseUrl": "./",
+    "paths": {
+      "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
+    }
   },
   "include": [
     "src-ts/**/*"

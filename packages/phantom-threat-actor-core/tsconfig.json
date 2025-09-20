@@ -14,7 +14,11 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
+    }
   },
   "include": [
     "src-ts/**/*"

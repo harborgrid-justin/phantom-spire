@@ -75,5 +75,8 @@
   "organization": {
     "name": "Phantom Spire",
     "url": "https://github.com/harborgrid-justin/phantom-spire"
+  },
+  "dependencies": {
+    "@phantom-spire/ml-core": "file:../phantom-ml-core/nextgen"
   }
 }

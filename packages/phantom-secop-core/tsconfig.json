@@ -12,7 +12,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "paths": {
+      "@phantom-spire/ml-core": ["../phantom-ml-core/nextgen"]
+    }
   },
   "include": [
     "src-ts/**/*"
