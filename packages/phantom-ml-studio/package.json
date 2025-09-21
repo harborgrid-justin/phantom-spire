@@ -1,7 +1,50 @@
 {
-  "name": "nextgen",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@phantom-spire/ml-studio",
+  "version": "2.0.0",
+  "description": "Enterprise-grade machine learning studio with comprehensive monitoring, security, and analytics - competitive with H2O.ai",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "private": false,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "npm run build:native && next build",
+    "build:native": "napi build --platform --release",
+    "build:native:debug": "napi build --platform",
+    "start": "next start",
+    "test": "jest",
+    "test:unit": "jest tests/unit",
+    "test:integration": "jest tests/integration", 
+    "test:e2e": "jest tests/e2e",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint src tests --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src tests --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx}\" \"tests/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rimraf dist coverage .next",
+    "docs": "typedoc src --out docs",
+    "security:audit": "npm audit && snyk test",
+    "security:check": "node scripts/pre-commit-security-check.js",
+    "performance:benchmark": "node scripts/performance-benchmark.js",
+    "health:check": "node scripts/health-check.js",
+    "env:validate": "node scripts/validate-env-setup.js"
+  },
+  "keywords": [
+    "machine-learning",
+    "ml-operations",
+    "enterprise", 
+    "monitoring",
+    "analytics",
+    "security",
+    "dashboard",
+    "h2o-competitor",
+    "mlops",
+    "phantom-spire",
+    "nextjs",
+    "react"
+  ],
+  "author": "Phantom Spire Team",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev -p 3001",
     "dev:turbopack": "next dev --turbopack",
@@ -66,12 +109,23 @@
     "@phantom-spire/vulnerability-core": "file:../phantom-vulnerability-core",
     "@phantom-spire/xdr-core": "file:../phantom-xdr-core",
     "@tanstack/react-query": "^5.87.4",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "helmet": "^8.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.0.1",
+    "winston": "^3.11.0",
+    "compression": "^1.7.4",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.1",
+    "node-cron": "^3.0.3",
+    "prom-client": "^15.1.0",
     "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
     "client-only": "^0.0.1",
     "critters": "^0.0.23",
-    "express-rate-limit": "^8.1.0",
-    "helmet": "^8.1.0",
     "ioredis": "^5.7.0",
     "isomorphic-dompurify": "^2.28.0",
     "lodash": "^4.17.21",
@@ -125,6 +179,68 @@
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.2",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-bundle-analyzer": "^4.10.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/ws": "^8.5.10",
+    "@types/uuid": "^9.0.7",
+    "@types/jest": "^29.5.8",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "rimraf": "^5.0.5",
+    "snyk": "^1.1251.0",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.ts",
+      "!src/**/*.d.ts",
+      "!src/**/index.ts"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 85,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.ts"
+    ],
+    "testTimeout": 30000
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-ml-studio"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire/tree/master/packages/phantom-ml-studio#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
   }
 }
