@@ -13,6 +13,9 @@ export class EnterprisePlatform {
   private core: EnterpriseCoreService;
   private orchestrator: EnterpriseOrchestratorService;
   private initialized = false;
+  private initializationPromise: Promise<void> | null = null;
+  private metricsCache: { data: string; timestamp: number } | null = null;
+  private readonly METRICS_CACHE_TTL = 30000; // 30 seconds
 
   constructor() {
     this.core = new EnterpriseCoreService();
@@ -22,6 +25,16 @@ export class EnterprisePlatform {
   async initialize(context?: EnterpriseContext): Promise<void> {
     if (this.initialized) return;
 
+    // Prevent multiple concurrent initializations
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+
+    this.initializationPromise = this.performInitialization(context);
+    return this.initializationPromise;
+  }
+
+  private async performInitialization(context?: EnterpriseContext): Promise<void> {
     try {
       await Promise.all([
         this.core.initialize(context),
@@ -29,8 +42,10 @@ export class EnterprisePlatform {
       ]);
 
       this.initialized = true;
+      this.initializationPromise = null;
       console.log('🚀 Enterprise ML Platform: Fully initialized and ready');
     } catch (error) {
+      this.initializationPromise = null;
       console.error('❌ Enterprise ML Platform: Initialization failed:', error);
       throw error;
     }
@@ -77,13 +92,13 @@ export class EnterprisePlatform {
       this.getEnterpriseMetrics()
     ]);
 
-    return JSON.stringify({
+    const systemStatus = {
       platform: 'phantom-ml-enterprise',
       version: '1.0.0',
       status: 'operational',
       timestamp: new Date().toISOString(),
-      health: JSON.parse(health),
-      metrics: JSON.parse(metrics),
+      health: await this.parseJsonSafely(health),
+      metrics: await this.parseJsonSafely(metrics),
       capabilities: {
         totalMethods: 32,
         activeServices: 8,
@@ -91,7 +106,9 @@ export class EnterprisePlatform {
         realTimeProcessing: true,
         enterpriseCompliance: true
       }
-    });
+    };
+
+    return JSON.stringify(systemStatus);
   }
 
   // ==================== ENTERPRISE METHODS (32 TOTAL) ====================
@@ -315,9 +332,9 @@ export class EnterprisePlatform {
         totalPredictions: 1250000,
         accuracy: 0.947
       },
-      health: JSON.parse(health),
-      metrics: JSON.parse(metrics),
-      insights: JSON.parse(insights),
+      health: await this.parseJsonSafely(health),
+      metrics: await this.parseJsonSafely(metrics),
+      insights: await this.parseJsonSafely(insights),
       quickActions: [
         { id: 'deploy_model', label: 'Deploy New Model', endpoint: '/api/models/deploy' },
         { id: 'run_analysis', label: 'Run Analysis', endpoint: '/api/analysis/run' },
@@ -362,7 +379,12 @@ export class EnterprisePlatform {
   }
 
   private async getEnterpriseMetrics(): Promise<string> {
-    // Simulate comprehensive enterprise metrics
+    // Use cached metrics if available and fresh
+    if (this.metricsCache && Date.now() - this.metricsCache.timestamp < this.METRICS_CACHE_TTL) {
+      return this.metricsCache.data;
+    }
+
+    // Generate new metrics
     const metrics = {
       platform: {
         version: '1.0.0',
@@ -397,7 +419,18 @@ export class EnterprisePlatform {
       }
     };
 
-    return JSON.stringify(metrics);
+    const metricsJson = JSON.stringify(metrics);
+    this.metricsCache = { data: metricsJson, timestamp: Date.now() };
+    return metricsJson;
+  }
+
+  private async parseJsonSafely(jsonString: string): Promise<any> {
+    try {
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.warn('Failed to parse JSON, returning empty object:', error);
+      return {};
+    }
   }
 
   private async getStubImplementation(methodName: string, params: any): Promise<string> {
