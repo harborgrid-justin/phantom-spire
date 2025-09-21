@@ -84,7 +84,12 @@ const initializePhantomCores = async () => {
         organizationName: 'ML Studio Enterprise',
         enterpriseMode: true,
         integrationMode: 'full',
-        enabledModules: ['ml', 'xdr', 'compliance']
+        enabledModules: [
+          'ml', 'xdr', 'compliance', 'attribution', 'crypto', 'cve', 
+          'feeds', 'forensics', 'hunting', 'incidentResponse', 'intel', 
+          'ioc', 'malware', 'mitre', 'reputation', 'risk', 'sandbox', 
+          'secop', 'threatActor', 'vulnerability'
+        ]
       }
     })
   });

@@ -43,7 +43,7 @@ import {
 } from '@mui/material';
 import {
   Search as HuntingIcon,
-  Target as TargetIcon,
+  GpsFixed as TargetIcon,
   Psychology as HypothesisIcon,
   Analytics as AnalyticsIcon,
   TrendingUp as TrendIcon,
