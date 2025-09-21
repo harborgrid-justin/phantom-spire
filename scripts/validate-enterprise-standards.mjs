@@ -68,7 +68,13 @@ class EnterpriseValidator {
         console.log(`\n📋 Validating ${moduleName}...`);
         
         const moduleDir = join(packagesDir, moduleName);
-        const cargoPath = join(moduleDir, 'Cargo.toml');
+        let cargoPath = join(moduleDir, 'Cargo.toml');
+        
+        // Special case for phantom-ml-core which has Cargo.toml in nextgen directory
+        if (moduleName === 'phantom-ml-core') {
+            cargoPath = join(moduleDir, 'nextgen', 'Cargo.toml');
+        }
+        
         const packagePath = join(moduleDir, 'package.json');
         
         const validation = {
