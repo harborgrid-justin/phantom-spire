@@ -639,5 +639,3 @@ const ReputationManagementDashboard: React.FC = () => {
 };
 
 export default ReputationManagementDashboard;
-
-export default ReputationManagementDashboard;

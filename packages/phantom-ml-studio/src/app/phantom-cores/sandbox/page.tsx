@@ -558,5 +558,3 @@ const SandboxManagementDashboard: React.FC = () => {
 };
 
 export default SandboxManagementDashboard;
-
-export default SandboxManagementDashboard;
