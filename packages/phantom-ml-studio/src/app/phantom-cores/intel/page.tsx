@@ -42,7 +42,7 @@ import {
   Tab
 } from '@mui/material';
 import {
-  Intelligence as IntelIcon,
+  Psychology as IntelIcon,
   Insights as AnalysisIcon,
   Public as OSINTIcon,
   Language as SIGINTIcon,

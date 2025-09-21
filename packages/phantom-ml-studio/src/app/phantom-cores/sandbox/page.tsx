@@ -24,7 +24,13 @@ import {
   ListItemText,
   ListItemIcon,
   CircularProgress,
-  TextField
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
 } from '@mui/material';
 import {
   Computer as SandboxIcon,
@@ -336,6 +342,155 @@ const SandboxAnalysisPanel: React.FC = () => {
   );
 };
 
+// Component: Sandbox Queue Panel
+const SandboxQueuePanel: React.FC = () => {
+  const [queuedFiles, setQueuedFiles] = useState([
+    { id: 1, filename: 'suspicious_file.exe', status: 'queued', priority: 'high', size: '2.3MB', submittedAt: '2024-01-15 10:30:00' },
+    { id: 2, filename: 'malware_sample.zip', status: 'processing', priority: 'critical', size: '1.8MB', submittedAt: '2024-01-15 10:25:00' },
+    { id: 3, filename: 'unknown_binary.dll', status: 'completed', priority: 'medium', size: '512KB', submittedAt: '2024-01-15 10:20:00' },
+  ]);
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Sandbox Queue
+        </Typography>
+        <List>
+          {queuedFiles.map((file) => (
+            <ListItem key={file.id} divider>
+              <ListItemIcon>
+                {file.status === 'queued' && <SandboxIcon color="action" />}
+                {file.status === 'processing' && <DynamicIcon color="primary" />}
+                {file.status === 'completed' && <CheckCircleIcon color="success" />}
+              </ListItemIcon>
+              <ListItemText
+                primary={file.filename}
+                secondary={
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">
+                      Size: {file.size} | Priority: {file.priority} | Status: {file.status}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      Submitted: {file.submittedAt}
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Component: Sandbox Metrics Panel
+const SandboxMetricsPanel: React.FC = () => {
+  const metrics = {
+    totalAnalyses: 1247,
+    threatDetected: 342,
+    cleanFiles: 905,
+    averageAnalysisTime: '3.2min',
+    successRate: '98.7%'
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Performance Metrics
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="primary">{metrics.totalAnalyses}</Typography>
+              <Typography variant="body2" color="textSecondary">Total Analyses</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="error">{metrics.threatDetected}</Typography>
+              <Typography variant="body2" color="textSecondary">Threats Detected</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="success">{metrics.cleanFiles}</Typography>
+              <Typography variant="body2" color="textSecondary">Clean Files</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="primary">{metrics.averageAnalysisTime}</Typography>
+              <Typography variant="body2" color="textSecondary">Avg Analysis Time</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Component: Sandbox History Panel  
+const SandboxHistoryPanel: React.FC = () => {
+  const [historyData, setHistoryData] = useState([
+    { id: 1, filename: 'trojan.exe', result: 'malicious', confidence: 95, analysisTime: '4.2min', timestamp: '2024-01-15 10:15:00' },
+    { id: 2, filename: 'document.pdf', result: 'clean', confidence: 99, analysisTime: '2.1min', timestamp: '2024-01-15 10:10:00' },
+    { id: 3, filename: 'installer.msi', result: 'suspicious', confidence: 78, analysisTime: '3.8min', timestamp: '2024-01-15 10:05:00' },
+    { id: 4, filename: 'archive.zip', result: 'clean', confidence: 97, analysisTime: '1.9min', timestamp: '2024-01-15 10:00:00' },
+  ]);
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Analysis History
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Filename</TableCell>
+                <TableCell>Result</TableCell>
+                <TableCell align="center">Confidence</TableCell>
+                <TableCell>Analysis Time</TableCell>
+                <TableCell>Timestamp</TableCell>
+                <TableCell align="center">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {historyData.map((row) => (
+                <TableRow key={row.id} hover>
+                  <TableCell>{row.filename}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={row.result}
+                      color={
+                        row.result === 'malicious' ? 'error' : 
+                        row.result === 'suspicious' ? 'warning' : 'success'
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell align="center">{row.confidence}%</TableCell>
+                  <TableCell>{row.analysisTime}</TableCell>
+                  <TableCell>{row.timestamp}</TableCell>
+                  <TableCell align="center">
+                    <Button size="small" variant="outlined">
+                      View Report
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Main Component: Sandbox Management Dashboard
 const SandboxManagementDashboard: React.FC = () => {
   const { data: sandboxStatus, isLoading, error } = useQuery({
@@ -384,6 +539,18 @@ const SandboxManagementDashboard: React.FC = () => {
 
         <Grid item xs={12}>
           <SandboxAnalysisPanel />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <SandboxQueuePanel />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <SandboxMetricsPanel />
+        </Grid>
+
+        <Grid item xs={12}>
+          <SandboxHistoryPanel />
         </Grid>
       </Grid>
     </Box>

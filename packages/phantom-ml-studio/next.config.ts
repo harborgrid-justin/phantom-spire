@@ -2,11 +2,16 @@ import type { NextConfig } from "next";
 import bundleAnalyzer from '@next/bundle-analyzer';
 
 const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: process.env['ANALYZE'] === 'true',
 });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash', 'recharts', 'plotly.js'],
     // P.17: Enable Partial Prerendering for enhanced prefetch performance

@@ -10,14 +10,14 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 interface PageProps {
-  params: { slug?: string[] };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug?: string[] }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata based on the slug path
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const path = slug ? slug.join('/') : '';
+  const resolvedParams = await params;
+  const path = resolvedParams.slug ? resolvedParams.slug.join('/') : '';
   const title = path ? `Blog - ${path}` : 'Blog';
 
   return {
@@ -39,8 +39,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function BlogPage({ params }: PageProps): JSX.Element {
-  const slug = params.slug;
+export default async function BlogPage({ params }: PageProps): Promise<JSX.Element> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
 
   // Handle the root blog page (when slug is undefined)
   if (!slug) {

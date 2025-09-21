@@ -4,6 +4,7 @@
 // Provides comprehensive enterprise cybersecurity and ML management
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Box,
   Card,
@@ -37,7 +38,23 @@ import {
   Analytics as AnalyticsIcon,
   Shield as ShieldIcon,
   Computer as SystemIcon,
-  Speed as PerformanceIcon
+  Speed as PerformanceIcon,
+  Flag as IOCIcon,
+  BugReport as MalwareIcon,
+  Fingerprint as ForensicsIcon,
+  Search as HuntingIcon,
+  Groups as ThreatActorIcon,
+  AccountTree as MitreIcon,
+  Memory as SandboxIcon,
+  Stars as ReputationIcon,
+  Assessment as RiskIcon,
+  Gavel as ComplianceIconAlt,
+  Security as CryptoIcon,
+  Rss as FeedsIcon,
+  Shield as VulnIcon,
+  Emergency as IncidentIcon,
+  Psychology as IntelIcon,
+  Launch as NavigateIcon
 } from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -84,7 +101,12 @@ const initializePhantomCores = async () => {
         organizationName: 'ML Studio Enterprise',
         enterpriseMode: true,
         integrationMode: 'full',
-        enabledModules: ['ml', 'xdr', 'compliance']
+        enabledModules: [
+          'ml', 'xdr', 'compliance', 'attribution', 'crypto', 'cve', 
+          'feeds', 'forensics', 'hunting', 'incidentResponse', 'intel', 
+          'ioc', 'malware', 'mitre', 'reputation', 'risk', 'sandbox', 
+          'secop', 'threatActor', 'vulnerability'
+        ]
       }
     })
   });
@@ -331,6 +353,209 @@ const CrossModuleAnalysisPanel: React.FC = () => {
   );
 };
 
+// Component: Phantom Modules Grid
+const PhantomModulesGrid: React.FC = () => {
+  const modules = [
+    { 
+      name: 'XDR Core', 
+      path: 'xdr', 
+      icon: <SecurityIcon />, 
+      description: 'Extended Detection and Response Engine',
+      status: 'operational',
+      color: '#1976d2'
+    },
+    { 
+      name: 'IOC Core', 
+      path: 'ioc', 
+      icon: <IOCIcon />, 
+      description: 'Indicators of Compromise Processing',
+      status: 'operational',
+      color: '#d32f2f'
+    },
+    { 
+      name: 'CVE Core', 
+      path: 'cve', 
+      icon: <VulnIcon />, 
+      description: 'Vulnerability Management and Analysis',
+      status: 'operational',
+      color: '#ed6c02'
+    },
+    { 
+      name: 'Intel Core', 
+      path: 'intel', 
+      icon: <IntelIcon />, 
+      description: 'Threat Intelligence Platform',
+      status: 'operational',
+      color: '#9c27b0'
+    },
+    { 
+      name: 'MITRE Core', 
+      path: 'mitre', 
+      icon: <MitreIcon />, 
+      description: 'MITRE ATT&CK Framework Integration',
+      status: 'operational',
+      color: '#388e3c'
+    },
+    { 
+      name: 'SecOp Core', 
+      path: 'secop', 
+      icon: <ShieldIcon />, 
+      description: 'Security Operations Center',
+      status: 'operational',
+      color: '#1976d2'
+    },
+    { 
+      name: 'Threat Actor Core', 
+      path: 'threat-actor', 
+      icon: <ThreatActorIcon />, 
+      description: 'Threat Actor Profiling and Attribution',
+      status: 'operational',
+      color: '#d32f2f'
+    },
+    { 
+      name: 'Incident Response Core', 
+      path: 'incident-response', 
+      icon: <IncidentIcon />, 
+      description: 'Incident Response Management',
+      status: 'operational',
+      color: '#ed6c02'
+    },
+    { 
+      name: 'ML Core', 
+      path: 'ml', 
+      icon: <MLIcon />, 
+      description: 'Machine Learning and AI Platform',
+      status: 'operational',
+      color: '#9c27b0'
+    },
+    { 
+      name: 'Malware Core', 
+      path: 'malware', 
+      icon: <MalwareIcon />, 
+      description: 'Malware Analysis and Detection',
+      status: 'operational',
+      color: '#d32f2f'
+    },
+    { 
+      name: 'Forensics Core', 
+      path: 'forensics', 
+      icon: <ForensicsIcon />, 
+      description: 'Digital Forensics Analysis',
+      status: 'operational',
+      color: '#388e3c'
+    },
+    { 
+      name: 'Hunting Core', 
+      path: 'hunting', 
+      icon: <HuntingIcon />, 
+      description: 'Threat Hunting Platform',
+      status: 'operational',
+      color: '#1976d2'
+    },
+    { 
+      name: 'Sandbox Core', 
+      path: 'sandbox', 
+      icon: <SandboxIcon />, 
+      description: 'Malware Sandboxing & Dynamic Analysis',
+      status: 'operational',
+      color: '#388e3c'
+    },
+    { 
+      name: 'Reputation Core', 
+      path: 'reputation', 
+      icon: <ReputationIcon />, 
+      description: 'Reputation Scoring & Analysis',
+      status: 'operational',
+      color: '#ed6c02'
+    },
+    { 
+      name: 'Risk Core', 
+      path: 'risk', 
+      icon: <RiskIcon />, 
+      description: 'Risk Assessment & Management',
+      status: 'operational',
+      color: '#d32f2f'
+    },
+    { 
+      name: 'Compliance Core', 
+      path: 'compliance', 
+      icon: <ComplianceIconAlt />, 
+      description: 'Compliance Monitoring & Reporting',
+      status: 'operational',
+      color: '#1976d2'
+    },
+    { 
+      name: 'Crypto Core', 
+      path: 'crypto', 
+      icon: <CryptoIcon />, 
+      description: 'Cryptographic Analysis & Validation',
+      status: 'operational',
+      color: '#9c27b0'
+    }
+  ];
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Phantom Core Modules
+        </Typography>
+        <Typography variant="body2" color="textSecondary" mb={3}>
+          Click on any module to access its dedicated management interface
+        </Typography>
+        
+        <Grid container spacing={2}>
+          {modules.map((module) => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={module.path}>
+              <Link href={`/phantom-cores/${module.path}`} style={{ textDecoration: 'none' }}>
+                <Card 
+                  sx={{ 
+                    height: '100%',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: 4,
+                      '& .module-icon': {
+                        transform: 'scale(1.1)'
+                      }
+                    }
+                  }}
+                >
+                  <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                    <Box 
+                      className="module-icon"
+                      sx={{ 
+                        mb: 1, 
+                        color: module.color,
+                        transition: 'transform 0.2s ease-in-out'
+                      }}
+                    >
+                      {React.cloneElement(module.icon, { sx: { fontSize: 32 } })}
+                    </Box>
+                    <Typography variant="subtitle1" component="h3" gutterBottom>
+                      {module.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.8rem', mb: 1 }}>
+                      {module.description}
+                    </Typography>
+                    <Chip 
+                      label={module.status}
+                      color="success"
+                      size="small"
+                      sx={{ fontSize: '0.7rem' }}
+                    />
+                  </CardContent>
+                </Card>
+              </Link>
+            </Grid>
+          ))}
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Main Component: Phantom Cores Dashboard
 const PhantomCoresDashboard: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
@@ -441,6 +666,9 @@ const PhantomCoresDashboard: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <ModuleStatusCards status={systemStatus} />
+            </Grid>
+            <Grid item xs={12}>
+              <PhantomModulesGrid />
             </Grid>
           </Grid>
         </Box>

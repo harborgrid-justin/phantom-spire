@@ -54,7 +54,7 @@ import {
   Security as SecurityIcon,
   Memory as MemoryIcon,
   Search as SearchIcon
-} from '@mui/material-icons';
+} from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Interfaces

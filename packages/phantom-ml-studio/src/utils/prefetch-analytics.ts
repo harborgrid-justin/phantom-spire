@@ -79,7 +79,7 @@ class PrefetchAnalytics {
     }) as EventListener);
 
     // Store in window for Next.js integration
-    (window as any).__prefetchAnalytics = this;
+    (window as Record<string, unknown>).__prefetchAnalytics = this;
   }
 
   recordPrefetch(
@@ -234,7 +234,7 @@ class PrefetchAnalytics {
   }
 
   // P.45: Failed prefetch logging
-  logFailedPrefetch(route: string, error: string, context?: any) {
+  logFailedPrefetch(route: string, error: string, context?: Record<string, unknown>) {
     console.error(`[Prefetch Failed] ${route}:`, error, context);
 
     this.recordPrefetch(route, false, undefined, `Failed: ${error}`);

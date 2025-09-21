@@ -47,7 +47,7 @@ import {
   Assessment as AssessmentIcon,
   Update as UpdateIcon,
   TrendingUp as TrendIcon,
-  Priority as PriorityIcon,
+  Flag as PriorityIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
   ExpandMore as ExpandMoreIcon,

@@ -27,7 +27,15 @@ import {
   ListItemText,
   ListItemIcon,
   CircularProgress,
-  TextField
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  Tab
 } from '@mui/material';
 import {
   Stars as ReputationIcon,
@@ -344,6 +352,226 @@ const ReputationAnalysisPanel: React.FC = () => {
   );
 };
 
+// Component: Reputation Feeds Panel
+const ReputationFeedsPanel: React.FC = () => {
+  const [feeds] = useState([
+    { id: 1, name: 'VirusTotal Intelligence', status: 'active', type: 'commercial', entries: 245789, reliability: 95 },
+    { id: 2, name: 'AbuseIPDB', status: 'active', type: 'open_source', entries: 89456, reliability: 87 },
+    { id: 3, name: 'Internal IOC Feed', status: 'active', type: 'internal', entries: 12467, reliability: 98 },
+    { id: 4, name: 'MISP Community', status: 'degraded', type: 'community', entries: 156234, reliability: 82 },
+  ]);
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Reputation Feeds Status
+        </Typography>
+        <List>
+          {feeds.map((feed) => (
+            <ListItem key={feed.id} divider>
+              <ListItemIcon>
+                <Chip
+                  label={feed.status}
+                  color={feed.status === 'active' ? 'success' : 'warning'}
+                  size="small"
+                />
+              </ListItemIcon>
+              <ListItemText
+                primary={feed.name}
+                secondary={
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">
+                      Type: {feed.type} | Entries: {feed.entries.toLocaleString()}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                      Reliability: {feed.reliability}%
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Component: Reputation Metrics Panel
+const ReputationMetricsPanel: React.FC = () => {
+  const metrics = {
+    dailyQueries: 1547293,
+    cacheHitRate: 89.4,
+    avgResponseTime: '12ms',
+    accuracyRate: 96.7,
+    maliciousEntities: 847293,
+    suspiciousEntities: 156842
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Performance Metrics
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="primary">{metrics.dailyQueries.toLocaleString()}</Typography>
+              <Typography variant="body2" color="textSecondary">Daily Queries</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="success">{metrics.cacheHitRate}%</Typography>
+              <Typography variant="body2" color="textSecondary">Cache Hit Rate</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="info">{metrics.avgResponseTime}</Typography>
+              <Typography variant="body2" color="textSecondary">Avg Response Time</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper sx={{ p: 2, textAlign: 'center' }}>
+              <Typography variant="h4" color="warning">{metrics.accuracyRate}%</Typography>
+              <Typography variant="body2" color="textSecondary">Accuracy Rate</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Component: Reputation Query Panel
+const ReputationQueryPanel: React.FC = () => {
+  const [queryEntity, setQueryEntity] = useState('');
+  const [entityType, setEntityType] = useState('ip');
+  const [queryResults, setQueryResults] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleQuery = async () => {
+    if (!queryEntity.trim()) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch('/api/phantom-cores/reputation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'query',
+          entity: queryEntity,
+          entity_type: entityType
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        setQueryResults(prev => [result.data, ...prev.slice(0, 4)]);
+      }
+    } catch (error) {
+      console.error('Query failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Reputation Query Tool
+        </Typography>
+        <Grid container spacing={2} alignItems="center" mb={2}>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Entity (IP, Domain, Hash)"
+              value={queryEntity}
+              onChange={(e) => setQueryEntity(e.target.value)}
+              placeholder="e.g., 192.168.1.1"
+            />
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth>
+              <InputLabel>Entity Type</InputLabel>
+              <Select
+                value={entityType}
+                onChange={(e) => setEntityType(e.target.value)}
+                label="Entity Type"
+              >
+                <MenuItem value="ip">IP Address</MenuItem>
+                <MenuItem value="domain">Domain</MenuItem>
+                <MenuItem value="hash">File Hash</MenuItem>
+                <MenuItem value="url">URL</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={2}>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleQuery}
+              disabled={loading || !queryEntity.trim()}
+            >
+              {loading ? <CircularProgress size={20} /> : 'Query'}
+            </Button>
+          </Grid>
+        </Grid>
+
+        {queryResults.length > 0 && (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Entity</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell align="center">Score</TableCell>
+                  <TableCell>Risk Level</TableCell>
+                  <TableCell align="center">Confidence</TableCell>
+                  <TableCell>Recommendation</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {queryResults.map((result, index) => (
+                  <TableRow key={index} hover>
+                    <TableCell>{result.entity}</TableCell>
+                    <TableCell>{result.entity_type}</TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={result.reputation_score}
+                        color={result.reputation_score < 30 ? 'error' : result.reputation_score < 60 ? 'warning' : 'success'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={result.risk_level}
+                        color={result.risk_level === 'high' ? 'error' : result.risk_level === 'medium' ? 'warning' : 'success'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell align="center">{Math.round(result.confidence * 100)}%</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={result.recommendation}
+                        color={result.recommendation === 'BLOCK' ? 'error' : result.recommendation === 'MONITOR' ? 'warning' : 'success'}
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 // Main Component: Reputation Management Dashboard
 const ReputationManagementDashboard: React.FC = () => {
   const { data: reputationStatus, isLoading, error } = useQuery({
@@ -392,6 +620,18 @@ const ReputationManagementDashboard: React.FC = () => {
 
         <Grid item xs={12}>
           <ReputationAnalysisPanel />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <ReputationFeedsPanel />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <ReputationMetricsPanel />
+        </Grid>
+
+        <Grid item xs={12}>
+          <ReputationQueryPanel />
         </Grid>
       </Grid>
     </Box>
