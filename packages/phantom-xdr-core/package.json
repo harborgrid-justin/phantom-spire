@@ -26,6 +26,7 @@
   },
   "files": [
     "index.js",
+    "enterprise-wrapper.js",
     "index.d.ts",
     "*.node",
     "README.md",

@@ -2,7 +2,7 @@
   "name": "@phantom-spire/compliance-core",
   "version": "1.0.0",
   "description": "Compliance and regulatory framework analysis core with automated audit and reporting capabilities - Part of the Phantom Spire CTI Platform",
-  "main": "index.js",
+  "main": "compliance-wrapper.js",
   "types": "index.d.ts",
   "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
   "repository": {
@@ -25,7 +25,7 @@
     }
   },
   "files": [
-    "index.js",
+    "compliance-wrapper.js",
     "index.d.ts",
     "*.node",
     "README.md",
@@ -79,6 +79,6 @@
     "url": "https://github.com/harborgrid-justin/phantom-spire"
   },
   "dependencies": {
-    "@phantom-spire/ml-core": "file:../phantom-ml-core/nextgen"
+    "@node-rs/helper": "^1.3.0"
   }
 }

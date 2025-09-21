@@ -31,6 +31,9 @@ import ABTestingIcon from '@mui/icons-material/Assessment';
 import ComplianceIcon from '@mui/icons-material/Business';
 import ShieldIcon from '@mui/icons-material/Shield';
 import EngineeringIcon from '@mui/icons-material/Build';
+import IntegrationIcon from '@mui/icons-material/IntegrationInstructions';
+import XdrIcon from '@mui/icons-material/Security';
+import ComplianceManagementIcon from '@mui/icons-material/Assessment';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -71,6 +74,12 @@ const menuItems: MenuItem[] = [
   { text: 'Threat Intelligence', icon: <MarketplaceIcon />, path: '/threatIntelligence', isNew: true, section: 'security', isResourceHeavy: true },
   { text: 'Enterprise Compliance', icon: <ComplianceIcon />, path: '/compliance', isNew: true, section: 'security' },
 
+  // Phantom Cores Integration
+  { text: 'Phantom Cores Dashboard', icon: <IntegrationIcon />, path: '/phantom-cores', isNew: true, section: 'phantom-cores' },
+  { text: 'XDR Management', icon: <XdrIcon />, path: '/phantom-cores/xdr', isNew: true, section: 'phantom-cores' },
+  { text: 'Compliance Management', icon: <ComplianceManagementIcon />, path: '/phantom-cores/compliance', isNew: true, section: 'phantom-cores' },
+  { text: 'API Verification', icon: <SecurityIcon />, path: '/phantom-cores/verify', isNew: true, section: 'phantom-cores' },
+
   // System
   { text: 'Analytics', icon: <AnalyticsIcon />, path: '/h2o-comparison', section: 'system', isResourceHeavy: true },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings', section: 'system' },
@@ -80,6 +89,7 @@ const sectionTitles = {
   core: 'Core Platform',
   advanced: 'Advanced ML',
   security: 'Security & Compliance',
+  'phantom-cores': 'Phantom Cores',
   system: 'System',
 };
 
@@ -87,7 +97,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
   const pathname = usePathname();
 
   const renderMenuItems = () => {
-    const sections = ['core', 'advanced', 'security', 'system'];
+    const sections = ['core', 'advanced', 'security', 'phantom-cores', 'system'];
     
     return sections.map((section) => {
       const sectionItems = menuItems.filter(item => item.section === section);

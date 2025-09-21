@@ -17,6 +17,7 @@ napi-derive = { version = "2.16", default-features = false, optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 chrono = { version = "0.4", features = ["serde"] }
+time = { version = "0.3", features = ["formatting", "parsing", "serde"] }
 uuid = { version = "1.0", features = ["v4", "serde"] }
 regex = "1.10"
 thiserror = "2.0.16"
@@ -96,4 +97,4 @@ enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 
 [build-dependencies]
-napi-build = "2.1.0"
+napi-build = "2.2.3"
