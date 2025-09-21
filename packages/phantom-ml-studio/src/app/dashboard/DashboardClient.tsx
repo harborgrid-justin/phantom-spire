@@ -42,12 +42,12 @@ class DashboardErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Dashboard Error:', error, errorInfo);
     // In production, send to error reporting service
   }
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -79,7 +79,14 @@ export default function DashboardClient() {
     try {
       setError(null);
       const response = await dashboardService.getDashboardData(
-        { id: 'dash_req', type: 'getDashboardData' as const },
+        { 
+          id: 'dash_req', 
+          type: 'getDashboardData' as const,
+          data: null,
+          metadata: { category: 'dashboard', module: 'dashboard-page', version: '1.0.0' },
+          context: { environment: 'development' },
+          timestamp: new Date()
+        },
         {}
       );
 

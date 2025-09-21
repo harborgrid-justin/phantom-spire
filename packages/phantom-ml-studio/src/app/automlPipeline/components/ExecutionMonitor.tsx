@@ -118,6 +118,9 @@ export default function ExecutionMonitor({ pipeline, isExecuting }: ExecutionMon
 
       return () => clearInterval(interval);
     }
+    
+    // Return cleanup function for when dependencies change but conditions aren't met
+    return () => {};
   }, [isExecuting, pipeline]);
 
   if (!pipeline || !isExecuting) {

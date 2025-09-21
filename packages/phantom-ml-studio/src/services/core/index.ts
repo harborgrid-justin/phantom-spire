@@ -1,3 +1,5 @@
+// Core Services - Mixed server/client usage
+// Contains both server-side logic (environment variables) and client-accessible exports
 // Base Classes and Types (export first to avoid reference issues)
 export { BusinessLogicBase } from './base/BusinessLogicBase';
 export { BaseService } from './base/BaseService';

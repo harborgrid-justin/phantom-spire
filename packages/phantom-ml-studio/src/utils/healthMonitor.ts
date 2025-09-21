@@ -1,3 +1,7 @@
+'use client';
+
+// Health monitoring utilities - CLIENT COMPONENT
+// This module uses browser APIs (localStorage, sessionStorage, WebSocket, window) and must run client-side
 interface HealthCheck {
   name: string;
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -28,7 +32,7 @@ class HealthMonitor {
   private initializeHealthChecks() {
     // API connectivity check
     this.registerCheck('api', async () => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_ENDPOINT || 'http://localhost:3000/api';
+      const apiUrl = process.env['NEXT_PUBLIC_API_ENDPOINT'] || 'http://localhost:3000/api';
       if (!apiUrl) return { status: 'degraded' as const, error: 'API URL not configured' };
 
       try {
@@ -58,7 +62,7 @@ class HealthMonitor {
 
     // WebSocket connectivity check
     this.registerCheck('websocket', async () => {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_ENDPOINT || 'ws://localhost:3001';
+      const wsUrl = process.env['NEXT_PUBLIC_WS_ENDPOINT'] || 'ws://localhost:3001';
       if (!wsUrl) return { status: 'degraded' as const, error: 'WebSocket URL not configured' };
 
       return new Promise<{ status: 'healthy' | 'degraded' | 'unhealthy'; error?: string }>((resolve) => {
@@ -210,14 +214,15 @@ class HealthMonitor {
       const result = await check.checkFn();
       const endTime = performance.now();
       
-      this.checks.set(name, {
-        ...check,
+      const updatedCheck: HealthCheck = {
+        name: check.name,
         status: result.status,
         lastCheck: Date.now(),
         responseTime: endTime - startTime,
-        error: result.error,
-        metadata: result.metadata,
-      });
+        ...(result.error && { error: result.error }),
+        ...(result.metadata && { metadata: result.metadata }),
+      };
+      this.checks.set(name, updatedCheck);
     } catch (error: unknown) {
       const endTime = performance.now();
       
