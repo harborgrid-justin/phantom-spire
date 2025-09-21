@@ -5,6 +5,36 @@
 
 import type { LoggerService } from '../services/core/LoggerService';
 
+// Semaphore class for concurrency control
+class Semaphore {
+  private permits: number;
+  private waitQueue: Array<() => void> = [];
+
+  constructor(permits: number) {
+    this.permits = permits;
+  }
+
+  async acquire(): Promise<void> {
+    if (this.permits > 0) {
+      this.permits--;
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve) => {
+      this.waitQueue.push(resolve);
+    });
+  }
+
+  release(): void {
+    if (this.waitQueue.length > 0) {
+      const resolve = this.waitQueue.shift()!;
+      resolve();
+    } else {
+      this.permits++;
+    }
+  }
+}
+
 // Error categories
 export enum ErrorCategory {
   NETWORK = 'network',
@@ -415,21 +445,22 @@ export class AsyncRetryHandler {
     operation: () => Promise<T>,
     timeoutMs: number
   ): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
         reject(ErrorFactory.timeoutError('operation', timeoutMs));
       }, timeoutMs);
-
-      operation()
-        .then((result) => {
-          clearTimeout(timeoutId);
-          resolve(result);
-        })
-        .catch((error) => {
-          clearTimeout(timeoutId);
-          reject(error);
-        });
     });
+
+    try {
+      const result = await Promise.race([operation(), timeoutPromise]);
+      clearTimeout(timeoutId);
+      return result;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
   }
 
   // Execute with circuit breaker pattern
@@ -448,14 +479,22 @@ export class AsyncRetryHandler {
       const now = Date.now();
       const timeSinceLastFailure = circuitBreaker.lastFailure 
         ? now - circuitBreaker.lastFailure.getTime()
-        : 0;
+        : Number.MAX_SAFE_INTEGER;
 
       if (timeSinceLastFailure < circuitBreaker.resetTimeout) {
         throw ErrorFactory.create(
-          'Circuit breaker is open',
+          `Circuit breaker is open. Time until reset: ${Math.ceil((circuitBreaker.resetTimeout - timeSinceLastFailure) / 1000)}s`,
           'CIRCUIT_BREAKER_OPEN',
           ErrorCategory.RESOURCE,
-          { severity: ErrorSeverity.HIGH, retryable: false }
+          { 
+            severity: ErrorSeverity.HIGH, 
+            retryable: false,
+            context: { 
+              state: circuitBreaker.state,
+              failures: circuitBreaker.failures,
+              resetIn: circuitBreaker.resetTimeout - timeSinceLastFailure
+            }
+          }
         );
       } else {
         circuitBreaker.state = 'half-open';
@@ -469,6 +508,7 @@ export class AsyncRetryHandler {
       if (circuitBreaker.state === 'half-open') {
         circuitBreaker.state = 'closed';
         circuitBreaker.failures = 0;
+        delete circuitBreaker.lastFailure;
       }
 
       return result;
@@ -480,6 +520,13 @@ export class AsyncRetryHandler {
 
       if (circuitBreaker.failures >= circuitBreaker.failureThreshold) {
         circuitBreaker.state = 'open';
+        
+        // Auto-reset circuit breaker after timeout
+        setTimeout(() => {
+          if (circuitBreaker.state === 'open') {
+            circuitBreaker.state = 'half-open';
+          }
+        }, circuitBreaker.resetTimeout);
       }
 
       throw error;
@@ -492,30 +539,19 @@ export class AsyncRetryHandler {
     concurrencyLimit = 10
   ): Promise<T[]> {
     const results: T[] = new Array(operations.length);
-    const executing: Array<Promise<void>> = [];
+    const semaphore = new Semaphore(concurrencyLimit);
 
-    for (let i = 0; i < operations.length; i++) {
-      const operation = operations[i];
-      
-      // Create promise that resolves when operation completes
-      const promise = operation().then(result => {
-        results[i] = result;
-      });
-
-      executing.push(promise);
-
-      // Wait if we've reached concurrency limit
-      if (executing.length >= concurrencyLimit) {
-        await Promise.race(executing);
-        // Remove completed promises
-        const completed = executing.filter(p => p !== promise);
-        executing.length = 0;
-        executing.push(...completed.filter((_, idx) => idx < concurrencyLimit - 1));
+    const promises = operations.map(async (operation, index) => {
+      await semaphore.acquire();
+      try {
+        const result = await operation();
+        results[index] = result;
+      } finally {
+        semaphore.release();
       }
-    }
+    });
 
-    // Wait for all remaining operations to complete
-    await Promise.all(executing);
+    await Promise.all(promises);
     return results;
   }
 
@@ -576,9 +612,13 @@ export class AsyncRetryHandler {
     const batches: Array<Array<{ item: T; index: number }>> = [];
     
     for (let i = 0; i < items.length; i += batchSize) {
-      const batch = items
-        .slice(i, i + batchSize)
-        .map((item, batchIndex) => ({ item, index: i + batchIndex }));
+      const endIndex = Math.min(i + batchSize, items.length);
+      const batch: Array<{ item: T; index: number }> = [];
+      
+      for (let j = i; j < endIndex; j++) {
+        batch.push({ item: items[j], index: j });
+      }
+      
       batches.push(batch);
     }
     
@@ -677,19 +717,32 @@ export class AsyncUtils {
     delay: number
   ): T {
     let timeoutId: NodeJS.Timeout | undefined;
+    let pendingPromise: { resolve: Function; reject: Function } | null = null;
     
     return ((...args: Parameters<T>): Promise<ReturnType<T>> => {
-      return new Promise((resolve, reject) => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
+      // Cancel previous timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      // If there's a pending promise, resolve it with the new execution
+      if (pendingPromise) {
+        pendingPromise.resolve = pendingPromise.resolve;
+        pendingPromise.reject = pendingPromise.reject;
+      }
+      
+      return new Promise<ReturnType<T>>((resolve, reject) => {
+        pendingPromise = { resolve, reject };
         
         timeoutId = setTimeout(async () => {
+          const currentPromise = pendingPromise;
+          pendingPromise = null;
+          
           try {
             const result = await fn(...args);
-            resolve(result);
+            currentPromise?.resolve(result);
           } catch (error) {
-            reject(error);
+            currentPromise?.reject(error);
           }
         }, delay);
       });
@@ -702,6 +755,7 @@ export class AsyncUtils {
     interval: number
   ): T {
     let lastCall = 0;
+    let pendingCall: Promise<ReturnType<T>> | null = null;
     
     return ((...args: Parameters<T>): Promise<ReturnType<T>> => {
       const now = Date.now();
@@ -710,7 +764,23 @@ export class AsyncUtils {
         lastCall = now;
         return fn(...args);
       } else {
-        return Promise.resolve() as Promise<ReturnType<T>>;
+        // Return existing pending call or create a new one
+        if (!pendingCall) {
+          const remainingTime = interval - (now - lastCall);
+          pendingCall = new Promise<ReturnType<T>>((resolve, reject) => {
+            setTimeout(async () => {
+              lastCall = Date.now();
+              pendingCall = null;
+              try {
+                const result = await fn(...args);
+                resolve(result);
+              } catch (error) {
+                reject(error);
+              }
+            }, remainingTime);
+          });
+        }
+        return pendingCall;
       }
     }) as T;
   }
@@ -721,22 +791,37 @@ export class AsyncUtils {
     keyGenerator?: (...args: Parameters<T>) => string,
     ttl?: number
   ): T {
-    const cache = new Map<string, { result: ReturnType<T>; timestamp: number }>();
+    const cache = new Map<string, { result: Promise<ReturnType<T>>; timestamp: number }>();
+    const DEFAULT_TTL = ttl || 300000; // 5 minutes default
     
-    const defaultKeyGenerator = (...args: any[]) => JSON.stringify(args);
+    const defaultKeyGenerator = (...args: any[]) => {
+      try {
+        return JSON.stringify(args);
+      } catch {
+        return String(args);
+      }
+    };
     const getKey = keyGenerator || defaultKeyGenerator;
 
     return ((...args: Parameters<T>): Promise<ReturnType<T>> => {
       const key = getKey(...args);
       const cached = cache.get(key);
       
-      // Check if cached result is still valid
-      if (cached) {
-        if (!ttl || Date.now() - cached.timestamp < ttl) {
-          return cached.result;
-        } else {
-          cache.delete(key);
+      // Clean expired entries periodically
+      if (cache.size > 100) {
+        const now = Date.now();
+        const toDelete: string[] = [];
+        for (const [cacheKey, entry] of cache.entries()) {
+          if (now - entry.timestamp > DEFAULT_TTL) {
+            toDelete.push(cacheKey);
+          }
         }
+        toDelete.forEach(k => cache.delete(k));
+      }
+      
+      // Check if cached result is still valid
+      if (cached && (!ttl || Date.now() - cached.timestamp < ttl)) {
+        return cached.result;
       }
 
       // Execute function and cache result

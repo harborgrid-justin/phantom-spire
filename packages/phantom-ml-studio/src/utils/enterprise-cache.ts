@@ -127,7 +127,8 @@ export class MemoryCache implements ICache {
   public readonly level = CacheLevel.MEMORY;
   
   private entries = new Map<string, CacheEntry>();
-  private accessOrder: string[] = [];
+  private accessOrderMap = new Map<string, number>(); // Track order more efficiently
+  private accessOrderCounter = 0;
   private stats = {
     hits: 0,
     misses: 0,
@@ -163,7 +164,7 @@ export class MemoryCache implements ICache {
     // Check TTL
     if (this.isExpired(entry)) {
       this.entries.delete(prefixedKey);
-      this.removeFromAccessOrder(prefixedKey);
+      this.accessOrderMap.delete(prefixedKey);
       this.stats.misses++;
       this.updateAccessStats(Date.now() - startTime);
       return null;
@@ -234,7 +235,7 @@ export class MemoryCache implements ICache {
     const deleted = this.entries.delete(prefixedKey);
     
     if (deleted) {
-      this.removeFromAccessOrder(prefixedKey);
+      this.accessOrderMap.delete(prefixedKey);
       this.logger?.debug(`Cache delete: ${prefixedKey}`);
     }
     
@@ -258,7 +259,7 @@ export class MemoryCache implements ICache {
     if (!pattern) {
       cleared = this.entries.size;
       this.entries.clear();
-      this.accessOrder = [];
+      this.accessOrderMap.clear();
     } else {
       const regex = new RegExp(pattern);
       const keysToDelete: string[] = [];
@@ -271,7 +272,7 @@ export class MemoryCache implements ICache {
 
       for (const key of keysToDelete) {
         this.entries.delete(key);
-        this.removeFromAccessOrder(key);
+        this.accessOrderMap.delete(key);
         cleared++;
       }
     }
@@ -429,17 +430,11 @@ export class MemoryCache implements ICache {
   }
 
   private updateAccessOrder(key: string): void {
-    // Remove from current position
-    this.removeFromAccessOrder(key);
-    // Add to end (most recently used)
-    this.accessOrder.push(key);
+    this.accessOrderMap.set(key, ++this.accessOrderCounter);
   }
 
   private removeFromAccessOrder(key: string): void {
-    const index = this.accessOrder.indexOf(key);
-    if (index !== -1) {
-      this.accessOrder.splice(index, 1);
-    }
+    this.accessOrderMap.delete(key);
   }
 
   private async evictIfNeeded(newEntrySize: number): Promise<void> {
@@ -461,23 +456,27 @@ export class MemoryCache implements ICache {
     let evictedSize = 0;
     let evictedCount = 0;
 
+    // Get entries sorted by access order (least recently used first)
+    const entriesByAccess = Array.from(this.entries.entries())
+      .map(([key, entry]) => ({ key, entry, order: this.accessOrderMap.get(key) || 0 }))
+      .sort((a, b) => a.order - b.order);
+
     // Evict least recently used entries
-    while (this.accessOrder.length > 0 && 
-           (evictedSize < targetSize || evictedCount < targetCount)) {
-      const keyToEvict = this.accessOrder.shift()!;
-      const entry = this.entries.get(keyToEvict);
-      
-      if (entry) {
-        evictedSize += entry.size;
-        evictedCount++;
-        this.entries.delete(keyToEvict);
-        this.stats.evictions++;
-        
-        this.logger?.debug(`Cache eviction: ${keyToEvict}`, {
-          size: entry.size,
-          age: Date.now() - entry.createdAt.getTime(),
-        });
+    for (const { key, entry } of entriesByAccess) {
+      if (evictedSize >= targetSize && evictedCount >= targetCount) {
+        break;
       }
+      
+      evictedSize += entry.size;
+      evictedCount++;
+      this.entries.delete(key);
+      this.accessOrderMap.delete(key);
+      this.stats.evictions++;
+      
+      this.logger?.debug(`Cache eviction: ${key}`, {
+        size: entry.size,
+        age: Date.now() - entry.createdAt.getTime(),
+      });
     }
 
     if (evictedCount > 0) {
@@ -497,7 +496,7 @@ export class MemoryCache implements ICache {
 
     for (const key of keysToDelete) {
       this.entries.delete(key);
-      this.removeFromAccessOrder(key);
+      this.accessOrderMap.delete(key);
       invalidated++;
     }
 
@@ -516,7 +515,7 @@ export class MemoryCache implements ICache {
 
     for (const key of keysToDelete) {
       this.entries.delete(key);
-      this.removeFromAccessOrder(key);
+      this.accessOrderMap.delete(key);
       invalidated++;
     }
 
@@ -535,7 +534,7 @@ export class MemoryCache implements ICache {
 
     for (const key of keysToDelete) {
       this.entries.delete(key);
-      this.removeFromAccessOrder(key);
+      this.accessOrderMap.delete(key);
       invalidated++;
     }
 

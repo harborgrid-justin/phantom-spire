@@ -86,6 +86,7 @@ export interface PhantomMLCoreBindings {
 class PhantomMLCoreService implements PhantomMLCoreBindings {
   private enterprisePlatform: EnterprisePlatform;
   private initialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor() {
     this.enterprisePlatform = phantomMLEnterprise;
@@ -93,94 +94,105 @@ class PhantomMLCoreService implements PhantomMLCoreBindings {
   }
 
   private async ensureInitialized(): Promise<void> {
-    if (!this.initialized) {
-      await this.enterprisePlatform.initialize();
-      this.initialized = true;
+    if (this.initialized) {
+      return;
     }
+    
+    // Prevent multiple concurrent initializations
+    if (this.initializationPromise) {
+      return this.initializationPromise;
+    }
+    
+    this.initializationPromise = this.enterprisePlatform.initialize().then(() => {
+      this.initialized = true;
+      this.initializationPromise = null;
+    });
+    
+    return this.initializationPromise;
   }
 
   // ==================== MODEL MANAGEMENT (8 methods) ====================
 
   async validateModel(modelId: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.validateModel(modelId);
+    return this.enterprisePlatform.validateModel(modelId);
   }
 
   async exportModel(modelId: string, format: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.exportModel(modelId, format);
+    return this.enterprisePlatform.exportModel(modelId, format);
   }
 
   async importModel(modelData: string, format: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.importModel(modelData, format);
+    return this.enterprisePlatform.importModel(modelData, format);
   }
 
   async cloneModel(modelId: string, cloneOptions: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.cloneModel(modelId, cloneOptions);
+    return this.enterprisePlatform.cloneModel(modelId, cloneOptions);
   }
 
   async archiveModel(modelId: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.archiveModel(modelId);
+    return this.enterprisePlatform.archiveModel(modelId);
   }
 
   async restoreModel(modelId: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.restoreModel(modelId);
+    return this.enterprisePlatform.restoreModel(modelId);
   }
 
   async compareModels(modelIds: string[]): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.compareModels(modelIds);
+    return this.enterprisePlatform.compareModels(modelIds);
   }
 
   async optimizeModel(modelId: string, optimizationConfig: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.optimizeModel(modelId, optimizationConfig);
+    return this.enterprisePlatform.optimizeModel(modelId, optimizationConfig);
   }
 
   // ==================== ANALYTICS & INSIGHTS (8 methods) ====================
 
   async generateInsights(analysisConfig: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.generateInsights(analysisConfig);
+    return this.enterprisePlatform.generateInsights(analysisConfig);
   }
 
   async trendAnalysis(data: string, config: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.trendAnalysis(data, config);
+    return this.enterprisePlatform.trendAnalysis(data, config);
   }
 
   async correlationAnalysis(data: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.correlationAnalysis(data);
+    return this.enterprisePlatform.correlationAnalysis(data);
   }
 
   async statisticalSummary(data: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.statisticalSummary(data);
+    return this.enterprisePlatform.statisticalSummary(data);
   }
 
   async dataQualityAssessment(data: string, config: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.dataQualityAssessment(data, config);
+    return this.enterprisePlatform.dataQualityAssessment(data, config);
   }
 
   async featureImportanceAnalysis(modelId: string, config: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.featureImportanceAnalysis(modelId, config);
+    return this.enterprisePlatform.featureImportanceAnalysis(modelId, config);
   }
 
   async modelExplainability(modelId: string, predictionId: string, config: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.modelExplainability(modelId, predictionId, config);
+    return this.enterprisePlatform.modelExplainability(modelId, predictionId, config);
   }
 
   async businessImpactAnalysis(config: string): Promise<string> {
     await this.ensureInitialized();
-    return await this.enterprisePlatform.businessImpactAnalysis(config);
+    return this.enterprisePlatform.businessImpactAnalysis(config);
   }
 
   // ==================== REAL-TIME PROCESSING (6 methods) ====================
