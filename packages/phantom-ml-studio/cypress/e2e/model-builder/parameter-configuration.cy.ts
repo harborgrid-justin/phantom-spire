@@ -1,6 +1,6 @@
 describe('Parameter Configuration', () => {
   beforeEach(() => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.createModel('Test Model', 'random-forest')
     cy.get('[data-cy="configure-parameters"]').click()
   })

@@ -6,7 +6,7 @@ import { BasePage } from './BasePage';
  */
 export class BiasDetectionPage extends BasePage {
   constructor() {
-    super('/bias-detection-engine', '[data-cy="bias-detection-content"]');
+    super('/biasDetection', '[data-cy="bias-detection-content"]');
   }
 
   // Selectors

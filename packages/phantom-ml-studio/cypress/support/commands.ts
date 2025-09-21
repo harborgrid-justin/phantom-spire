@@ -91,8 +91,41 @@ Cypress.Commands.add('navigateToPage', (pagePath: string) => {
 })
 
 Cypress.Commands.add('navigateViaSidebar', (menuItem: string) => {
-  cy.get('[data-cy="sidebar-toggle"]').click({ force: true })
-  cy.get(`[data-cy="sidebar-menu-${menuItem}"]`).click()
+  // Convert menuItem to match current data-cy attributes
+  const menuMapping: Record<string, string> = {
+    'dashboard': 'nav-link-dashboard',
+    'data-explorer': 'nav-link-data-explorer',
+    'model-builder': 'nav-link-automl-builder',
+    'experiments': 'nav-link-experiments',
+    'models': 'nav-link-models',
+    'deployments': 'nav-link-deployments',
+    'monitoring': 'nav-link-real-time-monitoring',
+    'automl-pipeline': 'nav-link-automl-pipeline',
+    'feature-engineering': 'nav-link-feature-engineering',
+    'model-comparison': 'nav-link-model-comparison',
+    'ab-testing': 'nav-link-a/b-testing',
+    'explainable-ai': 'nav-link-explainable-ai',
+    'bias-detection': 'nav-link-bias-detection',
+    'threat-intelligence': 'nav-link-threat-intelligence',
+    'compliance': 'nav-link-enterprise-compliance',
+    'phantom-cores': 'nav-link-phantom-cores-dashboard',
+    'xdr': 'nav-link-xdr-management',
+    'compliance-management': 'nav-link-compliance-management',
+    'verify': 'nav-link-api-verification',
+    'analytics': 'nav-link-analytics',
+    'settings': 'nav-link-settings'
+  }
+
+  const dataCySelector = menuMapping[menuItem] || `nav-link-${menuItem}`
+
+  // Ensure sidebar is visible on mobile
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-cy="nav-drawer-mobile"]').is(':visible')) {
+      cy.get('[data-cy="sidebar-toggle"]').click({ force: true })
+    }
+  })
+
+  cy.get(`[data-cy="${dataCySelector}"]`).should('be.visible').click()
   cy.get('[data-cy="page-loading"]').should('not.exist')
 })
 

@@ -21,8 +21,8 @@ describe('Form Validation Across Application', () => {
   })
 
   it('should validate form errors', () => {
-    cy.visit('/model-builder')
-    cy.url().should('include', '/model-builder')
+    cy.visit('/modelBuilder')
+    cy.url().should('include', '/modelBuilder')
 
     const expectedErrors = ['required-name', 'invalid-type']
     cy.validateFormErrors(expectedErrors)
@@ -41,17 +41,17 @@ describe('Form Validation Across Application', () => {
       errors: []
     })
 
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     cy.wait('@mockedAPI')
   })
 
   it('should handle navigation between pages', () => {
     cy.navigateToPage('/settings')
-    cy.navigateToPage('/model-builder')
+    cy.navigateToPage('/modelBuilder')
     cy.navigateToPage('/experiments')
 
     cy.go('back')
-    cy.url().should('include', '/model-builder')
+    cy.url().should('include', '/modelBuilder')
   })
 
   it('should test responsive form behavior', () => {
@@ -60,12 +60,12 @@ describe('Form Validation Across Application', () => {
   })
 
   it('should measure page performance', () => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.measurePageLoad()
   })
 
   it('should test form with different input types', () => {
-    cy.visit('/interactive-feature-engineering')
+    cy.visit('/featureEngineering')
 
     const complexFormData = {
       'feature-name': 'test feature',
@@ -82,7 +82,7 @@ describe('Form Validation Across Application', () => {
       message: 'Form submitted successfully'
     })
 
-    cy.visit('/bias-detection-engine')
+    cy.visit('/biasDetection')
     cy.wait('@mockedAPI')
   })
 

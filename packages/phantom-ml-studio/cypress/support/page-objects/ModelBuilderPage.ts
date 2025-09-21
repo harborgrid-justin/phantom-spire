@@ -6,7 +6,7 @@ import { BasePage } from './BasePage';
  */
 export class ModelBuilderPage extends BasePage {
   constructor() {
-    super('/model-builder', '[data-cy="model-builder-content"]');
+    super('/modelBuilder', '[data-cy="model-builder-content"]');
   }
 
   // Selectors

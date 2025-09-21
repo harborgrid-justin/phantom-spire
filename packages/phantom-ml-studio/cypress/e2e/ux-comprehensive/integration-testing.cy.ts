@@ -13,7 +13,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
   describe('Complete ML Model Lifecycle', () => {
     it('should support end-to-end model development workflow', () => {
       // Phase 1: Data Exploration
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="workflow-step-data"]').should('have.class', 'active');
 
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/enterprise-dataset.csv');
@@ -33,7 +33,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       cy.get('[data-cy="proceed-to-modeling"]').click();
 
       // Phase 2: Model Building
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
       cy.get('[data-cy="workflow-step-modeling"]').should('have.class', 'active');
 
       // Data should be pre-loaded from previous step
@@ -138,7 +138,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       const modelIds = [];
 
       algorithms.forEach((algorithm, index) => {
-        cy.visit('/model-builder');
+        cy.visit('/modelBuilder');
         cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
         // Quick setup for comparison testing
@@ -302,7 +302,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
 
     it('should integrate data explorer findings with model builder', () => {
       // Data exploration phase
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/complex-dataset.csv');
 
       // Discover data insights
@@ -323,7 +323,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
 
       // Transfer to model builder with context
       cy.get('[data-cy="build-model-with-insights"]').click();
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
 
       // Verify insights integration
       cy.get('[data-cy="applied-insights"]').should('be.visible');
@@ -417,7 +417,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       cy.visit('/dashboard');
 
       // Data upload with security scanning
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="security-notice"]').should('be.visible');
 
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/sensitive-dataset.csv');
@@ -445,7 +445,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
 
       // Model training with security constraints
       cy.get('[data-cy="proceed-with-conditions"]').click();
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
 
       cy.get('[data-cy="security-constraints"]').should('be.visible');
       cy.get('[data-cy="pii-masking-applied"]').should('be.visible');
@@ -483,10 +483,10 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       cy.visit('/dashboard');
 
       // Access allowed features
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="data-explorer-content"]').should('be.visible');
 
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.get('[data-cy="model-builder-content"]').should('be.visible');
 
       // Restricted access to sensitive features
@@ -495,7 +495,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       cy.get('[data-cy="insufficient-permissions"]').should('be.visible');
 
       // Feature-level restrictions
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.get('[data-cy="production-deployment"]').should('not.exist');
       cy.get('[data-cy="staging-deployment-only"]').should('be.visible');
 
@@ -528,7 +528,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
   describe('Performance at Scale Integration', () => {
     it('should handle enterprise-scale data processing workflows', () => {
       // Large dataset processing
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
 
       // Mock enterprise dataset (1M+ rows)
       cy.intercept('POST', '/api/datasets/upload-large', {
@@ -553,7 +553,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
 
       // Model training at scale
       cy.get('[data-cy="scale-to-modeling"]').click();
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
 
       // Auto-scaling configuration
       cy.get('[data-cy="auto-scaling-options"]').should('be.visible');
@@ -595,7 +595,7 @@ describe('UX: System Integration & End-to-End Workflows', () => {
       cy.get('[data-cy="resource-quota"]').should('be.visible');
 
       // Tenant-isolated data
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="tenant-datasets"]').should('be.visible');
       cy.get('[data-cy="dataset-isolation-indicator"]').should('be.visible');
 

@@ -1,6 +1,6 @@
 describe('Bias Mitigation Strategies', () => {
   beforeEach(() => {
-    cy.visit('/bias-detection-engine')
+    cy.visit('/biasDetection')
     cy.get('[data-cy="completed-analysis"]').first().click()
     cy.get('[data-cy="mitigation-tools"]').click()
   })

@@ -1,6 +1,6 @@
 describe('Data Filtering and Sorting', () => {
   beforeEach(() => {
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     cy.seedTestData('employees', 10)
   })
 
@@ -9,7 +9,7 @@ describe('Data Filtering and Sorting', () => {
   })
 
   it('should load data explorer page successfully', () => {
-    cy.url().should('include', '/data-explorer')
+    cy.url().should('include', '/dataExplorer')
     cy.get('body').should('be.visible')
   })
 
@@ -64,7 +64,7 @@ describe('Data Filtering and Sorting', () => {
       total: 2
     })
 
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     
     // Instead of waiting for a specific API call that might not happen,
     // let's wait for the page to load and then check if we can trigger the API
@@ -137,7 +137,7 @@ describe('Data Filtering and Sorting', () => {
   it('should handle navigation', () => {
     cy.navigateToPage('/dashboard')
     cy.go('back')
-    cy.url().should('include', '/data-explorer')
+    cy.url().should('include', '/dataExplorer')
   })
 
   it('should measure page performance', () => {

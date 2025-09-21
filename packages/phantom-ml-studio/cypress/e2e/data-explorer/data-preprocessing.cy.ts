@@ -1,6 +1,6 @@
 describe('Data Preprocessing Features', () => {
   beforeEach(() => {
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     // Wait for page to load and make sure file upload input exists
     cy.get('[data-cy="file-upload-input"]', { timeout: 10000 }).should('exist')
     cy.uploadFile('[data-cy="file-upload-input"]', 'cypress/fixtures/test-data.csv')

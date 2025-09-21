@@ -69,7 +69,7 @@ export class DashboardPage extends BasePage {
    */
   navigateToModelBuilder(): this {
     cy.get(this.selectors.modelBuilderLink).click();
-    cy.url().should('include', '/model-builder');
+    cy.url().should('include', '/modelBuilder');
     return this;
   }
 
@@ -78,7 +78,7 @@ export class DashboardPage extends BasePage {
    */
   navigateToDataExplorer(): this {
     cy.get(this.selectors.dataExplorerLink).click();
-    cy.url().should('include', '/data-explorer');
+    cy.url().should('include', '/dataExplorer');
     return this;
   }
 

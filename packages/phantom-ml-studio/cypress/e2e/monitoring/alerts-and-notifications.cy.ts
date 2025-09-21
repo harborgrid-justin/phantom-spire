@@ -1,6 +1,6 @@
 describe('Alerts and Notifications', () => {
   beforeEach(() => {
-    cy.visit('/real-time-monitoring')
+    cy.visit('/monitoring')
     cy.get('[data-cy="alerts-configuration"]').click()
   })
 

@@ -1,6 +1,6 @@
 describe('Bias Detection and Analysis', () => {
   beforeEach(() => {
-    cy.visit('/bias-detection-engine')
+    cy.visit('/biasDetection')
     cy.get('[data-cy="page-loading"]').should('not.exist')
   })
 

@@ -167,7 +167,7 @@ describe('Dashboard Loading and Components', () => {
     cy.log('Testing browser navigation with graceful fallbacks')
     
     // Try to navigate to a route that might exist
-    const testRoute = '/data-explorer'
+    const testRoute = '/dataExplorer'
     
     // Visit with failOnStatusCode: false to handle 404s gracefully
     cy.visit(testRoute, { failOnStatusCode: false }).then(() => {

@@ -1,6 +1,6 @@
 describe('Algorithm Selection', () => {
   beforeEach(() => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.get('[data-cy="create-new-model"]').click()
     cy.get('[data-cy="dataset-item"]').first().click()
     cy.get('[data-cy="next-step"]').click()

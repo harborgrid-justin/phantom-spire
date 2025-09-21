@@ -1,6 +1,6 @@
 describe('Data Integration and Sources', () => {
   beforeEach(() => {
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
   })
 
   it('should connect to external databases', () => {

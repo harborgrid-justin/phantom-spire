@@ -58,7 +58,7 @@ describe('UX: Responsive Design Patterns', () => {
 
     it('should provide consistent user workflows across devices', () => {
       const workflow = [
-        { action: 'navigate', target: '/model-builder' },
+        { action: 'navigate', target: '/modelBuilder' },
         { action: 'upload', target: 'cypress/fixtures/test-dataset.csv' },
         { action: 'select-target', target: 'performance_score' },
         { action: 'select-algorithm', target: 'random-forest' },
@@ -70,7 +70,7 @@ describe('UX: Responsive Design Patterns', () => {
         cy.log(`Testing workflow on ${device.name}`);
 
         // Navigate to model builder
-        cy.visit('/model-builder');
+        cy.visit('/modelBuilder');
 
         // Upload dataset
         cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
@@ -107,7 +107,7 @@ describe('UX: Responsive Design Patterns', () => {
 
       touchDevices.forEach(device => {
         cy.viewport(device.width, device.height);
-        cy.visit('/data-explorer');
+        cy.visit('/dataExplorer');
         cy.log(`Testing touch interactions on ${device.name}`);
 
         cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
@@ -184,7 +184,7 @@ describe('UX: Responsive Design Patterns', () => {
     });
 
     it('should optimize mobile form interactions', () => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Test mobile form layout
       cy.get('[data-cy="mobile-form-container"]').should('be.visible');
@@ -219,7 +219,7 @@ describe('UX: Responsive Design Patterns', () => {
     });
 
     it('should provide mobile-specific UI patterns', () => {
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
 
       // Test mobile-first card layouts
       cy.get('[data-cy="mobile-feature-cards"]').should('be.visible');
@@ -325,7 +325,7 @@ describe('UX: Responsive Design Patterns', () => {
     });
 
     it('should handle content reflow and text scaling', () => {
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       // Test text scaling at different zoom levels
@@ -401,7 +401,7 @@ describe('UX: Responsive Design Patterns', () => {
       cy.viewport(375, 667);
       cy.intercept('**', { throttleKbps: 300 }); // Slow 3G
 
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Should show loading states appropriately
       cy.get('[data-cy="page-loading"]').should('be.visible');
@@ -426,7 +426,7 @@ describe('UX: Responsive Design Patterns', () => {
 
     it('should handle memory constraints on mobile devices', () => {
       cy.viewport(375, 667);
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
 
       // Test large dataset handling
       cy.intercept('GET', '/api/datasets/large-dataset', {
@@ -501,7 +501,7 @@ describe('UX: Responsive Design Patterns', () => {
     });
 
     it('should maintain state during viewport changes', () => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.viewport(375, 667);
 
       // Setup form state
@@ -537,7 +537,7 @@ describe('UX: Responsive Design Patterns', () => {
 
       aspectRatios.forEach(device => {
         cy.viewport(device.width, device.height);
-        cy.visit('/data-explorer');
+        cy.visit('/dataExplorer');
         cy.log(`Testing ${device.name} (${device.ratio})`);
 
         // Test content adaptation

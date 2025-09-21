@@ -8,7 +8,7 @@
 describe('UX: Data Explorer & Analysis Workflow', () => {
   beforeEach(() => {
     cy.setupTestEnvironment('ml-models');
-    cy.visit('/data-explorer');
+    cy.visit('/dataExplorer');
   });
 
   describe('Dataset Upload & Validation', () => {

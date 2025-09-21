@@ -1,6 +1,6 @@
 describe('Anomaly Detection and Analysis', () => {
   beforeEach(() => {
-    cy.visit('/real-time-monitoring')
+    cy.visit('/monitoring')
     cy.get('[data-cy="anomaly-detection"]').click()
   })
 

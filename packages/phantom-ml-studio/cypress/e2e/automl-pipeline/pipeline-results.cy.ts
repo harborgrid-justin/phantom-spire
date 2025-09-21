@@ -1,6 +1,6 @@
 describe('AutoML Pipeline Results', () => {
   beforeEach(() => {
-    cy.visit('/automl-pipeline-visualizer')
+    cy.visit('/automlPipeline')
     cy.viewport(1280, 720)
     
     // Wait for page to load completely

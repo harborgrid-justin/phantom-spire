@@ -9,7 +9,7 @@ describe('API Integration Tests', () => {
   })
 
   it('should integrate with Hugging Face API', () => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.get('[data-cy="browse-huggingface-models"]').click()
 
     cy.get('[data-cy="huggingface-browser"]').should('be.visible')
@@ -34,7 +34,7 @@ describe('API Integration Tests', () => {
   it('should handle API rate limiting', () => {
     cy.intercept('GET', '**/api/data/load', { statusCode: 429 }).as('rateLimited')
 
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     cy.get('[data-cy="load-sample-data"]').click()
 
     cy.wait('@rateLimited')
@@ -45,7 +45,7 @@ describe('API Integration Tests', () => {
   it('should handle API timeouts gracefully', () => {
     cy.intercept('POST', '**/api/models/train', { delay: 30000 }).as('timeout')
 
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.createModel('Test Model', 'random-forest')
     cy.get('[data-cy="start-training"]').click()
 

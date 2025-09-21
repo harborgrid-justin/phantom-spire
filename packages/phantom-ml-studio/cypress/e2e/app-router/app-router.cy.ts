@@ -43,7 +43,7 @@ describe('Next.js App Router Features', () => {
 
   describe('Layouts and Templates', () => {
     it('should maintain layout consistency across pages', () => {
-      const pages = ['/dashboard', '/models', '/data-explorer', '/experiments'];
+      const pages = ['/dashboard', '/models', '/dataExplorer', '/experiments'];
 
       pages.forEach(page => {
         cy.visit(page);
@@ -93,7 +93,7 @@ describe('Next.js App Router Features', () => {
     });
 
     it('should show appropriate loading for slow pages', () => {
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
 
       // Data explorer might have longer loading times
       cy.get('[data-cy="page-loading"]', { timeout: 10000 }).should('not.exist');
@@ -142,7 +142,7 @@ describe('Next.js App Router Features', () => {
     });
 
     it('should organize related routes properly', () => {
-      const mlRoutes = ['/models', '/experiments', '/data-explorer'];
+      const mlRoutes = ['/models', '/experiments', '/dataExplorer'];
 
       mlRoutes.forEach(route => {
         cy.visit(route);
@@ -218,7 +218,7 @@ describe('Next.js App Router Features', () => {
       const routes = [
         { path: '/dashboard', title: 'Dashboard' },
         { path: '/models', title: 'Models' },
-        { path: '/data-explorer', title: 'Data Explorer' }
+        { path: '/dataExplorer', title: 'Data Explorer' }
       ];
 
       routes.forEach(route => {

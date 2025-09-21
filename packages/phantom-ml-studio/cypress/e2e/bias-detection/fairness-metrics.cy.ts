@@ -1,6 +1,6 @@
 describe('Fairness Metrics and Mitigation', () => {
   beforeEach(() => {
-    cy.visit('/bias-detection-engine')
+    cy.visit('/biasDetection')
     cy.get('[data-cy="completed-analysis"]').first().click()
   })
 

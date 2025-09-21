@@ -27,7 +27,7 @@ describe('Next.js Middleware Testing', () => {
     });
 
     it('should allow access to public routes', () => {
-      const publicRoutes = ['/', '/dashboard', '/models', '/data-explorer'];
+      const publicRoutes = ['/', '/dashboard', '/models', '/dataExplorer'];
 
       publicRoutes.forEach(route => {
         cy.visit(route);

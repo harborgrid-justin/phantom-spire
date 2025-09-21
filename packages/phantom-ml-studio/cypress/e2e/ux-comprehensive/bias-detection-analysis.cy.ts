@@ -8,7 +8,7 @@
 describe('UX: Bias Detection & Analysis Engine', () => {
   beforeEach(() => {
     cy.setupTestEnvironment('ml-models');
-    cy.visit('/bias-detection-engine');
+    cy.visit('/biasDetection');
   });
 
   describe('Bias Analysis Workflow', () => {

@@ -1,6 +1,6 @@
 describe('Data Upload Functionality', () => {
   beforeEach(() => {
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     cy.get('[data-cy="page-loading"]').should('not.exist')
   })
 

@@ -52,7 +52,7 @@ describe('UX: Performance Optimization', () => {
       // Should show loading state immediately
       cy.get('[data-cy="page-transition-loader"]').should('be.visible');
 
-      cy.url().should('include', '/data-explorer').then(() => {
+      cy.url().should('include', '/dataExplorer').then(() => {
         const navigationTime = Date.now() - navigationStart;
         expect(navigationTime).to.be.lessThan(500); // Navigation feels instant
       });
@@ -73,7 +73,7 @@ describe('UX: Performance Optimization', () => {
     });
 
     it('should handle large dataset loading efficiently', () => {
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
 
       // Mock large dataset with streaming response
       cy.intercept('POST', '/api/datasets/upload', {
@@ -114,7 +114,7 @@ describe('UX: Performance Optimization', () => {
 
   describe('Error State Management', () => {
     beforeEach(() => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
     });
 
     it('should handle various error scenarios gracefully', () => {
@@ -263,7 +263,7 @@ describe('UX: Performance Optimization', () => {
 
   describe('Performance Under Load', () => {
     it('should maintain performance with large datasets', () => {
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
 
       // Mock large dataset (10,000 rows)
       cy.intercept('GET', '/api/datasets/large/preview', {
@@ -361,11 +361,11 @@ describe('UX: Performance Optimization', () => {
 
     it('should manage memory usage effectively', () => {
       // Test memory cleanup on navigation
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/large-dataset.csv');
 
       // Navigate to different page
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Check memory cleanup
       cy.window().then((win) => {
@@ -390,7 +390,7 @@ describe('UX: Performance Optimization', () => {
       });
 
       // Test component unmounting cleanup
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
       cy.muiClickButton('analyze-model');
       cy.get('[data-cy="analysis-dialog"]').should('be.visible');
 
@@ -427,7 +427,7 @@ describe('UX: Performance Optimization', () => {
 
   describe('Loading State Optimization', () => {
     it('should provide contextual loading indicators', () => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Test file upload loading states
       cy.get('[data-cy="form-upload-dropzone"]').should('be.visible');
@@ -489,7 +489,7 @@ describe('UX: Performance Optimization', () => {
       });
 
       // Test image preloading
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="tutorial-images"]').should('exist');
       cy.get('img[data-preloaded="true"]').should('have.length.greaterThan', 0);
     });
@@ -562,7 +562,7 @@ describe('UX: Performance Optimization', () => {
       // Simulate slow 3G
       cy.intercept('**', { throttleKbps: 300 }).as('slowNetwork');
 
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Should show appropriate feedback for slow loading
       cy.get('[data-cy="slow-connection-detected"]').should('be.visible');
@@ -594,7 +594,7 @@ describe('UX: Performance Optimization', () => {
         }
       }).as('retryRequests');
 
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
       cy.muiStepperNavigate('next');
       cy.muiSelectOption('form-select-target-column', 'performance_score');

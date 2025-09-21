@@ -1,6 +1,6 @@
 describe('Real-time Monitoring Dashboard', () => {
   beforeEach(() => {
-    cy.visit('/real-time-monitoring')
+    cy.visit('/monitoring')
     cy.get('[data-cy="page-loading"]').should('not.exist')
   })
 

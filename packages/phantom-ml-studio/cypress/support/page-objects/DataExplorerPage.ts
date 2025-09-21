@@ -6,7 +6,7 @@ import { BasePage } from './BasePage';
  */
 export class DataExplorerPage extends BasePage {
   constructor() {
-    super('/data-explorer', '[data-cy="data-explorer-content"]');
+    super('/dataExplorer', '[data-cy="data-explorer-content"]');
   }
 
   // Selectors

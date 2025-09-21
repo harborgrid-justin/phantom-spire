@@ -1,6 +1,6 @@
 describe('Model Creation Workflow', () => {
   beforeEach(() => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.get('[data-cy="page-loading"]').should('not.exist')
   })
 

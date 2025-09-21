@@ -1,6 +1,6 @@
 describe('Model Comparison and Selection', () => {
   beforeEach(() => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
   })
 
   it('should compare multiple algorithms', () => {

@@ -185,7 +185,7 @@ describe('UX: Real-time Monitoring & Live Updates', () => {
 
   describe('Live Training Progress Monitoring', () => {
     beforeEach(() => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       // Setup training scenario
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
       cy.muiStepperNavigate('next');

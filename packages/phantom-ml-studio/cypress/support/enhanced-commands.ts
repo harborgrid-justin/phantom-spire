@@ -556,7 +556,7 @@ Cypress.Commands.add('verifyDownload', (fileName: string, timeout = 10000) => {
 })
 
 Cypress.Commands.add('uploadCSVDataset', (filePath: string, datasetName?: string) => {
-  cy.navigateToPage('/data-explorer')
+  cy.navigateToPage('/dataExplorer')
   cy.muiClickButton('upload-dataset-button')
   
   cy.uploadFile('[data-cy="file-upload"]', filePath, 'text/csv')
@@ -570,7 +570,7 @@ Cypress.Commands.add('uploadCSVDataset', (filePath: string, datasetName?: string
 })
 
 Cypress.Commands.add('uploadModelFile', (filePath: string, modelName?: string) => {
-  cy.navigateToPage('/model-builder')
+  cy.navigateToPage('/modelBuilder')
   cy.muiClickButton('upload-model-button')
   
   cy.uploadFile('[data-cy="model-file-upload"]', filePath)
@@ -588,7 +588,7 @@ Cypress.Commands.add('uploadModelFile', (filePath: string, modelName?: string) =
 // **********************************************************************
 
 Cypress.Commands.add('createModel', (modelConfig: { name?: string; algorithm?: string; dataset?: string; parameters?: Record<string, unknown> }) => {
-  cy.navigateToPage('/model-builder');
+  cy.navigateToPage('/modelBuilder');
   cy.muiClickButton('create-model-button');
 
   if (modelConfig.name) {
@@ -657,7 +657,7 @@ Cypress.Commands.add('deployModel', (modelId: string, deploymentConfig = {}) => 
 });
 
 Cypress.Commands.add('uploadDataset', (filePath: string, datasetName?: string, datasetType = 'csv') => {
-  cy.navigateToPage('/data-explorer');
+  cy.navigateToPage('/dataExplorer');
   cy.muiClickButton('upload-dataset-button');
 
   cy.uploadFile('[data-cy="file-upload"]', filePath);

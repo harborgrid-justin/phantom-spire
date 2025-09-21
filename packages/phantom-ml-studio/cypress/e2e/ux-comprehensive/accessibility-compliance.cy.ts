@@ -31,10 +31,10 @@ describe('UX: Accessibility & Compliance', () => {
       cy.focused().should('have.attr', 'data-cy', 'nav-link-data-explorer');
 
       cy.focused().type('{enter}');
-      cy.url().should('include', '/data-explorer');
+      cy.url().should('include', '/dataExplorer');
 
       // Test modal keyboard trapping
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
       cy.muiClickButton('analyze-model');
       cy.get('[data-cy="analysis-dialog"]').should('be.visible');
 
@@ -47,7 +47,7 @@ describe('UX: Accessibility & Compliance', () => {
       cy.get('[data-cy="analysis-dialog"]').should('not.exist');
 
       // Test form keyboard navigation
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.get('[data-cy="form-upload-dropzone"]').focus();
       cy.focused().tab();
       cy.focused().should('have.attr', 'data-cy').and('contain', 'btn-');
@@ -66,10 +66,10 @@ describe('UX: Accessibility & Compliance', () => {
       cy.url().should('include', '/dashboard');
 
       cy.get('body').type('{alt}2');
-      cy.url().should('include', '/data-explorer');
+      cy.url().should('include', '/dataExplorer');
 
       // Test context-specific shortcuts
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       cy.get('body').type('{ctrl}s');
@@ -81,7 +81,7 @@ describe('UX: Accessibility & Compliance', () => {
     });
 
     it('should handle complex component keyboard interactions', () => {
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       // Test table keyboard navigation
@@ -108,7 +108,7 @@ describe('UX: Accessibility & Compliance', () => {
       cy.get('[data-cy="chart-tooltip"]').should('be.visible');
 
       // Test autocomplete keyboard navigation
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
       cy.muiStepperNavigate('next');
       cy.muiStepperNavigate('next');
@@ -156,7 +156,7 @@ describe('UX: Accessibility & Compliance', () => {
         .should('have.attr', 'aria-live', 'polite');
 
       // Test form labels and descriptions
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.get('[data-cy="form-upload-dropzone"]')
         .should('have.attr', 'aria-label')
         .and('contain', 'upload');
@@ -199,7 +199,7 @@ describe('UX: Accessibility & Compliance', () => {
 
     it('should announce dynamic content changes appropriately', () => {
       // Test progress announcements
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
       cy.muiStepperNavigate('next');
       cy.muiSelectOption('form-select-target-column', 'performance_score');
@@ -229,7 +229,7 @@ describe('UX: Accessibility & Compliance', () => {
         .should('have.attr', 'aria-live', 'polite');
 
       // Test navigation announcements
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.get('[data-cy="page-announcer"]')
         .should('contain', 'Data Explorer')
         .and('have.attr', 'aria-live', 'polite');
@@ -255,7 +255,7 @@ describe('UX: Accessibility & Compliance', () => {
         .and('not.equal', 'rgba(0, 0, 0, 0)');
 
       // Test error state contrast
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.muiClickButton('btn-start-training'); // Trigger validation error
 
       cy.get('[data-cy="validation-error-dataset"]')
@@ -332,7 +332,7 @@ describe('UX: Accessibility & Compliance', () => {
         .and('contain', 'success');
 
       // Test loading state alternatives
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       cy.get('[data-cy="loading-spinner"]')
@@ -346,9 +346,9 @@ describe('UX: Accessibility & Compliance', () => {
       const pages = [
         '/',
         '/dashboard',
-        '/data-explorer',
-        '/model-builder',
-        '/bias-detection-engine',
+        '/dataExplorer',
+        '/modelBuilder',
+        '/biasDetection',
         '/settings'
       ];
 
@@ -368,13 +368,13 @@ describe('UX: Accessibility & Compliance', () => {
         });
 
         // Test page-specific accessibility requirements
-        if (page === '/data-explorer') {
+        if (page === '/dataExplorer') {
           // Data tables should have proper headers
           cy.get('table').should('have.attr', 'role', 'table');
           cy.get('th').should('have.attr', 'scope');
         }
 
-        if (page === '/model-builder') {
+        if (page === '/modelBuilder') {
           // Forms should have proper labeling
           cy.get('input, select, textarea').each($input => {
             cy.wrap($input).should('satisfy', $el => {
@@ -388,7 +388,7 @@ describe('UX: Accessibility & Compliance', () => {
     });
 
     it('should maintain accessibility during dynamic interactions', () => {
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
 
       // Test modal accessibility
       cy.muiClickButton('analyze-model');
@@ -429,7 +429,7 @@ describe('UX: Accessibility & Compliance', () => {
       });
 
       // Test focus management
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       // Focus should move to next logical element
@@ -467,7 +467,7 @@ describe('UX: Accessibility & Compliance', () => {
         .and('contain', 'navigation');
 
       // Test swipe gesture alternatives
-      cy.visit('/data-explorer');
+      cy.visit('/dataExplorer');
       cy.dragAndDropFile('[data-cy="form-upload-dropzone"]', 'cypress/fixtures/test-dataset.csv');
 
       cy.get('[data-cy="mobile-table-controls"]').should('be.visible');
@@ -476,7 +476,7 @@ describe('UX: Accessibility & Compliance', () => {
     });
 
     it('should maintain keyboard support on mobile devices', () => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Test external keyboard support
       cy.get('[data-cy="form-upload-dropzone"]').focus();
@@ -492,7 +492,7 @@ describe('UX: Accessibility & Compliance', () => {
         .and('have.attr', 'aria-haspopup');
 
       // Test mobile modal accessibility
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
       cy.muiClickButton('analyze-model');
 
       cy.get('[data-cy="mobile-analysis-dialog"]')
@@ -506,9 +506,9 @@ describe('UX: Accessibility & Compliance', () => {
       // Test comprehensive page coverage
       const criticalPages = [
         '/dashboard',
-        '/data-explorer',
-        '/model-builder',
-        '/bias-detection-engine',
+        '/dataExplorer',
+        '/modelBuilder',
+        '/biasDetection',
         '/experiments',
         '/deployments'
       ];

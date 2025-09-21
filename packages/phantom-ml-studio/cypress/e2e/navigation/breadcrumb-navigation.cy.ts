@@ -11,7 +11,7 @@ describe('Breadcrumb Navigation', () => {
   })
 
   it('should display correct breadcrumbs on model builder page', () => {
-    cy.navigateToPage('/model-builder')
+    cy.navigateToPage('/modelBuilder')
     cy.get('[data-cy="breadcrumbs"]').should('be.visible')
     cy.get('[data-cy="breadcrumb-item"]').should('contain', 'Model Builder')
   })
@@ -31,7 +31,7 @@ describe('Breadcrumb Navigation', () => {
   })
 
   it('should show home icon in breadcrumbs', () => {
-    cy.navigateToPage('/data-explorer')
+    cy.navigateToPage('/dataExplorer')
     cy.get('[data-cy="breadcrumb-home"]').should('be.visible')
     cy.get('[data-cy="breadcrumb-home"]').click()
     cy.url().should('include', '/dashboard')

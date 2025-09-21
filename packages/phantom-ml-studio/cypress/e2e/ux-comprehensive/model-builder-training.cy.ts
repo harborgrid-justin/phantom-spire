@@ -8,7 +8,7 @@
 describe('UX: Model Builder & Training Workflow', () => {
   beforeEach(() => {
     cy.setupTestEnvironment('ml-models');
-    cy.visit('/model-builder');
+    cy.visit('/modelBuilder');
   });
 
   describe('Model Creation Wizard', () => {

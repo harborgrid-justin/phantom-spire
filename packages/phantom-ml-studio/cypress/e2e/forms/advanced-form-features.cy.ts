@@ -1,6 +1,6 @@
 describe('Advanced Form Features', () => {
   beforeEach(() => {
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
   })
 
   it('should support conditional form fields', () => {
@@ -56,7 +56,7 @@ describe('Advanced Form Features', () => {
     cy.get('[data-cy="language"]').select('es')
     cy.get('[data-cy="save-language"]').click()
 
-    cy.visit('/model-builder')
+    cy.visit('/modelBuilder')
     cy.get('[data-cy="create-new-model"]').should('contain', 'Crear Nuevo Modelo')
   })
 

@@ -12,7 +12,7 @@ describe('UX: Forms & Validation Patterns', () => {
 
   describe('Complex Form Validation', () => {
     beforeEach(() => {
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
     });
 
     it('should provide comprehensive form validation feedback', () => {
@@ -601,7 +601,7 @@ describe('UX: Forms & Validation Patterns', () => {
 
     it('should adapt form layout for tablet devices', () => {
       cy.viewport(768, 1024);
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
 
       // Test tablet form layout
       cy.get('[data-cy="tablet-form-layout"]').should('be.visible');

@@ -1,12 +1,12 @@
 describe('Routing and Deep Links', () => {
   const routes = [
     { path: '/dashboard', title: 'Dashboard' },
-    { path: '/data-explorer', title: 'Data Explorer' },
-    { path: '/model-builder', title: 'Model Builder' },
+    { path: '/dataExplorer', title: 'Data Explorer' },
+    { path: '/modelBuilder', title: 'Model Builder' },
     { path: '/experiments', title: 'Experiments' },
     { path: '/deployments', title: 'Deployments' },
-    { path: '/automl-pipeline-visualizer', title: 'AutoML Pipeline Visualizer' },
-    { path: '/bias-detection-engine', title: 'Bias Detection Engine' },
+    { path: '/automlPipeline', title: 'AutoML Pipeline Visualizer' },
+    { path: '/biasDetection', title: 'Bias Detection Engine' },
     { path: '/explainable-ai-visualizer', title: 'Explainable AI Visualizer' },
     { path: '/interactive-feature-engineering', title: 'Interactive Feature Engineering' },
     { path: '/multi-model-ab-testing', title: 'Multi-Model A/B Testing' },
@@ -46,7 +46,7 @@ describe('Routing and Deep Links', () => {
 
     cy.navigateViaSidebar('dashboard')
     cy.navigateViaSidebar('data-explorer')
-    cy.url().should('include', '/data-explorer')
+    cy.url().should('include', '/dataExplorer')
   })
 
   it('should handle browser back and forward navigation', () => {

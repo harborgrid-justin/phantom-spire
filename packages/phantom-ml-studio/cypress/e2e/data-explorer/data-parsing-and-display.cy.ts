@@ -1,6 +1,6 @@
 describe('Data Parsing and Display', () => {
   beforeEach(() => {
-    cy.visit('/data-explorer')
+    cy.visit('/dataExplorer')
     cy.uploadFile('cypress/fixtures/test-data.csv', '[data-cy="file-upload-input"]')
     cy.get('[data-cy="upload-success-message"]').should('be.visible')
   })

@@ -20,19 +20,19 @@ describe('UX: Navigation & Layout', () => {
       cy.get('[data-cy="nav-link-dashboard"]').should('have.class', 'active');
 
       cy.navigateViaSidebar('Data Explorer');
-      cy.url().should('include', '/data-explorer');
+      cy.url().should('include', '/dataExplorer');
       cy.get('[data-cy="nav-link-data-explorer"]').should('have.class', 'active');
 
       cy.navigateViaSidebar('Model Builder');
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
 
       // Test Advanced section
       cy.get('[data-cy="nav-section-advanced"]').should('be.visible');
       cy.navigateViaSidebar('AutoML Pipeline');
-      cy.url().should('include', '/automl-pipeline-visualizer');
+      cy.url().should('include', '/automlPipeline');
 
       cy.navigateViaSidebar('Bias Detection Engine');
-      cy.url().should('include', '/bias-detection-engine');
+      cy.url().should('include', '/biasDetection');
 
       // Test Security section
       cy.get('[data-cy="nav-section-security"]').should('be.visible');
@@ -50,22 +50,22 @@ describe('UX: Navigation & Layout', () => {
 
     it('should handle direct URL access and browser navigation', () => {
       // Test direct access to nested routes
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
       cy.get('[data-cy="nav-link-bias-detection-engine"]').should('have.class', 'active');
       cy.get('h1').should('contain', 'Bias Detection Engine');
 
       // Test browser back button
-      cy.visit('/model-builder');
+      cy.visit('/modelBuilder');
       cy.go('back');
-      cy.url().should('include', '/bias-detection-engine');
+      cy.url().should('include', '/biasDetection');
 
       // Test browser forward button
       cy.go('forward');
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
 
       // Test URL state persistence
       cy.reload();
-      cy.url().should('include', '/model-builder');
+      cy.url().should('include', '/modelBuilder');
       cy.get('[data-cy="nav-link-model-builder"]').should('have.class', 'active');
     });
 
@@ -103,7 +103,7 @@ describe('UX: Navigation & Layout', () => {
 
   describe('Breadcrumb Navigation', () => {
     it('should display accurate breadcrumbs and enable navigation', () => {
-      cy.visit('/bias-detection-engine');
+      cy.visit('/biasDetection');
 
       // Check breadcrumb structure
       cy.get('[data-cy="breadcrumb-container"]').should('be.visible');
@@ -187,7 +187,7 @@ describe('UX: Navigation & Layout', () => {
 
       // Test Enter key navigation
       cy.focused().type('{enter}');
-      cy.url().should('include', '/data-explorer');
+      cy.url().should('include', '/dataExplorer');
 
       // Test Escape key for mobile menu
       cy.viewport(375, 667);

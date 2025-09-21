@@ -14,18 +14,18 @@ describe('Header Navigation', () => {
   })
 
   it('should navigate to data explorer page', () => {
-    cy.navigateToPage('/data-explorer')
-    cy.url().should('include', '/data-explorer')
+    cy.navigateToPage('/dataExplorer')
+    cy.url().should('include', '/dataExplorer')
   })
 
   it('should navigate to model builder page', () => {
-    cy.navigateToPage('/model-builder')
-    cy.url().should('include', '/model-builder')
+    cy.navigateToPage('/modelBuilder')
+    cy.url().should('include', '/modelBuilder')
   })
 
   it('should navigate to automl pipeline visualizer page', () => {
-    cy.navigateToPage('/automl-pipeline-visualizer')
-    cy.url().should('include', '/automl-pipeline-visualizer')
+    cy.navigateToPage('/automlPipeline')
+    cy.url().should('include', '/automlPipeline')
   })
 
   it('should navigate to experiments page', () => {
@@ -39,8 +39,8 @@ describe('Header Navigation', () => {
   })
 
   it('should navigate to bias detection engine page', () => {
-    cy.navigateToPage('/bias-detection-engine')
-    cy.url().should('include', '/bias-detection-engine')
+    cy.navigateToPage('/biasDetection')
+    cy.url().should('include', '/biasDetection')
   })
 
   it('should navigate to settings page', () => {
