@@ -897,7 +897,6 @@ export class PhantomCoreIntegrator {
     
     return workflow;
   }
-  }
 
   /**
    * Get unified system status across all cores
