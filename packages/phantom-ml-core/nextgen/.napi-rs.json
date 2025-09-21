@@ -1,0 +1,23 @@
+{
+  "targets": [
+    "x86_64-pc-windows-msvc",
+    "x86_64-apple-darwin",
+    "aarch64-apple-darwin",
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu"
+  ],
+  "bundler": {
+    "webpack": {
+      "externals": {
+        "win32-x64-msvc": "./phantom-ml-core.win32-x64-msvc.node",
+        "win32-x64-gnu": "./phantom-ml-core.win32-x64-gnu.node",
+        "darwin-universal": "./phantom-ml-core.darwin-universal.node",
+        "darwin-x64": "./phantom-ml-core.darwin-x64.node",
+        "darwin-arm64": "./phantom-ml-core.darwin-arm64.node",
+        "linux-x64-gnu": "./phantom-ml-core.linux-x64-gnu.node",
+        "linux-arm64-gnu": "./phantom-ml-core.linux-arm64-gnu.node"
+      }
+    },
+    "ignoreModuleNotFound": true
+  }
+}

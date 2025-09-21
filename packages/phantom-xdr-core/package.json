@@ -80,5 +80,24 @@
   },
   "dependencies": {
     "@phantom-spire/ml-core": "file:../phantom-ml-core/nextgen"
+  },
+  "optionalDependencies": {
+    "phantom-xdr-core-android-arm64": "1.0.0",
+    "phantom-xdr-core-android-arm-eabi": "1.0.0",
+    "phantom-xdr-core-win32-x64-msvc": "1.0.0",
+    "phantom-xdr-core-win32-ia32-msvc": "1.0.0",
+    "phantom-xdr-core-win32-arm64-msvc": "1.0.0",
+    "phantom-xdr-core-darwin-universal": "1.0.0",
+    "phantom-xdr-core-darwin-x64": "1.0.0",
+    "phantom-xdr-core-darwin-arm64": "1.0.0",
+    "phantom-xdr-core-freebsd-x64": "1.0.0",
+    "phantom-xdr-core-linux-x64-musl": "1.0.0",
+    "phantom-xdr-core-linux-x64-gnu": "1.0.0",
+    "phantom-xdr-core-linux-arm64-musl": "1.0.0",
+    "phantom-xdr-core-linux-arm64-gnu": "1.0.0",
+    "phantom-xdr-core-linux-arm-gnueabihf": "1.0.0",
+    "phantom-xdr-core-linux-riscv64-musl": "1.0.0",
+    "phantom-xdr-core-linux-riscv64-gnu": "1.0.0",
+    "phantom-xdr-core-linux-s390x-gnu": "1.0.0"
   }
 }

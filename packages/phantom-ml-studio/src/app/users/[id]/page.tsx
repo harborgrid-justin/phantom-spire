@@ -16,20 +16,20 @@ interface PageProps {
 
 // Generate metadata for the user page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const userId = params.id;
+  const { id } = await params;
 
   return {
-    title: `User Profile - ${userId} - Phantom ML Studio`,
-    description: `User profile page for user ${userId} in the ML platform`,
+    title: `User Profile - ${id} - Phantom ML Studio`,
+    description: `User profile page for user ${id} in the ML platform`,
   };
 }
 
 // Main page component
 export default function UserProfilePage({ params }: PageProps): JSX.Element {
-  const userId = params.id;
+  const { id } = params;
 
   // Validate the user ID format (basic validation)
-  if (!userId || userId.length < 1) {
+  if (!id || id.length < 1) {
     notFound();
   }
 

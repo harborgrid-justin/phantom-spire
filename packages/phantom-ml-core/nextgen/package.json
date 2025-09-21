@@ -117,5 +117,33 @@
     "singleQuote": true,
     "arrowParens": "always"
   },
-  "packageManager": "yarn@4.9.4"
+  "packageManager": "yarn@4.9.4",
+  "optionalDependencies": {
+    "@phantom-spire/ml-core-android-arm64": "1.0.1",
+    "@phantom-spire/ml-core-android-arm-eabi": "1.0.1",
+    "@phantom-spire/ml-core-win32-x64-msvc": "1.0.1",
+    "@phantom-spire/ml-core-win32-ia32-msvc": "1.0.1",
+    "@phantom-spire/ml-core-win32-arm64-msvc": "1.0.1",
+    "@phantom-spire/ml-core-darwin-universal": "1.0.1",
+    "@phantom-spire/ml-core-darwin-x64": "1.0.1",
+    "@phantom-spire/ml-core-darwin-arm64": "1.0.1",
+    "@phantom-spire/ml-core-freebsd-x64": "1.0.1",
+    "@phantom-spire/ml-core-freebsd-arm64": "1.0.1",
+    "@phantom-spire/ml-core-linux-x64-musl": "1.0.1",
+    "@phantom-spire/ml-core-linux-x64-gnu": "1.0.1",
+    "@phantom-spire/ml-core-linux-arm64-musl": "1.0.1",
+    "@phantom-spire/ml-core-linux-arm64-gnu": "1.0.1",
+    "@phantom-spire/ml-core-linux-arm-musleabihf": "1.0.1",
+    "@phantom-spire/ml-core-linux-arm-gnueabihf": "1.0.1",
+    "@phantom-spire/ml-core-linux-loong64-musl": "1.0.1",
+    "@phantom-spire/ml-core-linux-loong64-gnu": "1.0.1",
+    "@phantom-spire/ml-core-linux-riscv64-musl": "1.0.1",
+    "@phantom-spire/ml-core-linux-riscv64-gnu": "1.0.1",
+    "@phantom-spire/ml-core-linux-ppc64-gnu": "1.0.1",
+    "@phantom-spire/ml-core-linux-s390x-gnu": "1.0.1",
+    "@phantom-spire/ml-core-openharmony-arm64": "1.0.1",
+    "@phantom-spire/ml-core-openharmony-x64": "1.0.1",
+    "@phantom-spire/ml-core-openharmony-arm": "1.0.1",
+    "@phantom-spire/ml-core-wasm32-wasi": "1.0.1"
+  }
 }

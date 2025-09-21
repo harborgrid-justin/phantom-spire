@@ -17,7 +17,7 @@ interface PageProps {
 
 // Generate metadata for the model page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { projectId, modelId } = params;
+  const { projectId, modelId } = await params;
 
   return {
     title: `Model ${modelId} - Project ${projectId} - Phantom ML Studio`,

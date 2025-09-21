@@ -35,12 +35,27 @@ const nextConfig: NextConfig = {
       config.externals = [
         ...config.externals,
         '@phantom-spire/ml-core',
+        '@phantom-spire/xdr-core',
+        // Externalize all platform-specific NAPI packages
+        /@phantom-spire\/ml-core-.*/,
+        /phantom-.*-core-.*/,
+        // Externalize local .node files
+        /^.*\.node$/,
         '../phantom-ml-core/nextgen/phantom-ml-core.win32-x64-msvc.node',
+        '../phantom-xdr-core/phantom-xdr-core.win32-x64-gnu.node',
       ];
     }
 
     // Exclude .node files from bundling
     config.externals.push(/^.*\.node$/);
+    
+    // Ignore missing optional dependencies during bundling
+    config.ignoreWarnings = [
+      /Module not found.*@phantom-spire.*-core-.*/,
+      /Module not found.*phantom-.*-core-.*/,
+      /Can't resolve.*\.node$/,
+      /Can't resolve.*phantom-.*-core.wasi.cjs$/,
+    ];
 
     // Add bundle analysis in development
     if (dev && !isServer) {

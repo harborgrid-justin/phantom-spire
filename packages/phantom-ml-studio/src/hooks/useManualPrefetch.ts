@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useCallback, useRef } from 'react';
+import React from 'react';
 
 /**
  * P.2: Manual prefetching service for off-screen or special UX routes
@@ -80,7 +81,7 @@ export function useManualPrefetch() {
 export function withManualPrefetch<T extends Record<string, any>>(
   Component: React.ComponentType<T>
 ) {
-  return function ManualPrefetchComponent(props: T) {
+  const ManualPrefetchComponent = (props: T): JSX.Element => {
     const prefetch = useManualPrefetch();
 
     const enhancedProps = {
@@ -88,8 +89,10 @@ export function withManualPrefetch<T extends Record<string, any>>(
       manualPrefetch: prefetch,
     } as T;
 
-    return <Component {...enhancedProps} />;
+    return React.createElement(Component, enhancedProps);
   };
+
+  return ManualPrefetchComponent;
 }
 
 /**

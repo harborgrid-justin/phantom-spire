@@ -16,7 +16,8 @@ interface PageProps {
 
 // Generate metadata based on the slug path
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const path = params.slug ? params.slug.join('/') : '';
+  const { slug } = await params;
+  const path = slug ? slug.join('/') : '';
   const title = path ? `Blog - ${path}` : 'Blog';
 
   return {

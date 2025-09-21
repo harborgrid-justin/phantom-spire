@@ -16,7 +16,8 @@ interface PageProps {
 
 // Generate metadata based on the slug path
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const path = params.slug.join('/');
+  const { slug } = await params;
+  const path = slug.join('/');
 
   return {
     title: `Documentation - ${path} - Phantom ML Studio`,
