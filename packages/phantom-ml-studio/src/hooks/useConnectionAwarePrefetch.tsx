@@ -9,6 +9,11 @@ interface ConnectionInfo {
   saveData?: boolean;
 }
 
+interface DeviceMemoryInfo {
+  deviceMemory?: number;
+  hardwareConcurrency?: number;
+}
+
 interface ConnectionAwarePrefetchConfig {
   shouldPrefetch: boolean;
   reason: string;
@@ -47,11 +52,35 @@ export function useConnectionAwarePrefetch(): ConnectionAwarePrefetchConfig {
     const updatePrefetchConfig = () => {
       const { effectiveType, downlink, saveData } = connection;
 
+      // P.38: Check device resources
+      const deviceMemory = (navigator as any).deviceMemory as number | undefined;
+      const hardwareConcurrency = navigator.hardwareConcurrency;
+
       // Respect user's data saver preference
       if (saveData) {
         setConfig({
           shouldPrefetch: false,
           reason: 'Data saver mode enabled',
+          connectionType: effectiveType,
+        });
+        return;
+      }
+
+      // P.38: Disable prefetching on low memory devices
+      if (deviceMemory !== undefined && deviceMemory < 2) {
+        setConfig({
+          shouldPrefetch: false,
+          reason: `Low device memory detected (${deviceMemory}GB)`,
+          connectionType: effectiveType,
+        });
+        return;
+      }
+
+      // P.38: Conservative prefetching on devices with few CPU cores
+      if (hardwareConcurrency !== undefined && hardwareConcurrency < 2) {
+        setConfig({
+          shouldPrefetch: false,
+          reason: `Limited CPU cores detected (${hardwareConcurrency})`,
           connectionType: effectiveType,
         });
         return;

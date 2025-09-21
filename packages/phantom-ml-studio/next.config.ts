@@ -9,7 +9,23 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash', 'recharts', 'plotly.js'],
+    // P.17: Enable Partial Prerendering for enhanced prefetch performance
+    clientSegmentCache: false, // Enable when ready for production testing
   },
+  // P.7: Cache configuration for prefetched content
+  headers: async () => [
+    {
+      source: '/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: process.env.NODE_ENV === 'production'
+            ? 'public, max-age=300, stale-while-revalidate=300' // 5 minute TTL for prefetched content
+            : 'no-cache',
+        },
+      ],
+    },
+  ],
   // External packages for server components
   serverExternalPackages: ['@phantom-spire/ml-core'],
   // Bundle analysis for server/client separation monitoring

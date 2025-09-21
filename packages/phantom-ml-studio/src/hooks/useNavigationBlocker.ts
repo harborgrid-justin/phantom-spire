@@ -57,7 +57,16 @@ export function useNavigationBlocker({
   }, [hasUnsavedChanges, message, pathname]);
 
   // Create a navigation function that checks for unsaved changes
-  const navigateWithConfirmation = useCallback(async (href: string, options?: { replace?: boolean }) => {
+  // N.23: Ensures programmatic navigation mirrors <Link> prop recommendations
+  const navigateWithConfirmation = useCallback(async (
+    href: string,
+    options?: {
+      replace?: boolean;
+      scroll?: boolean;
+      shallow?: boolean;
+      // Mirror Link component props for consistency
+    }
+  ) => {
     if (hasUnsavedChanges) {
       let shouldNavigate = false;
 
@@ -72,12 +81,13 @@ export function useNavigationBlocker({
       }
     }
 
+    // N.23: Use navigation options that match Link behavior
     if (options?.replace) {
-      router.replace(href);
+      router.replace(href, { scroll: options.scroll });
     } else {
-      router.push(href);
+      router.push(href, { scroll: options.scroll });
     }
-    
+
     return true;
   }, [hasUnsavedChanges, confirmNavigation, message, router]);
 

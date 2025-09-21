@@ -22,6 +22,10 @@
     "test:report:merge": "mochawesome-merge cypress/results/mochawesome/*.json > cypress/results/merged-report.json",
     "test:report:generate": "marge cypress/results/merged-report.json --reportDir cypress/results/html --inline",
     "audit:nextjs": "npm run lint:boundary && npm run build:analyze",
+    "nextjs:check-updates": "node scripts/nextjs-upgrade-checklist.js check",
+    "nextjs:upgrade-update": "node scripts/nextjs-upgrade-checklist.js update",
+    "nextjs:upgrade-cleanup": "node scripts/nextjs-upgrade-checklist.js cleanup",
+    "nextjs:upgrade-report": "node scripts/nextjs-upgrade-checklist.js report",
     "security:check": "node scripts/pre-commit-security-check.js",
     "env:validate": "node scripts/validate-env-setup.js",
     "prepare": "husky install"

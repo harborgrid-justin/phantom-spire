@@ -12,8 +12,16 @@ npm run start       # Start production server
 npm run lint        # Run ESLint for code quality
 ```
 
-### No Testing Framework
-This project currently does not have a testing framework configured. When implementing tests, first research the existing codebase to determine what testing approach should be used.
+### Testing Framework
+The project uses Cypress for end-to-end testing, including comprehensive prefetch regression tests:
+
+```bash
+npm run cypress:open      # Open Cypress test runner
+npm run cypress:run       # Run tests headlessly
+npm run test:e2e         # Run all e2e tests
+```
+
+**Prefetch Testing**: See `cypress/e2e/prefetch-regression.cy.ts` for automated prefetch behavior testing.
 
 ## Project Overview
 
@@ -215,6 +223,8 @@ const { shouldPrefetch, reason } = useConnectionAwarePrefetch();
 - **Data Saver Mode**: Respects user's data saver preference
 - **Slow Connections**: Disabled on 2G and slow-2G connections
 - **Low Bandwidth**: Disabled when downlink < 0.5 Mbps
+- **Low Memory Devices**: Disabled when device memory < 2GB (P.38)
+- **Limited CPU**: Disabled when hardware concurrency < 2 cores (P.38)
 - **Connection Changes**: Dynamically adjusts when network conditions change
 
 #### Loading States
@@ -272,6 +282,174 @@ The application tracks prefetch effectiveness through:
 - Failed prefetch logs
 - Connection-aware decision analytics
 - Cache hit rates for prefetched content
+
+**Prefetch Analytics Usage:**
+```typescript
+import { usePrefetchAnalytics } from '@/utils/prefetch-analytics';
+
+const { getSummary, exportMetrics, trackTiming } = usePrefetchAnalytics();
+
+// Track prefetch timing
+const stopTiming = trackTiming('/dashboard');
+// ... prefetch logic
+stopTiming();
+
+// Get analytics summary
+const summary = getSummary();
+console.log('Prefetch hit rate:', summary.navigationMetrics.prefetchHitRate);
+```
+
+#### Cache Management
+**Cache TTL Configuration (P.7):**
+- Production: 5-minute TTL with stale-while-revalidate
+- Development: No caching for immediate updates
+
+**Cache Invalidation Strategies (P.34):**
+```typescript
+import { invalidateCacheTag, smartInvalidate } from '@/utils/cache-invalidation';
+
+// Invalidate specific content types
+await smartInvalidate('model', modelId);
+await invalidateCacheTag('dashboard');
+```
+
+#### Manual Prefetching (P.2)
+For off-screen or special UX scenarios:
+```typescript
+import { useManualPrefetch } from '@/hooks/useManualPrefetch';
+
+const { prefetchCriticalOffScreen, prefetchOnUserIntent } = useManualPrefetch();
+
+// Prefetch critical off-screen routes
+useEffect(() => {
+  prefetchCriticalOffScreen();
+}, []);
+
+// Prefetch on user intent (hover, focus)
+<button onMouseEnter={() => prefetchOnUserIntent('/settings')}>
+  Settings
+</button>
+```
+
+#### Troubleshooting Prefetch Issues (P.49)
+Common prefetch problems and solutions:
+
+1. **Prefetch Not Working**: Check browser network tab for prefetch requests
+2. **Too Many Prefetches**: Review `isResourceHeavy` flags in navigation config
+3. **Slow Navigation**: Verify prefetch cache hits in analytics
+4. **Connection Issues**: Check `data-prefetch-reason` attributes in dev mode
+5. **Cache Stale**: Use cache invalidation utilities for fresh content
+
+**Debug Mode**: Set `data-prefetch-debug="true"` on links for detailed logging.
+
+## Next.js Navigation and Linking Guidelines
+
+### N.33: Navigation Decision Documentation
+
+This section documents all navigation and linking decisions for developers working on the Phantom ML Studio application.
+
+#### Core Navigation Principles
+
+1. **Always Use Link Components**: All internal navigation must use Next.js `<Link>` components to enable client-side routing and prefetching.
+
+2. **External Link Security**: External links must include `target="_blank"` and `rel="noopener noreferrer"` for security.
+
+3. **Dynamic Route Patterns**: Use template literals for dynamic routes (e.g., `/projects/${projectId}`).
+
+#### Navigation Component Hierarchy
+
+```typescript
+// Standard internal navigation
+<Link href="/dashboard">Dashboard</Link>
+
+// Connection-aware navigation (respects bandwidth)
+<ConnectionAwareLink href="/data-explorer">Data Explorer</ConnectionAwareLink>
+
+// Navigation with progress feedback
+<LinkWithStatus href="/models" showProgress={true}>Models</LinkWithStatus>
+
+// Large list navigation (limits prefetching)
+<LazyPrefetchLink href="/item/123">Item 123</LazyPrefetchLink>
+
+// User-friendly blocking for unsaved changes
+<BlockableLink href="/exit" hasUnsavedChanges={isDirty}>Exit</BlockableLink>
+```
+
+#### Prefetch Strategy by Route Type
+
+- **Static Routes** (`/`, `/dashboard`, `/settings`): Auto-prefetch enabled
+- **Resource-Heavy Routes** (`/data-explorer`, `/deployments`): Prefetch disabled
+- **Dynamic Routes** (`/projects/[id]`): Conditional prefetch with loading states
+- **External Routes**: No prefetch, security attributes required
+
+#### Performance Guidelines
+
+- **Large Lists**: Use `LazyPrefetchLink` to limit concurrent prefetches (max 3)
+- **Navigation Metrics**: All navigation is automatically tracked for Core Web Vitals
+- **Loading States**: Dynamic routes include `loading.tsx` for immediate feedback
+- **Error Boundaries**: Navigation failures gracefully fall back to standard navigation
+
+#### Accessibility Requirements
+
+- All links must have accessible labels (`aria-label` or visible text)
+- Active navigation states use `aria-current="page"`
+- Hash navigation maintains focus and supports smooth scrolling
+- Keyboard navigation supported with proper focus management
+
+#### Developer Guidelines
+
+**When to Use Each Component:**
+
+- `Link`: Standard internal navigation
+- `ConnectionAwareLink`: Data-sensitive routes (respects user's connection)
+- `LazyPrefetchLink`: Items in large lists or tables
+- `BlockableLink`: Forms or editors with unsaved changes
+- `EnhancedLink`: Advanced scroll/replace behavior needed
+
+**Navigation Blocking Pattern:**
+```typescript
+const { navigateWithConfirmation, hasUnsavedChanges } = useNavigationBlocker({
+  hasUnsavedChanges: formIsDirty,
+  message: 'You have unsaved changes. Continue?',
+});
+
+// Use navigateWithConfirmation() for programmatic navigation
+```
+
+**Performance Monitoring:**
+```typescript
+const { getCoreWebVitalsScore, getSummary } = useNavigationMetrics();
+
+// Monitor navigation performance
+const score = getCoreWebVitalsScore(); // A-D grade
+const metrics = getSummary(); // Detailed timing data
+```
+
+#### Testing Requirements
+
+- All navigation components have Cypress E2E tests
+- Edge cases tested: slow networks, cancelled navigation, prefetch failures
+- Accessibility tested with keyboard and screen reader navigation
+- Performance metrics validated in CI/CD pipeline
+
+#### Troubleshooting Navigation Issues
+
+1. **Slow Navigation**: Check prefetch status and Core Web Vitals metrics
+2. **Broken Client-Side Routing**: Verify Link components used instead of `<a>` tags
+3. **Prefetch Issues**: Review network conditions and resource-heavy route flags
+4. **Accessibility Problems**: Validate `aria-label` attributes and focus management
+5. **Performance Degradation**: Monitor navigation metrics dashboard
+
+#### Next.js Version Compatibility
+
+**N.40: Update Tracking**: This documentation is maintained for Next.js 15.5.3. When upgrading:
+
+1. Review Next.js changelog for Link/Router API changes
+2. Update ESLint rules for deprecated patterns
+3. Test navigation components with new Next.js version
+4. Update documentation with any breaking changes
+
+See `N.40: Update Tracking` section for specific upgrade procedures.
 
 ## Security
 
