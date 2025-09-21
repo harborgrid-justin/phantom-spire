@@ -44,7 +44,7 @@ import {
   Api as ApiIcon
 } from '@mui/icons-material';
 
-const PhantomCoresOverview: React.FC = () => {
+const PhantomCoresOverview: React.FC = (): React.ReactElement => {
   // Production-Ready Phantom Core Modules with Full GUI Implementation
   const productionModules = [
     {
