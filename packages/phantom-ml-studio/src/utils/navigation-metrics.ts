@@ -28,6 +28,16 @@ interface PerformanceThresholds {
   fid: { good: number; poor: number };
 }
 
+// Extend PerformanceEntry for better typing
+interface PerformanceEventTimingExtended extends PerformanceEventTiming {
+  processingStart?: number;
+}
+
+interface PerformanceLayoutShiftEntry extends PerformanceEntry {
+  hadRecentInput?: boolean;
+  value?: number;
+}
+
 class NavigationMetricsCollector {
   private static instance: NavigationMetricsCollector;
   private metrics: NavigationMetric[] = [];
@@ -119,25 +129,25 @@ class NavigationMetricsCollector {
     }
   }
 
-  private processLCPEntry(entry: any) {
+  private processLCPEntry(entry: PerformanceEntry) {
     const latestMetric = this.metrics[this.metrics.length - 1];
     if (latestMetric) {
       latestMetric.lcp = entry.startTime;
     }
   }
 
-  private processFIDEntry(entry: any) {
+  private processFIDEntry(entry: PerformanceEventTimingExtended) {
     const latestMetric = this.metrics[this.metrics.length - 1];
     if (latestMetric) {
-      latestMetric.fid = entry.processingStart - entry.startTime;
+      latestMetric.fid = (entry.processingStart || 0) - entry.startTime;
     }
   }
 
-  private processLayoutShiftEntry(entry: any) {
+  private processLayoutShiftEntry(entry: PerformanceLayoutShiftEntry) {
     if (!entry.hadRecentInput) {
       const latestMetric = this.metrics[this.metrics.length - 1];
       if (latestMetric) {
-        latestMetric.cls = (latestMetric.cls || 0) + entry.value;
+        latestMetric.cls = (latestMetric.cls || 0) + (entry.value || 0);
       }
     }
   }

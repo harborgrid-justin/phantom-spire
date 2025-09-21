@@ -7,8 +7,8 @@
 import DataExplorerClient from './DataExplorerClient';
 
 interface PageProps {
-  params: Record<string, string>;
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<Record<string, string>>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 /**

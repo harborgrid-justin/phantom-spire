@@ -46,7 +46,7 @@ const DeploymentsClient = import('./DeploymentsClient');
  * Performance configuration for real-time deployment monitoring
  * Ensures live updates for deployment status and performance metrics
  */
-export const pageDynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 export const revalidate = false; // Disable static revalidation for real-time data
 export const runtime = 'nodejs';
 

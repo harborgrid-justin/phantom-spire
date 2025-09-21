@@ -11,13 +11,14 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 interface PageProps {
-  params: { projectId: string; modelId: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ projectId: string; modelId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata for the model page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { projectId, modelId } = params;
+  const resolvedParams = await params;
+  const { projectId, modelId } = resolvedParams;
 
   return {
     title: `Model ${modelId} - Project ${projectId} - Phantom ML Studio`,
@@ -35,8 +36,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function ProjectModelPage({ params }: PageProps): JSX.Element {
-  const { projectId, modelId } = params;
+export default async function ProjectModelPage({ params }: PageProps): Promise<JSX.Element> {
+  const resolvedParams = await params;
+  const { projectId, modelId } = resolvedParams;
 
   // Validate parameters
   if (!projectId || !modelId) {
