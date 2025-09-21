@@ -52,7 +52,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   PlayArrow as RunTestIcon,
   Description as ReportIcon,
-  Integration as IntegrationIcon
+  Hub as IntegrationIcon
 } from '@mui/icons-material';
 import { useQuery, useMutation } from '@tanstack/react-query';
 

@@ -54,7 +54,7 @@ import {
   Security as SecurityIcon,
   Memory as MemoryIcon,
   Search as SearchIcon
-} from '@mui/material-icons';
+} from '@mui/icons-material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // Interfaces
@@ -177,7 +177,7 @@ const ForensicsOverview: React.FC<{ status: ForensicsStatus | undefined }> = ({ 
       <Grid item xs={12} md={3}>
         <Card>
           <CardContent>
-            <Typography variant="h6" gutterBottom">Active Cases</Typography>
+            <Typography variant="h6" gutterBottom>Active Cases</Typography>
             <Typography variant="h3" color="primary">
               {metrics.active_cases}
             </Typography>

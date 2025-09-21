@@ -178,23 +178,205 @@ export class PhantomCoreIntegrator {
   private async initializeAdditionalCores(): Promise<void> {
     const { enabledModules } = this.config;
 
+    // Map of all available phantom cores with their import paths and configurations
+    // Using a more resilient approach that handles missing packages gracefully
+    const coreInitializers = {
+      'attribution': async () => {
+        try {
+          const module = await import('@phantom-spire/attribution-core');
+          const CoreClass = module.AttributionCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Attribution core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'crypto': async () => {
+        try {
+          const module = await import('@phantom-spire/crypto-core');
+          const CoreClass = module.CryptoCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Crypto core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'cve': async () => {
+        try {
+          const module = await import('@phantom-spire/cve-core');
+          const CoreClass = module.CveCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('CVE core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'feeds': async () => {
+        try {
+          const module = await import('@phantom-spire/feeds-core');
+          const CoreClass = module.FeedsCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Feeds core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'forensics': async () => {
+        try {
+          const module = await import('@phantom-spire/forensics-core');
+          const CoreClass = module.ForensicsCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Forensics core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'hunting': async () => {
+        try {
+          const module = await import('@phantom-spire/hunting-core');
+          const CoreClass = module.HuntingCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Hunting core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'incidentResponse': async () => {
+        try {
+          const module = await import('@phantom-spire/incident-response-core');
+          const CoreClass = module.IncidentResponseCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Incident Response core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'intel': async () => {
+        try {
+          const module = await import('@phantom-spire/intel-core');
+          const CoreClass = module.IntelCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Intel core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'ioc': async () => {
+        try {
+          const module = await import('@phantom-spire/ioc-core');
+          const CoreClass = module.IocCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('IOC core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'malware': async () => {
+        try {
+          const module = await import('@phantom-spire/malware-core');
+          const CoreClass = module.MalwareCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Malware core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'mitre': async () => {
+        try {
+          const module = await import('@phantom-spire/mitre-core');
+          const CoreClass = module.MitreCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('MITRE core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'reputation': async () => {
+        try {
+          const module = await import('@phantom-spire/reputation-core');
+          const CoreClass = module.ReputationCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Reputation core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'risk': async () => {
+        try {
+          const module = await import('@phantom-spire/risk-core');
+          const CoreClass = module.RiskCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Risk core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'sandbox': async () => {
+        try {
+          const module = await import('@phantom-spire/sandbox-core');
+          const CoreClass = module.SandboxCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Sandbox core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'secop': async () => {
+        try {
+          const module = await import('@phantom-spire/secop-core');
+          const CoreClass = module.SecopCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('SecOp core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'threatActor': async () => {
+        try {
+          const module = await import('@phantom-spire/threat-actor-core');
+          const CoreClass = module.ThreatActorCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Threat Actor core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      },
+      'vulnerability': async () => {
+        try {
+          const module = await import('@phantom-spire/vulnerability-core');
+          const CoreClass = module.VulnerabilityCoreNapi || module.default || module;
+          return typeof CoreClass === 'function' ? new CoreClass() : CoreClass;
+        } catch (error) {
+          console.warn('Vulnerability core not available:', error instanceof Error ? error.message : error);
+          return null;
+        }
+      }
+    };
+
     // Initialize cores dynamically based on enabled modules
     for (const module of enabledModules) {
       try {
-        switch (module) {
-          case 'attribution':
-            // Dynamic import for attribution core
-            break;
-          case 'crypto':
-            // Dynamic import for crypto core
-            break;
-          case 'cve':
-            // Dynamic import for CVE core
-            break;
-          // Add other modules as needed
+        const initializer = coreInitializers[module as keyof typeof coreInitializers];
+        if (initializer) {
+          console.log(`Attempting to initialize ${module} core...`);
+          const coreInstance = await initializer();
+          
+          if (coreInstance !== null) {
+            this.cores[module as keyof PhantomCoreIntegration] = coreInstance;
+            this.healthStatus.set(module, true);
+            console.log(`✅ ${module} core initialized successfully`);
+          } else {
+            this.cores[module as keyof PhantomCoreIntegration] = null;
+            this.healthStatus.set(module, false);
+            console.log(`⚠️ ${module} core not available - marked as unavailable`);
+          }
+        } else {
+          console.warn(`⚠️ No initializer found for module: ${module}`);
         }
       } catch (error) {
-        console.warn(`Failed to initialize ${module} core:`, error);
+        console.warn(`❌ Failed to initialize ${module} core:`, error);
+        this.cores[module as keyof PhantomCoreIntegration] = null;
+        this.healthStatus.set(module, false);
       }
     }
   }

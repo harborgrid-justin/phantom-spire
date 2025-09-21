@@ -42,7 +42,7 @@ import {
   Security as SecurityIcon,
   Search as SearchIcon,
   BugReport as ThreatIcon,
-  Investigation as InvestigateIcon,
+  Search as InvestigateIcon,
   PlayArrow as ResponseIcon,
   Psychology as BehaviorIcon,
   ExpandMore as ExpandMoreIcon,
