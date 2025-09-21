@@ -10,13 +10,14 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata for the user page
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const userId = params.id;
+  const resolvedParams = await params;
+  const userId = resolvedParams.id;
 
   return {
     title: `User Profile - ${userId} - Phantom ML Studio`,
@@ -25,8 +26,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // Main page component
-export default function UserProfilePage({ params }: PageProps): JSX.Element {
-  const userId = params.id;
+export default async function UserProfilePage({ params }: PageProps): Promise<JSX.Element> {
+  const resolvedParams = await params;
+  const userId = resolvedParams.id;
 
   // Validate the user ID format (basic validation)
   if (!userId || userId.length < 1) {

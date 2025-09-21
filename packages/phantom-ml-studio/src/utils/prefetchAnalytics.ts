@@ -140,7 +140,7 @@ class PrefetchAnalytics {
 
   private getConnectionType(): string {
     if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
+      const connection = (navigator as Record<string, unknown>).connection;
       return connection?.effectiveType || 'unknown';
     }
     return 'unknown';
@@ -254,5 +254,5 @@ export { prefetchAnalytics, type PrefetchMetrics, type PrefetchEvent };
 // Development helper functions
 if (process.env.NODE_ENV === 'development') {
   // Make analytics available in browser console
-  (window as any).prefetchAnalytics = prefetchAnalytics;
+  (window as Record<string, unknown>).prefetchAnalytics = prefetchAnalytics;
 }

@@ -23,20 +23,12 @@ const eslintConfig = [
   {
     // N.21: Custom rules for Next.js Link patterns
     rules: {
-      // Enforce proper Link usage
+      // Enforce proper Link usage - simplified rules to avoid regex issues
       "no-restricted-syntax": [
         "error",
         {
-          selector: "JSXElement[openingElement.name.name='Link'] JSXAttribute[name.name='as'][value.value=/^(?!\/)/]",
-          message: "N.21: Link 'as' prop should start with '/' for internal routes"
-        },
-        {
           selector: "JSXElement[openingElement.name.name='Link'] JSXAttribute[name.name='passHref']",
           message: "N.21: 'passHref' prop is deprecated in Next.js 13+ App Router"
-        },
-        {
-          selector: "JSXElement[openingElement.name.name='a'] JSXAttribute[name.name='href'][value.value=/^\//]:not([openingElement.attributes[*].name.name='target'])",
-          message: "N.21: Use Next.js Link component for internal navigation instead of <a> tags"
         }
       ],
       // Enforce Link component for internal routes

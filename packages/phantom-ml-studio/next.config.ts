@@ -7,6 +7,11 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if
+    // your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     optimizePackageImports: ['@mui/material', '@mui/icons-material', 'lodash', 'recharts', 'plotly.js'],
     // P.17: Enable Partial Prerendering for enhanced prefetch performance

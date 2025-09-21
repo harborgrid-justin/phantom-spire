@@ -10,13 +10,14 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 interface PageProps {
-  params: { slug: string[] };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ slug: string[] }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata based on the slug path
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const path = params.slug.join('/');
+  const resolvedParams = await params;
+  const path = resolvedParams.slug.join('/');
 
   return {
     title: `Documentation - ${path} - Phantom ML Studio`,
@@ -35,8 +36,9 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function DocumentationPage({ params }: PageProps): JSX.Element {
-  const slug = params.slug;
+export default async function DocumentationPage({ params }: PageProps): Promise<JSX.Element> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
 
   // Validate slug array - catch-all segments are always arrays
   if (!Array.isArray(slug) || slug.length === 0) {
