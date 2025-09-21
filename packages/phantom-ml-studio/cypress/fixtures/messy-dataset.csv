@@ -1,0 +1,13 @@
+name,age,score,category,email
+John Doe,25,85.5,A,john@example.com
+Jane Smith,,92.1,B,jane@example.com
+Mike Johnson,22,,A,mike@invalid
+Sarah Wilson,28,88.7,,sarah@example.com
+Tom Brown,35,76.9,C,tom@example.com
+Lisa Davis,26,94.2,A,
+Chris Lee,29,81.4,B,chris@example.com
+Amy White,24,87.6,A,amy@example.com
+David Clark,,79.8,C,david@example.com
+Emily Taylor,27,,B,emily@example.com
+John Doe,25,85.5,A,john@example.com
+Test User,invalid_age,95.0,D,test@example.com
