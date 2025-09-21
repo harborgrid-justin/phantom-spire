@@ -160,27 +160,26 @@ describe('AutoML Pipeline Execution', () => {
         '[data-cy="execution-confirmation"]',
         '[data-testid="confirm-dialog"]',
         '.execution-confirmation',
-        '[role="dialog"]',
         '.confirm-dialog'
       ]
-      
+
       let confirmationFound = false
       confirmationSelectors.forEach(selector => {
         if ($body.find(selector).length > 0 && !confirmationFound) {
           cy.get(selector).should('be.visible')
           confirmationFound = true
           cy.log(`✅ Execution confirmation found: ${selector}`)
-          
+
           // Look for confirm button
           const confirmButtonSelectors = [
             '[data-cy="confirm-execution"]',
             '[data-testid="confirm"]',
+            'button:contains("Execute Pipeline")',
             'button:contains("Confirm")',
             'button:contains("Yes")',
-            'button:contains("Execute")',
             '.confirm-button'
           ]
-          
+
           confirmButtonSelectors.forEach(btnSelector => {
             if ($body.find(btnSelector).length > 0) {
               cy.get(btnSelector).click()
@@ -189,8 +188,10 @@ describe('AutoML Pipeline Execution', () => {
           })
         }
       })
-      
+
       if (!confirmationFound) {
+        // Check if execution started directly without confirmation
+        cy.wait(1000) // Give time for direct execution
         cy.log('ℹ️ No confirmation dialog found - execution may have started directly')
       }
     })

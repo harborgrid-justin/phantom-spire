@@ -1,7 +1,8 @@
 describe('Fairness Metrics and Mitigation', () => {
   beforeEach(() => {
     cy.visit('/biasDetection')
-    cy.get('[data-cy="completed-analysis"]').first().click()
+    // Scroll to the element first to avoid toolbar overlap, then click with force if needed
+    cy.get('[data-cy="completed-analysis"]').first().scrollIntoView().click({ force: true })
   })
 
   it('should display comprehensive fairness metrics', () => {

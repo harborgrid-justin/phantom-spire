@@ -2,6 +2,9 @@
 // Minimal e2e support file for debugging
 // ***********************************************************
 
+// Import custom commands
+import './commands.ts'
+
 // Basic imports only
 import 'cypress-axe'
 
