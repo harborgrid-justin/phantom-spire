@@ -220,7 +220,7 @@ export default function AutoMLPipelineClient() {
       setAlgorithmPerformance(mockAlgorithmPerformance);
       
       // Select the first pipeline by default (now a pending pipeline)
-      setSelectedPipeline(mockPipelines[0]);
+      setSelectedPipeline(mockPipelines[0] || null);
       setLoading(false);
     } catch {
       setError('Failed to fetch pipeline data');

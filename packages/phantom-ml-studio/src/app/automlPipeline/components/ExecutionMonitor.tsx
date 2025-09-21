@@ -95,12 +95,14 @@ export default function ExecutionMonitor({ pipeline, isExecuting }: ExecutionMon
           'Cross-validation fold 3/5 completed',
           'Best model accuracy improved to 89.2%'
         ];
-        
+
+        const randomMessage = logMessages[Math.floor(Math.random() * logMessages.length)];
+
         setExecutionLog(prev => [
           {
             timestamp: new Date().toLocaleTimeString(),
             level: 'info',
-            message: logMessages[Math.floor(Math.random() * logMessages.length)]
+            message: randomMessage || 'Processing...'
           },
           ...prev.slice(0, 9) // Keep only last 10 entries
         ]);

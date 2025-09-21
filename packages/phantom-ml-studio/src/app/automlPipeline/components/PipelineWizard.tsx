@@ -258,17 +258,15 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
             <FormGroup>
               <FormControlLabel
                 control={
-                  <Checkbox 
+                  <Checkbox
                     checked={config.preprocessing?.scaling || false}
-                    onChange={(e) => setConfig(prev => ({ 
-                      ...prev, 
-                      preprocessing: { 
-                        scaling: false, 
-                        encoding: false, 
-                        missingValues: '', 
-                        featureSelection: false, 
-                        ...prev.preprocessing, 
-                        scaling: e.target.checked 
+                    onChange={(e) => setConfig(prev => ({
+                      ...prev,
+                      preprocessing: {
+                        scaling: e.target.checked,
+                        encoding: prev.preprocessing?.encoding || false,
+                        missingValues: prev.preprocessing?.missingValues || '',
+                        featureSelection: prev.preprocessing?.featureSelection || false
                       }
                     }))}
                     data-cy="enable-scaling"
@@ -280,15 +278,13 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
                 control={
                   <Checkbox
                     checked={config.preprocessing?.encoding || false}
-                    onChange={(e) => setConfig(prev => ({ 
-                      ...prev, 
-                      preprocessing: { 
-                        scaling: false, 
-                        encoding: false, 
-                        missingValues: '', 
-                        featureSelection: false, 
-                        ...prev.preprocessing, 
-                        encoding: e.target.checked 
+                    onChange={(e) => setConfig(prev => ({
+                      ...prev,
+                      preprocessing: {
+                        scaling: prev.preprocessing?.scaling || false,
+                        encoding: e.target.checked,
+                        missingValues: prev.preprocessing?.missingValues || '',
+                        featureSelection: prev.preprocessing?.featureSelection || false
                       }
                     }))}
                     data-cy="enable-encoding"
@@ -301,15 +297,13 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               <InputLabel>Handle Missing Values</InputLabel>
               <Select
                 value={config.preprocessing?.missingValues || ''}
-                onChange={(e) => setConfig(prev => ({ 
-                  ...prev, 
-                  preprocessing: { 
-                    scaling: false, 
-                    encoding: false, 
-                    missingValues: '', 
-                    featureSelection: false, 
-                    ...prev.preprocessing, 
-                    missingValues: e.target.value 
+                onChange={(e) => setConfig(prev => ({
+                  ...prev,
+                  preprocessing: {
+                    scaling: prev.preprocessing?.scaling || false,
+                    encoding: prev.preprocessing?.encoding || false,
+                    missingValues: e.target.value,
+                    featureSelection: prev.preprocessing?.featureSelection || false
                   }
                 }))}
                 data-cy="handle-missing-values"
@@ -323,15 +317,13 @@ export default function PipelineWizard({ open, onClose, onComplete }: PipelineWi
               control={
                 <Checkbox
                   checked={config.preprocessing?.featureSelection || false}
-                  onChange={(e) => setConfig(prev => ({ 
-                    ...prev, 
-                    preprocessing: { 
-                      scaling: false, 
-                      encoding: false, 
-                      missingValues: '', 
-                      featureSelection: false, 
-                      ...prev.preprocessing, 
-                      featureSelection: e.target.checked 
+                  onChange={(e) => setConfig(prev => ({
+                    ...prev,
+                    preprocessing: {
+                      scaling: prev.preprocessing?.scaling || false,
+                      encoding: prev.preprocessing?.encoding || false,
+                      missingValues: prev.preprocessing?.missingValues || '',
+                      featureSelection: e.target.checked
                     }
                   }))}
                   data-cy="feature-selection"

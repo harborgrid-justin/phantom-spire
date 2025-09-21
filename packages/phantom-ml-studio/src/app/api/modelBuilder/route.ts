@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       type: 'startTraining',
       data: { config, columns: data.columns },
       metadata: { category: 'model-builder', module: 'model-builder-page', version: '1.0.0' },
-      context: { environment: process.env.NODE_ENV || 'development' },
+      context: { environment: (process.env.NODE_ENV === 'test' ? 'development' : process.env.NODE_ENV) || 'development' as 'development' | 'staging' | 'production' },
       timestamp: new Date(),
     }, {
       requestId: `req-${Date.now()}`,

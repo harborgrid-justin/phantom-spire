@@ -345,7 +345,7 @@ export default function EnterpriseSecurityCompliancePage() {
     };
 
     setFrameworks(mockFrameworks);
-    setSelectedFramework(mockFrameworks[0]);
+    setSelectedFramework(mockFrameworks[0] || null);
     setSecurityMetrics(mockSecurityMetrics);
   }, []);
 
@@ -354,7 +354,7 @@ export default function EnterpriseSecurityCompliancePage() {
   };
 
   const getStatusColor = (_status: string) => {
-    switch (status) {
+    switch (_status) {
       case 'compliant': return 'success';
       case 'partial': return 'warning';
       case 'non-compliant': return 'error';
@@ -366,7 +366,7 @@ export default function EnterpriseSecurityCompliancePage() {
   };
 
   const getRiskColor = (_risk: string) => {
-    switch (risk) {
+    switch (_risk) {
       case 'low': return 'success';
       case 'medium': return 'warning';
       case 'high': return 'error';
@@ -376,7 +376,7 @@ export default function EnterpriseSecurityCompliancePage() {
   };
 
   const getStatusIcon = (_status: string) => {
-    switch (status) {
+    switch (_status) {
       case 'compliant':
       case 'met':
         return <CheckIcon />;
@@ -1215,4 +1215,3 @@ export default function EnterpriseSecurityCompliancePage() {
     </Box>
   );
 };
-

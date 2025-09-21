@@ -41,7 +41,7 @@ export default function BiasDetectionClient() {
       setFairnessAnalysis(analysisData);
       
       if (reportsData.length > 0 && !selectedReportId) {
-        setSelectedReportId(reportsData[0].id);
+        setSelectedReportId(reportsData[0]?.id || null);
       }
     } catch (error) {
       console.error('Failed to load bias detection data:', error);

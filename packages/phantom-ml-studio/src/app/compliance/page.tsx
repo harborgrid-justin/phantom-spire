@@ -204,7 +204,7 @@ export default function EnterpriseSecurityCompliancePage() {
       setFrameworks(mockFrameworks);
       setSecurityMetrics(mockSecurityMetrics);
       // setAuditReports(mockAuditReports); // Future implementation
-      setSelectedFramework(mockFrameworks[0]);
+      setSelectedFramework(mockFrameworks[0] || null);
       setLoading(false);
     } catch {
       setError('Failed to fetch compliance data');

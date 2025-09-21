@@ -90,7 +90,7 @@ export default function ComplianceCharts({ frameworks }: ComplianceChartsProps) 
           boxShadow: 1
         }}>
           <Typography variant="body2">
-            {`${label}: ${payload[0].value}`}
+            {`${label}: ${payload[0]?.value || 0}`}
           </Typography>
         </Box>
       );
