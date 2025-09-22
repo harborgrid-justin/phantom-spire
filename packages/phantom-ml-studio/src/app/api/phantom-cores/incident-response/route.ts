@@ -16,40 +16,42 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'incident-response-' + Date.now(),
-            system_overview: {
-              overall_status: 'operational',
-              system_health: 'excellent',
+            status: 'operational',
+            metrics: {
               uptime: '99.8%',
               active_incidents: 15,
-              total_incidents: 1247
+              response_time_avg: '45 min',
+              resolution_rate: 0.94,
+              team_readiness: 0.85
             },
-            incident_metrics: {
-              open: 15,
-              investigating: 8,
-              contained: 4,
-              resolved: 1219,
-              false_positives: 9
-            },
-            response_performance: {
-              mean_time_to_detection: '12.5 minutes',
-              mean_time_to_response: '45 minutes',
-              mean_time_to_containment: '2.3 hours',
-              mean_time_to_recovery: '8.7 hours',
-              sla_compliance: 0.94
-            },
-            severity_distribution: {
-              critical: 3,
-              high: 5,
-              medium: 7,
-              low: 0,
-              informational: 0
-            },
-            team_status: {
-              analysts_available: 12,
-              analysts_busy: 8,
-              escalation_queue: 3,
-              on_call_engineers: 4
+            components: {
+              incident_metrics: {
+                open: 15,
+                investigating: 8,
+                contained: 4,
+                resolved: 1219,
+                false_positives: 9
+              },
+              response_performance: {
+                mean_time_to_detection: '12.5 minutes',
+                mean_time_to_response: '45 minutes',
+                mean_time_to_containment: '2.3 hours',
+                mean_time_to_recovery: '8.7 hours',
+                sla_compliance: 0.94
+              },
+              severity_distribution: {
+                critical: 3,
+                high: 5,
+                medium: 7,
+                low: 0,
+                informational: 0
+              },
+              team_status: {
+                analysts_available: 12,
+                analysts_busy: 8,
+                escalation_queue: 3,
+                on_call_engineers: 4
+              }
             }
           },
           source: 'phantom-incident-response-core',
@@ -259,9 +261,171 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { operation, ...params } = body;
 
+    // Debug logging
+    console.log('Incident Response API - Received operation:', operation);
+    console.log('Incident Response API - Full body:', JSON.stringify(body, null, 2));
+
     switch (operation) {
+      case 'analyze-incident':
+        // Mock incident analysis
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysis_id: 'incident-analysis-' + Date.now(),
+            incident_profile: {
+              incident_id: 'INC-2024-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
+              incident_type: params.incidentData?.incident_type || 'security_breach',
+              severity_level: params.incidentData?.severity_level || 'HIGH',
+              response_status: 'analysis_complete'
+            },
+            response_metrics: {
+              time_to_detection: Math.floor(Math.random() * 30) + 5 + ' minutes',
+              time_to_response: Math.floor(Math.random() * 60) + 15 + ' minutes',
+              estimated_resolution: Math.floor(Math.random() * 8) + 2 + ' hours',
+              confidence_score: Math.random() * 0.3 + 0.7
+            },
+            containment_actions: [
+              'Immediate network isolation initiated',
+              'Affected systems quarantined', 
+              'User accounts secured',
+              'Evidence preservation procedures activated'
+            ],
+            recommendations: [
+              'Escalate to senior incident response team',
+              'Initiate legal and compliance notification procedures',
+              'Activate crisis communication plan',
+              'Prepare forensic investigation resources',
+              'Schedule executive briefing within 2 hours'
+            ]
+          },
+          source: 'phantom-incident-response-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'initiate-response':
+        // Mock response initiation
+        return NextResponse.json({
+          success: true,
+          data: {
+            response_id: 'response-' + Date.now(),
+            activation_level: params.responseData?.response_level || 'full_activation',
+            team_assembly_status: 'teams_assembling',
+            estimated_full_activation: '15 minutes',
+            activated_teams: [
+              'Incident Response Team',
+              'Security Operations Center',
+              'IT Operations',
+              'Legal & Compliance',
+              'Communications Team'
+            ],
+            immediate_actions: [
+              'War room established',
+              'Communication channels activated',
+              'Stakeholder notifications initiated',
+              'Resource allocation in progress'
+            ],
+            next_milestones: [
+              { action: 'Team assembly complete', eta: '15 minutes' },
+              { action: 'Initial containment assessment', eta: '30 minutes' },
+              { action: 'Executive briefing', eta: '1 hour' },
+              { action: 'Public relations strategy', eta: '2 hours' }
+            ]
+          },
+          source: 'phantom-incident-response-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'coordinate-team':
+        // Mock team coordination
+        return NextResponse.json({
+          success: true,
+          data: {
+            coordination_id: 'coord-' + Date.now(),
+            coordination_status: 'active',
+            unified_command_established: true,
+            active_teams: params.teamData?.teams || ['technical_response', 'communications', 'legal', 'management'],
+            resource_allocation: {
+              technical_analysts: 8,
+              forensic_specialists: 3,
+              communication_leads: 2,
+              legal_advisors: 1,
+              executive_liaisons: 2
+            },
+            coordination_channels: [
+              'Primary: Incident Response Bridge',
+              'Technical: SOC Secure Channel',
+              'Executive: Leadership Crisis Line',
+              'External: Vendor Support Bridge'
+            ],
+            status_reporting: {
+              frequency: 'Every 30 minutes',
+              next_update: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+              distribution_list: ['C-Suite', 'Legal', 'IT Leadership', 'HR']
+            },
+            current_priorities: [
+              'Contain and assess scope of impact',
+              'Preserve evidence and maintain chain of custody',
+              'Prepare stakeholder communications',
+              'Coordinate with external partners as needed'
+            ]
+          },
+          source: 'phantom-incident-response-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'generate-incident-report':
+        // Mock incident report generation
+        return NextResponse.json({
+          success: true,
+          data: {
+            report_id: 'incident-report-' + Date.now(),
+            report_type: params.reportData?.report_type || 'Post-Incident Analysis Report',
+            generated_at: new Date().toISOString(),
+            incident_summary: {
+              incident_id: 'INC-2024-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
+              duration: Math.floor(Math.random() * 12) + 2 + ' hours',
+              severity: 'HIGH',
+              business_impact: 'MEDIUM',
+              systems_affected: Math.floor(Math.random() * 20) + 5
+            },
+            timeline_analysis: {
+              detection_time: '8 minutes',
+              response_time: '23 minutes', 
+              containment_time: '1.5 hours',
+              resolution_time: '4.2 hours',
+              total_incident_duration: '6.1 hours'
+            },
+            key_findings: [
+              'Initial compromise vector identified as spear-phishing email',
+              'Lateral movement contained within 2 hours of detection',
+              'No evidence of data exfiltration found',
+              'Response procedures followed according to playbook',
+              'Cross-team coordination was effective'
+            ],
+            lessons_learned: [
+              'Enhance email security filtering for targeted attacks',
+              'Improve network segmentation in affected department',
+              'Update user training to include latest phishing techniques',
+              'Consider additional monitoring tools for early detection'
+            ],
+            recommendations: [
+              'Implement advanced email threat protection',
+              'Conduct tabletop exercise within 30 days',
+              'Review and update incident response procedures',
+              'Schedule follow-up security awareness training',
+              'Enhance monitoring for similar attack patterns'
+            ],
+            compliance_notes: params.reportData?.compliance_requirements?.length > 0 
+              ? `Report addresses requirements for: ${params.reportData.compliance_requirements.join(', ')}`
+              : 'Standard incident reporting compliance maintained',
+            download_url: '/api/reports/incident-' + Date.now() + '.pdf'
+          },
+          source: 'phantom-incident-response-core',
+          timestamp: new Date().toISOString()
+        });
+
       case 'create':
-        // Mock incident creation
+        // Mock incident creation (legacy support)
         return NextResponse.json({
           success: true,
           data: {
@@ -279,7 +443,7 @@ export async function POST(request: NextRequest) {
         });
 
       case 'update':
-        // Mock incident update
+        // Mock incident update (legacy support)
         return NextResponse.json({
           success: true,
           data: {
@@ -295,7 +459,7 @@ export async function POST(request: NextRequest) {
         });
 
       case 'escalate':
-        // Mock incident escalation
+        // Mock incident escalation (legacy support)
         return NextResponse.json({
           success: true,
           data: {
@@ -310,7 +474,7 @@ export async function POST(request: NextRequest) {
         });
 
       case 'contain':
-        // Mock containment action
+        // Mock containment action (legacy support)
         return NextResponse.json({
           success: true,
           data: {

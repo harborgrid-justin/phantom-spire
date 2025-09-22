@@ -16,7 +16,20 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'ioc-' + Date.now(),
+            status: 'operational',
+            components: {
+              enrichment_engine: 'operational',
+              correlation_engine: 'operational',
+              ingestion_pipeline: 'operational',
+              validation_service: 'operational'
+            },
+            metrics: {
+              uptime: '99.8%',
+              total_iocs: 2456789,
+              active_iocs: 1247,
+              detection_rate: 0.967,
+              false_positive_rate: 0.023
+            },
             system_overview: {
               overall_status: 'operational',
               system_health: 'excellent',
@@ -304,8 +317,139 @@ export async function POST(request: NextRequest) {
           timestamp: new Date().toISOString()
         });
 
-      case 'enrich':
+      case 'analyze-ioc':
+        // Mock IOC analysis
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysis_id: 'ioc-analysis-' + Date.now(),
+            ioc_profile: {
+              indicator_value: params.iocData?.indicator_value || 'a1b2c3d4e5f6...',
+              indicator_type: params.iocData?.indicator_type || 'hash',
+              threat_level: 'HIGH',
+              confidence_score: 0.94
+            },
+            threat_assessment: {
+              malware_families: ['Emotet', 'TrickBot'],
+              campaign_associations: ['Operation Shadow Dragon', 'APT29 Campaign']
+            },
+            attribution_data: {
+              threat_actor: 'APT29',
+              country: 'Russian Federation'
+            },
+            recommendations: [
+              'Block indicator at perimeter security controls',
+              'Monitor for related indicators in network traffic',
+              'Review historical connections and communications',
+              'Update threat intelligence feeds with new IOC data',
+              'Implement additional network monitoring rules'
+            ]
+          },
+          source: 'phantom-ioc-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'enrich-ioc':
         // Mock IOC enrichment
+        return NextResponse.json({
+          success: true,
+          data: {
+            enrichment_id: 'enrichment-' + Date.now(),
+            enrichment_sources_used: params.enrichmentData?.enrichment_sources || ['VirusTotal', 'ThreatConnect'],
+            enrichment_complete: true,
+            enriched_data: {
+              reputation_score: Math.floor(Math.random() * 100),
+              threat_score: Math.floor(Math.random() * 100),
+              confidence: Math.random() * 0.4 + 0.6,
+              malware_families: ['TrickBot', 'Emotet'],
+              campaigns: ['Operation X', 'APT Campaign Y'],
+              geolocation: {
+                country: 'Unknown',
+                city: 'Unknown',
+                coordinates: null
+              },
+              whois_data: {
+                registrar: 'Example Registrar',
+                creation_date: '2023-01-01T00:00:00Z'
+              }
+            },
+            historical_context: {
+              first_seen: '2024-01-01T00:00:00Z',
+              last_seen: new Date().toISOString(),
+              frequency_score: 0.75
+            }
+          },
+          source: 'phantom-ioc-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'correlate-iocs':
+        // Mock IOC correlation
+        return NextResponse.json({
+          success: true,
+          data: {
+            correlation_id: 'correlation-' + Date.now(),
+            correlation_results: {
+              total_correlations: Math.floor(Math.random() * 50) + 10,
+              high_confidence_matches: Math.floor(Math.random() * 10) + 5,
+              temporal_patterns: ['Increased activity during business hours', 'Weekend anomalies detected'],
+              network_patterns: ['Multiple C2 communications', 'Data exfiltration patterns'],
+              behavioral_patterns: ['Lateral movement indicators', 'Persistence mechanisms']
+            },
+            campaign_analysis: {
+              likely_campaigns: ['Operation Shadow Dragon', 'APT29 Campaign'],
+              campaign_confidence: 0.87,
+              attribution_confidence: 0.72
+            },
+            related_indicators: [
+              { value: 'related-domain.com', type: 'domain', correlation_score: 0.92 },
+              { value: '192.168.1.50', type: 'ip_address', correlation_score: 0.88 },
+              { value: 'f1e2d3c4b5a6', type: 'file_hash', correlation_score: 0.85 }
+            ]
+          },
+          source: 'phantom-ioc-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'generate-ioc-report':
+        // Mock IOC report generation
+        return NextResponse.json({
+          success: true,
+          data: {
+            report_id: 'report-' + Date.now(),
+            report_type: params.reportData?.report_type || 'IOC Intelligence Report',
+            report_period: params.reportData?.time_period || '7_days',
+            report_status: 'generated',
+            report_summary: {
+              total_iocs_analyzed: 1247,
+              high_threat_iocs: 234,
+              new_campaigns_identified: 3,
+              attribution_updates: 12
+            },
+            key_findings: [
+              'Significant increase in Emotet-related IOCs over the past week',
+              'New campaign identified targeting financial institutions',
+              'APT29 infrastructure changes detected',
+              'Correlation patterns suggest coordinated threat activity'
+            ],
+            trending_threats: [
+              { threat: 'Emotet Botnet', trend: 'increasing', confidence: 0.94 },
+              { threat: 'APT29 Campaign', trend: 'stable', confidence: 0.89 },
+              { threat: 'Phishing Infrastructure', trend: 'decreasing', confidence: 0.76 }
+            ],
+            mitigation_strategies: [
+              'Implement additional email security controls',
+              'Update endpoint detection rules',
+              'Enhance network monitoring for identified IOC patterns',
+              'Coordinate with threat intelligence sharing partners'
+            ]
+          },
+          source: 'phantom-ioc-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'enrich':
+        // Legacy IOC enrichment endpoint
         const indicator = params.indicator || 'unknown';
         return NextResponse.json({
           success: true,

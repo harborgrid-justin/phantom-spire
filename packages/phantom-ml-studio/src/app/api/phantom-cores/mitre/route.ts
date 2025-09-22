@@ -16,38 +16,40 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'mitre-' + Date.now(),
-            system_overview: {
-              overall_status: 'operational',
-              system_health: 'excellent',
+            status: 'operational',
+            metrics: {
               uptime: '99.9%',
-              framework_version: 'v14.1',
-              last_update: '2024-01-10T00:00:00Z'
+              techniques_mapped: 193,
+              coverage_percentage: 0.807,
+              detection_rules: 1247,
+              framework_version: 'v14.1'
             },
-            framework_coverage: {
-              tactics: 14,
-              techniques: 193,
-              sub_techniques: 401,
-              procedures: 2847,
-              mitigations: 42,
-              groups: 142
-            },
-            detection_coverage: {
-              techniques_covered: 156,
-              coverage_percentage: 80.7,
-              high_priority_gaps: 12,
-              detection_rules: 1247
-            },
-            mapping_statistics: {
-              alerts_mapped: 5623,
-              incidents_analyzed: 234,
-              campaigns_profiled: 45,
-              threat_actors_tracked: 89
-            },
-            intelligence_integration: {
-              active_campaigns: 23,
-              recent_mappings: 156,
-              threat_landscape_updates: 34
+            components: {
+              framework_coverage: {
+                tactics: 14,
+                techniques: 193,
+                sub_techniques: 401,
+                procedures: 2847,
+                mitigations: 42,
+                groups: 142
+              },
+              detection_coverage: {
+                techniques_covered: 156,
+                coverage_percentage: 80.7,
+                high_priority_gaps: 12,
+                detection_rules: 1247
+              },
+              mapping_statistics: {
+                alerts_mapped: 5623,
+                incidents_analyzed: 234,
+                campaigns_profiled: 45,
+                threat_actors_tracked: 89
+              },
+              intelligence_integration: {
+                active_campaigns: 23,
+                recent_mappings: 156,
+                threat_landscape_updates: 34
+              }
             }
           },
           source: 'phantom-mitre-core',
@@ -297,9 +299,147 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { operation, ...params } = body;
 
+    // Debug logging
+    console.log('MITRE API - Received operation:', operation);
+    console.log('MITRE API - Full body:', JSON.stringify(body, null, 2));
+
     switch (operation) {
+      case 'analyze-ttp':
+        // Mock TTP analysis
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysis_id: 'mitre-analysis-' + Date.now(),
+            ttp_profile: {
+              technique_id: params.ttpData?.technique_id || 'T1566.001',
+              technique_name: 'Spearphishing Attachment',
+              tactic: params.ttpData?.tactic || 'Initial Access',
+              coverage_score: Math.random() * 0.4 + 0.6 // 0.6 to 1.0
+            },
+            mapping_results: {
+              threat_score: Math.floor(Math.random() * 50) + 50,
+              prevalence: Math.random() > 0.5 ? 'HIGH' : 'MEDIUM',
+              detection_difficulty: Math.random() > 0.6 ? 'MEDIUM' : 'LOW',
+              business_impact: Math.random() > 0.7 ? 'HIGH' : 'MEDIUM'
+            },
+            detection_coverage: {
+              rules_count: Math.floor(Math.random() * 20) + 5,
+              coverage_percentage: Math.random() * 0.4 + 0.6,
+              gaps: ['Network monitoring', 'Endpoint detection']
+            },
+            recommendations: [
+              'Implement specific detection rules for ' + (params.ttpData?.technique_id || 'T1566.001'),
+              'Enhance monitoring for ' + (params.ttpData?.tactic || 'Initial Access') + ' tactics',
+              'Update security controls based on threat landscape',
+              'Conduct tabletop exercises for this technique'
+            ]
+          },
+          source: 'phantom-mitre-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'map-techniques':
+        // Mock technique mapping
+        return NextResponse.json({
+          success: true,
+          data: {
+            mapping_id: 'mapping-' + Date.now(),
+            techniques_mapped: Math.floor(Math.random() * 50) + 20,
+            coverage_analysis: {
+              total_techniques: 193,
+              covered_techniques: Math.floor(Math.random() * 50) + 120,
+              coverage_percentage: Math.random() * 0.3 + 0.7
+            },
+            gap_analysis: [
+              { technique: 'T1071.001', name: 'Web Protocols', priority: 'HIGH' },
+              { technique: 'T1055', name: 'Process Injection', priority: 'HIGH' },
+              { technique: 'T1027', name: 'Obfuscated Files', priority: 'MEDIUM' }
+            ],
+            recommendations: [
+              'Focus on high-priority gaps in detection coverage',
+              'Implement behavioral analytics for process injection',
+              'Enhance network monitoring capabilities',
+              'Review and update detection rules quarterly'
+            ]
+          },
+          source: 'phantom-mitre-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'assess-coverage':
+        // Mock coverage assessment
+        return NextResponse.json({
+          success: true,
+          data: {
+            assessment_id: 'assessment-' + Date.now(),
+            overall_coverage: Math.random() * 0.3 + 0.7, // 70-100%
+            coverage_by_tactic: {
+              'Initial Access': Math.random() * 0.2 + 0.8,
+              'Execution': Math.random() * 0.2 + 0.8,
+              'Persistence': Math.random() * 0.3 + 0.7,
+              'Privilege Escalation': Math.random() * 0.3 + 0.7,
+              'Defense Evasion': Math.random() * 0.4 + 0.6,
+              'Credential Access': Math.random() * 0.2 + 0.8,
+              'Discovery': Math.random() * 0.2 + 0.8,
+              'Lateral Movement': Math.random() * 0.3 + 0.7,
+              'Collection': Math.random() * 0.2 + 0.8,
+              'Command and Control': Math.random() * 0.4 + 0.6,
+              'Exfiltration': Math.random() * 0.3 + 0.7,
+              'Impact': Math.random() * 0.3 + 0.7
+            },
+            critical_gaps: [
+              'T1071.001 - Web Protocols',
+              'T1055 - Process Injection',
+              'T1027 - Obfuscated Files or Information'
+            ],
+            recommendations: [
+              'Prioritize detection rules for critical gaps',
+              'Implement network-based detection for C2 communications',
+              'Enhance behavioral analysis capabilities',
+              'Schedule regular coverage assessment reviews'
+            ]
+          },
+          source: 'phantom-mitre-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'generate-mitre-report':
+        // Mock MITRE report generation
+        return NextResponse.json({
+          success: true,
+          data: {
+            report_id: 'mitre-report-' + Date.now(),
+            report_type: params.reportData?.report_type || 'MITRE ATT&CK Coverage Report',
+            generated_at: new Date().toISOString(),
+            summary: {
+              total_techniques_analyzed: 193,
+              coverage_percentage: Math.random() * 0.3 + 0.7,
+              critical_gaps: Math.floor(Math.random() * 10) + 5,
+              recommendations_count: Math.floor(Math.random() * 15) + 10
+            },
+            sections: [
+              'Executive Summary',
+              'Coverage Analysis',
+              'Gap Assessment', 
+              'Threat Landscape Overview',
+              'Recommendations',
+              'Implementation Roadmap'
+            ],
+            download_url: '/api/reports/mitre-coverage-' + Date.now() + '.pdf',
+            recommendations: [
+              'Implement high-priority detection rules identified in gap analysis',
+              'Enhance monitoring for under-covered tactics',
+              'Conduct regular threat hunting exercises',
+              'Update incident response playbooks based on MITRE framework',
+              'Schedule quarterly coverage assessments'
+            ]
+          },
+          source: 'phantom-mitre-core',
+          timestamp: new Date().toISOString()
+        });
+
       case 'map_incident':
-        // Mock incident to MITRE mapping
+        // Mock incident to MITRE mapping (legacy support)
         return NextResponse.json({
           success: true,
           data: {
@@ -319,29 +459,6 @@ export async function POST(request: NextRequest) {
               likely_groups: ['FIN7', 'Carbanak'],
               campaign_type: 'Financial'
             }
-          },
-          source: 'phantom-mitre-core',
-          timestamp: new Date().toISOString()
-        });
-
-      case 'analyze_ttp':
-        // Mock TTP analysis
-        const technique = params.technique || 'T1566.001';
-        return NextResponse.json({
-          success: true,
-          data: {
-            technique,
-            analysis: {
-              threat_score: Math.floor(Math.random() * 50) + 50,
-              prevalence: Math.random() > 0.5 ? 'HIGH' : 'MEDIUM',
-              detection_difficulty: Math.random() > 0.6 ? 'MEDIUM' : 'LOW',
-              business_impact: Math.random() > 0.7 ? 'HIGH' : 'MEDIUM'
-            },
-            recommendations: [
-              'Implement specific detection rules',
-              'Update security controls',
-              'Enhance monitoring capabilities'
-            ]
           },
           source: 'phantom-mitre-core',
           timestamp: new Date().toISOString()

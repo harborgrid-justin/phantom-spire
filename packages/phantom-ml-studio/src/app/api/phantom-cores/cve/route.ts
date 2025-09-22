@@ -16,7 +16,20 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'cve-' + Date.now(),
+            status: 'operational',
+            components: {
+              vulnerability_scanner: 'operational',
+              cve_database: 'operational',
+              analysis_engine: 'operational',
+              patch_tracker: 'operational'
+            },
+            metrics: {
+              uptime: '99.7%',
+              total_cves: 245789,
+              critical_cves: 12456,
+              patched_vulnerabilities: 156789,
+              coverage_percentage: 0.87
+            },
             system_overview: {
               overall_status: 'operational',
               system_health: 'excellent',
@@ -252,13 +265,134 @@ export async function POST(request: NextRequest) {
           timestamp: new Date().toISOString()
         });
 
-      case 'analyze':
+      case 'analyze-cve':
         // Mock CVE analysis
-        const cveId = params.cve_id || 'CVE-2024-UNKNOWN';
+        const cveId = params.analysisData?.cve_id || 'CVE-2024-21887';
         return NextResponse.json({
           success: true,
           data: {
-            cve_id: cveId,
+            analysis_id: 'cve-analysis-' + Date.now(),
+            vulnerability_profile: {
+              cve_id: cveId,
+              severity_score: Math.random() * 3 + 7, // 7-10 range
+              impact_level: 'HIGH',
+              exploitability: 'NETWORK_ACCESSIBLE'
+            },
+            assessment_results: {
+              risk_assessment: 'CRITICAL',
+              patch_availability: true,
+              exploit_maturity: 'PROOF_OF_CONCEPT'
+            },
+            remediation_plan: {
+              immediate_actions: ['Apply security patches', 'Monitor network traffic'],
+              timeline: '24-48 hours'
+            },
+            recommendations: [
+              'Apply available security patches immediately',
+              'Implement network monitoring for exploitation attempts',
+              'Review affected systems for compromise indicators',
+              'Update vulnerability management procedures',
+              'Coordinate with security operations center'
+            ]
+          },
+          source: 'phantom-cve-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'track-vulnerability':
+        // Mock vulnerability tracking
+        return NextResponse.json({
+          success: true,
+          data: {
+            tracking_id: 'vuln-track-' + Date.now(),
+            tracking_status: 'active',
+            vulnerabilities_tracked: Math.floor(Math.random() * 500) + 100,
+            new_vulnerabilities_found: Math.floor(Math.random() * 50) + 10,
+            tracking_summary: {
+              critical: Math.floor(Math.random() * 20) + 5,
+              high: Math.floor(Math.random() * 50) + 15,
+              medium: Math.floor(Math.random() * 100) + 30,
+              low: Math.floor(Math.random() * 200) + 50
+            },
+            affected_assets: {
+              total_scanned: Math.floor(Math.random() * 5000) + 1000,
+              vulnerable_assets: Math.floor(Math.random() * 1000) + 200,
+              critical_assets_affected: Math.floor(Math.random() * 100) + 20
+            }
+          },
+          source: 'phantom-cve-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'update-database':
+        // Mock database update
+        return NextResponse.json({
+          success: true,
+          data: {
+            update_id: 'db-update-' + Date.now(),
+            update_status: 'completed',
+            records_updated: Math.floor(Math.random() * 1000) + 500,
+            new_cves_added: Math.floor(Math.random() * 100) + 25,
+            modified_entries: Math.floor(Math.random() * 200) + 50,
+            update_summary: {
+              total_cves: 245789 + Math.floor(Math.random() * 100),
+              sources_synchronized: ['NIST NVD', 'MITRE CVE', 'CISA KEV'],
+              last_sync_time: new Date().toISOString(),
+              sync_success_rate: 0.99 + Math.random() * 0.01
+            },
+            validation_results: {
+              entries_validated: Math.floor(Math.random() * 1000) + 500,
+              validation_errors: Math.floor(Math.random() * 5),
+              duplicate_entries_removed: Math.floor(Math.random() * 10) + 2
+            }
+          },
+          source: 'phantom-cve-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'generate-report':
+        // Mock vulnerability report generation
+        return NextResponse.json({
+          success: true,
+          data: {
+            report_id: 'vuln-report-' + Date.now(),
+            report_type: params.reportData?.report_type || 'Enterprise Vulnerability Assessment',
+            report_period: params.reportData?.time_period || '30_days',
+            report_status: 'generated',
+            vulnerability_overview: {
+              total_vulnerabilities: Math.floor(Math.random() * 5000) + 2000,
+              critical_vulnerabilities: Math.floor(Math.random() * 200) + 50,
+              high_vulnerabilities: Math.floor(Math.random() * 800) + 300,
+              newly_discovered: Math.floor(Math.random() * 150) + 75
+            },
+            trend_analysis: {
+              vulnerability_trend: 'increasing',
+              monthly_growth_rate: (Math.random() * 10 + 5).toFixed(1) + '%',
+              most_affected_categories: ['Web Applications', 'Operating Systems', 'Network Services']
+            },
+            remediation_progress: {
+              patches_applied: Math.floor(Math.random() * 1000) + 500,
+              pending_patches: Math.floor(Math.random() * 500) + 100,
+              patch_success_rate: (Math.random() * 10 + 85).toFixed(1) + '%'
+            },
+            recommendations: [
+              'Accelerate patch deployment for critical vulnerabilities',
+              'Enhance vulnerability scanning frequency',
+              'Implement automated patch management',
+              'Improve asset discovery and inventory management'
+            ]
+          },
+          source: 'phantom-cve-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'analyze':
+        // Legacy CVE analysis endpoint
+        const legacyCveId = params.cve_id || 'CVE-2024-UNKNOWN';
+        return NextResponse.json({
+          success: true,
+          data: {
+            cve_id: legacyCveId,
             analysis_complete: true,
             risk_score: Math.floor(Math.random() * 100),
             exploitation_likelihood: Math.random() > 0.6 ? 'HIGH' : 'MEDIUM',

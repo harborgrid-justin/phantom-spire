@@ -149,6 +149,13 @@ const CryptoOverview: React.FC<{ status: CryptoStatus | undefined }> = ({ status
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">Crypto metrics are currently being initialized...</Alert>
+    );
+  }
+
   const getStrengthColor = (strength: number) => {
     if (strength >= 0.9) return 'success';
     if (strength >= 0.7) return 'warning';
@@ -156,8 +163,8 @@ const CryptoOverview: React.FC<{ status: CryptoStatus | undefined }> = ({ status
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
@@ -171,22 +178,22 @@ const CryptoOverview: React.FC<{ status: CryptoStatus | undefined }> = ({ status
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Detection Rate</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.cipher_detection_rate * 100}
+                value={(metrics.cipher_detection_rate || 0) * 100}
                 size={60}
                 color="primary"
               />
               <Box ml={2}>
                 <Typography variant="h4" color="primary">
-                  {(metrics.cipher_detection_rate * 100).toFixed(1)}%
+                  {((metrics.cipher_detection_rate || 0) * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Cipher Detection
@@ -195,36 +202,36 @@ const CryptoOverview: React.FC<{ status: CryptoStatus | undefined }> = ({ status
             </Box>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Analyzed Samples</Typography>
             <Typography variant="h3" color="secondary">
-              {metrics.analyzed_samples.toLocaleString()}
+              {(metrics.analyzed_samples || 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Cryptographic samples
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Encryption Strength</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.encryption_strength * 100}
+                value={(metrics.encryption_strength || 0) * 100}
                 size={60}
-                color={getStrengthColor(metrics.encryption_strength)}
+                color={getStrengthColor(metrics.encryption_strength || 0)}
               />
               <Box ml={2}>
-                <Typography variant="h4" color={getStrengthColor(metrics.encryption_strength)}>
-                  {(metrics.encryption_strength * 100).toFixed(0)}%
+                <Typography variant="h4" color={getStrengthColor(metrics.encryption_strength || 0)}>
+                  {((metrics.encryption_strength || 0) * 100).toFixed(0)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Avg Strength
@@ -233,8 +240,8 @@ const CryptoOverview: React.FC<{ status: CryptoStatus | undefined }> = ({ status
             </Box>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -321,8 +328,8 @@ const CryptographicAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Cipher Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -334,8 +341,8 @@ const CryptographicAnalysisPanel: React.FC = () => {
                   <Typography variant="body2" mb={1}>
                     <strong>Encryption Strength:</strong> {analysis.cipher_profile.encryption_strength}
                   </Typography>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Typography variant="body2" mr={1}>
+                  <Box display="flex" alignItems="center" mb={1} gap={1}>
+                    <Typography variant="body2" component="span">
                       <strong>Confidence Score:</strong>
                     </Typography>
                     <Chip
@@ -349,9 +356,9 @@ const CryptographicAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Security Assessment</Typography>
                   <List dense>
@@ -393,8 +400,8 @@ const CryptographicAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Key Recommendations</Typography>
@@ -491,9 +498,9 @@ const CryptoOperationsPanel: React.FC = () => {
       <CardContent>
         <Typography variant="h6" gutterBottom>Cryptographic Operations</Typography>
 
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -515,9 +522,9 @@ const CryptoOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {loading && (
           <Box mt={2}>
@@ -588,19 +595,11 @@ const CryptoManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <CryptoOverview status={cryptoStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <CryptographicAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <CryptoOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <CryptoOverview status={cryptoStatus} />
+        <CryptographicAnalysisPanel />
+        <CryptoOperationsPanel />
+      </Box>
     </Box>
   );
 };

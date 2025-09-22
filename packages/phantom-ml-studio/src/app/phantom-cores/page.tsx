@@ -50,7 +50,7 @@ import {
   Assessment as RiskIcon,
   Gavel as ComplianceIconAlt,
   Security as CryptoIcon,
-  Rss as FeedsIcon,
+  Feed as FeedsIcon,
   Shield as VulnIcon,
   Emergency as IncidentIcon,
   Psychology as IntelIcon,
@@ -146,6 +146,10 @@ const SystemStatusOverview: React.FC<{ status: SystemStatus | undefined }> = ({ 
 
   const { overall_health, health_checks, integration_mode, enabled_modules } = status.data;
 
+  // Add null checking for health_checks and enabled_modules
+  const safeHealthChecks = health_checks || {};
+  const safeEnabledModules = enabled_modules || [];
+
   return (
     <Card>
       <CardContent>
@@ -158,39 +162,57 @@ const SystemStatusOverview: React.FC<{ status: SystemStatus | undefined }> = ({ 
           />
         </Box>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
+          <Box flex="1 1 350px" minWidth="350px">
             <Typography variant="subtitle2" gutterBottom>Module Health</Typography>
             <List dense>
-              {Object.entries(health_checks).map(([module, healthy]) => (
-                <ListItem key={module}>
+              {Object.entries(safeHealthChecks).length > 0 ? (
+                Object.entries(safeHealthChecks).map(([module, healthy]) => (
+                  <ListItem key={module}>
+                    <ListItemIcon>
+                      {healthy ? <CheckCircleIcon color="success" /> : <ErrorIcon color="error" />}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={module.toUpperCase()}
+                      secondary={healthy ? 'Operational' : 'Issues detected'}
+                    />
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
                   <ListItemIcon>
-                    {healthy ? <CheckCircleIcon color="success" /> : <ErrorIcon color="error" />}
+                    <WarningIcon color="warning" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={module.toUpperCase()}
-                    secondary={healthy ? 'Operational' : 'Issues detected'}
+                    primary="No health check data available"
+                    secondary="System may be initializing"
                   />
                 </ListItem>
-              ))}
+              )}
             </List>
-          </Grid>
+          </Box>
 
-          <Grid item xs={12} md={6}>
+          <Box flex="1 1 350px" minWidth="350px">
             <Typography variant="subtitle2" gutterBottom>Configuration</Typography>
             <Typography variant="body2" color="textSecondary">
-              Integration Mode: <strong>{integration_mode}</strong>
+              Integration Mode: <strong>{integration_mode || 'Not configured'}</strong>
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Enabled Modules: <strong>{enabled_modules.length}</strong>
+              Enabled Modules: <strong>{safeEnabledModules.length}</strong>
             </Typography>
             <Box mt={1}>
-              {enabled_modules.map((module) => (
-                <Chip key={module} label={module} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
-              ))}
+              {safeEnabledModules.length > 0 ? (
+                safeEnabledModules.map((module) => (
+                  <Chip key={module} label={module} size="small" sx={{ mr: 0.5, mb: 0.5 }} />
+                ))
+              ) : (
+                <Typography variant="body2" color="textSecondary">
+                  No modules configured
+                </Typography>
+              )}
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -203,9 +225,9 @@ const ModuleStatusCards: React.FC<{ status: SystemStatus | undefined }> = ({ sta
   const { ml, xdr, compliance } = status.data.module_status;
 
   return (
-    <Grid container spacing={2}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
       {/* ML Core Status */}
-      <Grid item xs={12} md={4}>
+      <Box flex="1 1 300px" minWidth="300px">
         <Card>
           <CardContent>
             <Box display="flex" alignItems="center" mb={2}>
@@ -223,10 +245,10 @@ const ModuleStatusCards: React.FC<{ status: SystemStatus | undefined }> = ({ sta
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
       {/* XDR Core Status */}
-      <Grid item xs={12} md={4}>
+      <Box flex="1 1 300px" minWidth="300px">
         <Card>
           <CardContent>
             <Box display="flex" alignItems="center" mb={2}>
@@ -244,10 +266,10 @@ const ModuleStatusCards: React.FC<{ status: SystemStatus | undefined }> = ({ sta
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
       {/* Compliance Core Status */}
-      <Grid item xs={12} md={4}>
+      <Box flex="1 1 300px" minWidth="300px">
         <Card>
           <CardContent>
             <Box display="flex" alignItems="center" mb={2}>
@@ -265,8 +287,8 @@ const ModuleStatusCards: React.FC<{ status: SystemStatus | undefined }> = ({ sta
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -306,8 +328,8 @@ const CrossModuleAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2}>
+              <Box flex="1 1 350px" minWidth="350px">
                 <Typography variant="subtitle2" gutterBottom>Key Insights</Typography>
                 <List dense>
                   {analysis.insights.map((insight, index) => (
@@ -319,9 +341,9 @@ const CrossModuleAnalysisPanel: React.FC = () => {
                     </ListItem>
                   ))}
                 </List>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 350px" minWidth="350px">
                 <Typography variant="subtitle2" gutterBottom>Recommendations</Typography>
                 <List dense>
                   {analysis.recommendations.map((recommendation, index) => (
@@ -333,8 +355,8 @@ const CrossModuleAnalysisPanel: React.FC = () => {
                     </ListItem>
                   ))}
                 </List>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Divider sx={{ my: 2 }} />
 
@@ -504,9 +526,9 @@ const PhantomModulesGrid: React.FC = () => {
           Click on any module to access its dedicated management interface
         </Typography>
         
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {modules.map((module) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={module.path}>
+            <Box key={module.path} flex="1 1 280px" minWidth="280px" maxWidth="300px">
               <Link href={`/phantom-cores/${module.path}`} style={{ textDecoration: 'none' }}>
                 <Card 
                   sx={{ 
@@ -548,9 +570,9 @@ const PhantomModulesGrid: React.FC = () => {
                   </CardContent>
                 </Card>
               </Link>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -659,18 +681,10 @@ const PhantomCoresDashboard: React.FC = () => {
 
       {/* Tab Panels */}
       {tabValue === 0 && (
-        <Box>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <SystemStatusOverview status={systemStatus} />
-            </Grid>
-            <Grid item xs={12}>
-              <ModuleStatusCards status={systemStatus} />
-            </Grid>
-            <Grid item xs={12}>
-              <PhantomModulesGrid />
-            </Grid>
-          </Grid>
+        <Box display="flex" flexDirection="column" gap={3}>
+          <SystemStatusOverview status={systemStatus} />
+          <ModuleStatusCards status={systemStatus} />
+          <PhantomModulesGrid />
         </Box>
       )}
 

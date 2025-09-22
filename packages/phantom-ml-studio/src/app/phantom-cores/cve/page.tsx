@@ -150,6 +150,13 @@ const CVEOverview: React.FC<{ status: CVEStatus | undefined }> = ({ status }) =>
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">CVE metrics are currently being initialized...</Alert>
+    );
+  }
+
   const getCoverageColor = (percentage: number) => {
     if (percentage >= 0.9) return 'success';
     if (percentage >= 0.7) return 'warning';
@@ -157,8 +164,8 @@ const CVEOverview: React.FC<{ status: CVEStatus | undefined }> = ({ status }) =>
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
@@ -172,50 +179,50 @@ const CVEOverview: React.FC<{ status: CVEStatus | undefined }> = ({ status }) =>
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Total CVEs</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.total_cves.toLocaleString()}
+              {(metrics.total_cves || 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Tracked vulnerabilities
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Critical CVEs</Typography>
             <Typography variant="h3" color="error">
-              {metrics.critical_cves}
+              {metrics.critical_cves || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               High severity issues
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Coverage</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.coverage_percentage * 100}
+                value={(metrics.coverage_percentage || 0) * 100}
                 size={60}
-                color={getCoverageColor(metrics.coverage_percentage)}
+                color={getCoverageColor(metrics.coverage_percentage || 0)}
               />
               <Box ml={2}>
-                <Typography variant="h4" color={getCoverageColor(metrics.coverage_percentage)}>
-                  {(metrics.coverage_percentage * 100).toFixed(1)}%
+                <Typography variant="h4" color={getCoverageColor(metrics.coverage_percentage || 0)}>
+                  {((metrics.coverage_percentage || 0) * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Database Coverage
@@ -224,8 +231,8 @@ const CVEOverview: React.FC<{ status: CVEStatus | undefined }> = ({ status }) =>
             </Box>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -299,8 +306,8 @@ const CVEAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Vulnerability Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -312,8 +319,8 @@ const CVEAnalysisPanel: React.FC = () => {
                   <Typography variant="body2" mb={1}>
                     <strong>Exploitability:</strong> {analysis.vulnerability_profile.exploitability}
                   </Typography>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Typography variant="body2" mr={1}>
+                  <Box display="flex" alignItems="center" mb={1} gap={1}>
+                    <Typography variant="body2" component="span">
                       <strong>CVSS Score:</strong>
                     </Typography>
                     <Chip
@@ -327,9 +334,9 @@ const CVEAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Risk Assessment</Typography>
                   <List dense>
@@ -371,8 +378,8 @@ const CVEAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Remediation Recommendations</Typography>
@@ -472,9 +479,9 @@ const CVEOperationsPanel: React.FC = () => {
       <CardContent>
         <Typography variant="h6" gutterBottom>CVE Operations</Typography>
 
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -496,9 +503,9 @@ const CVEOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {loading && (
           <Box mt={2}>
@@ -569,19 +576,11 @@ const CVEManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <CVEOverview status={cveStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <CVEAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <CVEOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <CVEOverview status={cveStatus} />
+        <CVEAnalysisPanel />
+        <CVEOperationsPanel />
+      </Box>
     </Box>
   );
 };
