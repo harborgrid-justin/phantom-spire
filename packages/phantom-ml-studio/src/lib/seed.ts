@@ -5,6 +5,7 @@
 import 'server-only';
 import { query, transaction } from './database';
 import { initializeSchema } from './schema';
+import { mitreService } from './services/mitreService';
 
 // Import mock data
 import {
@@ -87,6 +88,16 @@ export async function seedDatabase(): Promise<void> {
       await seedApiKeys(client);
     });
 
+    // Seed MITRE ATT&CK data (done outside transaction due to size)
+    console.log('🎯 Seeding MITRE ATT&CK framework data...');
+    try {
+      const mitreResult = await mitreService.syncMitreData();
+      console.log(`✅ MITRE data seeded successfully: ${mitreResult.tactics} tactics, ${mitreResult.techniques} techniques, ${mitreResult.groups} groups, ${mitreResult.software} software, ${mitreResult.mitigations} mitigations, ${mitreResult.dataSources} data sources`);
+    } catch (mitreError) {
+      console.warn('⚠️ MITRE data seeding failed, continuing with other data:', mitreError);
+      // Don't throw - allow the rest of the seeding to complete
+    }
+
     console.log('✅ Database seeding completed successfully');
   } catch (error) {
     console.error('❌ Database seeding failed:', error);
@@ -113,7 +124,15 @@ async function clearAllData(client: any): Promise<void> {
     'experiments',
     'models',
     'settings',
-    'api_keys'
+    'api_keys',
+    // MITRE tables (in dependency order)
+    'mitre_relationships',
+    'mitre_data_sources',
+    'mitre_mitigations',
+    'mitre_software',
+    'mitre_groups',
+    'mitre_techniques',
+    'mitre_tactics'
   ];
 
   for (const table of tables) {

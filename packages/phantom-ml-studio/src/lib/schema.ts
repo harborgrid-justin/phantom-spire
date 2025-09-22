@@ -184,6 +184,157 @@ const CREATE_TABLES_SQL = `
     updated_at TIMESTAMP DEFAULT NOW()
   );
 
+  -- MITRE ATT&CK Framework Tables
+  -- Tactics table
+  CREATE TABLE IF NOT EXISTS mitre_tactics (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "TA0001"
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    short_name VARCHAR(100),
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    platforms TEXT[], -- PostgreSQL array type
+    kill_chain_phases JSONB DEFAULT '[]',
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- Techniques table
+  CREATE TABLE IF NOT EXISTS mitre_techniques (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "T1566", "T1566.001"
+    name VARCHAR(500) NOT NULL,
+    description TEXT,
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    parent_technique VARCHAR(20), -- For sub-techniques
+    is_sub_technique BOOLEAN DEFAULT FALSE,
+    tactics TEXT[], -- Array of tactic IDs
+    platforms TEXT[], -- Array of platforms
+    data_sources TEXT[], -- Array of data sources
+    defenses TEXT[],
+    permissions TEXT[],
+    system_requirements TEXT[],
+    network_requirements TEXT[],
+    remote_support BOOLEAN DEFAULT FALSE,
+    detection TEXT,
+    kill_chain_phases JSONB DEFAULT '[]',
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- Groups (Threat Actors/APTs) table
+  CREATE TABLE IF NOT EXISTS mitre_groups (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "G0001"
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    aliases TEXT[], -- Array of known aliases
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    associated_groups TEXT[],
+    techniques_used TEXT[], -- Array of technique IDs
+    software_used TEXT[], -- Array of software IDs
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- Software (Malware/Tools) table
+  CREATE TABLE IF NOT EXISTS mitre_software (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "S0001"
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    type VARCHAR(50), -- 'malware' or 'tool'
+    labels TEXT[],
+    aliases TEXT[],
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    platforms TEXT[],
+    techniques_used TEXT[], -- Array of technique IDs
+    groups_using TEXT[], -- Array of group IDs
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- Mitigations table
+  CREATE TABLE IF NOT EXISTS mitre_mitigations (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "M1001"
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    techniques_addressed TEXT[], -- Array of technique IDs
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- Data Sources table
+  CREATE TABLE IF NOT EXISTS mitre_data_sources (
+    id SERIAL PRIMARY KEY,
+    mitre_id VARCHAR(20) NOT NULL UNIQUE, -- e.g., "DS0001"
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    url VARCHAR(500),
+    version VARCHAR(50),
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    data_components TEXT[],
+    techniques_detected TEXT[], -- Array of technique IDs
+    platforms TEXT[],
+    collection_layers TEXT[],
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- MITRE Relationships table (for complex relationships between entities)
+  CREATE TABLE IF NOT EXISTS mitre_relationships (
+    id SERIAL PRIMARY KEY,
+    relationship_type VARCHAR(100) NOT NULL, -- 'uses', 'mitigates', 'detects', etc.
+    source_type VARCHAR(50) NOT NULL, -- 'technique', 'group', 'software', etc.
+    source_id VARCHAR(20) NOT NULL, -- MITRE ID of source
+    target_type VARCHAR(50) NOT NULL,
+    target_id VARCHAR(20) NOT NULL, -- MITRE ID of target
+    description TEXT,
+    stix_id VARCHAR(100),
+    created_date TIMESTAMP,
+    modified_date TIMESTAMP,
+    external_references JSONB DEFAULT '[]',
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
   -- Create indexes for better performance
   CREATE INDEX IF NOT EXISTS idx_datasets_type ON datasets(type);
   CREATE INDEX IF NOT EXISTS idx_deployments_status ON deployments(status);
@@ -195,6 +346,28 @@ const CREATE_TABLES_SQL = `
   CREATE INDEX IF NOT EXISTS idx_sample_data_dataset_id ON sample_data(dataset_id);
   CREATE INDEX IF NOT EXISTS idx_metrics_data_deployment_id ON metrics_data(deployment_id);
   CREATE INDEX IF NOT EXISTS idx_training_history_experiment_id ON training_history(experiment_id);
+  
+  -- MITRE indexes for performance
+  CREATE INDEX IF NOT EXISTS idx_mitre_tactics_mitre_id ON mitre_tactics(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_tactics_name ON mitre_tactics(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_mitre_id ON mitre_techniques(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_name ON mitre_techniques(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_parent ON mitre_techniques(parent_technique);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_is_sub ON mitre_techniques(is_sub_technique);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_tactics ON mitre_techniques USING GIN(tactics);
+  CREATE INDEX IF NOT EXISTS idx_mitre_techniques_platforms ON mitre_techniques USING GIN(platforms);
+  CREATE INDEX IF NOT EXISTS idx_mitre_groups_mitre_id ON mitre_groups(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_groups_name ON mitre_groups(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_software_mitre_id ON mitre_software(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_software_name ON mitre_software(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_software_type ON mitre_software(type);
+  CREATE INDEX IF NOT EXISTS idx_mitre_mitigations_mitre_id ON mitre_mitigations(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_mitigations_name ON mitre_mitigations(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_data_sources_mitre_id ON mitre_data_sources(mitre_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_data_sources_name ON mitre_data_sources(name);
+  CREATE INDEX IF NOT EXISTS idx_mitre_relationships_type ON mitre_relationships(relationship_type);
+  CREATE INDEX IF NOT EXISTS idx_mitre_relationships_source ON mitre_relationships(source_type, source_id);
+  CREATE INDEX IF NOT EXISTS idx_mitre_relationships_target ON mitre_relationships(target_type, target_id);
 `;
 
 /**
@@ -244,6 +417,13 @@ export async function dropAllTables(): Promise<void> {
       DROP TABLE IF EXISTS models CASCADE;
       DROP TABLE IF EXISTS settings CASCADE;
       DROP TABLE IF EXISTS api_keys CASCADE;
+      DROP TABLE IF EXISTS mitre_relationships CASCADE;
+      DROP TABLE IF EXISTS mitre_data_sources CASCADE;
+      DROP TABLE IF EXISTS mitre_mitigations CASCADE;
+      DROP TABLE IF EXISTS mitre_software CASCADE;
+      DROP TABLE IF EXISTS mitre_groups CASCADE;
+      DROP TABLE IF EXISTS mitre_techniques CASCADE;
+      DROP TABLE IF EXISTS mitre_tactics CASCADE;
     `;
 
     await query(dropSQL);
@@ -263,10 +443,10 @@ export async function tablesExist(): Promise<boolean> {
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
-      AND table_name IN ('datasets', 'deployments', 'experiments', 'models')
+      AND table_name IN ('datasets', 'deployments', 'experiments', 'models', 'mitre_tactics', 'mitre_techniques')
     `);
     
-    return result.rows.length >= 4;
+    return result.rows.length >= 6;
   } catch (error) {
     console.error('❌ Failed to check table existence:', error);
     return false;
