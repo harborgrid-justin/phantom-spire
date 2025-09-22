@@ -16,7 +16,12 @@ import {
 import { 
   handleVulnerabilityTracking,
   handleDatabaseUpdate,
-  handleReportGeneration
+  handleReportGeneration,
+  handleRealTimeCorrelation,
+  handleStreamAnalysis,
+  handleRealTimeFeed,
+  handleMLPrioritization,
+  handleCrossModuleAnalysis
 } from './handlers/management';
 
 // Import utilities
@@ -91,6 +96,21 @@ export async function POST(request: NextRequest) {
 
       case 'generate-report':
         return await handleReportGeneration(body);
+      
+      case 'correlate-cve':
+        return await handleRealTimeCorrelation(body);
+      
+      case 'stream-analysis':
+        return await handleStreamAnalysis(body);
+      
+      case 'real-time-feed':
+        return await handleRealTimeFeed(body);
+      
+      case 'ml-prioritization':
+        return await handleMLPrioritization(body);
+      
+      case 'cross-module-analysis':
+        return await handleCrossModuleAnalysis(body);
 
       case 'analyze':
         // Legacy endpoint - validate CVE ID if provided

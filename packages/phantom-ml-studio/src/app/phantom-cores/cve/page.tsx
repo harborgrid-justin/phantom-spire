@@ -1,7 +1,8 @@
 'use client';
 
-// Phantom CVE Core Management - CVE Management & Vulnerability Tracking
-// Provides comprehensive GUI for CVE database management and vulnerability tracking
+// Phantom CVE Core Management - Enhanced Real-time CVE Management & Vulnerability Tracking
+// Provides comprehensive GUI for CVE database management with real-time streaming, ML prioritization,
+// and cross-module threat intelligence correlation
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -39,7 +40,12 @@ import {
   ListItemIcon,
   CircularProgress,
   Tabs,
-  Tab
+  Tab,
+  Badge,
+  Switch,
+  FormControlLabel,
+  Tooltip,
+  IconButton
 } from '@mui/material';
 import {
   BugReport as CVEIcon,
@@ -48,6 +54,12 @@ import {
   Update as UpdateIcon,
   TrendingUp as TrendIcon,
   Flag as PriorityIcon,
+  Stream as StreamIcon,
+  Psychology as MLIcon,
+  Hub as CrossModuleIcon,
+  Notifications as NotificationIcon,
+  Speed as RealtimeIcon,
+  Analytics as CorrelationIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon,
   ExpandMore as ExpandMoreIcon,
@@ -135,6 +147,67 @@ const generateVulnerabilityReport = async (reportData: any) => {
     body: JSON.stringify({
       operation: 'generate-report',
       reportData
+    })
+  });
+  return response.json();
+};
+
+// New Real-time CVE API functions
+const correlateCVE = async (correlationData: any) => {
+  const response = await fetch('/api/phantom-cores/cve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      operation: 'correlate-cve',
+      ...correlationData
+    })
+  });
+  return response.json();
+};
+
+const analyzeRealtimeStream = async (streamData: any) => {
+  const response = await fetch('/api/phantom-cores/cve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      operation: 'stream-analysis',
+      ...streamData
+    })
+  });
+  return response.json();
+};
+
+const checkRealtimeFeed = async (feedData: any) => {
+  const response = await fetch('/api/phantom-cores/cve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      operation: 'real-time-feed',
+      ...feedData
+    })
+  });
+  return response.json();
+};
+
+const mlPrioritizeCVEs = async (priorityData: any) => {
+  const response = await fetch('/api/phantom-cores/cve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      operation: 'ml-prioritization',
+      ...priorityData
+    })
+  });
+  return response.json();
+};
+
+const crossModuleAnalysis = async (analysisData: any) => {
+  const response = await fetch('/api/phantom-cores/cve', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      operation: 'cross-module-analysis',
+      ...analysisData
     })
   });
   return response.json();
@@ -414,7 +487,7 @@ const CVEOperationsPanel: React.FC = () => {
     {
       id: 'track',
       title: 'Vulnerability Tracking',
-      description: 'Track and monitor vulnerability lifecycle',
+      description: 'Track and monitor vulnerability lifecycle with real-time updates',
       icon: <VulnIcon />,
       action: async () => {
         const result = await trackVulnerability({
@@ -430,8 +503,8 @@ const CVEOperationsPanel: React.FC = () => {
     },
     {
       id: 'update',
-      title: 'Database Update',
-      description: 'Update CVE database with latest vulnerabilities',
+      title: 'Real-time Database Update',
+      description: 'Update CVE database with streaming real-time feeds',
       icon: <UpdateIcon />,
       action: async () => {
         const result = await updateCVEDatabase({
@@ -445,8 +518,8 @@ const CVEOperationsPanel: React.FC = () => {
     },
     {
       id: 'report',
-      title: 'Vulnerability Report',
-      description: 'Generate comprehensive vulnerability assessment report',
+      title: 'Enhanced Vulnerability Report',
+      description: 'Generate comprehensive report with threat intelligence fusion',
       icon: <AssessmentIcon />,
       action: async () => {
         const result = await generateVulnerabilityReport({
@@ -455,6 +528,81 @@ const CVEOperationsPanel: React.FC = () => {
           include_trends: true,
           severity_breakdown: true,
           remediation_status: true
+        });
+        return result.data;
+      }
+    },
+    {
+      id: 'correlate',
+      title: 'CVE Threat Correlation',
+      description: 'Perform AI-powered threat intelligence correlation',
+      icon: <CorrelationIcon />,
+      action: async () => {
+        const result = await correlateCVE({
+          cveId: 'CVE-2024-21887',
+          includeMLAnalysis: true,
+          correlationTypes: ['mitre', 'ioc', 'threat-actor', 'malware']
+        });
+        return result.data;
+      }
+    },
+    {
+      id: 'stream',
+      title: 'Real-time Stream Analysis',
+      description: 'Analyze CVE processing stream performance and metrics',
+      icon: <StreamIcon />,
+      action: async () => {
+        const result = await analyzeRealtimeStream({
+          includeMetrics: true,
+          includePerfomance: true,
+          analyzeQueue: true
+        });
+        return result.data;
+      }
+    },
+    {
+      id: 'feed',
+      title: 'Real-time Feed Status',
+      description: 'Monitor live CVE feed connections and data flow',
+      icon: <RealtimeIcon />,
+      action: async () => {
+        const result = await checkRealtimeFeed({
+          feedType: 'all',
+          severityFilter: ['critical', 'high', 'medium'],
+          includeHealth: true
+        });
+        return result.data;
+      }
+    },
+    {
+      id: 'ml-priority',
+      title: 'ML-Powered Prioritization',
+      description: 'Use machine learning to prioritize CVE remediation',
+      icon: <MLIcon />,
+      action: async () => {
+        const result = await mlPrioritizeCVEs({
+          cves: ['CVE-2024-21887', 'CVE-2024-1234', 'CVE-2024-5678'],
+          organizationContext: {
+            sector: 'Technology',
+            riskTolerance: 'Low',
+            assetCriticality: 'High'
+          },
+          includeMLMetrics: true
+        });
+        return result.data;
+      }
+    },
+    {
+      id: 'cross-module',
+      title: 'Cross-Module Analysis',
+      description: 'Unified threat analysis across all phantom-*-core modules',
+      icon: <CrossModuleIcon />,
+      action: async () => {
+        const result = await crossModuleAnalysis({
+          cveId: 'CVE-2024-21887',
+          modules: ['mitre', 'ioc', 'threat-actor', 'vulnerability', 'malware'],
+          includeCorrelation: true,
+          includeML: true
         });
         return result.data;
       }

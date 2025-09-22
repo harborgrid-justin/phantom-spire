@@ -166,7 +166,7 @@ export default function BusinessIntelligenceClient() {
       {/* KPI Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {businessMetrics.map((metric, index) => (
-          <Grid item xs={12} sm={6} lg={3} key={index}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }} key={index}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
                 <Box display="flex" alignItems="center" justifyContent="between" mb={2}>
