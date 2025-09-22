@@ -513,7 +513,7 @@ export class PhantomCoreIntegrator {
               error: 'MITRE service unavailable'
             };
           }
-        }),
+        },
         mapToFramework: async (data: any) => {
           try {
             const { mitreService } = await import('../lib/services/mitreService');
@@ -540,7 +540,7 @@ export class PhantomCoreIntegrator {
               error: 'MITRE service unavailable'
             };
           }
-        }),
+        },
         // New methods for direct MITRE data access
         searchTechniques: async (query: string, options = {}) => {
           try {

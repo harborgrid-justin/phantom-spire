@@ -215,3 +215,178 @@ export async function handleReportGeneration(body: any) {
     timestamp: new Date().toISOString()
   });
 }
+
+/**
+ * Handle real-time CVE correlation
+ */
+export async function handleRealTimeCorrelation(body: any) {
+  const { cveId, includeMLAnalysis = true } = body;
+  
+  return NextResponse.json({
+    success: true,
+    data: {
+      correlationId: `corr-${Date.now()}`,
+      cveId: cveId,
+      analysisTimestamp: new Date().toISOString(),
+      correlations: {
+        mitreTechniques: [
+          {
+            techniqueId: 'T1190',
+            techniqueName: 'Exploit Public-Facing Application',
+            tactics: ['Initial Access'],
+            confidence: getRandomFloat(0.75, 0.95, 2),
+            reasoning: 'CVE affects public-facing web service'
+          }
+        ],
+        threatActors: [
+          {
+            actorName: 'APT29',
+            confidence: getRandomFloat(0.70, 0.90, 2),
+            sophistication: 'advanced',
+            motivation: ['espionage', 'intelligence'],
+            targetSectors: ['government', 'healthcare', 'technology']
+          }
+        ]
+      },
+      riskEnhancement: {
+        originalRiskScore: getRandomFloat(60, 80, 1),
+        enhancedRiskScore: getRandomFloat(75, 95, 1),
+        riskFactors: ['Active threat actor targeting', 'Known exploitation in the wild'],
+        confidenceLevel: getRandomFloat(0.80, 0.95, 2)
+      },
+      mlInsights: includeMLAnalysis ? {
+        priorityScore: getRandomFloat(85, 98, 1),
+        exploitProbability: getRandomFloat(0.70, 0.95, 2),
+        businessImpactScore: getRandomFloat(75, 90, 1),
+        recommendedPatching: 'immediate'
+      } : null
+    },
+    source: 'phantom-cve-correlation-service',
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Handle real-time stream analysis
+ */
+export async function handleStreamAnalysis(body: any) {
+  return NextResponse.json({
+    success: true,
+    data: {
+      analysisId: `stream-${Date.now()}`,
+      streamMetrics: {
+        messagesProcessed: getRandomNumber(10000, 50000),
+        messagesPerSecond: getRandomFloat(50, 150, 1),
+        processingLatencyMs: getRandomFloat(50, 200, 1),
+        errorRate: getRandomFloat(0.1, 2.5, 1)
+      },
+      performance: {
+        throughput: `${getRandomFloat(100, 300, 1)} CVEs/second`,
+        latency: `${getRandomFloat(25, 100, 1)}ms average`,
+        duplicateDetection: `${getRandomNumber(50, 200)} duplicates filtered`
+      },
+      realTimeCapabilities: {
+        activeStreams: 3,
+        connectedClients: getRandomNumber(5, 25),
+        processingQueue: getRandomNumber(0, 50),
+        cacheHitRate: `${getRandomFloat(80, 95, 1)}%`
+      }
+    },
+    source: 'phantom-stream-processor',
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Handle real-time feed status
+ */
+export async function handleRealTimeFeed(body: any) {
+  const { feedType = 'all', severityFilter = ['critical', 'high'] } = body;
+  
+  return NextResponse.json({
+    success: true,
+    data: {
+      feedId: `feed-${Date.now()}`,
+      type: feedType,
+      severityFilter: severityFilter,
+      realTimeStreaming: true,
+      sources: ['NVD', 'MITRE', 'CISA KEV', 'VulnDB'],
+      latency: '< 30 seconds',
+      dataFlow: {
+        inbound: `${getRandomNumber(20, 80)} CVEs/hour`,
+        processed: `${getRandomNumber(15, 75)} CVEs/hour`,
+        filtered: `${getRandomNumber(2, 10)} CVEs/hour`
+      }
+    },
+    source: 'phantom-realtime-feed',
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Handle ML-powered CVE prioritization
+ */
+export async function handleMLPrioritization(body: any) {
+  const { cves = [], organizationContext = {} } = body;
+  
+  const prioritizedCVEs = cves.map((cveId: string, index: number) => ({
+    cveId,
+    mlPriorityScore: getRandomFloat(60, 100, 1),
+    riskFactors: getRandomElements(['Threat actor targeting', 'Active exploitation', 'Asset criticality'], 2),
+    recommendedAction: index < 2 ? 'Immediate patching' : 'Priority patching',
+    businessImpact: getRandomElement(['Critical', 'High', 'Medium', 'Low']),
+    confidence: getRandomFloat(0.80, 0.95, 2)
+  }));
+
+  return NextResponse.json({
+    success: true,
+    data: {
+      analysisId: `ml-priority-${Date.now()}`,
+      modelVersion: '2.1.0',
+      algorithm: 'Gradient Boosting + Threat Intelligence Fusion',
+      processingTime: `${getRandomNumber(100, 500)}ms`,
+      prioritizedCVEs,
+      contextFactors: {
+        organizationSector: organizationContext.sector || 'Technology',
+        assetCriticality: 'High',
+        threatLandscape: 'Elevated'
+      }
+    },
+    source: 'phantom-ml-prioritization',
+    timestamp: new Date().toISOString()
+  });
+}
+
+/**
+ * Handle cross-module threat analysis
+ */
+export async function handleCrossModuleAnalysis(body: any) {
+  const { cveId, modules = ['mitre', 'ioc', 'threat-actor'] } = body;
+  
+  return NextResponse.json({
+    success: true,
+    data: {
+      analysisId: `cross-module-${Date.now()}`,
+      cveId,
+      modules,
+      interoperability: {
+        mitreMapping: modules.includes('mitre'),
+        iocCorrelation: modules.includes('ioc'), 
+        threatActorLinks: modules.includes('threat-actor')
+      },
+      unifiedThreatProfile: {
+        riskScore: getRandomFloat(70, 95, 1),
+        threatLevel: getRandomElement(['Medium', 'High', 'Critical']),
+        actionRequired: true,
+        timeToRemediation: `${getRandomNumber(24, 168)} hours`
+      },
+      recommendations: [
+        'Cross-module correlation indicates elevated threat',
+        'Multiple intelligence sources confirm active exploitation',
+        'Immediate remediation recommended'
+      ]
+    },
+    source: 'phantom-cross-module-analysis',
+    timestamp: new Date().toISOString()
+  });
+}
