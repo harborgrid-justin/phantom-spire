@@ -5,7 +5,7 @@
 import {
   Table,
   Column,
-  Model as SequelizeModel,
+  Model,
   PrimaryKey,
   AutoIncrement,
   AllowNull,
@@ -13,17 +13,81 @@ import {
   CreatedAt,
   UpdatedAt,
   HasMany,
-  DataType
+  DataType,
+  Length
 } from 'sequelize-typescript';
-import { Deployment } from './Deployment.model';
+import { Optional } from 'sequelize';
 import { Op } from 'sequelize';
+import { Deployment } from './Deployment.model';
+
+// Model Attributes Interface
+export interface ModelAttributes {
+  /** Unique identifier for the model */
+  id: number;
+  /** Name of the model */
+  name: string;
+  /** Type of the model */
+  type: string;
+  /** Algorithm used by the model */
+  algorithm: string;
+  /** Model accuracy score */
+  accuracy: number;
+  /** Model F1 score */
+  f1_score: number;
+  /** Model AUC score */
+  auc: number;
+  /** Current status of the model */
+  status: string;
+  /** Version of the model */
+  version: string;
+  /** Size of the model */
+  size: string;
+  /** Record creation timestamp */
+  created_at: Date;
+  /** Last training timestamp */
+  last_trained: Date;
+  /** Number of deployments */
+  deployments: number;
+  /** Number of predictions made */
+  predictions: number;
+  /** Whether the model is starred */
+  starred: boolean;
+  /** Framework used to build the model */
+  framework: string;
+  /** Model features */
+  features: string[];
+  /** Model metrics */
+  metrics: Record<string, any>;
+  /** Security score */
+  security_score: number;
+  /** Performance score */
+  performance_score: number;
+  /** Record last update timestamp */
+  updated_at: Date;
+}
+
+// Model Creation Attributes Interface
+export interface ModelCreationAttributes extends Optional<ModelAttributes,
+  'id' | 'accuracy' | 'f1_score' | 'auc' | 'status' | 'version' | 'size' | 
+  'created_at' | 'last_trained' | 'deployments' | 'predictions' | 'starred' | 
+  'framework' | 'features' | 'metrics' | 'security_score' | 'performance_score' | 'updated_at'
+> {}
 
 @Table({
   tableName: 'models',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  paranoid: false,
+  indexes: [
+    { fields: ['name'] },
+    { fields: ['type'] },
+    { fields: ['algorithm'] },
+    { fields: ['status'] },
+    { fields: ['starred'] },
+    { fields: ['created_at'] }
+  ]
 })
-export class MLModel extends SequelizeModel {
+export class MLModel extends Model<ModelAttributes, ModelCreationAttributes> implements ModelAttributes {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
@@ -236,3 +300,5 @@ export class MLModel extends SequelizeModel {
     });
   }
 }
+
+export default MLModel;
