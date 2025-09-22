@@ -1,7 +1,7 @@
 // src/services/dashboardService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '..\..\..\lib\core';
-import { DashboardData, GetDashboardDataRequest, GetDashboardDataResponse } from '..\..\..\lib\dashboard.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../../../lib/core';
+import { DashboardData, GetDashboardDataRequest, GetDashboardDataResponse } from '../../../lib/dashboard.types';
 
 const DASHBOARD_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-dashboard',

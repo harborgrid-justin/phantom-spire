@@ -42,8 +42,8 @@ const MetricCard = React.memo(function MetricCard({ title, value, max, unit, col
   const safePercentage = Math.min(percentage, 100)
   const usageLevel = percentage > 80 ? 'High' : percentage > 50 ? 'Medium' : 'Low'
 
-  const titleId = `metric-${title.replace(/\s+/g, '-').toLowerCase()}-title`
-  const progressId = `metric-${title.replace(/\s+/g, '-').toLowerCase()}-progress`
+  const titleId = `metric-${title.replace(//s+/g, '-').toLowerCase()}-title`
+  const progressId = `metric-${title.replace(//s+/g, '-').toLowerCase()}-progress`
 
   return (
     <Card

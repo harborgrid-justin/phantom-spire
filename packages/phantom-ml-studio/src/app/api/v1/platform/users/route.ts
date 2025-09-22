@@ -3,8 +3,8 @@
  * User management and authentication
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '..\..\..\..\..\..\..\lib\database\models\User.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { User } from '../../../../../../../lib/database/models/User.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^/s@]+@[^/s@]+/.[^/s@]+$/;
     if (!emailRegex.test(body.email)) {
       return NextResponse.json(
         {

@@ -3,7 +3,7 @@
  * Advanced rate limiting with Redis backend, multiple algorithms, and dynamic scaling
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 import type { ICache } from '../utils/enterprise-cache';
 
 // Rate limiting algorithms

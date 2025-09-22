@@ -5,11 +5,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { enterpriseStateManager } from '..\..\state\enterprise-state-manager.service';
-import { realTimeProcessingService } from '..\..\streaming\real-time-processing.service';
-import { performanceMonitoringService } from '..\..\monitoring\performance-monitoring.service';
+import { enterpriseStateManager } from '../../state/enterprise-state-manager.service';
+import { realTimeProcessingService } from '../../streaming/real-time-processing.service';
+import { performanceMonitoringService } from '../../monitoring/performance-monitoring.service';
 import { businessIntelligenceService } from '../analytics/business-intelligence.service';
-import { complianceSecurityService } from '..\..\security\compliance-security.service';
+import { complianceSecurityService } from '../../security/compliance-security.service';
 
 // ==================== INTEGRATION TYPES ====================
 

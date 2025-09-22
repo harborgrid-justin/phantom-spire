@@ -5,9 +5,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { enterpriseStateManager } from '..\..\state\enterprise-state-manager.service';
+import { enterpriseStateManager } from '../../state/enterprise-state-manager.service';
 import { persistenceService } from '../persistence/enterprise-persistence.service';
-import { mlCoreManager } from '..\..\..\..\lib\ml-core';
+import { mlCoreManager } from '../../../../lib/ml-core';
 
 // ==================== BUSINESS INTELLIGENCE TYPES ====================
 

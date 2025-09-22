@@ -1,6 +1,6 @@
 // src/services/dashboard.types.ts
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '../../../lib/core';
 
 export interface PerformanceMetric {
     name: string;

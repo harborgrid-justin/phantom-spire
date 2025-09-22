@@ -1,7 +1,7 @@
 // src/services/automl-pipeline-visualizer/automlPipelineVisualizerService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
-import { AutoMLExperiment, GetAutoMLExperimentRequest, GetAutoMLExperimentResponse } from '..\..\..\lib\automlPipelineVisualizer.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../../../lib/core';
+import { AutoMLExperiment, GetAutoMLExperimentRequest, GetAutoMLExperimentResponse } from '../../../lib/automlPipelineVisualizer.types';
 
 const AUTOML_PIPELINE_VISUALIZER_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-automl-pipeline-visualizer',

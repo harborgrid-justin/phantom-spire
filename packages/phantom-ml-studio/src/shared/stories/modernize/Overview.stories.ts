@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import React from 'react';
-import { Button } from '..\..\..\..\modernize\src\components\ui\Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '..\..\..\..\modernize\src\components\ui\Card';
-import { Input } from '..\..\..\..\modernize\src\components\ui\Input';
-import { Badge } from '..\..\..\..\modernize\src\components\ui\Badge';
-import { Avatar, AvatarFallback, AvatarImage } from '..\..\..\..\modernize\src\components\ui\Avatar';
+import { Button } from '../../../../modernize/src/components/ui/Button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '../../../../modernize/src/components/ui/Card';
+import { Input } from '../../../../modernize/src/components/ui/Input';
+import { Badge } from '../../../../modernize/src/components/ui/Badge';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../modernize/src/components/ui/Avatar';
 
 // Create a comprehensive overview component
 const ModernizeOverview = () => React.createElement(

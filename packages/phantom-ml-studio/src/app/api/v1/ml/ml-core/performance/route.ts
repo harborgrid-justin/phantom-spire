@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { PerformanceStats } from '../../../../lib/ml-core/types';
+import type { PerformanceStats } from '../../../../../lib/ml-core/types';
 
 // Mock performance data
 const generateMockPerformanceStats = (): PerformanceStats => {

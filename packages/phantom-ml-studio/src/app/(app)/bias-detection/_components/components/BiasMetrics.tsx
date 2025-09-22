@@ -63,7 +63,7 @@ export function BiasMetrics({ metrics }: BiasMetricsProps) {
 
         <Grid container spacing={3}>
           {metrics.map((metric) => {
-            const dataCyAttribute = metric.metric.toLowerCase().replace(/\s+/g, '-');
+            const dataCyAttribute = metric.metric.toLowerCase().replace(//s+/g, '-');
             return (
               <Grid item xs={12} md={6} key={metric.metric}>
                 <Card variant="outlined" sx={{ height: '100%' }} data-cy={dataCyAttribute}>

@@ -38,7 +38,7 @@ export class InputValidator {
 
     this.validationRules.set('datasetPath', z.string()
       .refine(path => !path.includes('..'), 'Path traversal not allowed')
-      .refine(path => validator.matches(path, /^[a-zA-Z0-9\/._-]+$/), 'Invalid characters in path')
+      .refine(path => validator.matches(path, /^[a-zA-Z0-9//._-]+$/), 'Invalid characters in path')
     );
 
     // User input validations
@@ -85,9 +85,9 @@ export class InputValidator {
     
     // Remove dangerous SQL keywords and characters
     const dangerousPatterns = [
-      /('|(\\'))/gi,
-      /(;|--|\s*(union|select|insert|update|delete|drop|create|alter|exec|execute)\s+)/gi,
-      /(\s*(or|and)\s+\d+\s*=\s*\d+)/gi
+      /('|(//'))/gi,
+      /(;|--|/s*(union|select|insert|update|delete|drop|create|alter|exec|execute)/s+)/gi,
+      /(/s*(or|and)/s+/d+/s*=/s*/d+)/gi
     ];
 
     let sanitized = input;

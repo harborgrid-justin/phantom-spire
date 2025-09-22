@@ -3,8 +3,8 @@
  * MITRE ATT&CK Techniques management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { MitreTechnique } from '..\..\..\..\..\..\..\lib\database\models\MitreTechnique.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { MitreTechnique } from '../../../../../../../lib/database/models/MitreTechnique.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**

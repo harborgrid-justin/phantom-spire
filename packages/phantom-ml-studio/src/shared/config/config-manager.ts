@@ -326,7 +326,7 @@ export class EnterpriseConfigurationManager extends EventEmitter {
     }
 
     if (errors.length > 0) {
-      const error = new Error(`Configuration validation failed:\n${errors.join('\n')}`);
+      const error = new Error(`Configuration validation failed:/n${errors.join('/n')}`);
       this.emit('validation_error', { errors });
       throw error;
     }
@@ -367,7 +367,7 @@ export class EnterpriseConfigurationManager extends EventEmitter {
     } catch (error) {
       isValid = false;
       if (error instanceof Error) {
-        validationErrors = error.message.split('\n').slice(1); // Remove first line
+        validationErrors = error.message.split('/n').slice(1); // Remove first line
       }
     }
 

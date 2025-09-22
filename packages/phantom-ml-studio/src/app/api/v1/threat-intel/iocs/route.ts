@@ -3,8 +3,8 @@
  * Indicators of Compromise management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { IOC } from '..\..\..\..\..\..\..\lib\database\models\IOC.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { IOC } from '../../../../../../../lib/database/models/IOC.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**

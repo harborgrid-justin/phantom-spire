@@ -311,7 +311,7 @@ export class PhantomCore extends Model<PhantomCoreAttributes, PhantomCoreCreatio
    * @returns True if version follows semantic versioning
    */
   public hasSemanticVersion(): boolean {
-    return /^\d+\.\d+\.\d+/.test(this.version);
+    return /^/d+/./d+/./d+/.test(this.version);
   }
 
   /**
@@ -319,7 +319,7 @@ export class PhantomCore extends Model<PhantomCoreAttributes, PhantomCoreCreatio
    * @returns Major version number, or null if not semantic
    */
   public getMajorVersion(): number | null {
-    const match = this.version.match(/^(\d+)\./);
+    const match = this.version.match(/^(/d+)/./);
     return match ? parseInt(match[1]) : null;
   }
 

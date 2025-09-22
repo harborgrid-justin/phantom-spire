@@ -1,8 +1,8 @@
 // src/services/dashboard/enhancedDashboardService.ts
 // Enhanced Dashboard Service with Business Intelligence NAPI Bindings
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult } from '..\..\..\lib\core';
-import { phantomMLCore } from '..\..\..\lib\phantom-ml-core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult } from '../../../lib/core';
+import { phantomMLCore } from '../../../lib/phantom-ml-core';
 
 export interface DashboardMetrics {
   modelPerformance: {

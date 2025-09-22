@@ -5,9 +5,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { PerformanceMonitor } from '..\..\..\lib\monitoring\performance-monitor';
-import { EnterpriseCache } from '..\..\..\lib\caching\enterprise-cache';
-import { AuditLogger } from '..\..\..\security\audit-logger';
+import { PerformanceMonitor } from '../../../lib/monitoring/performance-monitor';
+import { EnterpriseCache } from '../../../lib/caching/enterprise-cache';
+import { AuditLogger } from '../../../security/audit-logger';
 
 export interface AnalyticsMetric {
   id: string;

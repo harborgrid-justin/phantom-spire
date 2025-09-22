@@ -2,7 +2,7 @@
  * Multi-Model A/B Testing Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '../../../lib/core';
 
 export interface ModelVariant {
   id: string;

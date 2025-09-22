@@ -107,7 +107,7 @@ export abstract class BaseComponent<P extends BaseComponentProps = BaseComponent
   }
 
   protected getTestId(suffix?: string): string {
-    const baseTestId = this.props['data-testid'] || this.displayName.toLowerCase().replace(/\s+/g, '-');
+    const baseTestId = this.props['data-testid'] || this.displayName.toLowerCase().replace(//s+/g, '-');
     return suffix ? `${baseTestId}-${suffix}` : baseTestId;
   }
 
@@ -153,7 +153,7 @@ export function withStandardBehavior<P extends object>(
     const { loading, error, onRetry, className, 'data-testid': testId, ...otherProps } = props;
     
     const getTestId = (suffix?: string): string => {
-      const baseTestId = testId || displayName.toLowerCase().replace(/\s+/g, '-');
+      const baseTestId = testId || displayName.toLowerCase().replace(//s+/g, '-');
       return suffix ? `${baseTestId}-${suffix}` : baseTestId;
     };
 

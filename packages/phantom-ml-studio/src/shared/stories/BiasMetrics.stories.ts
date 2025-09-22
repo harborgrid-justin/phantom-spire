@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { BiasMetrics } from '..\..\lib\app\biasDetection\components\BiasMetrics';
-import { BiasMetric } from '..\..\lib\app\biasDetection\types';
+import { BiasMetrics } from '../../lib/app/biasDetection/components/BiasMetrics';
+import { BiasMetric } from '../../lib/app/biasDetection/types';
 
 // Mock bias metrics data
 const mockMetrics: BiasMetric[] = [

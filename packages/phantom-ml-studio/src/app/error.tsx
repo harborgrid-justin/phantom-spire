@@ -96,7 +96,7 @@ export default function Error({ error, reset }: ErrorProps): JSX.Element {
                 }}
               >
                 {error.message}
-                {error.digest && `\nDigest: ${error.digest}`}
+                {error.digest && `/nDigest: ${error.digest}`}
               </Typography>
             </Box>
           )}

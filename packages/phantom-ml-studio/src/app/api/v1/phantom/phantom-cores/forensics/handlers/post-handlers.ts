@@ -46,7 +46,7 @@ export function handleAnalyzeEvidence(params: { analysisData?: AnalysisRequest }
         type: 'Registry Evidence',
         description: 'USB device connection timeline established',
         significance: 'HIGH',
-        location: 'HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Enum\\USBSTOR'
+        location: 'HKEY_LOCAL_MACHINE//SYSTEM//CurrentControlSet//Enum//USBSTOR'
       }
     ],
     timeline_events: randomInRange(500, 1500),

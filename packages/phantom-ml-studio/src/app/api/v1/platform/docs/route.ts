@@ -3,7 +3,7 @@
  * Comprehensive API documentation for all endpoints
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { generateOpenAPISpec } from '..\..\..\..\..\..\..\lib\api-docs\swagger\openapi-spec';
+import { generateOpenAPISpec } from '../../../../../../../lib/api-docs/swagger/openapi-spec';
 
 /**
  * @swagger

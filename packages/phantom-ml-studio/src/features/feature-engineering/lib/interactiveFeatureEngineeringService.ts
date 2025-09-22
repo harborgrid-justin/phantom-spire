@@ -1,7 +1,7 @@
 // src/services/interactive-feature-engineering/interactiveFeatureEngineeringService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
-import { FeatureEngineeringPipeline, GetFeatureEngineeringPipelineRequest, GetFeatureEngineeringPipelineResponse } from '..\..\..\lib\interactiveFeatureEngineering.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../../../lib/core-logic/types/business-logic.types';
+import { FeatureEngineeringPipeline, GetFeatureEngineeringPipelineRequest, GetFeatureEngineeringPipelineResponse } from '../types/interactiveFeatureEngineering.types';
 
 const INTERACTIVE_FEATURE_ENGINEERING_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-interactive-feature-engineering',

@@ -35,7 +35,7 @@ API requests are rate-limited to ensure fair usage and system stability.
 
 ## Pagination
 
-List endpoints support pagination with \`page\` and \`limit\` query parameters.
+List endpoints support pagination with /`page/` and /`limit/` query parameters.
       `,
       contact: {
         name: 'Phantom Spire Team',

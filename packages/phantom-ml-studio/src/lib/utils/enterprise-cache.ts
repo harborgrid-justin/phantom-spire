@@ -3,7 +3,7 @@
  * Multi-level caching with invalidation strategies, compression, and distributed support
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 
 // Cache levels
 export enum CacheLevel {

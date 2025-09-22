@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import { Input } from '..\..\..\..\modernize\src\components\ui\Input';
+import { Input } from '../../../../modernize/src/components/ui/Input';
 
 const meta = {
   title: 'Modernize/Input',

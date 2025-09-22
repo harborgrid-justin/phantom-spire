@@ -715,8 +715,8 @@ export class EnterpriseDatabasePoolManager extends EventEmitter {
   private sanitizeQuery(query: string): string {
     // Remove sensitive data from query for logging
     return query
-      .replace(/password\s*=\s*'[^']*'/gi, "password='***'")
-      .replace(/password\s*=\s*"[^"]*"/gi, 'password="***"')
+      .replace(/password/s*=/s*'[^']*'/gi, "password='***'")
+      .replace(/password/s*=/s*"[^"]*"/gi, 'password="***"')
       .substring(0, 200); // Limit length
   }
 

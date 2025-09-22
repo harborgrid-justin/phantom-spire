@@ -5,7 +5,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { persistenceService } from '..\..\persistence\enterprise-persistence.service';
+import { persistenceService } from '../../persistence/enterprise-persistence.service';
 import { realTimeProcessingService } from '../streaming/real-time-processing.service';
 
 // ==================== STATE TYPES ====================

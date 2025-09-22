@@ -187,7 +187,7 @@ export function applyPrioritySampling(
  */
 export function matchesPattern(pattern: string, metricName: string): boolean {
   if (pattern.includes('*')) {
-    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+    const regex = new RegExp(pattern.replace(//*/g, '.*'));
     return regex.test(metricName);
   }
   return pattern === metricName;

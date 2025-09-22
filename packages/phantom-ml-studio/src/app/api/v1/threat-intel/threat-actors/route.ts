@@ -3,8 +3,8 @@
  * Comprehensive threat actor and APT group management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { ThreatActor } from '..\..\..\..\..\..\..\lib\database\models\ThreatActor.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { ThreatActor } from '../../../../../../../lib/database/models/ThreatActor.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 
 /**
  * @swagger

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import type { SystemInfo } from '../../../../lib/ml-core/types';
+import type { SystemInfo } from '../../../../../lib/ml-core/types';
 
 // Mock system info data
 const generateMockSystemInfo = (): SystemInfo => {

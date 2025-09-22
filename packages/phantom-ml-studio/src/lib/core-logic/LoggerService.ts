@@ -73,14 +73,14 @@ export class ConsoleTransport implements ILogTransport {
     const levelName = levelNames[entry.level] || 'UNKNOWN';
     
     const colorCodes = {
-      ERROR: '\x1b[31m',
-      WARN: '\x1b[33m',
-      INFO: '\x1b[36m',
-      DEBUG: '\x1b[37m',
-      TRACE: '\x1b[90m'
+      ERROR: '/x1b[31m',
+      WARN: '/x1b[33m',
+      INFO: '/x1b[36m',
+      DEBUG: '/x1b[37m',
+      TRACE: '/x1b[90m'
     };
 
-    const resetCode = '\x1b[0m';
+    const resetCode = '/x1b[0m';
     const colorCode = colorCodes[levelName as keyof typeof colorCodes] || '';
 
     const logMessage = `${colorCode}[${entry.timestamp}] ${levelName}${resetCode} ${entry.context ? `[${entry.context}]` : ''} ${entry.message}`;
@@ -132,7 +132,7 @@ export class FileTransport implements ILogTransport {
 
   async log(entry: LogEntry): Promise<void> {
     if (this.writeStream) {
-      const logLine = JSON.stringify(entry) + '\n';
+      const logLine = JSON.stringify(entry) + '/n';
       this.writeStream.write(logLine);
     }
   }

@@ -218,7 +218,7 @@ export default function DashboardClient() {
           </Card>
 
           {dashboardData.performanceMetrics.map(metric => (
-            <Card key={metric.name} elevation={2} data-cy={`metric-card-${metric.name.toLowerCase().replace(/\s+/g, '-')}`}>
+            <Card key={metric.name} elevation={2} data-cy={`metric-card-${metric.name.toLowerCase().replace(//s+/g, '-')}`}>
               <CardContent>
                 <Typography variant="h6" color="text.secondary" gutterBottom data-cy="metric-label">
                   {metric.name}
@@ -281,7 +281,7 @@ export default function DashboardClient() {
                       <ListItemText
                         primary={
                           <Typography variant="body1" fontWeight="medium" data-cy="activity-type">
-                            {activity.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            {activity.type.replace('_', ' ').replace(//b/w/g, l => l.toUpperCase())}
                           </Typography>
                         }
                         secondary={

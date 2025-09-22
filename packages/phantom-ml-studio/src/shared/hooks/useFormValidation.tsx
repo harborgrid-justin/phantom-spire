@@ -9,7 +9,7 @@ export const modelValidationSchema = yup.object({
     .required('Model name is required')
     .min(3, 'Model name must be at least 3 characters')
     .max(50, 'Model name must not exceed 50 characters')
-    .matches(/^[a-zA-Z0-9\s-_]+$/, 'Model name can only contain letters, numbers, spaces, hyphens, and underscores'),
+    .matches(/^[a-zA-Z0-9/s-_]+$/, 'Model name can only contain letters, numbers, spaces, hyphens, and underscores'),
 
   type: yup
     .string()

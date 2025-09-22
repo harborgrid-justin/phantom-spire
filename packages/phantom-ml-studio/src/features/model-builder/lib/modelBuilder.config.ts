@@ -1,6 +1,6 @@
 // src/services/modelBuilder.config.ts
 
-import { AlgorithmType } from '..\..\..\lib\modelBuilder.types';
+import { AlgorithmType } from '../../../lib/modelBuilder.types';
 
 export const modelBuilderConfig = {
     featureEngineering: {

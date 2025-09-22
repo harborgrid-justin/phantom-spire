@@ -275,7 +275,7 @@ const WorkflowExecutionPanel: React.FC = () => {
               >
                 {workflowTypes.map((type) => (
                   <MenuItem key={type} value={type}>
-                    {type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {type.replace('_', ' ').replace(//b/w/g, l => l.toUpperCase())}
                   </MenuItem>
                 ))}
               </Select>

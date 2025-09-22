@@ -1,2 +1,2 @@
 export * from './interactiveFeatureEngineeringService';
-export * from './interactiveFeatureEngineering.types';
+export * from '../types/interactiveFeatureEngineering.types';

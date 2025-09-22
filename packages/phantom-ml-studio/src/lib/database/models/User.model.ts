@@ -965,7 +965,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^/s@]+@[^/s@]+/.[^/s@]+$/;
     if (!emailRegex.test(data.email)) {
       throw new Error('Invalid email format');
     }

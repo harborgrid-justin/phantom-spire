@@ -1,6 +1,6 @@
 // src/services/deployment.types.ts
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '../../../lib/core';
 
 export type DeploymentStatus = 'active' | 'inactive' | 'error' | 'updating';
 

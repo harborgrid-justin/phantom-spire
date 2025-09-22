@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { inputValidator } from './input-validator';
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 
 export interface SecurityConfig {
   contentSecurityPolicy: {
@@ -675,7 +675,7 @@ const DEFAULT_CORS_CONFIG: CorsConfig = {
     enabled: true,
     allowLocalhost: true,
     allowedDomains: ['phantom-ml-studio.com', '*.phantom-ml-studio.com'],
-    allowedPatterns: [/^https:\/\/.*\.phantom-ml-studio\.com$/],
+    allowedPatterns: [/^https:////.*/.phantom-ml-studio/.com$/],
   },
   
   security: {
@@ -1145,7 +1145,7 @@ export class SecurityMiddleware {
     const xssPatterns = [
       /<script/i,
       /javascript:/i,
-      /on\w+\s*=/i,
+      /on/w+/s*=/i,
       /<iframe/i,
       /<object/i,
       /<embed/i,
@@ -1173,9 +1173,9 @@ export class SecurityMiddleware {
 
     // Check for SQL injection patterns
     const sqlPatterns = [
-      /(\b(ALTER|CREATE|DELETE|DROP|EXEC(UTE)?|INSERT|SELECT|UNION|UPDATE)\b)/i,
-      /(\b(OR|AND)\b.*(=|<|>|\b(LIKE)\b))/i,
-      /(\'|\"|`)(.*)(\'|\"|`)/,
+      /(/b(ALTER|CREATE|DELETE|DROP|EXEC(UTE)?|INSERT|SELECT|UNION|UPDATE)/b)/i,
+      /(/b(OR|AND)/b.*(=|<|>|/b(LIKE)/b))/i,
+      /(/'|/"|`)(.*)(/'|/"|`)/,
     ];
 
     for (const pattern of sqlPatterns) {
@@ -1264,17 +1264,17 @@ export const SecurityUtils = {
       .replace(/[<>]/g, '') // Remove potential HTML tags
       .replace(/['"]/g, '') // Remove quotes
       .replace(/javascript:/gi, '') // Remove javascript: protocol
-      .replace(/on\w+=/gi, '') // Remove event handlers
+      .replace(/on/w+=/gi, '') // Remove event handlers
       .trim();
   },
 
   // Check if IP is in private range
   isPrivateIP(ip: string): boolean {
     const privateRanges = [
-      /^10\./,
-      /^172\.(1[6-9]|2\d|3[01])\./,
-      /^192\.168\./,
-      /^127\./,
+      /^10/./,
+      /^172/.(1[6-9]|2/d|3[01])/./,
+      /^192/.168/./,
+      /^127/./,
       /^::1$/,
       /^fc00:/,
       /^fe80:/,

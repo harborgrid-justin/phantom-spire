@@ -1,7 +1,7 @@
 // src/services/model-builder/modelBuilderService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature, SelectedFeature } from '..\..\..\lib\core';
-import { ModelConfig, AutoMLResult, UploadedData, ParseDataRequest, ParseDataResponse, StartTrainingRequest, StartTrainingResponse, DataRow, AlgorithmType, ModelResult, EnsembleResult } from '..\..\..\lib\modelBuilder.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature, SelectedFeature } from '../../../lib/core-logic/types/business-logic.types';
+import { ModelConfig, AutoMLResult, UploadedData, ParseDataRequest, ParseDataResponse, StartTrainingRequest, StartTrainingResponse, DataRow, AlgorithmType, ModelResult, EnsembleResult } from '../types/modelBuilder.types';
 import { modelBuilderConfig } from './modelBuilder.config';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { RandomForestRegression } from 'ml-random-forest';
@@ -409,7 +409,7 @@ class ModelBuilderService extends BusinessLogicBase {
                         return;
                     }
         
-                    const lines = text.split('\n').filter(line => line.trim().length > 0);
+                    const lines = text.split('/n').filter(line => line.trim().length > 0);
                     if (lines.length < 2) {
                         errors.push('File must contain at least header and one data row');
                     }

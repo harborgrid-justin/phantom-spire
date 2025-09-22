@@ -3,7 +3,7 @@
  * Modular cybersecurity components management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 
 /**
  * @swagger

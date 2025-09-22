@@ -886,7 +886,7 @@ async function seedDeployments() {
         model_version: model.version,
         status: randomStatus,
         environment: randomEnv,
-        endpoint: `https://api.phantom-ml.com/v1/models/${model.name.toLowerCase().replace(/\s+/g, '-')}`,
+        endpoint: `https://api.phantom-ml.com/v1/models/${model.name.toLowerCase().replace(//s+/g, '-')}`,
         instances: Math.floor(Math.random() * 5) + 1,
         cpu: Math.random() * 2 + 0.5,
         memory: Math.random() * 4 + 1,

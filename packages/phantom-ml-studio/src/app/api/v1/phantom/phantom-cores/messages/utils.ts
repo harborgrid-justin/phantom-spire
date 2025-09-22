@@ -15,7 +15,7 @@ import {
   type ContextMessage,
   type SourceIdentifier
 } from './index';
-import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '..\..\..\..\..\..\lib\constants';
+import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '../../../../../../lib/constants';
 
 // ================================
 // ERROR RESPONSE BUILDERS
@@ -422,7 +422,7 @@ export function validateTimePeriod(period: string): { isValid: boolean; error?: 
  * Validate CVE ID format
  */
 export function validateCVEId(cveId: string): { isValid: boolean; error?: string } {
-  const cvePattern = /^CVE-\d{4}-\d{4,}$/;
+  const cvePattern = /^CVE-/d{4}-/d{4,}$/;
   if (!cvePattern.test(cveId)) {
     return {
       isValid: false,

@@ -2,7 +2,7 @@
 // Centralized error handling for CVE operations
 
 import { NextResponse } from 'next/server';
-import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '..\..\..\..\..\..\..\constants';
+import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '../../../../../../../constants';
 import { 
   buildErrorResponse,
   buildUnknownOperationResponse,

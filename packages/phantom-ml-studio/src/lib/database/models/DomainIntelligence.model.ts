@@ -838,7 +838,7 @@ export class DomainIntelligence extends Model<DomainIntelligenceAttributes, Doma
    */
   static async createDomain(data: DomainIntelligenceCreationAttributes): Promise<DomainIntelligence> {
     // Validate domain name format
-    if (!data.domain_name || !/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(data.domain_name)) {
+    if (!data.domain_name || !/^[a-zA-Z0-9.-]+/.[a-zA-Z]{2,}$/.test(data.domain_name)) {
       throw new Error('Invalid domain name format');
     }
 

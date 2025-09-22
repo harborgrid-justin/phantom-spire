@@ -3,7 +3,7 @@
  * Comprehensive audit logging for compliance and security monitoring
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 
 // Audit event types
 export enum AuditEventType {
@@ -692,7 +692,7 @@ export class AuditTrailService {
       }).join(','))
     ];
 
-    return csvRows.join('\n');
+    return csvRows.join('/n');
   }
 
   private calculateDailyTrends(events: AuditEvent[], days: number): Array<{ date: string; count: number }> {

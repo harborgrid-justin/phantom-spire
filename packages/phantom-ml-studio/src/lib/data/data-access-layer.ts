@@ -3,7 +3,7 @@
  * Unified abstraction for multi-database operations with transactions, caching, and monitoring
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 import type { ICache } from '../utils/enterprise-cache';
 
 // Database providers

@@ -71,7 +71,7 @@ export class MigrationPipeline {
       const files = await fs.readdir(this.migrationsPath);
       return files
         .filter(file => file.endsWith('.ts') || file.endsWith('.js'))
-        .filter(file => /^\d{14}-.*\.(ts|js)$/.test(file)) // Format: YYYYMMDDHHMMSS-description.ts
+        .filter(file => /^/d{14}-.*/.(ts|js)$/.test(file)) // Format: YYYYMMDDHHMMSS-description.ts
         .sort();
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
@@ -256,7 +256,7 @@ export class MigrationPipeline {
       }
       
       status.push({
-        name: filename.replace(/^\d{14}-/, '').replace(/\.(ts|js)$/, ''),
+        name: filename.replace(/^/d{14}-/, '').replace(//.(ts|js)$/, ''),
         filename,
         timestamp,
         executed: isExecuted,
@@ -418,7 +418,7 @@ export class MigrationCLI {
       console.log(`${statusIcon} ${migration.name} (${migration.timestamp}) ${rollbackIcon}`);
     });
     
-    console.log('\nLegend: ✅ Executed | ⏳ Pending | 🔄 Rollback Support | ❌ No Rollback');
+    console.log('/nLegend: ✅ Executed | ⏳ Pending | 🔄 Rollback Support | ❌ No Rollback');
   }
 
   async migrate(): Promise<void> {
@@ -564,7 +564,7 @@ export async function up(queryInterface: QueryInterface, sequelize: Sequelize): 
     // Auto-generated from model definition
     ${Object.entries(attributes).map(([name, attr]: [string, any]) => {
       return `${name}: ${this.attributeToMigrationDefinition(attr)}`;
-    }).join(',\n    ')}
+    }).join(',/n    ')}
   });
 }
 
@@ -584,7 +584,7 @@ export async function down(queryInterface: QueryInterface, sequelize: Sequelize)
         default:
           return `  // TODO: Handle ${diff.type}`;
       }
-    }).join('\n');
+    }).join('/n');
 
     const downOperations = differences.map(diff => {
       switch (diff.type) {
@@ -595,7 +595,7 @@ export async function down(queryInterface: QueryInterface, sequelize: Sequelize)
         default:
           return `  // TODO: Reverse ${diff.type}`;
       }
-    }).reverse().join('\n');
+    }).reverse().join('/n');
 
     return `/**
  * Auto-generated migration: Alter ${tableName} table

@@ -154,7 +154,7 @@ class NavigationMetricsCollector {
 
   private determineRouteType(route: string): 'static' | 'dynamic' | 'api' {
     if (route.startsWith('/api/')) return 'api';
-    if (route.includes('[') || route.match(/\/\d+/)) return 'dynamic';
+    if (route.includes('[') || route.match(////d+/)) return 'dynamic';
     return 'static';
   }
 

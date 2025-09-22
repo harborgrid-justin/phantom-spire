@@ -3,8 +3,8 @@
  * Project management and collaboration
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { Project } from '..\..\..\..\..\..\..\lib\database\models\Project.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { Project } from '../../../../../../../lib/database/models/Project.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**

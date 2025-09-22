@@ -224,10 +224,10 @@ export class SecurityService extends BaseBusinessLogic {
 
     // Simulate PII detection
     const piiPatterns = [
-      { type: 'email', regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g },
-      { type: 'phone', regex: /\b\d{3}-\d{3}-\d{4}\b/g },
-      { type: 'ssn', regex: /\b\d{3}-\d{2}-\d{4}\b/g },
-      { type: 'credit_card', regex: /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g }
+      { type: 'email', regex: //b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+/.[A-Z|a-z]{2,}/b/g },
+      { type: 'phone', regex: //b/d{3}-/d{3}-/d{4}/b/g },
+      { type: 'ssn', regex: //b/d{3}-/d{2}-/d{4}/b/g },
+      { type: 'credit_card', regex: //b/d{4}[/s-]?/d{4}[/s-]?/d{4}[/s-]?/d{4}/b/g }
     ];
 
     for (const pattern of piiPatterns) {

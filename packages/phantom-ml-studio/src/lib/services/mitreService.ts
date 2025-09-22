@@ -4,7 +4,7 @@
  */
 import 'server-only';
 import axios from 'axios';
-import { query, transaction } from '..\database';
+import { query, transaction } from '../database';
 import { 
   StixBundle, 
   StixObject, 

@@ -368,7 +368,7 @@ export class CVE extends Model<CVEAttributes, CVECreationAttributes> implements 
    * @returns Year from CVE ID
    */
   public getCveYear(): number {
-    const match = this.cve_id.match(/CVE-(\d{4})-/);
+    const match = this.cve_id.match(/CVE-(/d{4})-/);
     return match ? parseInt(match[1]) : 0;
   }
 
@@ -775,7 +775,7 @@ export class CVE extends Model<CVEAttributes, CVECreationAttributes> implements 
    */
   static async createCVE(data: CVECreationAttributes): Promise<CVE> {
     // Validate CVE ID format
-    if (!/^CVE-\d{4}-\d{4,}$/.test(data.cve_id)) {
+    if (!/^CVE-/d{4}-/d{4,}$/.test(data.cve_id)) {
       throw new Error('CVE ID must follow format CVE-YYYY-NNNN');
     }
 
@@ -808,7 +808,7 @@ export class CVE extends Model<CVEAttributes, CVECreationAttributes> implements 
     for (const data of cveData) {
       try {
         // Validate CVE ID format
-        if (!/^CVE-\d{4}-\d{4,}$/.test(data.cve_id)) {
+        if (!/^CVE-/d{4}-/d{4,}$/.test(data.cve_id)) {
           results.errors.push(`Invalid CVE ID format: ${data.cve_id}`);
           continue;
         }

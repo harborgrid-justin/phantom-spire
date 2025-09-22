@@ -3,7 +3,7 @@
  * Comprehensive application monitoring with Prometheus-compatible metrics, alerting, and APM
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 
 // Metric types
 export enum MetricType {
@@ -547,8 +547,8 @@ export class MetricsRegistry {
 
     for (const metric of this.metrics.values()) {
       // Add help and type comments
-      output += `# HELP ${metric.name} ${metric.description}\n`;
-      output += `# TYPE ${metric.name} ${metric.type}\n`;
+      output += `# HELP ${metric.name} ${metric.description}/n`;
+      output += `# TYPE ${metric.name} ${metric.type}/n`;
 
       // Export metric data
       if (metric instanceof Histogram) {
@@ -559,11 +559,11 @@ export class MetricsRegistry {
           
           for (const bucket of buckets) {
             const bucketLabels = { ...dataPoint.labels, le: bucket.bucket };
-            output += `${metric.name}_bucket${this.formatLabels(bucketLabels)} ${bucket.count}\n`;
+            output += `${metric.name}_bucket${this.formatLabels(bucketLabels)} ${bucket.count}/n`;
           }
           
-          output += `${metric.name}_sum${labelStr} ${metric.getSum(dataPoint.labels)}\n`;
-          output += `${metric.name}_count${labelStr} ${metric.getCount(dataPoint.labels)}\n`;
+          output += `${metric.name}_sum${labelStr} ${metric.getSum(dataPoint.labels)}/n`;
+          output += `${metric.name}_count${labelStr} ${metric.getCount(dataPoint.labels)}/n`;
         }
       } else if (metric instanceof Summary) {
         // Export summary quantiles and sum/count
@@ -573,21 +573,21 @@ export class MetricsRegistry {
           
           for (const quantile of quantiles) {
             const quantileLabels = { ...dataPoint.labels, quantile: quantile.quantile };
-            output += `${metric.name}${this.formatLabels(quantileLabels)} ${quantile.value}\n`;
+            output += `${metric.name}${this.formatLabels(quantileLabels)} ${quantile.value}/n`;
           }
           
-          output += `${metric.name}_sum${labelStr} ${metric.getSum(dataPoint.labels)}\n`;
-          output += `${metric.name}_count${labelStr} ${metric.getCount(dataPoint.labels)}\n`;
+          output += `${metric.name}_sum${labelStr} ${metric.getSum(dataPoint.labels)}/n`;
+          output += `${metric.name}_count${labelStr} ${metric.getCount(dataPoint.labels)}/n`;
         }
       } else {
         // Export simple metrics
         for (const dataPoint of metric.getAll()) {
           const labelStr = this.formatLabels(dataPoint.labels);
-          output += `${metric.name}${labelStr} ${dataPoint.value}\n`;
+          output += `${metric.name}${labelStr} ${dataPoint.value}/n`;
         }
       }
 
-      output += '\n';
+      output += '/n';
     }
 
     return output;

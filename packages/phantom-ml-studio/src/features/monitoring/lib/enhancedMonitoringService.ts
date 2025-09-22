@@ -1,8 +1,8 @@
 // src/services/real-time-monitoring/enhancedMonitoringService.ts
 // Enhanced Real-time Monitoring Service with 6 Real-time Processing NAPI Bindings
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '..\..\..\lib\core';
-import { phantomMLCore } from '..\..\..\lib\phantom-ml-core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../../../lib/core';
+import { phantomMLCore } from '../../../lib/phantom-ml-core';
 
 export interface RealTimeMetrics {
   timestamp: string;

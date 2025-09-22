@@ -3,11 +3,11 @@
  * Focused service for ML model operations with enterprise features
  */
 
-import { BaseService } from '..\core\ServiceRegistry';
-import type { ICache } from '..\..\utils\enterprise-cache';
-import type { LoggerService } from '..\core\LoggerService';
-import type { AuditTrailService } from '..\..\utils\audit-trail';
-import type { MetricsRegistry } from '..\..\monitoring\metrics-system';
+import { BaseService } from '../core/ServiceRegistry';
+import type { ICache } from '../../utils/enterprise-cache';
+import type { LoggerService } from '../core/LoggerService';
+import type { AuditTrailService } from '../../utils/audit-trail';
+import type { MetricsRegistry } from '../../monitoring/metrics-system';
 import { z } from 'zod';
 
 // Model schemas

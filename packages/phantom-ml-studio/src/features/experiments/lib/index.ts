@@ -1,2 +1,2 @@
 export * from './experimentsService';
-export * from './experiments.types';
+export * from '../types/experiments.types';

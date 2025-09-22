@@ -3,7 +3,7 @@
  * Environment-based configuration with validation, encryption, and hot-reloading
  */
 
-import { BaseService, Injectable } from '..\..\lib\core\ServiceRegistry';
+import { BaseService, Injectable } from '../../lib/core/ServiceRegistry';
 import { ValidationUtils, SchemaRegistry } from '../../lib/validation/schemas';
 import * as yup from 'yup';
 
@@ -126,7 +126,7 @@ const SecurityConfigSchema = yup.object({
 const AppConfigSchema = yup.object({
   app: yup.object({
     name: yup.string().required('App name is required'),
-    version: yup.string().matches(/^\d+\.\d+\.\d+$/, 'Version must follow semantic versioning').required(),
+    version: yup.string().matches(/^/d+/./d+/./d+$/, 'Version must follow semantic versioning').required(),
     environment: yup.string().oneOf(['development', 'staging', 'production']).required(),
     port: yup.number().integer().min(1).max(65535).default(3001),
     host: yup.string().default('localhost'),
@@ -468,7 +468,7 @@ export class ConfigUtils {
       'GB': 1024 * 1024 * 1024
     };
     
-    const match = size.match(/^(\d+(?:\.\d+)?)\s*(B|KB|MB|GB)$/i);
+    const match = size.match(/^(/d+(?:/./d+)?)/s*(B|KB|MB|GB)$/i);
     if (!match) {
       throw new Error(`Invalid size format: ${size}`);
     }
@@ -486,7 +486,7 @@ export class ConfigUtils {
       'd': 24 * 60 * 60 * 1000
     };
     
-    const match = duration.match(/^(\d+(?:\.\d+)?)\s*(ms|s|m|h|d)$/i);
+    const match = duration.match(/^(/d+(?:/./d+)?)/s*(ms|s|m|h|d)$/i);
     if (!match) {
       throw new Error(`Invalid duration format: ${duration}`);
     }

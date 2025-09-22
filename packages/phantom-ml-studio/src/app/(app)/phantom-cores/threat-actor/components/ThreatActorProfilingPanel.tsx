@@ -81,7 +81,7 @@ export const ThreatActorProfilingPanel: React.FC = () => {
               >
                 {actorTypes.map((type) => (
                   <MenuItem key={type} value={type}>
-                    {type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    {type.replace('_', ' ').replace(//b/w/g, l => l.toUpperCase())}
                   </MenuItem>
                 ))}
               </Select>
@@ -125,7 +125,7 @@ export const ThreatActorProfilingPanel: React.FC = () => {
                     <Box>
                       <Typography variant="subtitle1">{profile.actor_profile.name}</Typography>
                       <Typography variant="body2" color="textSecondary">
-                        {profile.actor_profile.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {profile.actor_profile.type.replace('_', ' ').replace(//b/w/g, l => l.toUpperCase())}
                       </Typography>
                     </Box>
                   </Box>

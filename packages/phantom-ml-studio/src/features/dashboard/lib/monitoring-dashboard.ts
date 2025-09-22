@@ -5,10 +5,10 @@
  */
 
 import { EventEmitter } from 'events';
-import { PerformanceMonitor } from '..\..\..\lib\monitoring\performance-monitor';
-import { HealthMonitor } from '..\..\..\lib\monitoring\health-monitor';
-import { EnterpriseCache } from '..\..\..\lib\caching\enterprise-cache';
-import { AuditLogger } from '..\..\..\security\audit-logger';
+import { PerformanceMonitor } from '../../../lib/monitoring/performance-monitor';
+import { HealthMonitor } from '../../../lib/monitoring/health-monitor';
+import { EnterpriseCache } from '../../../lib/caching/enterprise-cache';
+import { AuditLogger } from '../../../security/audit-logger';
 
 export interface DashboardMetric {
   id: string;

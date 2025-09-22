@@ -1,7 +1,7 @@
 // src/services/threat-intelligence-marketplace/threatIntelligenceMarketplaceService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
-import { ThreatModel, GetThreatModelsRequest, GetThreatModelsResponse } from '..\..\..\lib\threatIntelligenceMarketplace.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../../../lib/core';
+import { ThreatModel, GetThreatModelsRequest, GetThreatModelsResponse } from '../../../lib/threatIntelligenceMarketplace.types';
 
 const THREAT_INTELLIGENCE_MARKETPLACE_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-threat-intelligence-marketplace',

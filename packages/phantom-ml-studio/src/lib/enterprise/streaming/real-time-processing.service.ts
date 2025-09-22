@@ -5,8 +5,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { mlCoreManager } from '..\..\..\..\lib\ml-core';
-import { persistenceService } from '..\..\persistence\enterprise-persistence.service';
+import { mlCoreManager } from '../../../../lib/ml-core';
+import { persistenceService } from '../../persistence/enterprise-persistence.service';
 
 // ==================== STREAMING TYPES ====================
 

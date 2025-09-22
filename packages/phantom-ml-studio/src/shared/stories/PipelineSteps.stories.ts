@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import PipelineStepsComponent from '..\..\lib\app\automlPipeline\components\PipelineSteps';
-import { PipelineStep } from '..\..\lib\app\automlPipeline\types';
+import PipelineStepsComponent from '../../lib/app/automlPipeline/components/PipelineSteps';
+import { PipelineStep } from '../../lib/app/automlPipeline/types';
 
 // Mock pipeline steps data
 const mockSteps: PipelineStep[] = [

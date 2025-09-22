@@ -7,13 +7,13 @@ import * as yup from 'yup';
 
 // Common validation patterns
 const PATTERNS = {
-  EMAIL: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  PHONE: /^\+?[\d\s()-]{10,}$/,
+  EMAIL: /^[^/s@]+@[^/s@]+/.[^/s@]+$/,
+  PHONE: /^/+?[/d/s()-]{10,}$/,
   UUID: /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
   SLUG: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-  IP_ADDRESS: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
-  URL: /^https?:\/\/(?:[-\w.])+(?:\:[0-9]+)?(?:\/(?:[\w\/_.])*(?:\?(?:[\w&=%.])*)?(?:\#(?:[\w.])*)?)?$/,
-  SEMANTIC_VERSION: /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?:[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
+  IP_ADDRESS: /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
+  URL: /^https?:////(?:[-/w.])+(?:/:[0-9]+)?(?://(?:[/w//_.])*(?:/?(?:[/w&=%.])*)?(?:/#(?:[/w.])*)?)?$/,
+  SEMANTIC_VERSION: /^(?:0|[1-9]/d*)/.(?:0|[1-9]/d*)/.(?:0|[1-9]/d*)(?:-(?:(?:0|[1-9]/d*|/d*[a-zA-Z-][0-9a-zA-Z-]*)(?:/.(?:0|[1-9]/d*|/d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:/+(?:[0-9a-zA-Z-]+(?:/.[0-9a-zA-Z-]+)*))?$/,
   HASH_SHA256: /^[a-fA-F0-9]{64}$/,
   HASH_MD5: /^[a-fA-F0-9]{32}$/
 };
@@ -28,7 +28,7 @@ const createCustomValidators = () => {
       const hasMinLength = value.length >= 8;
       const hasUppercase = /[A-Z]/.test(value);
       const hasLowercase = /[a-z]/.test(value);
-      const hasNumber = /\d/.test(value);
+      const hasNumber = //d/.test(value);
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
       
       return hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
@@ -37,12 +37,12 @@ const createCustomValidators = () => {
 
   // CVE ID validation
   (yup.string as any).cveId = function() {
-    return this.matches(/^CVE-\d{4}-\d{4,}$/, 'Must be a valid CVE ID (e.g., CVE-2023-1234)');
+    return this.matches(/^CVE-/d{4}-/d{4,}$/, 'Must be a valid CVE ID (e.g., CVE-2023-1234)');
   };
 
   // MITRE technique ID validation
   (yup.string as any).mitreId = function() {
-    return this.matches(/^T\d{4}(?:\.\d{3})?$/, 'Must be a valid MITRE ATT&CK technique ID (e.g., T1055.001)');
+    return this.matches(/^T/d{4}(?:/./d{3})?$/, 'Must be a valid MITRE ATT&CK technique ID (e.g., T1055.001)');
   };
 
   // IOC type validation
@@ -86,7 +86,7 @@ export const UserRegistrationSchema = yup.object({
       const hasMinLength = value.length >= 8;
       const hasUppercase = /[A-Z]/.test(value);
       const hasLowercase = /[a-z]/.test(value);
-      const hasNumber = /\d/.test(value);
+      const hasNumber = //d/.test(value);
       const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
       return hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
     })

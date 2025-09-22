@@ -4,7 +4,7 @@
  */
 
 import { EnterpriseRateLimiter, RateLimitResult } from './rate-limiter';
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 import type { ICache } from '../utils/enterprise-cache';
 
 export interface AdaptiveRateLimitConfig {

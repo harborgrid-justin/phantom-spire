@@ -421,11 +421,11 @@ export function generateNetworkIndicators(count: number = 3): string[] {
  */
 export function generateRegistryModifications(count: number = 2): string[] {
   const modifications = [
-    'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run',
-    'HKCU\\SOFTWARE\\Classes\\exefile\\shell\\open\\command',
-    'HKLM\\SYSTEM\\CurrentControlSet\\Services',
-    'HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce',
-    'HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon'
+    'HKLM//SOFTWARE//Microsoft//Windows//CurrentVersion//Run',
+    'HKCU//SOFTWARE//Classes//exefile//shell//open//command',
+    'HKLM//SYSTEM//CurrentControlSet//Services',
+    'HKCU//SOFTWARE//Microsoft//Windows//CurrentVersion//RunOnce',
+    'HKLM//SOFTWARE//Microsoft//Windows NT//CurrentVersion//Winlogon'
   ];
   return getRandomItems(modifications, count);
 }

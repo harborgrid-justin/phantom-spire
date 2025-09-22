@@ -65,7 +65,7 @@ export class CodePruningSystem {
         const content = await fs.readFile(file, 'utf-8');
         const stats = await fs.stat(file);
         totalSize += stats.size;
-        totalLines += content.split('\n').length;
+        totalLines += content.split('/n').length;
 
         // Find unused imports
         const unusedImports = await this.findUnusedImports(file, content, dependencyGraph);
@@ -152,7 +152,7 @@ export class CodePruningSystem {
     const dependencies = new Set<string>();
     
     // Extract imports
-    const importRegex = /import.*?from\s+['"]([^'"]+)['"]/g;
+    const importRegex = /import.*?from/s+['"]([^'"]+)['"]/g;
     let match;
     
     while ((match = importRegex.exec(content)) !== null) {
@@ -168,7 +168,7 @@ export class CodePruningSystem {
     }
     
     // Extract dynamic imports
-    const dynamicImportRegex = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+    const dynamicImportRegex = /import/s*/(/s*['"]([^'"]+)['"]/s*/)/g;
     while ((match = dynamicImportRegex.exec(content)) !== null) {
       dependencies.add(match[1]);
     }
@@ -181,14 +181,14 @@ export class CodePruningSystem {
    */
   private async findUnusedImports(file: string, content: string, graph: Map<string, Set<string>>): Promise<UnusedCode[]> {
     const unused: UnusedCode[] = [];
-    const lines = content.split('\n');
+    const lines = content.split('/n');
     
     // Extract all imports
-    const importRegex = /^import\s+(?:{([^}]+)}|(\w+)|\*\s+as\s+(\w+))\s+from\s+['"]([^'"]+)['"];?/gm;
+    const importRegex = /^import/s+(?:{([^}]+)}|(/w+)|/*/s+as/s+(/w+))/s+from/s+['"]([^'"]+)['"];?/gm;
     let match;
     
     while ((match = importRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const namedImports = match[1];
       const defaultImport = match[2];
       const namespaceImport = match[3];
@@ -241,11 +241,11 @@ export class CodePruningSystem {
     const unused: UnusedCode[] = [];
     
     // Find all exports
-    const exportRegex = /^export\s+(?:(?:const|let|var|function|class|interface|type)\s+)?(\w+)/gm;
+    const exportRegex = /^export/s+(?:(?:const|let|var|function|class|interface|type)/s+)?(/w+)/gm;
     let match;
     
     while ((match = exportRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const exportName = match[1];
       
       // Check if this export is imported anywhere
@@ -272,11 +272,11 @@ export class CodePruningSystem {
     const unused: UnusedCode[] = [];
     
     // Find functions
-    const functionRegex = /^(?:export\s+)?(?:async\s+)?function\s+(\w+)/gm;
+    const functionRegex = /^(?:export/s+)?(?:async/s+)?function/s+(/w+)/gm;
     let match;
     
     while ((match = functionRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const functionName = match[1];
       
       if (!this.isIdentifierUsed(content, functionName) && !this.isExportUsed(file, functionName, graph)) {
@@ -291,9 +291,9 @@ export class CodePruningSystem {
     }
     
     // Find classes
-    const classRegex = /^(?:export\s+)?(?:abstract\s+)?class\s+(\w+)/gm;
+    const classRegex = /^(?:export/s+)?(?:abstract/s+)?class/s+(/w+)/gm;
     while ((match = classRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const className = match[1];
       
       if (!this.isIdentifierUsed(content, className) && !this.isExportUsed(file, className, graph)) {
@@ -308,9 +308,9 @@ export class CodePruningSystem {
     }
     
     // Find interfaces
-    const interfaceRegex = /^(?:export\s+)?interface\s+(\w+)/gm;
+    const interfaceRegex = /^(?:export/s+)?interface/s+(/w+)/gm;
     while ((match = interfaceRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const interfaceName = match[1];
       
       if (!this.isIdentifierUsed(content, interfaceName) && !this.isExportUsed(file, interfaceName, graph)) {
@@ -334,15 +334,15 @@ export class CodePruningSystem {
     const unused: UnusedCode[] = [];
     
     // Find variable declarations
-    const varRegex = /^(?:const|let|var)\s+(\w+)/gm;
+    const varRegex = /^(?:const|let|var)/s+(/w+)/gm;
     let match;
     
     while ((match = varRegex.exec(content)) !== null) {
-      const lineNumber = content.substring(0, match.index).split('\n').length;
+      const lineNumber = content.substring(0, match.index).split('/n').length;
       const varName = match[1];
       
       // Count occurrences (should be more than 1 if used)
-      const occurrences = (content.match(new RegExp(`\\b${varName}\\b`, 'g')) || []).length;
+      const occurrences = (content.match(new RegExp(`//b${varName}//b`, 'g')) || []).length;
       
       if (occurrences === 1) {
         unused.push({
@@ -369,7 +369,7 @@ export class CodePruningSystem {
     );
     
     // Check for usage
-    const regex = new RegExp(`\\b${identifier}\\b`, 'g');
+    const regex = new RegExp(`//b${identifier}//b`, 'g');
     const matches = withoutImportExport.match(regex);
     
     return matches && matches.length > 0;
@@ -493,7 +493,7 @@ export class CodePruningSystem {
   private async removeUnusedCode(item: UnusedCode): Promise<void> {
     try {
       const content = await fs.readFile(item.file, 'utf-8');
-      const lines = content.split('\n');
+      const lines = content.split('/n');
       
       if (item.type === 'import') {
         // Remove entire import line
@@ -503,7 +503,7 @@ export class CodePruningSystem {
         lines.splice(item.line - 1, 1);
       }
       
-      await fs.writeFile(item.file, lines.join('\n'));
+      await fs.writeFile(item.file, lines.join('/n'));
       console.log(`✅ Removed unused ${item.type} '${item.name}' from ${path.basename(item.file)}`);
     } catch (error) {
       console.error(`❌ Failed to remove ${item.type} '${item.name}' from ${item.file}:`, error);
@@ -528,7 +528,7 @@ Generated: ${report.analysisDate.toISOString()}
 ${this.generateBreakdownTable(report.unusedItems)}
 
 ## Recommendations
-${report.recommendations.map(rec => `- ${rec}`).join('\n')}
+${report.recommendations.map(rec => `- ${rec}`).join('/n')}
 
 ## Detailed Findings
 
@@ -536,7 +536,7 @@ ${report.unusedItems.map(item => `### ${item.type.toUpperCase()}: ${item.name}
 - **File**: ${path.relative(this.projectRoot, item.file)}
 - **Line**: ${item.line}
 - **Reason**: ${item.reason}
-`).join('\n')}
+`).join('/n')}
 
 ## Files with Most Issues
 ${this.getFilesWithMostIssues(report.unusedItems)}
@@ -558,7 +558,7 @@ ${this.getFilesWithMostIssues(report.unusedItems)}
 
     return Object.entries(breakdown)
       .map(([type, count]) => `| ${type.charAt(0).toUpperCase() + type.slice(1)} | ${count} |`)
-      .join('\n');
+      .join('/n');
   }
 
   private getFilesWithMostIssues(items: UnusedCode[]): string {
@@ -572,7 +572,7 @@ ${this.getFilesWithMostIssues(report.unusedItems)}
       .sort(([,a], [,b]) => b - a)
       .slice(0, 10)
       .map(([file, count]) => `- **${file}**: ${count} issues`)
-      .join('\n');
+      .join('/n');
   }
 }
 
@@ -588,20 +588,20 @@ export class CodePruningCLI {
 
   async analyze(): Promise<void> {
     const report = await this.system.analyzeCodebase();
-    console.log(`\n📊 Code Analysis Results:`);
+    console.log(`/n📊 Code Analysis Results:`);
     console.log(`Files analyzed: ${report.filesAnalyzed}`);
     console.log(`Unused items: ${report.unusedItems.length}`);
     console.log(`Potential savings: ${report.potentialSavings.lines} lines, ${(report.potentialSavings.size / 1024).toFixed(1)}KB`);
     
     if (report.recommendations.length > 0) {
-      console.log(`\n💡 Recommendations:`);
+      console.log(`/n💡 Recommendations:`);
       report.recommendations.forEach(rec => console.log(`  - ${rec}`));
     }
   }
 
   async prune(dryRun: boolean = true): Promise<void> {
     const result = await this.system.autoPrune(dryRun);
-    console.log(`\n🧹 Pruning Results:`);
+    console.log(`/n🧹 Pruning Results:`);
     console.log(`Items ${dryRun ? 'to be' : ''} removed: ${result.removed.length}`);
     console.log(`Items requiring manual review: ${result.skipped.length}`);
   }

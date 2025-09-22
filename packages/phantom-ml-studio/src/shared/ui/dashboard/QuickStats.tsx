@@ -42,13 +42,13 @@ const StatCard = React.memo(function StatCard({ title, value, subtitle, icon, co
       className="ml-card h-full"
       component="article"
       role="region"
-      aria-labelledby={`stat-${title.replace(/\s+/g, '-').toLowerCase()}-title`}
+      aria-labelledby={`stat-${title.replace(//s+/g, '-').toLowerCase()}-title`}
     >
       <CardContent className="p-6">
         <Box className="flex items-start justify-between">
           <Box className="flex-1">
             <Typography
-              id={`stat-${title.replace(/\s+/g, '-').toLowerCase()}-title`}
+              id={`stat-${title.replace(//s+/g, '-').toLowerCase()}-title`}
               variant="body2"
               color="text.secondary"
               className="mb-2"
@@ -60,13 +60,13 @@ const StatCard = React.memo(function StatCard({ title, value, subtitle, icon, co
               variant="h4"
               className="font-bold mb-1"
               style={{ color }}
-              aria-describedby={subtitle ? `stat-${title.replace(/\s+/g, '-').toLowerCase()}-subtitle` : undefined}
+              aria-describedby={subtitle ? `stat-${title.replace(//s+/g, '-').toLowerCase()}-subtitle` : undefined}
             >
               {value}
             </Typography>
             {subtitle && (
               <Typography
-                id={`stat-${title.replace(/\s+/g, '-').toLowerCase()}-subtitle`}
+                id={`stat-${title.replace(//s+/g, '-').toLowerCase()}-subtitle`}
                 variant="body2"
                 color="text.secondary"
               >

@@ -1,8 +1,8 @@
 // src/services/experimentsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '..\..\..\lib\core';
-import { Experiment, ExperimentRun, CreateExperimentRequest, CreateExperimentResponse, GetExperimentsRequest, GetExperimentsResponse, GetExperimentRequest, GetExperimentResponse, StartExperimentRunRequest, StartExperimentRunResponse, LogExperimentRunResultsRequest, LogExperimentRunResultsResponse } from '..\..\..\lib\experiments.types';
-import { ModelConfig, AutoMLResult } from '..\..\..\lib\model-builder\modelBuilder.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../../../lib/core-logic/types/business-logic.types';
+import { Experiment, ExperimentRun, CreateExperimentRequest, CreateExperimentResponse, GetExperimentsRequest, GetExperimentsResponse, GetExperimentRequest, GetExperimentResponse, StartExperimentRunRequest, StartExperimentRunResponse, LogExperimentRunResultsRequest, LogExperimentRunResultsResponse } from '../types/experiments.types';
+import { ModelConfig, AutoMLResult } from '../../model-builder/types/modelBuilder.types';
 
 const EXPERIMENTS_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-experiments',

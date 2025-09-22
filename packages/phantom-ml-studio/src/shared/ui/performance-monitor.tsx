@@ -348,10 +348,10 @@ class PerformanceMonitor {
       scripts: resourceMetrics.filter(m => m.name.includes('.js')).length,
       stylesheets: resourceMetrics.filter(m => m.name.includes('.css')).length,
       images: resourceMetrics.filter(m =>
-        m.name.match(/\.(jpg|jpeg|png|gif|svg|webp|avif)/)
+        m.name.match(//.(jpg|jpeg|png|gif|svg|webp|avif)/)
       ).length,
       fonts: resourceMetrics.filter(m =>
-        m.name.match(/\.(woff|woff2|ttf|otf)/)
+        m.name.match(//.(woff|woff2|ttf|otf)/)
       ).length,
       total: resourceMetrics.length,
     };

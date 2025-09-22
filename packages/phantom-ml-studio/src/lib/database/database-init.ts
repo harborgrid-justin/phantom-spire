@@ -4,7 +4,7 @@
  */
 import { initializeDatabase } from './database';
 import { initializeSchema } from './schema';
-import { seedDatabase, isDatabaseSeeded } from '..\seed';
+import { seedDatabase, isDatabaseSeeded } from '../seed';
 
 /**
  * Initialize the complete database setup

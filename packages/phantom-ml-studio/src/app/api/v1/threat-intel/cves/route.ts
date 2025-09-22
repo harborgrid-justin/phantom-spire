@@ -3,8 +3,8 @@
  * Common Vulnerabilities and Exposures management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { CVE } from '..\..\..\..\..\..\..\lib\database\models\CVE.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { CVE } from '../../../../../../../lib/database/models/CVE.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 
 /**
  * @swagger
@@ -253,7 +253,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate CVE ID format
-    const cveIdPattern = /^CVE-\d{4}-\d{4,}$/;
+    const cveIdPattern = /^CVE-/d{4}-/d{4,}$/;
     if (!cveIdPattern.test(body.cve_id)) {
       return NextResponse.json(
         {

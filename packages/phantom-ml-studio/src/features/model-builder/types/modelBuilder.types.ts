@@ -2,7 +2,7 @@
  * Model Builder Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse, DataObject, EngineeredFeature, SelectedFeature, EnsembleResult } from '..\..\..\lib\core';
+import { BusinessLogicRequest, BusinessLogicResponse, DataObject, EngineeredFeature, SelectedFeature, EnsembleResult } from '../../../lib/core';
 
 // Re-export EnsembleResult so it can be imported from this module
 export type { EnsembleResult } from '../core';

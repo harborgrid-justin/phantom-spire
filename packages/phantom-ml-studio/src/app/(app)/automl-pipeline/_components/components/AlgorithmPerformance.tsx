@@ -112,7 +112,7 @@ export default function AlgorithmPerformanceComponent({ performance }: Algorithm
                 return (
                   <TableRow 
                     key={perf.algorithm}
-                    data-cy={`algorithm-performance-${perf.algorithm.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-cy={`algorithm-performance-${perf.algorithm.toLowerCase().replace(//s+/g, '-')}`}
                     sx={{
                       backgroundColor: isBest ? 'success.light' : 'inherit',
                       opacity: isFailed ? 0.6 : 1

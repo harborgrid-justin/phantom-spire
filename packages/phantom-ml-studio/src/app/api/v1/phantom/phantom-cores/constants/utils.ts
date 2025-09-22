@@ -52,7 +52,7 @@ export const isValidRiskLevel = (level: string): boolean => {
 };
 
 export const isValidIPv4 = (ip: string): boolean => {
-  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+  const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
   return ipv4Regex.test(ip);
 };
 
@@ -62,12 +62,12 @@ export const isValidIPv6 = (ip: string): boolean => {
 };
 
 export const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^/s@]+@[^/s@]+/.[^/s@]+$/;
   return emailRegex.test(email);
 };
 
 export const isValidDomain = (domain: string): boolean => {
-  const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+  const domainRegex = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?/.)+[a-zA-Z]{2,}$/;
   return domainRegex.test(domain);
 };
 

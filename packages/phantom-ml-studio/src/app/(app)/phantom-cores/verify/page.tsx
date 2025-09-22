@@ -97,7 +97,7 @@ ${Object.entries(data.verificationResults || {})
   Enterprise Features: ${(result.enterpriseFeatures || []).length}
   Test Results: ${(result.testResults?.passed || 0)}/${(result.testResults?.totalTests || 0)} passed
   ${result.importError ? `  Import Error: ${result.importError}` : ''}
-`).join('\n')}
+`).join('/n')}
 
 RECOMMENDATIONS:
 ${errors > 0 ?

@@ -4,7 +4,7 @@
  * Fully H2O.ai competitive enterprise ML platform
  */
 
-import { phantomMLEnterprise, EnterprisePlatform } from '..\enterprise';
+import { phantomMLEnterprise, EnterprisePlatform } from './enterprise-core.service';
 
 export interface PhantomMLCoreBindings {
   // ==================== MODEL MANAGEMENT (8 bindings) ====================

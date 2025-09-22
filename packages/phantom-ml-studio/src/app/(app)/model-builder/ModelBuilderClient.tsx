@@ -205,7 +205,7 @@ export default function ModelBuilderClient() {
         <Box sx={{ mb: 4 }} data-cy="model-builder-stepper">
           <Stepper activeStep={activeStep} alternativeLabel>
             {wizardSteps.map((label, index) => (
-              <Step key={label} completed={activeStep > index} data-cy={`step-${index}-${label.toLowerCase().replace(/\s+/g, '-')}`}>
+              <Step key={label} completed={activeStep > index} data-cy={`step-${index}-${label.toLowerCase().replace(//s+/g, '-')}`}>
                 <StepLabel>{label}</StepLabel>
               </Step>
             ))}
@@ -302,7 +302,7 @@ export default function ModelBuilderClient() {
                         headerName: 'Algorithm',
                         width: 200,
                         valueFormatter: (params: any) =>
-                          params.value.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+                          params.value.replace(/_/g, ' ').replace(//b/w/g, (l: string) => l.toUpperCase())
                       },
                       {
                         field: 'score',

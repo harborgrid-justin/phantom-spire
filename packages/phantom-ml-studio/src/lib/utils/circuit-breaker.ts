@@ -3,7 +3,7 @@
  * Implements circuit breaker pattern with health monitoring for all services
  */
 
-import type { LoggerService } from '..\services\core\LoggerService';
+import type { LoggerService } from '../services/core/LoggerService';
 
 // Circuit breaker states
 export enum CircuitBreakerState {

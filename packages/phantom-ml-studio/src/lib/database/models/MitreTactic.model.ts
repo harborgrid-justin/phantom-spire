@@ -263,7 +263,7 @@ export class MitreTactic extends Model<MitreTacticAttributes, MitreTacticCreatio
    * @returns Numeric part of tactic ID
    */
   public getTacticNumber(): number {
-    const match = this.tactic_id.match(/\d+/);
+    const match = this.tactic_id.match(//d+/);
     return match ? parseInt(match[0]) : 0;
   }
 
@@ -540,7 +540,7 @@ export class MitreTactic extends Model<MitreTacticAttributes, MitreTacticCreatio
    */
   static async createTactic(data: MitreTacticCreationAttributes): Promise<MitreTactic> {
     // Validate tactic ID format
-    if (!/^TA\d{4}$/.test(data.tactic_id)) {
+    if (!/^TA/d{4}$/.test(data.tactic_id)) {
       throw new Error('Tactic ID must follow format TA#### (e.g., TA0001)');
     }
 

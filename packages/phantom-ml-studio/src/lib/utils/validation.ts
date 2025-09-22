@@ -38,7 +38,7 @@ export const BaseValidationSchemas = {
   slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/, 'Invalid slug format'),
   email: z.string().email('Invalid email format'),
   url: z.string().url('Invalid URL format'),
-  version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Invalid version format (expected x.y.z)'),
+  version: z.string().regex(/^/d+/./d+/./d+$/, 'Invalid version format (expected x.y.z)'),
   
   // Date and time
   isoDate: z.string().datetime('Invalid ISO date format'),
@@ -204,7 +204,7 @@ export const APIValidationSchemas = {
   fileUpload: z.object({
     filename: z.string().min(1).max(255),
     size: z.number().int().min(1).max(100 * 1024 * 1024), // 100MB max
-    mimetype: z.string().regex(/^[a-z]+\/[a-z0-9\-\+\.]+$/, 'Invalid MIME type'),
+    mimetype: z.string().regex(/^[a-z]+//[a-z0-9/-/+/.]+$/, 'Invalid MIME type'),
     encoding: z.string().optional(),
   }),
   
@@ -288,8 +288,8 @@ export const ModelValidationSchemas = {
     config: z.object({
       replicas: z.number().int().min(1).max(100).default(1),
       resources: z.object({
-        cpu: z.string().regex(/^\d+m?$/, 'Invalid CPU format'),
-        memory: z.string().regex(/^\d+[KMGT]i?$/, 'Invalid memory format'),
+        cpu: z.string().regex(/^/d+m?$/, 'Invalid CPU format'),
+        memory: z.string().regex(/^/d+[KMGT]i?$/, 'Invalid memory format'),
         gpu: z.number().int().min(0).optional(),
       }).optional(),
       scaling: z.object({
@@ -419,7 +419,7 @@ export const AuthValidationSchemas = {
   register: z.object({
     email: BaseValidationSchemas.email,
     password: z.string().min(8).max(128)
-      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*/d)(?=.*[@$!%*?&])[A-Za-z/d@$!%*?&]/, 
         'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character'),
     confirmPassword: z.string(),
     firstName: z.string().min(1).max(50),

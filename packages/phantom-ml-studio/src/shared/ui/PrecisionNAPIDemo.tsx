@@ -26,7 +26,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { phantomMLCore } from '../services/phantom-ml-core';
+import { phantomMLCore } from '../../lib/core-logic/phantom-ml-core';
 
 interface TabPanelProps {
   children?: React.ReactNode;

@@ -88,7 +88,7 @@ export default function PipelineSteps({ steps }: PipelineStepsProps) {
           {steps.map((step, index) => {
             // Map step names to test-friendly identifiers
             const stepTestId = step.name.toLowerCase()
-              .replace(/\s+/g, '-')
+              .replace(//s+/g, '-')
               .replace(/[^a-z0-9-]/g, '');
             
             return (

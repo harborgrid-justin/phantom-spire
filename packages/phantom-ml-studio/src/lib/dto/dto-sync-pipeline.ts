@@ -4,8 +4,8 @@
  */
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { getSequelize } from '..\sequelize';
-import { models } from '..\models';
+import { getSequelize } from '../sequelize';
+import { models } from '../models';
 
 export interface DTOField {
   name: string;
@@ -128,7 +128,7 @@ export class ${modelName}DTOTransformer {
    */
   static toDTO(model: any): ${modelName}DTO {
     return {
-      ${Object.keys(attributes).map(attr => `${attr}: model.${attr}`).join(',\n      ')}
+      ${Object.keys(attributes).map(attr => `${attr}: model.${attr}`).join(',/n      ')}
     };
   }
 
@@ -176,19 +176,19 @@ export class ${modelName}DTOTransformer {
       const value = dto[field];
       
       if (rules.required && (value === undefined || value === null)) {
-        errors.push(\`Field '\${field}' is required\`);
+        errors.push(/`Field '/${field}' is required/`);
       }
       
       if (rules.type && value !== undefined && typeof value !== rules.type) {
-        errors.push(\`Field '\${field}' must be of type \${rules.type}\`);
+        errors.push(/`Field '/${field}' must be of type /${rules.type}/`);
       }
       
       if (rules.minLength && typeof value === 'string' && value.length < rules.minLength) {
-        errors.push(\`Field '\${field}' must be at least \${rules.minLength} characters long\`);
+        errors.push(/`Field '/${field}' must be at least /${rules.minLength} characters long/`);
       }
       
       if (rules.maxLength && typeof value === 'string' && value.length > rules.maxLength) {
-        errors.push(\`Field '\${field}' must be at most \${rules.maxLength} characters long\`);
+        errors.push(/`Field '/${field}' must be at most /${rules.maxLength} characters long/`);
       }
     });
     
@@ -236,8 +236,8 @@ export class ${modelName}DTOFactory {
       const optional = attr.allowNull !== false ? '?' : '';
       const comment = attr.comment || `${name} field`;
       
-      return `  /** ${comment} */\n  ${name}${optional}: ${type};`;
-    }).join('\n\n');
+      return `  /** ${comment} *//n  ${name}${optional}: ${type};`;
+    }).join('/n/n');
 
     return `/**
  * Base ${modelName} DTO Interface
@@ -268,12 +268,12 @@ export interface ${modelName}Attributes extends ${modelName}DTO {}`;
         return; // Skip auto-generated fields
       }
       
-      const fieldDef = `  /** ${comment} */\n  ${name}: ${type};`;
+      const fieldDef = `  /** ${comment} *//n  ${name}: ${type};`;
       
       if (attr.allowNull === false && !attr.defaultValue) {
         requiredFields.push(fieldDef);
       } else {
-        optionalFields.push(`  /** ${comment} */\n  ${name}?: ${type};`);
+        optionalFields.push(`  /** ${comment} *//n  ${name}?: ${type};`);
       }
     });
 
@@ -282,9 +282,9 @@ export interface ${modelName}Attributes extends ${modelName}DTO {}`;
  * Used for creating new ${modelName} entities
  */
 export interface Create${modelName}DTO {
-${requiredFields.join('\n\n')}
+${requiredFields.join('/n/n')}
 
-${optionalFields.length > 0 ? optionalFields.join('\n\n') : ''}
+${optionalFields.length > 0 ? optionalFields.join('/n/n') : ''}
 }
 
 /**
@@ -305,8 +305,8 @@ export interface ${modelName}CreationAttributes extends Create${modelName}DTO {}
       const type = this.sequelizeTypeToTSType(attr.type || attr);
       const comment = attr.comment || `${name} field`;
       
-      return `  /** ${comment} */\n  ${name}?: ${type};`;
-    }).filter(Boolean).join('\n\n');
+      return `  /** ${comment} *//n  ${name}?: ${type};`;
+    }).filter(Boolean).join('/n/n');
 
     return `/**
  * ${modelName} Update DTO
@@ -335,8 +335,8 @@ ${fields}
         filterType = `Date | { gt?: Date; gte?: Date; lt?: Date; lte?: Date; }`;
       }
       
-      return `  /** ${comment} */\n  ${name}?: ${filterType};`;
-    }).join('\n\n');
+      return `  /** ${comment} *//n  ${name}?: ${filterType};`;
+    }).join('/n/n');
 
     return `/**
  * ${modelName} Filter DTO
@@ -515,7 +515,7 @@ export interface Delete${modelName}ResponseDTO {
       }
       
       return `${name}: { ${validation} }`;
-    }).filter(Boolean).join(',\n    ');
+    }).filter(Boolean).join(',/n    ');
 
     return rules;
   }
@@ -527,7 +527,7 @@ export interface Delete${modelName}ResponseDTO {
     return Object.keys(attributes)
       .filter(name => name !== 'id' && name !== 'created_at' && name !== 'updated_at')
       .map(name => `${name}: dto.${name}`)
-      .join(',\n      ');
+      .join(',/n      ');
   }
 
   /**
@@ -537,7 +537,7 @@ export interface Delete${modelName}ResponseDTO {
     return Object.keys(attributes)
       .filter(name => name !== 'id' && name !== 'created_at')
       .map(name => `if (dto.${name} !== undefined) updateData.${name} = dto.${name};`)
-      .join('\n    ');
+      .join('/n    ');
   }
 
   /**
@@ -555,9 +555,9 @@ export interface Delete${modelName}ResponseDTO {
         where.${name} = filter.${name};
       } else {
         const stringFilter = filter.${name} as any;
-        if (stringFilter.contains) where.${name} = { [Op.like]: \`%\${stringFilter.contains}%\` };
-        if (stringFilter.startsWith) where.${name} = { [Op.like]: \`\${stringFilter.startsWith}%\` };
-        if (stringFilter.endsWith) where.${name} = { [Op.like]: \`%\${stringFilter.endsWith}\` };
+        if (stringFilter.contains) where.${name} = { [Op.like]: /`%/${stringFilter.contains}%/` };
+        if (stringFilter.startsWith) where.${name} = { [Op.like]: /`/${stringFilter.startsWith}%/` };
+        if (stringFilter.endsWith) where.${name} = { [Op.like]: /`%/${stringFilter.endsWith}/` };
       }
     }`;
         } else if (tsType === 'number' || tsType === 'Date') {
@@ -576,7 +576,7 @@ export interface Delete${modelName}ResponseDTO {
           return `if (filter.${name} !== undefined) where.${name} = filter.${name};`;
         }
       })
-      .join('\n    ');
+      .join('/n    ');
   }
 
   /**
@@ -620,7 +620,7 @@ export interface Delete${modelName}ResponseDTO {
         return type === 'filter' && value === 'undefined' ? null : `${name}: ${value}`;
       })
       .filter(Boolean)
-      .join(',\n      ');
+      .join(',/n      ');
   }
 
   /**
@@ -630,7 +630,7 @@ export interface Delete${modelName}ResponseDTO {
     const exports = models.map(model => {
       const modelName = model.name;
       return `export * from './${modelName}.dto';`;
-    }).join('\n');
+    }).join('/n');
 
     const content = `/**
  * DTO INDEX FILE
@@ -691,7 +691,7 @@ import {
   Update${modelName}DTO, 
   ${modelName}FilterDTO 
 } from '../${modelName}.dto';
-import { ApiResponseDTO, PaginationDTO } from '..\index';
+import { ApiResponseDTO, PaginationDTO } from '../index';
 
 /**
  * ${modelName} API Request DTOs
@@ -737,7 +737,7 @@ export namespace ${modelName}API {
     // Generate API index
     const apiExports = models.map(model => 
       `export * from './${model.name}.api.dto';`
-    ).join('\n');
+    ).join('/n');
     
     await fs.writeFile(path.join(apiDtoPath, 'index.ts'), `/**
  * API DTO INDEX

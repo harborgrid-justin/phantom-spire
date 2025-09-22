@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { ValidationUtils } from '..\..\lib\utils\validation';
+import { ValidationUtils } from '../../lib/utils/validation';
 
 // Configuration source types
 export enum ConfigSource {
@@ -587,7 +587,7 @@ export class EnterpriseConfigManager {
       }
       
       const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
+      const lines = content.split('/n');
       let loaded = 0;
       
       for (const line of lines) {

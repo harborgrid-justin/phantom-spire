@@ -648,7 +648,7 @@ export class HuggingFaceModelRegistry extends EventEmitter {
 
   // Utility methods
   private generateEntryId(modelId: string): string {
-    return `hf-${modelId.replace(/[/\\]/g, '-')}-${Date.now()}`;
+    return `hf-${modelId.replace(/[///]/g, '-')}-${Date.now()}`;
   }
 
   private createInitialAnalytics(): ModelAnalytics {

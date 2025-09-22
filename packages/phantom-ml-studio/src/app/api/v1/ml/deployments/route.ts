@@ -3,8 +3,8 @@
  * Model deployment and serving management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { Deployment } from '../../../../lib/database/models/Deployment.model';
-import { initializeCompleteDatabase } from '../../../../lib/database/database-init';
+import { Deployment } from '../../../../../lib/database/models/Deployment.model';
+import { initializeCompleteDatabase } from '../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**

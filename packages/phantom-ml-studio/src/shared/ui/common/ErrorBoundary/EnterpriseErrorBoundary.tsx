@@ -185,7 +185,7 @@ export class EnterpriseErrorBoundary extends React.Component<
 
     // Open bug report system or email client
     const subject = encodeURIComponent(`Bug Report: ${errorId}`);
-    const body = encodeURIComponent(`Error Details:\n${JSON.stringify(bugReportData, null, 2)}`);
+    const body = encodeURIComponent(`Error Details:/n${JSON.stringify(bugReportData, null, 2)}`);
     window.open(`mailto:support@phantom-spire.com?subject=${subject}&body=${body}`);
   };
 

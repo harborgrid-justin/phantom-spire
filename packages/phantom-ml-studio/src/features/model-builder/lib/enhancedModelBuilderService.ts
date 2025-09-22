@@ -1,9 +1,9 @@
 // src/services/model-builder/enhancedModelBuilderService.ts
 // Enhanced Model Builder Service with 32 Precision NAPI Bindings Integration
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
-import { ModelConfig, AutoMLResult, UploadedData, ModelResult, EnsembleResult } from '..\..\..\lib\modelBuilder.types';
-import { phantomMLCore } from '..\..\..\lib\phantom-ml-core';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../../../lib/core-logic/types/business-logic.types';
+import { ModelConfig, AutoMLResult, UploadedData, ModelResult, EnsembleResult } from '../types/modelBuilder.types';
+import { phantomMLCore } from '../../../lib/core-logic/phantom-ml-core';
 
 const ENHANCED_MODEL_BUILDER_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-enhanced-model-builder',

@@ -3,8 +3,8 @@
  * Security incident management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { Incident } from '..\..\..\..\..\..\..\lib\database\models\Incident.model';
-import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
+import { Incident } from '../../../../../../../lib/database/models/Incident.model';
+import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 import { Op } from 'sequelize';
 
 /**

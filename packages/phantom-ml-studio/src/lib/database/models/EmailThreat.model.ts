@@ -812,7 +812,7 @@ export class EmailThreat extends Model<EmailThreatAttributes, EmailThreatCreatio
     }
 
     // Validate email formats
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^/s@]+@[^/s@]+/.[^/s@]+$/;
     if (!emailRegex.test(data.sender_email)) {
       throw new Error('Invalid sender email format');
     }

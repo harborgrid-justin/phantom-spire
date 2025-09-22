@@ -122,7 +122,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
           </Typography>
           <List dense>
             {sectionItems.map((item) => (
-              <ListItem key={item.text} disablePadding data-cy={`nav-item-${item.text.toLowerCase().replace(/\s+/g, '-')}`}>
+              <ListItem key={item.text} disablePadding data-cy={`nav-item-${item.text.toLowerCase().replace(//s+/g, '-')}`}>
                 <ListItemButton
                   component={Link}
                   href={item.path}
@@ -147,7 +147,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                       backgroundColor: 'action.hover',
                     },
                   }}
-                  data-cy={`nav-link-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                  data-cy={`nav-link-${item.text.toLowerCase().replace(//s+/g, '-')}`}
                   data-prefetch-disabled={item.isResourceHeavy ? 'true' : 'false'}
                 >
                   <ListItemIcon
@@ -155,7 +155,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                       minWidth: 40,
                       color: pathname === item.path ? 'inherit' : 'text.secondary',
                     }}
-                    data-cy={`nav-icon-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-cy={`nav-icon-${item.text.toLowerCase().replace(//s+/g, '-')}`}
                   >
                     {item.icon}
                   </ListItemIcon>
@@ -165,7 +165,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                       fontSize: '0.875rem',
                       fontWeight: pathname === item.path ? 600 : 400,
                     }}
-                    data-cy={`nav-text-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-cy={`nav-text-${item.text.toLowerCase().replace(//s+/g, '-')}`}
                   />
                   {item.isNew && (
                     <Badge
@@ -180,7 +180,7 @@ export function Sidebar({ drawerWidth, mobileOpen, onDrawerToggle }: SidebarProp
                           fontWeight: 600,
                         },
                       }}
-                      data-cy={`nav-badge-new-${item.text.toLowerCase().replace(/\s+/g, '-')}`}
+                      data-cy={`nav-badge-new-${item.text.toLowerCase().replace(//s+/g, '-')}`}
                     />
                   )}
                 </ListItemButton>

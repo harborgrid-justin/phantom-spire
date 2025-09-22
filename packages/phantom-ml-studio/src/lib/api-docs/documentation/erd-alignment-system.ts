@@ -4,8 +4,8 @@
  */
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { getSequelize } from '..\..\sequelize';
-import { models } from '..\..\models';
+import { getSequelize } from '../../sequelize';
+import { models } from '../../models';
 
 export interface ERDEntity {
   name: string;
@@ -319,7 +319,7 @@ ${this.getCategoryEntities(entities, ['ThreatHunt', 'DarkWebIntel', 'Attribution
 
 ## Entity Definitions
 
-${entities.map(entity => this.generateEntitySummary(entity)).join('\n\n')}
+${entities.map(entity => this.generateEntitySummary(entity)).join('/n/n')}
 
 ## Key Relationships
 
@@ -329,7 +329,7 @@ ${this.generateRelationshipsSummary(entities)}
 ## Database Constraints & Indexes
 
 ### Primary Keys
-${entities.map(e => `- **${e.name}**: ${e.attributes.filter(a => a.primaryKey).map(a => a.name).join(', ')}`).join('\n')}
+${entities.map(e => `- **${e.name}**: ${e.attributes.filter(a => a.primaryKey).map(a => a.name).join(', ')}`).join('/n')}
 
 ### Foreign Key Relationships
 ${this.generateForeignKeySummary(entities)}
@@ -340,7 +340,7 @@ ${this.generateUniqueConstraintsSummary(entities)}
 ### Performance Indexes
 ${entities.filter(e => e.indexes.length > 0).map(e => 
   `- **${e.name}**: ${e.indexes.map(i => `${i.name} (${i.columns.join(', ')})`).join(', ')}`
-).join('\n')}
+).join('/n')}
 
 ## Data Types Summary
 ${this.generateDataTypesSummary(entities)}
@@ -373,7 +373,7 @@ ${this.generateDataTypesSummary(entities)}
    */
   private async generateEntityDocumentation(entity: ERDEntity): Promise<string> {
     const doc = `# ${entity.name} Entity
-**Table**: \`${entity.tableName}\`  
+**Table**: /`${entity.tableName}/`  
 **Generated**: ${new Date().toISOString()}
 
 ## Overview
@@ -385,7 +385,7 @@ Detailed documentation for the ${entity.name} entity in the Phantom ML Studio da
 |--------|------|----------|-------------|-------------|---------|-------------|
 ${entity.attributes.map(attr => 
   `| ${attr.name} | ${attr.type} | ${attr.nullable ? 'YES' : 'NO'} | ${attr.primaryKey ? 'YES' : 'NO'} | ${attr.foreignKey ? `${attr.foreignKey.table}.${attr.foreignKey.column}` : '-'} | ${attr.defaultValue || '-'} | ${attr.description || '-'} |`
-).join('\n')}
+).join('/n')}
 
 ## Relationships
 
@@ -394,7 +394,7 @@ ${entity.relationships.length > 0 ? entity.relationships.map(rel =>
 - **Type**: ${rel.type}
 - **Foreign Key**: ${rel.foreignKey}
 - **Description**: ${rel.description}
-`).join('\n') : 'No relationships defined.'}
+`).join('/n') : 'No relationships defined.'}
 
 ## Indexes
 
@@ -403,7 +403,7 @@ ${entity.indexes.length > 0 ? entity.indexes.map(idx =>
 - **Columns**: ${idx.columns.join(', ')}
 - **Unique**: ${idx.unique ? 'YES' : 'NO'}
 - **Type**: ${idx.type || 'btree'}
-`).join('\n') : 'No custom indexes defined.'}
+`).join('/n') : 'No custom indexes defined.'}
 
 ## Constraints
 
@@ -412,7 +412,7 @@ ${entity.constraints.length > 0 ? entity.constraints.map(constraint =>
 - **Type**: ${constraint.type}
 - **Columns**: ${constraint.columns.join(', ')}
 - **Definition**: ${constraint.definition || 'Standard constraint'}
-`).join('\n') : 'No custom constraints defined.'}
+`).join('/n') : 'No custom constraints defined.'}
 
 ## Business Rules
 <!-- Add business rules and validation logic specific to this entity -->
@@ -421,7 +421,7 @@ ${entity.constraints.length > 0 ? entity.constraints.map(constraint =>
 <!-- Add common query patterns and usage examples -->
 
 ## Related Entities
-${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.md)`).join('\n')}
+${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.md)`).join('/n')}
 `;
 
     return doc;
@@ -431,24 +431,24 @@ ${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.m
    * Generate Mermaid ERD diagram
    */
   private async generateMermaidERD(entities: ERDEntity[]): Promise<string> {
-    let diagram = `erDiagram\n`;
+    let diagram = `erDiagram/n`;
     
     // Define entities
     entities.forEach(entity => {
-      diagram += `    ${entity.name.toUpperCase()} {\n`;
+      diagram += `    ${entity.name.toUpperCase()} {/n`;
       entity.attributes.forEach(attr => {
         const pk = attr.primaryKey ? ' PK' : '';
         const fk = attr.foreignKey ? ' FK' : '';
-        diagram += `        ${attr.type} ${attr.name}${pk}${fk}\n`;
+        diagram += `        ${attr.type} ${attr.name}${pk}${fk}/n`;
       });
-      diagram += `    }\n\n`;
+      diagram += `    }/n/n`;
     });
     
     // Define relationships
     entities.forEach(entity => {
       entity.relationships.forEach(rel => {
         const relationshipSymbol = this.getMermaidRelationshipSymbol(rel.type);
-        diagram += `    ${entity.name.toUpperCase()} ${relationshipSymbol} ${rel.targetEntity.toUpperCase()} : "${rel.foreignKey}"\n`;
+        diagram += `    ${entity.name.toUpperCase()} ${relationshipSymbol} ${rel.targetEntity.toUpperCase()} : "${rel.foreignKey}"/n`;
       });
     });
     
@@ -459,28 +459,28 @@ ${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.m
    * Generate PlantUML ERD diagram
    */
   private async generatePlantUMLERD(entities: ERDEntity[]): Promise<string> {
-    let diagram = `@startuml ERD\n!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>\n\n`;
+    let diagram = `@startuml ERD/n!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>/n/n`;
     
     // Define entities
     entities.forEach(entity => {
-      diagram += `Table(${entity.name}, "${entity.tableName}") {\n`;
+      diagram += `Table(${entity.name}, "${entity.tableName}") {/n`;
       entity.attributes.forEach(attr => {
         const pk = attr.primaryKey ? ' <<PK>>' : '';
         const fk = attr.foreignKey ? ' <<FK>>' : '';
-        diagram += `  ${attr.name} : ${attr.type}${pk}${fk}\n`;
+        diagram += `  ${attr.name} : ${attr.type}${pk}${fk}/n`;
       });
-      diagram += `}\n\n`;
+      diagram += `}/n/n`;
     });
     
     // Define relationships
     entities.forEach(entity => {
       entity.relationships.forEach(rel => {
         const relationshipSymbol = this.getPlantUMLRelationshipSymbol(rel.type);
-        diagram += `${entity.name} ${relationshipSymbol} ${rel.targetEntity} : ${rel.foreignKey}\n`;
+        diagram += `${entity.name} ${relationshipSymbol} ${rel.targetEntity} : ${rel.foreignKey}/n`;
       });
     });
     
-    diagram += `\n@enduml`;
+    diagram += `/n@enduml`;
     
     return diagram;
   }
@@ -489,12 +489,12 @@ ${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.m
    * Generate database schema SQL
    */
   private async generateSchemaSQL(entities: ERDEntity[]): Promise<string> {
-    let sql = `-- Database Schema for Phantom ML Studio\n-- Generated: ${new Date().toISOString()}\n\n`;
+    let sql = `-- Database Schema for Phantom ML Studio/n-- Generated: ${new Date().toISOString()}/n/n`;
     
     // Create tables
     entities.forEach(entity => {
-      sql += `-- Table: ${entity.tableName}\n`;
-      sql += `CREATE TABLE ${entity.tableName} (\n`;
+      sql += `-- Table: ${entity.tableName}/n`;
+      sql += `CREATE TABLE ${entity.tableName} (/n`;
       
       const columns = entity.attributes.map(attr => {
         let columnDef = `    ${attr.name} ${attr.type}`;
@@ -504,16 +504,16 @@ ${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.m
         return columnDef;
       });
       
-      sql += columns.join(',\n') + '\n';
-      sql += `);\n\n`;
+      sql += columns.join(',/n') + '/n';
+      sql += `);/n/n`;
       
       // Add indexes
       entity.indexes.forEach(index => {
         const uniqueKeyword = index.unique ? 'UNIQUE ' : '';
-        sql += `CREATE ${uniqueKeyword}INDEX ${index.name} ON ${entity.tableName} (${index.columns.join(', ')});\n`;
+        sql += `CREATE ${uniqueKeyword}INDEX ${index.name} ON ${entity.tableName} (${index.columns.join(', ')});/n`;
       });
       
-      sql += '\n';
+      sql += '/n';
     });
     
     // Add foreign key constraints
@@ -522,7 +522,7 @@ ${entity.relationships.map(rel => `- [${rel.targetEntity}](${rel.targetEntity}.m
         .filter(attr => attr.foreignKey)
         .forEach(attr => {
           sql += `ALTER TABLE ${entity.tableName} ADD CONSTRAINT fk_${entity.tableName}_${attr.name} `;
-          sql += `FOREIGN KEY (${attr.name}) REFERENCES ${attr.foreignKey!.table}(${attr.foreignKey!.column});\n`;
+          sql += `FOREIGN KEY (${attr.name}) REFERENCES ${attr.foreignKey!.table}(${attr.foreignKey!.column});/n`;
         });
     });
     
@@ -543,7 +543,7 @@ Comprehensive data dictionary for the Phantom ML Studio database schema.
 
 ${entities.map(entity => `
 ### ${entity.name}
-**Table Name**: \`${entity.tableName}\`
+**Table Name**: /`${entity.tableName}/`
 
 ${entity.attributes.map(attr => `
 #### ${attr.name}
@@ -562,7 +562,7 @@ ${entities.map(entity =>
 ### ${entity.name} Relationships
 ${entity.relationships.map(rel => 
   `- **${rel.type}** with ${rel.targetEntity} via ${rel.foreignKey}`
-).join('\n')}` : ''
+).join('/n')}` : ''
 ).join('')}
 `;
 
@@ -573,13 +573,13 @@ ${entity.relationships.map(rel =>
   private getCategoryEntities(entities: ERDEntity[], categoryEntities: string[]): string {
     return entities
       .filter(e => categoryEntities.includes(e.name))
-      .map(e => `- **${e.name}** (\`${e.tableName}\`)`)
-      .join('\n');
+      .map(e => `- **${e.name}** (/`${e.tableName}/`)`)
+      .join('/n');
   }
 
   private generateEntitySummary(entity: ERDEntity): string {
     return `### ${entity.name}
-**Table**: \`${entity.tableName}\`  
+**Table**: /`${entity.tableName}/`  
 **Attributes**: ${entity.attributes.length}  
 **Relationships**: ${entity.relationships.length}  
 **Indexes**: ${entity.indexes.length}
@@ -597,7 +597,7 @@ ${entity.attributes.length > 0 ?
     
     return allRelationships
       .map(rel => `- **${rel.from}** ${rel.type} **${rel.targetEntity}** (${rel.foreignKey})`)
-      .join('\n');
+      .join('/n');
   }
 
   private generateForeignKeySummary(entities: ERDEntity[]): string {
@@ -605,7 +605,7 @@ ${entity.attributes.length > 0 ?
       e.attributes
         .filter(a => a.foreignKey)
         .map(a => `- **${e.name}.${a.name}** → **${a.foreignKey!.table}.${a.foreignKey!.column}**`)
-    ).join('\n');
+    ).join('/n');
   }
 
   private generateUniqueConstraintsSummary(entities: ERDEntity[]): string {
@@ -613,7 +613,7 @@ ${entity.attributes.length > 0 ?
       e.indexes
         .filter(i => i.unique)
         .map(i => `- **${e.name}**: ${i.columns.join(', ')}`)
-    ).join('\n');
+    ).join('/n');
   }
 
   private generateDataTypesSummary(entities: ERDEntity[]): string {
@@ -625,7 +625,7 @@ ${entity.attributes.length > 0 ?
     return Object.entries(typeCount)
       .sort(([,a], [,b]) => b - a)
       .map(([type, count]) => `- **${type}**: ${count} columns`)
-      .join('\n');
+      .join('/n');
   }
 
   private getM ermaidRelationshipSymbol(type: ERDRelationship['type']): string {

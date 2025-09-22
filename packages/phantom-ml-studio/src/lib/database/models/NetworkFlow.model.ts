@@ -348,7 +348,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
     const isPrivateIP = (ip: string): boolean => {
       return ip.startsWith('10.') || 
              ip.startsWith('192.168.') || 
-             !!ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
+             !!ip.match(/^172/.(1[6-9]|2[0-9]|3[0-1])/./);
     };
     
     return isPrivateIP(this.source_ip) && isPrivateIP(this.destination_ip);
@@ -369,10 +369,10 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
   public getFlowDirection(): 'internal' | 'outbound' | 'inbound' | 'external' {
     const isSourcePrivate = this.source_ip.startsWith('10.') || 
                            this.source_ip.startsWith('192.168.') || 
-                           !!this.source_ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
+                           !!this.source_ip.match(/^172/.(1[6-9]|2[0-9]|3[0-1])/./);
     const isDestPrivate = this.destination_ip.startsWith('10.') || 
                           this.destination_ip.startsWith('192.168.') || 
-                          !!this.destination_ip.match(/^172\.(1[6-9]|2[0-9]|3[0-1])\./);
+                          !!this.destination_ip.match(/^172/.(1[6-9]|2[0-9]|3[0-1])/./);
 
     if (isSourcePrivate && isDestPrivate) return 'internal';
     if (isSourcePrivate && !isDestPrivate) return 'outbound';
@@ -619,7 +619,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
                     [Op.or]: [
                       { [Op.like]: '10.%' },
                       { [Op.like]: '192.168.%' },
-                      { [Op.regexp]: '^172\\.(1[6-9]|2[0-9]|3[0-1])\\.' }
+                      { [Op.regexp]: '^172//.(1[6-9]|2[0-9]|3[0-1])//.' }
                     ]
                   }
                 },
@@ -628,7 +628,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
                     [Op.or]: [
                       { [Op.like]: '10.%' },
                       { [Op.like]: '192.168.%' },
-                      { [Op.regexp]: '^172\\.(1[6-9]|2[0-9]|3[0-1])\\.' }
+                      { [Op.regexp]: '^172//.(1[6-9]|2[0-9]|3[0-1])//.' }
                     ]
                   }
                 }
@@ -780,7 +780,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
                   [Op.or]: [
                     { [Op.like]: '10.%' },
                     { [Op.like]: '192.168.%' },
-                    { [Op.regexp]: '^172\\.(1[6-9]|2[0-9]|3[0-1])\\.' }
+                    { [Op.regexp]: '^172//.(1[6-9]|2[0-9]|3[0-1])//.' }
                   ]
                 }
               },
@@ -789,7 +789,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
                   [Op.or]: [
                     { [Op.like]: '10.%' },
                     { [Op.like]: '192.168.%' },
-                    { [Op.regexp]: '^172\\.(1[6-9]|2[0-9]|3[0-1])\\.' }
+                    { [Op.regexp]: '^172//.(1[6-9]|2[0-9]|3[0-1])//.' }
                   ]
                 }
               }
@@ -849,7 +849,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
    */
   static async createFlow(data: NetworkFlowCreationAttributes): Promise<NetworkFlow> {
     // Validate IP addresses format
-    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
     
     if (!ipRegex.test(data.source_ip)) {
       throw new Error('Invalid source IP address format');

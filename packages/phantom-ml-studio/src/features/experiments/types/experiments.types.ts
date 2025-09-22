@@ -1,7 +1,7 @@
 // src/services/experiments.types.ts
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
-import { ModelConfig, AutoMLResult } from '..\..\..\lib\model-builder\modelBuilder.types';
+import { BusinessLogicRequest, BusinessLogicResponse } from '../../../lib/core';
+import { ModelConfig, AutoMLResult } from '../../../lib/model-builder/modelBuilder.types';
 
 export interface ExperimentRun {
     runId: string;

@@ -3,16 +3,7 @@
  * Main page for accessing MITRE data and functionality
  */
 import { Metadata } from 'next';
-import dynamic from 'next/dynamic';
-
-// Dynamic import to ensure client-side rendering
-const MitreDashboard = dynamic(
-  () => import('@/shared/ui/mitre/MitreDashboard'),
-  { 
-    ssr: false,
-    loading: () => <div>Loading MITRE Dashboard...</div>
-  }
-);
+import MitreDashboardClient from './MitreDashboardClient';
 
 export const metadata: Metadata = {
   title: 'MITRE ATT&CK Framework - Phantom ML Studio',
@@ -21,5 +12,5 @@ export const metadata: Metadata = {
 };
 
 export default function MitrePage() {
-  return <MitreDashboard />;
+  return <MitreDashboardClient />;
 }

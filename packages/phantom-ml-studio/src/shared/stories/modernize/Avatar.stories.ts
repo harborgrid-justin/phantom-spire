@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '..\..\..\..\modernize\src\components\ui\Avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../modernize/src/components/ui/Avatar';
 
 // Create a wrapper component for better story composition
 const AvatarExample = (props: any) => React.createElement(

@@ -3,7 +3,7 @@
  * Get ML models from PostgreSQL database using Sequelize
  */
 import { NextRequest, NextResponse } from 'next/server'
-import type { Model as MLCoreModel } from '../../../../lib/ml-core/types';
+import type { Model as MLCoreModel } from '../../../../../lib/ml-core/types';
 import { Model } from '../../../../../lib/database/models/Model.model';
 import { getSequelize } from '../../../../../lib/database/sequelize';
 

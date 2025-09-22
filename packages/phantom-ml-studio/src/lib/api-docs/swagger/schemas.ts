@@ -197,7 +197,7 @@ export const CVESchema: OpenAPIV3.SchemaObject = {
     id: { type: 'integer', readOnly: true },
     cve_id: { 
       type: 'string', 
-      pattern: '^CVE-\\d{4}-\\d{4,}$',
+      pattern: '^CVE-//d{4}-//d{4,}$',
       example: 'CVE-2024-1234'
     },
     description: { type: 'string', minLength: 1 },

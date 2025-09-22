@@ -4,7 +4,7 @@
  * Designed to compete with H2O.ai and other enterprise ML platforms
  */
 
-import { PhantomMLCoreBindings } from '..\phantom-ml-core';
+import { PhantomMLCoreBindings } from '../phantom-ml-core';
 
 export interface EnterpriseMetrics {
   totalOperations: number;

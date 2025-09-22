@@ -2,7 +2,7 @@
  * Explainable AI Visualizer Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '../../../lib/core';
 
 export interface FeatureImportance {
   feature: string;

@@ -347,12 +347,12 @@ export abstract class BaseBusinessLogic implements BusinessLogic {
     return input
       .replace(/[<>]/g, '') // Remove potential HTML tags
       .replace(/['"]/g, '') // Remove quotes
-      .replace(/[;\\]/g, '') // Remove potential injection characters
+      .replace(/[;//]/g, '') // Remove potential injection characters
       .trim();
   }
 
   protected validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^/s@]+@[^/s@]+/.[^/s@]+$/;
     return emailRegex.test(email);
   }
 
