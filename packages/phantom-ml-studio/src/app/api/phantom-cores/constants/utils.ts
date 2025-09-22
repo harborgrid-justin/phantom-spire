@@ -172,6 +172,24 @@ export const getThreatScore = (score: number): string => {
   return 'Unknown';
 };
 
+export const getRiskLevel = (score: number): string => {
+  const RISK_LEVEL_SCORES = {
+    CRITICAL: { min: 80, max: 100, label: 'critical' },
+    HIGH: { min: 60, max: 79, label: 'high' },
+    MEDIUM: { min: 40, max: 59, label: 'medium' },
+    LOW: { min: 20, max: 39, label: 'low' },
+    MINIMAL: { min: 5, max: 19, label: 'minimal' },
+    NEGLIGIBLE: { min: 0, max: 4, label: 'negligible' }
+  };
+
+  for (const [, value] of Object.entries(RISK_LEVEL_SCORES)) {
+    if (score >= value.min && score <= value.max) {
+      return value.label;
+    }
+  }
+  return 'unknown';
+};
+
 // ================================
 // DATE AND TIME UTILITIES
 // ================================

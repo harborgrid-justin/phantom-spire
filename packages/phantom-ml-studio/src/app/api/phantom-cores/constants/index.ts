@@ -86,6 +86,7 @@ export {
   getQualityLabel,
   getCVSSSeverity,
   getThreatScore,
+  getRiskLevel,
   ERROR_CODES,
   DEFAULT_ERROR_MESSAGES
 } from './utils';
@@ -387,6 +388,22 @@ export const INTEL_CONFIDENCE = {
   POSSIBLE: 'possible',
   DOUBTFUL: 'doubtful',
   IMPROBABLE: 'improbable'
+} as const;
+
+// Risk Assessment Types (for risk management)
+export const ASSESSMENT_TYPES = {
+  OPERATIONAL: 'operational',
+  FINANCIAL: 'financial',
+  STRATEGIC: 'strategic',
+  COMPLIANCE: 'compliance',
+  CYBERSECURITY: 'cybersecurity',
+  REPUTATIONAL: 'reputational',
+  LEGAL: 'legal',
+  TECHNOLOGY: 'technology',
+  MARKET: 'market',
+  CREDIT: 'credit',
+  LIQUIDITY: 'liquidity',
+  ENVIRONMENTAL: 'environmental'
 } as const;
 
 // Summary of total constants added
