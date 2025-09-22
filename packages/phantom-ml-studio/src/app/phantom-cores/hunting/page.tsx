@@ -150,6 +150,13 @@ const HuntingOverview: React.FC<{ status: HuntingStatus | undefined }> = ({ stat
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">Hunting metrics are currently being initialized...</Alert>
+    );
+  }
+
   const getSuccessColor = (rate: number) => {
     if (rate >= 0.8) return 'success';
     if (rate >= 0.6) return 'warning';
@@ -157,8 +164,8 @@ const HuntingOverview: React.FC<{ status: HuntingStatus | undefined }> = ({ stat
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
@@ -172,36 +179,36 @@ const HuntingOverview: React.FC<{ status: HuntingStatus | undefined }> = ({ stat
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Active Hunts</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.active_hunts}
+              {metrics.active_hunts || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Ongoing investigations
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Success Rate</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.hunt_success_rate * 100}
+                value={(metrics.hunt_success_rate || 0) * 100}
                 size={60}
-                color={getSuccessColor(metrics.hunt_success_rate)}
+                color={getSuccessColor(metrics.hunt_success_rate || 0)}
               />
               <Box ml={2}>
-                <Typography variant="h4" color={getSuccessColor(metrics.hunt_success_rate)}>
-                  {(metrics.hunt_success_rate * 100).toFixed(1)}%
+                <Typography variant="h4" color={getSuccessColor(metrics.hunt_success_rate || 0)}>
+                  {((metrics.hunt_success_rate || 0) * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Hunt Success
@@ -210,22 +217,22 @@ const HuntingOverview: React.FC<{ status: HuntingStatus | undefined }> = ({ stat
             </Box>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Threats Discovered</Typography>
             <Typography variant="h3" color="error">
-              {metrics.threats_discovered}
+              {metrics.threats_discovered || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               This week
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -314,8 +321,8 @@ const HuntingAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Hunt Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -327,8 +334,8 @@ const HuntingAnalysisPanel: React.FC = () => {
                   <Typography variant="body2" mb={1}>
                     <strong>Threat Level:</strong> {analysis.hunt_profile.threat_level}
                   </Typography>
-                  <Box display="flex" alignItems="center" mb={1}>
-                    <Typography variant="body2" mr={1}>
+                  <Box display="flex" alignItems="center" mb={1} gap={1}>
+                    <Typography variant="body2" component="span">
                       <strong>Confidence Score:</strong>
                     </Typography>
                     <Chip
@@ -342,9 +349,9 @@ const HuntingAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Hunt Results</Typography>
                   <List dense>
@@ -386,8 +393,8 @@ const HuntingAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Hunt Recommendations</Typography>
@@ -485,9 +492,9 @@ const HuntingOperationsPanel: React.FC = () => {
       <CardContent>
         <Typography variant="h6" gutterBottom>Hunting Operations</Typography>
 
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -509,9 +516,9 @@ const HuntingOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {loading && (
           <Box mt={2}>
@@ -582,19 +589,11 @@ const HuntingManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <HuntingOverview status={huntingStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <HuntingAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <HuntingOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <HuntingOverview status={huntingStatus} />
+        <HuntingAnalysisPanel />
+        <HuntingOperationsPanel />
+      </Box>
     </Box>
   );
 };

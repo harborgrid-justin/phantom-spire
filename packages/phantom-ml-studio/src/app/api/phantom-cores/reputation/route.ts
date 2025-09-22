@@ -16,13 +16,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'reputation-' + Date.now(),
-            system_overview: {
-              overall_status: 'operational',
-              system_health: 'excellent',
+            status: 'operational',
+            metrics: {
               uptime: '99.9%',
-              active_feeds: 47,
-              reputation_db_size: '2.8M entries'
+              entities_scored: 2847293,
+              reputation_accuracy: 0.967,
+              threat_entities: 847293,
+              trusted_entities: 2156789
             },
             reputation_sources: {
               commercial_feeds: { active: 12, status: 'healthy' },
@@ -35,12 +35,6 @@ export async function GET(request: NextRequest) {
               cache_hit_rate: 0.894,
               average_response_time: '12ms',
               reputation_accuracy: 0.967
-            },
-            threat_landscape: {
-              known_malicious: 847293,
-              suspicious: 156842,
-              known_clean: 2156789,
-              unknown: 89234
             }
           },
           source: 'phantom-reputation-core',
@@ -245,6 +239,45 @@ export async function POST(request: NextRequest) {
               risk_level: Math.random() > 0.5 ? 'low' : 'medium',
               confidence: Math.random() * 0.4 + 0.6
             }))
+          },
+          source: 'phantom-reputation-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'analyze-reputation':
+        // Mock comprehensive reputation analysis
+        const reputationScore = Math.random();
+        const threatLevel = reputationScore < 0.3 ? 'HIGH' : reputationScore < 0.6 ? 'MEDIUM' : 'LOW';
+        
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysis_id: 'reputation-analysis-' + Date.now(),
+            reputation_profile: {
+              entity_value: params.reputationData?.entity_value || entity || 'unknown',
+              entity_type: params.reputationData?.entity_type || entity_type || 'unknown',
+              reputation_score: reputationScore,
+              threat_level: threatLevel
+            },
+            scoring_factors: {
+              threat_intelligence: Math.random() > 0.5,
+              historical_activity: Math.random() > 0.4,
+              geographic_distribution: Math.random() > 0.3,
+              behavioral_patterns: Math.random() > 0.6
+            },
+            threat_intelligence: {
+              sources: Math.floor(Math.random() * 10) + 5,
+              confidence: Math.random() * 0.4 + 0.6,
+              last_updated: new Date(Date.now() - Math.random() * 86400000).toISOString()
+            },
+            recommendations: [
+              'Block entity across security perimeter',
+              'Monitor for related threat activity',
+              'Update threat intelligence databases',
+              'Implement additional behavioral monitoring',
+              'Review recent security events for correlation',
+              'Enhance detection rules based on analysis'
+            ]
           },
           source: 'phantom-reputation-core',
           timestamp: new Date().toISOString()

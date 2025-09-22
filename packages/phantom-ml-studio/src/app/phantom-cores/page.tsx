@@ -332,28 +332,46 @@ const CrossModuleAnalysisPanel: React.FC = () => {
               <Box flex="1 1 350px" minWidth="350px">
                 <Typography variant="subtitle2" gutterBottom>Key Insights</Typography>
                 <List dense>
-                  {analysis.insights.map((insight, index) => (
-                    <ListItem key={index}>
+                  {(analysis.insights || []).length > 0 ? (
+                    analysis.insights.map((insight, index) => (
+                      <ListItem key={index}>
+                        <ListItemIcon>
+                          <ShieldIcon color="primary" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary={insight} />
+                      </ListItem>
+                    ))
+                  ) : (
+                    <ListItem>
                       <ListItemIcon>
-                        <ShieldIcon color="primary" fontSize="small" />
+                        <WarningIcon color="warning" fontSize="small" />
                       </ListItemIcon>
-                      <ListItemText primary={insight} />
+                      <ListItemText primary="No insights available" />
                     </ListItem>
-                  ))}
+                  )}
                 </List>
               </Box>
 
               <Box flex="1 1 350px" minWidth="350px">
                 <Typography variant="subtitle2" gutterBottom>Recommendations</Typography>
                 <List dense>
-                  {analysis.recommendations.map((recommendation, index) => (
-                    <ListItem key={index}>
+                  {(analysis.recommendations || []).length > 0 ? (
+                    analysis.recommendations.map((recommendation, index) => (
+                      <ListItem key={index}>
+                        <ListItemIcon>
+                          <CheckCircleIcon color="success" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary={recommendation} />
+                      </ListItem>
+                    ))
+                  ) : (
+                    <ListItem>
                       <ListItemIcon>
-                        <CheckCircleIcon color="success" fontSize="small" />
+                        <WarningIcon color="warning" fontSize="small" />
                       </ListItemIcon>
-                      <ListItemText primary={recommendation} />
+                      <ListItemText primary="No recommendations available" />
                     </ListItem>
-                  ))}
+                  )}
                 </List>
               </Box>
             </Box>
@@ -362,10 +380,10 @@ const CrossModuleAnalysisPanel: React.FC = () => {
 
             <Box display="flex" alignItems="center" justifyContent="space-between">
               <Typography variant="subtitle2">
-                Risk Score: <strong>{analysis.riskScore.toFixed(2)}</strong>
+                Risk Score: <strong>{analysis.riskScore ? analysis.riskScore.toFixed(2) : 'N/A'}</strong>
               </Typography>
               <Typography variant="subtitle2">
-                Modules Analyzed: <strong>{analysis.modules.join(', ')}</strong>
+                Modules Analyzed: <strong>{(analysis.modules || []).join(', ') || 'None'}</strong>
               </Typography>
             </Box>
           </Box>

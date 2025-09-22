@@ -17,13 +17,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            status_id: 'sandbox-' + Date.now(),
-            system_overview: {
-              overall_status: 'operational',
-              system_health: 'excellent',
+            status: 'operational',
+            metrics: {
               uptime: '99.8%',
-              active_sandboxes: 12,
-              queue_length: 3
+              sandbox_instances: 12,
+              samples_analyzed: 1456,
+              detection_rate: 0.274,
+              avg_analysis_time: '3.2min'
             },
             analysis_engines: {
               windows_vm: { status: 'active', analyses_today: 156 },
@@ -122,6 +122,45 @@ export async function POST(request: NextRequest) {
             queued_position: Math.floor(Math.random() * 10) + 1,
             estimated_completion: new Date(Date.now() + (Math.random() * 600000)).toISOString(),
             message: 'File successfully queued for analysis'
+          },
+          source: 'phantom-sandbox-core',
+          timestamp: new Date().toISOString()
+        });
+
+      case 'execute-analysis':
+        // Mock sandbox analysis execution
+        return NextResponse.json({
+          success: true,
+          data: {
+            analysis_id: 'sandbox-analysis-' + Date.now(),
+            sandbox_profile: {
+              sample_hash: params.sandboxData?.sample_hash || 'a1b2c3d4e5f6789...',
+              environment: params.sandboxData?.environment || 'windows_10',
+              analysis_duration: `${Math.floor(Math.random() * 3) + 2}.${Math.floor(Math.random() * 9)}min`,
+              threat_detected: Math.random() > 0.7
+            },
+            behavioral_analysis: {
+              malicious_behavior: Math.random() > 0.6,
+              network_activity: Math.random() > 0.4,
+              file_modifications: Math.random() > 0.5,
+              registry_changes: Math.random() > 0.3,
+              process_injection: Math.random() > 0.8,
+              persistence_mechanisms: Math.random() > 0.7
+            },
+            network_analysis: {
+              dns_queries: Math.floor(Math.random() * 50) + 10,
+              http_requests: Math.floor(Math.random() * 100) + 20,
+              suspicious_domains: Math.floor(Math.random() * 5),
+              c2_communication: Math.random() > 0.9
+            },
+            recommendations: [
+              'Implement advanced behavioral monitoring for similar samples',
+              'Update endpoint detection rules based on observed TTPs',
+              'Monitor network traffic for C2 communication patterns',
+              'Deploy additional sandboxing for related file families',
+              'Enhance threat intelligence with observed IOCs',
+              'Review and update security policies based on analysis results'
+            ]
           },
           source: 'phantom-sandbox-core',
           timestamp: new Date().toISOString()

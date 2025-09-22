@@ -139,6 +139,13 @@ const SecOpOverview: React.FC<{ status: SecOpStatus | undefined }> = ({ status }
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">SecOp metrics are currently being initialized...</Alert>
+    );
+  }
+
   const getEfficiencyColor = (efficiency: number) => {
     if (efficiency >= 90) return 'success';
     if (efficiency >= 70) return 'warning';
@@ -146,37 +153,37 @@ const SecOpOverview: React.FC<{ status: SecOpStatus | undefined }> = ({ status }
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
             <Chip
               icon={status.data.status === 'operational' ? <CheckCircleIcon /> : <WarningIcon />}
-              label={status.data.status}
+              label={status.data.status || 'Unknown'}
               color={status.data.status === 'operational' ? 'success' : 'warning'}
             />
             <Typography variant="body2" color="textSecondary" mt={1}>
-              Uptime: {metrics.uptime}
+              Uptime: {metrics.uptime || 'N/A'}
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>SOC Efficiency</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.soc_efficiency}
+                value={metrics.soc_efficiency || 0}
                 size={60}
-                color={getEfficiencyColor(metrics.soc_efficiency)}
+                color={getEfficiencyColor(metrics.soc_efficiency || 0)}
               />
               <Box ml={2}>
-                <Typography variant="h4" color={getEfficiencyColor(metrics.soc_efficiency)}>
-                  {metrics.soc_efficiency.toFixed(0)}%
+                <Typography variant="h4" color={getEfficiencyColor(metrics.soc_efficiency || 0)}>
+                  {(metrics.soc_efficiency || 0).toFixed(0)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Operational Efficiency
@@ -185,36 +192,36 @@ const SecOpOverview: React.FC<{ status: SecOpStatus | undefined }> = ({ status }
             </Box>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Active Workflows</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.active_workflows}
+              {metrics.active_workflows || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Currently executing workflows
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Automated Responses</Typography>
             <Typography variant="h3" color="success.main">
-              {metrics.automated_responses.toLocaleString()}
+              {(metrics.automated_responses || 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Responses automated today
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -302,8 +309,8 @@ const WorkflowExecutionPanel: React.FC = () => {
 
         {execution && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Workflow Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -319,9 +326,9 @@ const WorkflowExecutionPanel: React.FC = () => {
                     <strong>Est. Duration:</strong> {execution.workflow_profile.estimated_duration}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Execution Status</Typography>
                   <Box display="flex" alignItems="center" mb={2}>
@@ -342,11 +349,11 @@ const WorkflowExecutionPanel: React.FC = () => {
                     Execution ID: {execution.execution_id}
                   </Typography>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Workflow Outputs</Typography>
                   <List dense>
@@ -364,9 +371,9 @@ const WorkflowExecutionPanel: React.FC = () => {
                     ))}
                   </List>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Recommendations</Typography>
                   <List dense>
@@ -383,8 +390,8 @@ const WorkflowExecutionPanel: React.FC = () => {
                     ))}
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Box>
         )}
       </CardContent>
@@ -468,9 +475,9 @@ const SecOpOperationsPanel: React.FC = () => {
       <CardContent>
         <Typography variant="h6" gutterBottom>Security Operations</Typography>
 
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -492,9 +499,9 @@ const SecOpOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {loading && (
           <Box mt={2}>
@@ -565,19 +572,11 @@ const SecOpManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <SecOpOverview status={secOpStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <WorkflowExecutionPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <SecOpOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <SecOpOverview status={secOpStatus} />
+        <WorkflowExecutionPanel />
+        <SecOpOperationsPanel />
+      </Box>
     </Box>
   );
 };

@@ -109,66 +109,73 @@ const ReputationOverview: React.FC<{ status: ReputationStatus | undefined }> = (
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">Reputation metrics are currently being initialized...</Alert>
+    );
+  }
+
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
             <Chip
               icon={status.data.status === 'operational' ? <CheckCircleIcon /> : <WarningIcon />}
-              label={status.data.status}
+              label={status.data.status || 'Unknown'}
               color={status.data.status === 'operational' ? 'success' : 'warning'}
             />
             <Typography variant="body2" color="textSecondary" mt={1}>
-              Uptime: {metrics.uptime}
+              Uptime: {metrics.uptime || 'N/A'}
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Entities Scored</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.entities_scored.toLocaleString()}
+              {(metrics.entities_scored || 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Total reputation scores
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Threat Entities</Typography>
             <Typography variant="h3" color="error">
-              {metrics.threat_entities}
+              {metrics.threat_entities || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Malicious reputation
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Trusted Entities</Typography>
             <Typography variant="h3" color="success.main">
-              {metrics.trusted_entities}
+              {metrics.trusted_entities || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Good reputation
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -248,8 +255,8 @@ const ReputationAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Reputation Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -282,9 +289,9 @@ const ReputationAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Reputation Factors</Typography>
                   <List dense>
@@ -326,8 +333,8 @@ const ReputationAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Reputation Recommendations</Typography>
@@ -415,32 +422,32 @@ const ReputationMetricsPanel: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Performance Metrics
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="primary">{metrics.dailyQueries.toLocaleString()}</Typography>
               <Typography variant="body2" color="textSecondary">Daily Queries</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="success">{metrics.cacheHitRate}%</Typography>
               <Typography variant="body2" color="textSecondary">Cache Hit Rate</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="info">{metrics.avgResponseTime}</Typography>
               <Typography variant="body2" color="textSecondary">Avg Response Time</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="warning">{metrics.accuracyRate}%</Typography>
               <Typography variant="body2" color="textSecondary">Accuracy Rate</Typography>
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -484,8 +491,8 @@ const ReputationQueryPanel: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Reputation Query Tool
         </Typography>
-        <Grid container spacing={2} alignItems="center" mb={2}>
-          <Grid item xs={12} md={4}>
+        <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" mb={2}>
+          <Box flex="1 1 300px" minWidth="300px">
             <TextField
               fullWidth
               label="Entity (IP, Domain, Hash)"
@@ -493,8 +500,8 @@ const ReputationQueryPanel: React.FC = () => {
               onChange={(e) => setQueryEntity(e.target.value)}
               placeholder="e.g., 192.168.1.1"
             />
-          </Grid>
-          <Grid item xs={12} md={3}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <FormControl fullWidth>
               <InputLabel>Entity Type</InputLabel>
               <Select
@@ -508,8 +515,8 @@ const ReputationQueryPanel: React.FC = () => {
                 <MenuItem value="url">URL</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12} md={2}>
+          </Box>
+          <Box flex="0 0 120px">
             <Button
               fullWidth
               variant="contained"
@@ -518,8 +525,8 @@ const ReputationQueryPanel: React.FC = () => {
             >
               {loading ? <CircularProgress size={20} /> : 'Query'}
             </Button>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
 
         {queryResults.length > 0 && (
           <TableContainer component={Paper}>
@@ -613,27 +620,21 @@ const ReputationManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <ReputationOverview status={reputationStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <ReputationAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <ReputationFeedsPanel />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <ReputationMetricsPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <ReputationQueryPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <ReputationOverview status={reputationStatus} />
+        <ReputationAnalysisPanel />
+        
+        <Box display="flex" flexWrap="wrap" gap={3}>
+          <Box flex="1 1 400px" minWidth="400px">
+            <ReputationFeedsPanel />
+          </Box>
+          <Box flex="1 1 400px" minWidth="400px">
+            <ReputationMetricsPanel />
+          </Box>
+        </Box>
+        
+        <ReputationQueryPanel />
+      </Box>
     </Box>
   );
 };

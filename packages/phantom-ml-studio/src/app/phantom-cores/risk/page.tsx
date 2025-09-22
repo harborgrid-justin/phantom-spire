@@ -144,6 +144,13 @@ const RiskOverview: React.FC<{ status: RiskStatus | undefined }> = ({ status }) 
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">Risk metrics are currently being initialized...</Alert>
+    );
+  }
+
   const getRiskColor = (score: number) => {
     if (score <= 30) return 'success';
     if (score <= 60) return 'warning';
@@ -157,75 +164,75 @@ const RiskOverview: React.FC<{ status: RiskStatus | undefined }> = ({ status }) 
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
             <Chip
               icon={status.data.status === 'operational' ? <CheckCircleIcon /> : <WarningIcon />}
-              label={status.data.status}
+              label={status.data.status || 'Unknown'}
               color={status.data.status === 'operational' ? 'success' : 'warning'}
             />
             <Typography variant="body2" color="textSecondary" mt={1}>
-              Uptime: {metrics.uptime}
+              Uptime: {metrics.uptime || 'N/A'}
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Overall Risk Score</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.overall_risk_score}
+                value={metrics.overall_risk_score || 0}
                 size={60}
-                color={getRiskColor(metrics.overall_risk_score)}
+                color={getRiskColor(metrics.overall_risk_score || 0)}
               />
               <Box ml={2}>
-                <Typography variant="h4" color={getRiskColor(metrics.overall_risk_score)}>
-                  {metrics.overall_risk_score.toFixed(0)}
+                <Typography variant="h4" color={getRiskColor(metrics.overall_risk_score || 0)}>
+                  {(metrics.overall_risk_score || 0).toFixed(0)}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  {getRiskLevel(metrics.overall_risk_score)}
+                  {getRiskLevel(metrics.overall_risk_score || 0)}
                 </Typography>
               </Box>
             </Box>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Active Assessments</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.active_assessments}
+              {metrics.active_assessments || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Currently running assessments
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Critical Risks</Typography>
             <Typography variant="h3" color="error">
-              {metrics.critical_risks}
+              {metrics.critical_risks || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Requiring immediate attention
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -300,8 +307,8 @@ const RiskAssessmentPanel: React.FC = () => {
 
         {assessment && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Risk Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -317,33 +324,31 @@ const RiskAssessmentPanel: React.FC = () => {
                     <strong>Assessment Date:</strong> {new Date(assessment.risk_profile.assessment_date).toLocaleDateString()}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Risk Categories</Typography>
-                  <Grid container spacing={1}>
+                  <Box display="flex" flexDirection="column" gap={1}>
                     {Object.entries(assessment.risk_categories).map(([category, score]) => (
-                      <Grid item xs={12} key={category}>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                          <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
-                            {category}:
-                          </Typography>
-                          <Chip
-                            label={`${score}/100`}
-                            size="small"
-                            color={score > 70 ? 'error' : score > 40 ? 'warning' : 'success'}
-                          />
-                        </Box>
-                      </Grid>
+                      <Box display="flex" justifyContent="space-between" alignItems="center" key={category}>
+                        <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                          {category}:
+                        </Typography>
+                        <Chip
+                          label={`${score}/100`}
+                          size="small"
+                          color={score > 70 ? 'error' : score > 40 ? 'warning' : 'success'}
+                        />
+                      </Box>
                     ))}
-                  </Grid>
+                  </Box>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Key Recommendations</Typography>
                   <List dense>
@@ -360,9 +365,9 @@ const RiskAssessmentPanel: React.FC = () => {
                     ))}
                   </List>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Mitigation Strategies</Typography>
                   <List dense>
@@ -379,8 +384,8 @@ const RiskAssessmentPanel: React.FC = () => {
                     ))}
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
           </Box>
         )}
       </CardContent>
@@ -463,9 +468,9 @@ const RiskOperationsPanel: React.FC = () => {
       <CardContent>
         <Typography variant="h6" gutterBottom>Risk Operations</Typography>
 
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -487,9 +492,9 @@ const RiskOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
         {loading && (
           <Box mt={2}>
@@ -560,19 +565,11 @@ const RiskManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <RiskOverview status={riskStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <RiskAssessmentPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <RiskOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <RiskOverview status={riskStatus} />
+        <RiskAssessmentPanel />
+        <RiskOperationsPanel />
+      </Box>
     </Box>
   );
 };

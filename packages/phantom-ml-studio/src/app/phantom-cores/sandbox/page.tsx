@@ -102,66 +102,73 @@ const SandboxOverview: React.FC<{ status: SandboxStatus | undefined }> = ({ stat
 
   const { metrics } = status.data;
 
+  // Add null check for metrics
+  if (!metrics) {
+    return (
+      <Alert severity="info">Sandbox metrics are currently being initialized...</Alert>
+    );
+  }
+
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
+    <Box display="flex" flexWrap="wrap" gap={2}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>System Status</Typography>
             <Chip
               icon={status.data.status === 'operational' ? <CheckCircleIcon /> : <WarningIcon />}
-              label={status.data.status}
+              label={status.data.status || 'Unknown'}
               color={status.data.status === 'operational' ? 'success' : 'warning'}
             />
             <Typography variant="body2" color="textSecondary" mt={1}>
-              Uptime: {metrics.uptime}
+              Uptime: {metrics.uptime || 'N/A'}
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Active Sandboxes</Typography>
             <Typography variant="h3" color="primary">
-              {metrics.sandbox_instances}
+              {metrics.sandbox_instances || 0}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Running instances
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Samples Analyzed</Typography>
             <Typography variant="h3" color="secondary">
-              {metrics.samples_analyzed.toLocaleString()}
+              {(metrics.samples_analyzed || 0).toLocaleString()}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Total specimens
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} md={3}>
+      <Box flex="1 1 250px" minWidth="250px">
         <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>Detection Rate</Typography>
             <Box display="flex" alignItems="center">
               <CircularProgress
                 variant="determinate"
-                value={metrics.detection_rate * 100}
+                value={(metrics.detection_rate || 0) * 100}
                 size={60}
                 color="success"
               />
               <Box ml={2}>
                 <Typography variant="h4" color="success.main">
-                  {(metrics.detection_rate * 100).toFixed(1)}%
+                  {((metrics.detection_rate || 0) * 100).toFixed(1)}%
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   Malware Detection
@@ -170,8 +177,8 @@ const SandboxOverview: React.FC<{ status: SandboxStatus | undefined }> = ({ stat
             </Box>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   );
 };
 
@@ -246,8 +253,8 @@ const SandboxAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Analysis Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -272,9 +279,9 @@ const SandboxAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Behavioral Analysis</Typography>
                   <List dense>
@@ -316,8 +323,8 @@ const SandboxAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Analysis Recommendations</Typography>
@@ -401,32 +408,32 @@ const SandboxMetricsPanel: React.FC = () => {
         <Typography variant="h6" gutterBottom>
           Performance Metrics
         </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={6}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="primary">{metrics.totalAnalyses}</Typography>
               <Typography variant="body2" color="textSecondary">Total Analyses</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="error">{metrics.threatDetected}</Typography>
               <Typography variant="body2" color="textSecondary">Threats Detected</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="success">{metrics.cleanFiles}</Typography>
               <Typography variant="body2" color="textSecondary">Clean Files</Typography>
             </Paper>
-          </Grid>
-          <Grid item xs={6}>
+          </Box>
+          <Box flex="1 1 200px" minWidth="200px">
             <Paper sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" color="primary">{metrics.averageAnalysisTime}</Typography>
               <Typography variant="body2" color="textSecondary">Avg Analysis Time</Typography>
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );
@@ -532,27 +539,21 @@ const SandboxManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <SandboxOverview status={sandboxStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <SandboxAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <SandboxQueuePanel />
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <SandboxMetricsPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <SandboxHistoryPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <SandboxOverview status={sandboxStatus} />
+        <SandboxAnalysisPanel />
+        
+        <Box display="flex" flexWrap="wrap" gap={3}>
+          <Box flex="1 1 400px" minWidth="400px">
+            <SandboxQueuePanel />
+          </Box>
+          <Box flex="1 1 400px" minWidth="400px">
+            <SandboxMetricsPanel />
+          </Box>
+        </Box>
+        
+        <SandboxHistoryPanel />
+      </Box>
     </Box>
   );
 };
