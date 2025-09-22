@@ -71,7 +71,7 @@ export class SecurityControl extends Model {
   @Column(DataType.JSONB)
   declare remediation_plan: Record<string, any>;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare related_threats: string[];
 

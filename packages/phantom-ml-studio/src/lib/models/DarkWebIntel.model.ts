@@ -117,13 +117,13 @@ export class DarkWebIntel extends Model<DarkWebIntelAttributes, DarkWebIntelCrea
 
   /** Keywords that were matched during monitoring */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare keywords_matched: string[];
 
   /** Entities mentioned in the content */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare entities_mentioned: string[];
 
@@ -162,19 +162,19 @@ export class DarkWebIntel extends Model<DarkWebIntelAttributes, DarkWebIntelCrea
 
   /** Geographic indicators */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare geographic_indicators: string[];
 
   /** Associated threat actors */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare associated_actors: string[];
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

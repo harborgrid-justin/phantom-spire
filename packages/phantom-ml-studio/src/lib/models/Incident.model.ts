@@ -68,11 +68,11 @@ export class Incident extends Model {
   @Column(DataType.STRING(100))
   declare incident_type: string; // Malware, Phishing, Data Breach, etc.
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare affected_systems: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare affected_users: string[];
 
@@ -96,7 +96,7 @@ export class Incident extends Model {
   @Column(DataType.JSONB)
   declare timeline: Record<string, any>;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

@@ -102,13 +102,13 @@ export class MitreTactic extends Model<MitreTacticAttributes, MitreTacticCreatio
 
   /** Platforms this tactic applies to */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare platforms: string[];
 
   /** Data sources for detecting this tactic */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare data_sources: string[];
 

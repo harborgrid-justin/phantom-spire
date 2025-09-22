@@ -122,7 +122,7 @@ export class DomainIntelligence extends Model<DomainIntelligenceAttributes, Doma
 
   /** IP addresses associated with this domain */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare associated_ips: string[];
 
@@ -152,7 +152,7 @@ export class DomainIntelligence extends Model<DomainIntelligenceAttributes, Doma
 
   /** Threat categories associated with the domain */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare threat_categories: string[];
 
@@ -206,7 +206,7 @@ export class DomainIntelligence extends Model<DomainIntelligenceAttributes, Doma
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

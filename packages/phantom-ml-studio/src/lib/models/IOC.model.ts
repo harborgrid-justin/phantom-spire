@@ -22,6 +22,7 @@ import {
 import { Optional } from 'sequelize';
 import { Op } from 'sequelize';
 import { ThreatActor } from './ThreatActor.model';
+import { ThreatFeed } from './ThreatFeed.model';
 import { IncidentIOC } from './IncidentIOC.model';
 
 // IOC Attributes Interface
@@ -36,6 +37,8 @@ export interface IOCAttributes {
   description?: string;
   /** Associated threat actor ID */
   threat_actor_id?: number;
+  /** Associated threat feed ID */
+  threat_feed_id?: number;
   /** Confidence level of this IOC */
   confidence: 'low' | 'medium' | 'high';
   /** Severity level of this IOC */
@@ -67,6 +70,8 @@ export interface IOCAttributes {
   /** Additional metadata */
   metadata: Record<string, any>;
   /** Record creation timestamp */
+    /** Associated threatfeed ID */
+  threatfeed_id?: number;
   created_at: Date;
   /** Record last update timestamp */
   updated_at: Date;
@@ -106,6 +111,12 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated threatfeed ID */
+  @ForeignKey(() => ThreatFeed)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threatfeed_id?: number;
+
   /** The actual IOC value (IP, domain, hash, etc.) */
   @AllowNull(false)
   @Length({ min: 1, max: 1000 })
@@ -129,6 +140,12 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
   @AllowNull(true)
   @Column(DataType.INTEGER)
   declare threat_actor_id?: number;
+
+  /** Associated threat feed ID */
+  @ForeignKey(() => ThreatFeed)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threat_feed_id?: number;
 
   /** Confidence level of this IOC */
   @AllowNull(false)
@@ -165,19 +182,19 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
   /** Intelligence sources */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare sources: string[];
 
   /** MITRE ATT&CK kill chain phases */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare kill_chain_phases: string[];
 
@@ -207,7 +224,7 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
 
   /** Reference URLs */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare references: string[];
 
@@ -237,6 +254,15 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
   })
   declare threat_actor?: ThreatActor;
 
+  /** Associated threat feed */
+  @BelongsTo(() => ThreatFeed, {
+    foreignKey: 'threat_feed_id',
+    as: 'threat_feed',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threat_feed?: ThreatFeed;
+
   /** Incident IOC relationships */
   @HasMany(() => IncidentIOC, {
     foreignKey: 'ioc_id',
@@ -246,7 +272,16 @@ export class IOC extends Model<IOCAttributes, IOCCreationAttributes> implements 
   })
   declare incident_iocs?: IncidentIOC[];
 
-  // Instance methods
+ 
+  /** Associated threatfeed */
+  @BelongsTo(() => ThreatFeed, {
+    foreignKey: 'threatfeed_id',
+    as: 'threatfeed',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threatfeed?: ThreatFeed;
+ // Instance methods
   /**
    * Check if this IOC has expired
    * @returns True if the IOC has expired

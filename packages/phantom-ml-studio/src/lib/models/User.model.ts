@@ -310,7 +310,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
 
   /** Array of user permissions */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare permissions: string[];
 
@@ -336,7 +336,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

@@ -24,7 +24,8 @@ import { Op } from 'sequelize';
 import { ThreatActor } from './ThreatActor.model';
 import { User } from './User.model';
 import { ThreatIntelligence } from './ThreatIntelligence.model';
-import { IOC } from './IOC.model';
+import { IOC } from './IOC.model'
+import { ThreatGroup } from './ThreatGroup.model';;
 
 // Campaign Attributes Interface
 export interface CampaignAttributes {
@@ -77,6 +78,8 @@ export interface CampaignAttributes {
   /** Additional metadata */
   metadata: Record<string, any>;
   /** Record creation timestamp */
+    /** Associated threatgroup ID */
+  threatgroup_id?: number;
   created_at: Date;
   /** Record last update timestamp */
   updated_at: Date;
@@ -114,6 +117,12 @@ export class Campaign extends Model<CampaignAttributes, CampaignCreationAttribut
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
+
+  /** Associated threatgroup ID */
+  @ForeignKey(() => ThreatGroup)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threatgroup_id?: number;
 
   /** Name of the campaign */
   @AllowNull(false)
@@ -161,49 +170,49 @@ export class Campaign extends Model<CampaignAttributes, CampaignCreationAttribut
 
   /** Countries targeted by this campaign */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_countries: string[];
 
   /** Industries targeted by this campaign */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_industries: string[];
 
   /** Specific organizations targeted */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_organizations: string[];
 
   /** Campaign objectives */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare objectives: string[];
 
   /** Attack vectors used in the campaign */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attack_vectors: string[];
 
   /** MITRE ATT&CK technique IDs used */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare techniques_used: string[];
 
   /** Malware families associated with campaign */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare malware_families: string[];
 
   /** Tools used in the campaign */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tools_used: string[];
 
@@ -240,13 +249,13 @@ export class Campaign extends Model<CampaignAttributes, CampaignCreationAttribut
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
   /** Reference URLs and sources */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare references: string[];
 
@@ -303,7 +312,16 @@ export class Campaign extends Model<CampaignAttributes, CampaignCreationAttribut
   })
   declare indicators?: IOC[];
 
-  // Instance methods
+ 
+  /** Associated threatgroup */
+  @BelongsTo(() => ThreatGroup, {
+    foreignKey: 'threatgroup_id',
+    as: 'threatgroup',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threatgroup?: ThreatGroup;
+ // Instance methods
   /**
    * Check if the campaign is currently active
    * @returns True if status is active

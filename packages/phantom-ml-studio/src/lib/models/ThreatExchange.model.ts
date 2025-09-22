@@ -53,7 +53,7 @@ export class ThreatExchange extends Model {
   @Column(DataType.STRING(20))
   declare status: string;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare recipients: string[];
 

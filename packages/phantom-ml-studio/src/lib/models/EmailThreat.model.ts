@@ -149,13 +149,13 @@ export class EmailThreat extends Model<EmailThreatAttributes, EmailThreatCreatio
 
   /** List of email attachments */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attachments: string[];
 
   /** URLs found in the email */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare urls: string[];
 
@@ -211,13 +211,13 @@ export class EmailThreat extends Model<EmailThreatAttributes, EmailThreatCreatio
 
   /** List of indicators of compromise */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare iocs: string[];
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

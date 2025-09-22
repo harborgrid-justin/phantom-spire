@@ -117,6 +117,12 @@ export class Alert extends Model<AlertAttributes, AlertCreationAttributes> imple
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated incident ID */
+  @ForeignKey(() => Incident)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare incident_id?: number;
+
   /** Alert title */
   @AllowNull(false)
   @Length({ min: 1, max: 255 })
@@ -212,7 +218,7 @@ export class Alert extends Model<AlertAttributes, AlertCreationAttributes> imple
 
   /** Alert classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
@@ -288,7 +294,16 @@ export class Alert extends Model<AlertAttributes, AlertCreationAttributes> imple
   })
   declare triggering_ioc?: IOC;
 
-  // Instance methods
+ 
+  /** Associated incident */
+  @BelongsTo(() => Incident, {
+    foreignKey: 'incident_id',
+    as: 'incident',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare incident?: Incident;
+ // Instance methods
   /**
    * Check if this alert is high priority
    * @returns True if severity is critical/high or risk score >= 80

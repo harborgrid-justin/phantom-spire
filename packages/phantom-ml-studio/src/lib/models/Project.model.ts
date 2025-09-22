@@ -117,7 +117,7 @@ export class Project extends Model<ProjectAttributes, ProjectCreationAttributes>
 
   /** Project tags for categorization */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

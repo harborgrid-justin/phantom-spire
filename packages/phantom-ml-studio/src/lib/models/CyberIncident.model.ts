@@ -179,7 +179,7 @@ export class CyberIncident extends Model<CyberIncidentAttributes, CyberIncidentC
 
   /** List of affected systems */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare affected_systems: string[];
 
@@ -203,7 +203,7 @@ export class CyberIncident extends Model<CyberIncidentAttributes, CyberIncidentC
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

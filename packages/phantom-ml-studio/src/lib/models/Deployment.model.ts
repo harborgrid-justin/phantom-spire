@@ -27,6 +27,8 @@ import { MetricsData } from './MetricsData.model';
 export interface DeploymentAttributes {
   /** Unique identifier for the deployment */
   id: number;
+  /** Foreign key reference to the ML model */
+  model_id: number;
   /** Human-readable name for the deployment */
   name: string;
   /** Name of the deployed model */
@@ -110,6 +112,18 @@ export class Deployment extends Model<DeploymentAttributes, DeploymentCreationAt
   @AutoIncrement
   @Column(DataType.INTEGER)
   declare id: number;
+
+  /** Associated model ID */
+  @ForeignKey(() => Model)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare model_id?: number;
+
+  /** Foreign key reference to the ML model */
+  @ForeignKey(() => MLModel)
+  @AllowNull(false)
+  @Column(DataType.INTEGER)
+  declare model_id: number;
 
   /** Human-readable name for the deployment */
   @AllowNull(false)
@@ -239,7 +253,7 @@ export class Deployment extends Model<DeploymentAttributes, DeploymentCreationAt
 
   /** Deployment tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
@@ -260,6 +274,15 @@ export class Deployment extends Model<DeploymentAttributes, DeploymentCreationAt
   declare updated_at: Date;
 
   // Associations
+  /** Associated ML model */
+  @BelongsTo(() => MLModel, {
+    foreignKey: 'model_id',
+    as: 'model',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  })
+  declare model?: MLModel;
+
   /** Metrics data for this deployment */
   @HasMany(() => MetricsData, {
     foreignKey: 'deployment_id',
@@ -269,7 +292,16 @@ export class Deployment extends Model<DeploymentAttributes, DeploymentCreationAt
   })
   declare metrics?: MetricsData[];
 
-  // Instance methods
+ 
+  /** Associated model */
+  @BelongsTo(() => Model, {
+    foreignKey: 'model_id',
+    as: 'model',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare model?: Model;
+ // Instance methods
   /**
    * Increment the total request counter
    * @returns Promise resolving to updated deployment

@@ -146,7 +146,7 @@ export class Dataset extends Model<DatasetAttributes, DatasetCreationAttributes>
 
   /** Dataset tags for categorization */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

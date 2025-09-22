@@ -176,13 +176,13 @@ export class RiskAssessment extends Model<RiskAssessmentAttributes, RiskAssessme
 
   /** List of identified threats */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare threats_identified: string[];
 
   /** List of identified vulnerabilities */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare vulnerabilities_identified: string[];
 
@@ -194,7 +194,7 @@ export class RiskAssessment extends Model<RiskAssessmentAttributes, RiskAssessme
 
   /** Existing security controls */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare existing_controls: string[];
 
@@ -218,7 +218,7 @@ export class RiskAssessment extends Model<RiskAssessmentAttributes, RiskAssessme
 
   /** Compliance frameworks considered */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare compliance_frameworks: string[];
 

@@ -23,6 +23,7 @@ import { Optional } from 'sequelize';
 import { Op } from 'sequelize';
 import { User } from './User.model';
 import { ThreatActor } from './ThreatActor.model';
+import { ThreatFeed } from './ThreatFeed.model';
 import { IOC } from './IOC.model';
 
 // ThreatIntelligence Attributes Interface
@@ -41,6 +42,8 @@ export interface ThreatIntelligenceAttributes {
   reliability: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
   /** Associated threat actor ID */
   threat_actor_id?: number;
+  /** Associated threat feed ID */
+  threat_feed_id?: number;
   /** Analyst who created this report */
   analyst_id: number;
   /** Source of the intelligence */
@@ -84,6 +87,8 @@ export interface ThreatIntelligenceAttributes {
   /** Additional metadata */
   metadata: Record<string, any>;
   /** Record creation timestamp */
+    /** Associated threatfeed ID */
+  threatfeed_id?: number;
   created_at: Date;
   /** Record last update timestamp */
   updated_at: Date;
@@ -125,6 +130,12 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated threatfeed ID */
+  @ForeignKey(() => ThreatFeed)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threatfeed_id?: number;
+
   /** Title of the threat intelligence report */
   @AllowNull(false)
   @Length({ min: 1, max: 255 })
@@ -160,6 +171,12 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
   @Column(DataType.INTEGER)
   declare threat_actor_id?: number;
 
+  /** Associated threat feed ID */
+  @ForeignKey(() => ThreatFeed)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threat_feed_id?: number;
+
   /** Analyst who created this report */
   @ForeignKey(() => User)
   @AllowNull(false)
@@ -180,43 +197,43 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
 
   /** Industries targeted by this threat */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_industries: string[];
 
   /** Countries targeted by this threat */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_countries: string[];
 
   /** Products affected by this threat */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare affected_products: string[];
 
   /** Attack vectors used by this threat */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attack_vectors: string[];
 
   /** MITRE ATT&CK tactic IDs */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare mitre_tactics: string[];
 
   /** MITRE ATT&CK technique IDs */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare mitre_techniques: string[];
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
@@ -273,7 +290,7 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
 
   /** Reference URLs and sources */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare references: string[];
 
@@ -303,6 +320,15 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
   })
   declare threat_actor?: ThreatActor;
 
+  /** Associated threat feed */
+  @BelongsTo(() => ThreatFeed, {
+    foreignKey: 'threat_feed_id',
+    as: 'threat_feed',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threat_feed?: ThreatFeed;
+
   /** Analyst who created this report */
   @BelongsTo(() => User, {
     foreignKey: 'analyst_id',
@@ -312,7 +338,16 @@ export class ThreatIntelligence extends Model<ThreatIntelligenceAttributes, Thre
   })
   declare analyst?: User;
 
-  // Instance methods
+ 
+  /** Associated threatfeed */
+  @BelongsTo(() => ThreatFeed, {
+    foreignKey: 'threatfeed_id',
+    as: 'threatfeed',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threatfeed?: ThreatFeed;
+ // Instance methods
   /**
    * Check if this intelligence is currently valid
    * @returns True if within valid date range

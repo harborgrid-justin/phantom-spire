@@ -28,6 +28,12 @@ export class ThreatActorTechnique extends Model {
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated mitretechnique ID */
+  @ForeignKey(() => MitreTechnique)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare mitretechnique_id?: number;
+
   @ForeignKey(() => ThreatActor)
   @AllowNull(false)
   @Column(DataType.INTEGER)
@@ -49,3 +55,12 @@ export class ThreatActorTechnique extends Model {
   @BelongsTo(() => MitreTechnique)
   declare technique: MitreTechnique;
 }
+  /** Associated mitretechnique */
+  @BelongsTo(() => MitreTechnique, {
+    foreignKey: 'mitretechnique_id',
+    as: 'mitretechnique',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare mitretechnique?: MitreTechnique;
+

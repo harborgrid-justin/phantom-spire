@@ -175,19 +175,19 @@ export class ThreatHunt extends Model<ThreatHuntAttributes, ThreatHuntCreationAt
 
   /** MITRE ATT&CK techniques being hunted */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare hunt_techniques: string[];
 
   /** Data sources being analyzed */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare data_sources: string[];
 
   /** Search queries and detection logic */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare search_queries: string[];
 
@@ -240,7 +240,7 @@ export class ThreatHunt extends Model<ThreatHuntAttributes, ThreatHuntCreationAt
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

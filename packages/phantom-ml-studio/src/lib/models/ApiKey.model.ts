@@ -119,7 +119,7 @@ export class ApiKey extends Model<ApiKeyAttributes, ApiKeyCreationAttributes> im
 
   /** Permissions/scopes granted to this API key */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare scopes: string[];
 
@@ -149,7 +149,7 @@ export class ApiKey extends Model<ApiKeyAttributes, ApiKeyCreationAttributes> im
 
   /** IP addresses allowed to use this key */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare allowed_ips: string[];
 

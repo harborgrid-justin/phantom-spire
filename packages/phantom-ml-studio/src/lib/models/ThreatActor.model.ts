@@ -23,7 +23,8 @@ import { Op } from 'sequelize';
 import { ThreatActorTactic } from './ThreatActorTactic.model';
 import { ThreatActorTechnique } from './ThreatActorTechnique.model';
 import { ThreatActorCVE } from './ThreatActorCVE.model';
-import { Campaign } from './Campaign.model';
+import { Campaign } from './Campaign.model'
+import { ThreatGroup } from './ThreatGroup.model';;
 
 // ThreatActor Attributes Interface
 export interface ThreatActorAttributes {
@@ -80,6 +81,8 @@ export interface ThreatActorAttributes {
   /** Additional metadata */
   metadata: Record<string, any>;
   /** Record creation timestamp */
+    /** Associated threatgroup ID */
+  threatgroup_id?: number;
   created_at: Date;
   /** Record last update timestamp */
   updated_at: Date;
@@ -120,6 +123,12 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated threatgroup ID */
+  @ForeignKey(() => ThreatGroup)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare threatgroup_id?: number;
+
   /** Name of the threat actor or APT group */
   @AllowNull(false)
   @Unique
@@ -129,7 +138,7 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** Array of aliases and alternative names */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare aliases: string[];
 
@@ -147,25 +156,25 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** Countries attributed to this actor */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attributed_countries: string[];
 
   /** Countries typically targeted by this actor */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_countries: string[];
 
   /** Industries typically targeted */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_industries: string[];
 
   /** Primary motivations */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare motivations: string[];
 
@@ -197,13 +206,13 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** Tools commonly used by this actor */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tools_used: string[];
 
   /** Malware families associated with this actor */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare malware_families: string[];
 
@@ -221,7 +230,7 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** External references and sources */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare references: string[];
 
@@ -241,19 +250,19 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** Known victims */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare known_victims: string[];
 
   /** Attack patterns */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attack_patterns: string[];
 
   /** Geographic regions of operation */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare operating_regions: string[];
 
@@ -266,7 +275,7 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 
@@ -323,7 +332,16 @@ export class ThreatActor extends Model<ThreatActorAttributes, ThreatActorCreatio
   })
   declare campaigns?: Campaign[];
 
-  // Instance methods
+ 
+  /** Associated threatgroup */
+  @BelongsTo(() => ThreatGroup, {
+    foreignKey: 'threatgroup_id',
+    as: 'threatgroup',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare threatgroup?: ThreatGroup;
+ // Instance methods
   /**
    * Check if the threat actor is currently active
    * @returns True if status is active

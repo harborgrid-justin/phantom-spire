@@ -182,7 +182,7 @@ export class AttributionAnalysis extends Model<AttributionAnalysisAttributes, At
 
   /** Sources of evidence used */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare evidence_sources: string[];
 

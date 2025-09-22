@@ -59,11 +59,11 @@ export class FileIntelligence extends Model {
   @Column(DataType.JSONB)
   declare dynamic_analysis: Record<string, any>;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare yara_matches: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare av_detections: string[];
 

@@ -79,7 +79,7 @@ export class ThreatVector extends Model<ThreatVectorAttributes, ThreatVectorCrea
   @Column(DataType.STRING(20))
   declare risk_level: string;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare attack_techniques: string[];
 

@@ -132,13 +132,13 @@ export class PhantomCore extends Model<PhantomCoreAttributes, PhantomCoreCreatio
 
   /** List of capabilities provided by this core */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare capabilities: string[];
 
   /** List of other cores this module depends on */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare dependencies: string[];
 

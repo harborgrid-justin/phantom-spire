@@ -87,15 +87,15 @@ export class SandboxAnalysis extends Model {
   @Column(DataType.JSONB)
   declare api_calls: Record<string, any>;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare dropped_files: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare network_connections: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare dns_queries: string[];
 

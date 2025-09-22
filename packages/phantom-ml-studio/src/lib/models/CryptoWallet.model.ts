@@ -103,7 +103,7 @@ export class CryptoWallet extends Model<CryptoWalletAttributes, CryptoWalletCrea
 
   /** Associated threat categories */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare associated_threats: string[];
 
@@ -141,7 +141,7 @@ export class CryptoWallet extends Model<CryptoWalletAttributes, CryptoWalletCrea
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

@@ -52,7 +52,7 @@ export class ReputationScore extends Model {
   @Column(DataType.INTEGER)
   declare confidence: number; // 0-100
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare sources: string[]; // Reputation sources
 
@@ -70,7 +70,7 @@ export class ReputationScore extends Model {
   @Column(DataType.INTEGER)
   declare observation_count: number;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare categories: string[]; // malware, phishing, spam, etc.
 

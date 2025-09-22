@@ -229,13 +229,13 @@ export class XDREvent extends Model<XDREventAttributes, XDREventCreationAttribut
 
   /** MITRE ATT&CK techniques associated */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare mitre_techniques: string[];
 
   /** Kill chain phases */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare kill_chain_phases: string[];
 
@@ -298,7 +298,7 @@ export class XDREvent extends Model<XDREventAttributes, XDREventCreationAttribut
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

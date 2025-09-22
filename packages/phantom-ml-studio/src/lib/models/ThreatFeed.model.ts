@@ -106,11 +106,11 @@ export class ThreatFeed extends Model {
   @Column(DataType.JSONB)
   declare configuration: Record<string, any>; // Feed-specific settings
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare supported_indicators: string[]; // IP, Domain, Hash, etc.
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

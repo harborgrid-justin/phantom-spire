@@ -223,7 +223,7 @@ export class Experiment extends Model<ExperimentAttributes, ExperimentCreationAt
 
   /** Experiment tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

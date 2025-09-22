@@ -151,25 +151,25 @@ export class CVE extends Model<CVEAttributes, CVECreationAttributes> implements 
 
   /** Associated Common Weakness Enumeration IDs */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare cwe_ids: string[];
 
   /** Products affected by this vulnerability */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare affected_products: string[];
 
   /** Vendor names associated with affected products */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare vendor_names: string[];
 
   /** Reference URLs and sources */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare references: string[];
 
@@ -182,7 +182,7 @@ export class CVE extends Model<CVEAttributes, CVECreationAttributes> implements 
 
   /** Classification tags */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare tags: string[];
 

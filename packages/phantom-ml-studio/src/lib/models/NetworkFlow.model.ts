@@ -179,7 +179,7 @@ export class NetworkFlow extends Model<NetworkFlowAttributes, NetworkFlowCreatio
 
   /** Flow flags and attributes */
   @AllowNull(false)
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare flags: string[];
 

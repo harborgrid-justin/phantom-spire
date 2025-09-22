@@ -37,11 +37,11 @@ export class ThreatGroup extends Model {
   @Column(DataType.TEXT)
   declare description: string;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare aliases: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare associated_groups: string[];
 
@@ -49,11 +49,11 @@ export class ThreatGroup extends Model {
   @Column(DataType.STRING(100))
   declare origin_country: string;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare motivations: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare target_sectors: string[];
 

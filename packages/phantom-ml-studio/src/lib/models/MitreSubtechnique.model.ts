@@ -31,6 +31,12 @@ export class MitreSubtechnique extends Model {
   @Column(DataType.INTEGER)
   declare id: number;
 
+  /** Associated mitretechnique ID */
+  @ForeignKey(() => MitreTechnique)
+  @AllowNull(true)
+  @Column(DataType.INTEGER)
+  declare mitretechnique_id?: number;
+
   @AllowNull(false)
   @Unique
   @Column(DataType.STRING(20))
@@ -51,15 +57,15 @@ export class MitreSubtechnique extends Model {
   @Column(DataType.STRING(500))
   declare url: string;
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare platforms: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare data_sources: string[];
 
-  @Default('[]')
+  @Default([])
   @Column(DataType.ARRAY(DataType.STRING))
   declare defenses_bypassed: string[];
 
@@ -95,7 +101,16 @@ export class MitreSubtechnique extends Model {
   @BelongsTo(() => MitreTechnique)
   declare technique: MitreTechnique;
 
-  // Static methods
+ 
+  /** Associated mitretechnique */
+  @BelongsTo(() => MitreTechnique, {
+    foreignKey: 'mitretechnique_id',
+    as: 'mitretechnique',
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE'
+  })
+  declare mitretechnique?: MitreTechnique;
+ // Static methods
   static async findBySubtechniqueId(subtechniqueId: string) {
     return this.findOne({ 
       where: { subtechnique_id: subtechniqueId },
