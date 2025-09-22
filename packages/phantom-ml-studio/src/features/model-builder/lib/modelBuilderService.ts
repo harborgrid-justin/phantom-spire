@@ -1,7 +1,7 @@
 // src/services/model-builder/modelBuilderService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature, SelectedFeature } from '../core';
-import { ModelConfig, AutoMLResult, UploadedData, ParseDataRequest, ParseDataResponse, StartTrainingRequest, StartTrainingResponse, DataRow, AlgorithmType, ModelResult, EnsembleResult } from './modelBuilder.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature, SelectedFeature } from '..\..\..\lib\core';
+import { ModelConfig, AutoMLResult, UploadedData, ParseDataRequest, ParseDataResponse, StartTrainingRequest, StartTrainingResponse, DataRow, AlgorithmType, ModelResult, EnsembleResult } from '..\..\..\lib\modelBuilder.types';
 import { modelBuilderConfig } from './modelBuilder.config';
 import { SimpleLinearRegression } from 'ml-regression-simple-linear';
 import { RandomForestRegression } from 'ml-random-forest';

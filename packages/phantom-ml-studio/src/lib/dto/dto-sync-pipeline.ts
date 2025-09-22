@@ -4,8 +4,8 @@
  */
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { getSequelize } from '../sequelize';
-import { models } from '../models';
+import { getSequelize } from '..\sequelize';
+import { models } from '..\models';
 
 export interface DTOField {
   name: string;
@@ -691,7 +691,7 @@ import {
   Update${modelName}DTO, 
   ${modelName}FilterDTO 
 } from '../${modelName}.dto';
-import { ApiResponseDTO, PaginationDTO } from '../index';
+import { ApiResponseDTO, PaginationDTO } from '..\index';
 
 /**
  * ${modelName} API Request DTOs

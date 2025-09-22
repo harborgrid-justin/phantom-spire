@@ -24,7 +24,7 @@ import {
   Warning as WarningIcon,
   Error as ErrorIcon
 } from '@mui/icons-material';
-import { ComplianceFramework, SecurityMetrics } from '../types';
+import { ComplianceFramework, SecurityMetrics } from '../../_lib/types';
 
 interface ComplianceOverviewCardsProps {
   frameworks: ComplianceFramework[];

@@ -1,7 +1,7 @@
 // src/services/multi-model-ab-testing/multiModelAbTestingService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../core';
-import { ABTest, GetABTestsRequest, GetABTestsResponse } from './multiModelAbTesting.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '@/lib/core-logic/types/service.types';
+import { ABTest, GetABTestsRequest, GetABTestsResponse } from '../types/multiModelAbTesting.types';
 
 const MULTI_MODEL_AB_TESTING_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-multi-model-ab-testing',

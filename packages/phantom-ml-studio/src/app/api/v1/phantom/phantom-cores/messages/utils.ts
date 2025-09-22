@@ -15,7 +15,7 @@ import {
   type ContextMessage,
   type SourceIdentifier
 } from './index';
-import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '../constants';
+import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '..\..\..\..\..\..\lib\constants';
 
 // ================================
 // ERROR RESPONSE BUILDERS

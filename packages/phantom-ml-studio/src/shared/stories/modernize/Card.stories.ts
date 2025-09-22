@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle
 } from '../../../modernize/src/components/ui/Card';
-import { Button } from '../../../modernize/src/components/ui/Button';
+import { Button } from '..\..\..\..\modernize\src\components\ui\Button';
 
 // Create a wrapper component for better story composition
 const CardExample = (props: any) => React.createElement(

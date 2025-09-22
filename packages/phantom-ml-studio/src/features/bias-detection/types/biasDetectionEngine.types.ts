@@ -2,7 +2,7 @@
  * Bias Detection Engine Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
 
 export interface BiasMetric {
   category: string;

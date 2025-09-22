@@ -37,7 +37,7 @@ import {
   Psychology as AdvancedIcon,
   Speed as PerformanceIcon
 } from '@mui/icons-material';
-import { Algorithm, HyperparameterConfig, HyperparameterValue } from '../types';
+import { Algorithm, HyperparameterConfig, HyperparameterValue } from '../../_lib/types';
 
 interface ParameterTuningProps {
   selectedAlgorithm: Algorithm | null;

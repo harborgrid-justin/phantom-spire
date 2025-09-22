@@ -6,9 +6,9 @@ import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { SelectChangeEvent } from '@mui/material';
 
-import { modelBuilderService } from '@/services/model-builder';
-import { UploadedData, ModelConfig, AutoMLResult, AlgorithmType } from '@/services/model-builder';
-import { Dataset, AlgorithmInfo, ModelBuilderState } from '../types';
+import { modelBuilderService } from '@/features/model-builder/lib';
+import { UploadedData, ModelConfig, AutoMLResult, AlgorithmType } from '@/features/model-builder/lib';
+import { Dataset, AlgorithmInfo, ModelBuilderState } from '../../../../../lib/ml-core/types';
 import { sampleColumns } from '../data/sampleData';
 
 const availableAlgorithms: AlgorithmType[] = ['simple_linear_regression', 'random_forest_regression'];

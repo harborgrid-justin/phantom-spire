@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { Download as DownloadIcon } from '@mui/icons-material';
-import { SubscriptionCardProps, CATEGORY_COLORS } from '../types';
+import { SubscriptionCardProps, CATEGORY_COLORS } from '../../_lib/types';
 
 export function SubscriptionCard({
   feed,

@@ -23,8 +23,8 @@ import {
   Add as AddIcon,
   PlayArrow as RunIcon
 } from '@mui/icons-material';
-import { experimentsService } from '@/services/experiments';
-import { Experiment } from '@/services/experiments';
+import { experimentsService } from '@/features/experiments/lib';
+import { Experiment } from '@/features/experiments/lib';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 // Error boundary component

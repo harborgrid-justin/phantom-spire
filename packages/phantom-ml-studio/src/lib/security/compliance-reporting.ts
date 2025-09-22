@@ -5,7 +5,7 @@
  */
 
 import { AuditLogger } from './audit-logger';
-import { EnterpriseErrorManager } from '../services/error-handling/enterprise-error-manager';
+import { EnterpriseErrorManager } from '..\services\error-handling\enterprise-error-manager';
 
 export interface ComplianceFramework {
   id: string;

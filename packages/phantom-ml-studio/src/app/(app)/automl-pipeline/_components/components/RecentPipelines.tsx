@@ -27,7 +27,7 @@ import {
   Stop,
   MoreVert
 } from '@mui/icons-material';
-import { Pipeline } from '../types';
+import { Pipeline } from '../../_lib/types';
 
 interface RecentPipelinesProps {
   pipelines: Pipeline[];

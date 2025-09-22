@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { explainableAiVisualizerService } from '@/services/explainable-ai-visualizer';
+import { explainableAiVisualizerService } from '@/features/explainable-ai/lib';
 
 export async function GET() {
   const data = await explainableAiVisualizerService.getModelExplanation({

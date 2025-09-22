@@ -24,15 +24,15 @@ import { Download as DownloadIcon, PlayArrow as StartIcon } from '@mui/icons-mat
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { BarChart } from '@mui/x-charts/BarChart';
 
-import { useModelBuilder } from './hooks/useModelBuilder';
-import { ModelBuilderErrorBoundary } from './components/ErrorBoundary';
+import { useModelBuilder } from './_lib/hooks/useModelBuilder';
+import { ModelBuilderErrorBoundary } from './_components/components/ErrorBoundary';
 import { 
   CreateModelStep, 
   SelectDatasetStep, 
   ChooseTargetStep, 
   SelectFeaturesStep 
-} from './components/steps';
-import { wizardSteps } from './data/sampleData';
+} from './_components/components/steps';
+import { wizardSteps } from './_lib/data/sampleData';
 
 export default function ModelBuilderClient() {
   const {

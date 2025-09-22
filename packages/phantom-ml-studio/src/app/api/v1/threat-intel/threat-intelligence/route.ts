@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { threatIntelligenceMarketplaceService } from '@/services/threat-intelligence-marketplace';
+import { threatIntelligenceMarketplaceService } from '@/features/threat-intelligence/lib';
 
 export async function GET() {
   const data = await threatIntelligenceMarketplaceService.getThreatModels({

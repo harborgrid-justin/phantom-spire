@@ -2,7 +2,7 @@
  * AutoML Pipeline Visualizer Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
 
 export interface PipelineStep {
   id: string;

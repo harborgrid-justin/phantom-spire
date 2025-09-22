@@ -3,8 +3,8 @@
  * Common Vulnerabilities and Exposures management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { CVE } from '../../../lib/models/CVE.model';
-import { initializeCompleteDatabase } from '../../../lib/database-init';
+import { CVE } from '..\..\..\..\..\..\..\lib\database\models\CVE.model';
+import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
 
 /**
  * @swagger

@@ -24,16 +24,16 @@ import {
 import Grid from '@mui/material/Grid2';
 
 // Component imports
-import PipelineTemplates from './components/PipelineTemplates';
-import RecentPipelines from './components/RecentPipelines';
-import PipelineOverview from './components/PipelineOverview';
-import PipelineSteps from './components/PipelineSteps';
-import AlgorithmPerformanceComponent from './components/AlgorithmPerformance';
-import ExecutionDialog from './components/ExecutionDialog';
-import ExecutionMonitor from './components/ExecutionMonitor';
-import CancelConfirmationDialog from './components/CancelConfirmationDialog';
-import SaveResultsDialog from './components/SaveResultsDialog';
-import PipelineWizard from './components/PipelineWizard';
+import PipelineTemplates from './_components/components/PipelineTemplates';
+import RecentPipelines from './_components/components/RecentPipelines';
+import PipelineOverview from './_components/components/PipelineOverview';
+import PipelineSteps from './_components/components/PipelineSteps';
+import AlgorithmPerformanceComponent from './_components/components/AlgorithmPerformance';
+import ExecutionDialog from './_components/components/ExecutionDialog';
+import ExecutionMonitor from './_components/components/ExecutionMonitor';
+import CancelConfirmationDialog from './_components/components/CancelConfirmationDialog';
+import SaveResultsDialog from './_components/components/SaveResultsDialog';
+import PipelineWizard from './_components/components/PipelineWizard';
 
 // Type imports
 import type {
@@ -45,7 +45,7 @@ import type {
   ExecutionState,
   DialogStates,
   NotificationStates
-} from './types';
+} from './_lib/types';
 
 export default function AutoMLPipelineClient() {
   // State management

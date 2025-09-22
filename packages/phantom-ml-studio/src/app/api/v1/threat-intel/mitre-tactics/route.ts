@@ -3,8 +3,8 @@
  * MITRE ATT&CK Tactics management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { MitreTactic } from '../../../lib/models/MitreTactic.model';
-import { initializeCompleteDatabase } from '../../../lib/database-init';
+import { MitreTactic } from '..\..\..\..\..\..\..\lib\database\models\MitreTactic.model';
+import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
 import { Op } from 'sequelize';
 
 /**

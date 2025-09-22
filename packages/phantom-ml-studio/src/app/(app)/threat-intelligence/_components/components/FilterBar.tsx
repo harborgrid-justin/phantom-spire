@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { FilterBarProps } from '../types';
+import { FilterBarProps } from '../../_lib/types';
 
 export function FilterBar({
   searchTerm,

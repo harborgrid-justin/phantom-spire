@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { Dataset as DatasetIcon } from '@mui/icons-material';
 import { Dataset } from '../../types';
-import { sampleDatasets } from '../../data/sampleData';
+import { sampleDatasets } from '../../../_lib/data/sampleData';
 
 interface SelectDatasetStepProps {
   selectedDataset: Dataset | null;

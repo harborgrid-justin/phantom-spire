@@ -5,14 +5,14 @@ import { Box, Typography, Button, LinearProgress, Alert, Card, CardContent } fro
 import Grid from '@mui/material/Grid2';
 import { Refresh, Assessment } from '@mui/icons-material';
 
-import { BiasReport, FairnessAnalysis, AnalysisConfig } from './types';
-import { BiasReportTable } from './components/BiasReportTable';
-import { ReportDetails } from './components/ReportDetails';
-import { BiasMetrics } from './components/BiasMetrics';
-import { FairnessAnalysis as FairnessAnalysisComponent } from './components/FairnessAnalysis';
-import { MitigationRecommendations } from './components/MitigationRecommendations';
-import { RunAnalysisDialog } from './components/RunAnalysisDialog';
-import { MockDataService } from './services/mockDataService';
+import { BiasReport, FairnessAnalysis, AnalysisConfig } from './_lib/types';
+import { BiasReportTable } from './_components/components/BiasReportTable';
+import { ReportDetails } from './_components/components/ReportDetails';
+import { BiasMetrics } from './_components/components/BiasMetrics';
+import { FairnessAnalysis as FairnessAnalysisComponent } from './_components/components/FairnessAnalysis';
+import { MitigationRecommendations } from './_components/components/MitigationRecommendations';
+import { RunAnalysisDialog } from './_components/components/RunAnalysisDialog';
+import { MockDataService } from './_lib/services/mockDataService';
 
 export default function BiasDetectionClient() {
   const [biasReports, setBiasReports] = useState<BiasReport[]>([]);

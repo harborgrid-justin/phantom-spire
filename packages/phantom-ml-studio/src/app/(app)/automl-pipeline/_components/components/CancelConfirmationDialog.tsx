@@ -17,7 +17,7 @@ import {
   Box
 } from '@mui/material';
 import { Warning } from '@mui/icons-material';
-import { Pipeline } from '../types';
+import { Pipeline } from '../../_lib/types';
 
 interface CancelConfirmationDialogProps {
   open: boolean;

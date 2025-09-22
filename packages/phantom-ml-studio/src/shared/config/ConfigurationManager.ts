@@ -3,7 +3,7 @@
  * Environment-based configuration with validation, encryption, and hot-reloading
  */
 
-import { BaseService, Injectable } from '../core/ServiceRegistry';
+import { BaseService, Injectable } from '..\..\lib\core\ServiceRegistry';
 import { ValidationUtils, SchemaRegistry } from '../../lib/validation/schemas';
 import * as yup from 'yup';
 

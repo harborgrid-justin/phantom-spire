@@ -3,11 +3,11 @@
  * Standardized service contracts for consistent architecture
  */
 
-import type { LoggerService } from '../core/LoggerService';
-import type { ICache } from '../../utils/enterprise-cache';
-import type { AuditTrailService } from '../../utils/audit-trail';
-import type { MetricsRegistry } from '../../monitoring/metrics-system';
-import type { CircuitBreaker } from '../../utils/circuit-breaker';
+import type { LoggerService } from '..\..\lib\core\LoggerService';
+import type { ICache } from '..\..\utils\enterprise-cache';
+import type { AuditTrailService } from '..\..\utils\audit-trail';
+import type { MetricsRegistry } from '..\..\monitoring\metrics-system';
+import type { CircuitBreaker } from '..\..\utils\circuit-breaker';
 
 // Service lifecycle states
 export enum ServiceState {

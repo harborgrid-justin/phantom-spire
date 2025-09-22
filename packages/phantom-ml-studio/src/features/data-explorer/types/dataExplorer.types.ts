@@ -2,7 +2,7 @@
  * Data Explorer Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
 
 export interface Dataset {
   id: number;

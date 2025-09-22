@@ -20,7 +20,7 @@ import {
   Alert
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { PipelineTemplate } from '../types';
+import { PipelineTemplate } from '../../_lib/types';
 
 interface PipelineTemplatesProps {
   onCreatePipeline: () => void;

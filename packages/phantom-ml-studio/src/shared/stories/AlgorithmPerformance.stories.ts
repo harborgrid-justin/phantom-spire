@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import AlgorithmPerformanceComponent from '../app/automlPipeline/components/AlgorithmPerformance';
-import { AlgorithmPerformance } from '../app/automlPipeline/types';
+import AlgorithmPerformanceComponent from '..\..\lib\app\automlPipeline\components\AlgorithmPerformance';
+import { AlgorithmPerformance } from '..\..\lib\app\automlPipeline\types';
 
 // Mock data for the stories
 const mockPerformanceData: AlgorithmPerformance[] = [

@@ -2,8 +2,8 @@
 // Centralized error handling for risk management operations
 
 import { NextResponse } from 'next/server';
-import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '../../constants';
-import { DEFAULT_CONFIG, HTTP_STATUS_CODES } from '../../configs';
+import { ERROR_CODES, DEFAULT_ERROR_MESSAGES } from '..\..\..\..\..\..\..\constants';
+import { DEFAULT_CONFIG, HTTP_STATUS_CODES } from '..\..\..\..\..\..\..\configs';
 import { 
   buildErrorResponse,
   buildUnknownOperationResponse,

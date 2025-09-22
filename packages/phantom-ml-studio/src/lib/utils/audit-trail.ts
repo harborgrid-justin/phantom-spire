@@ -3,7 +3,7 @@
  * Comprehensive audit logging for compliance and security monitoring
  */
 
-import type { LoggerService } from '../services/core/LoggerService';
+import type { LoggerService } from '..\services\core\LoggerService';
 
 // Audit event types
 export enum AuditEventType {

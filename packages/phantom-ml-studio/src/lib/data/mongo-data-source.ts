@@ -13,7 +13,7 @@ import {
   type QueryFilter,
   type QueryOptions,
 } from './data-access-layer';
-import type { LoggerService } from '../services/core/LoggerService';
+import type { LoggerService } from '..\services\core\LoggerService';
 
 // MongoDB-specific query interface
 interface MongoQuery {

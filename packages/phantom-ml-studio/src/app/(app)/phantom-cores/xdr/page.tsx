@@ -16,7 +16,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 // Import types, API functions, and components
-import { XDRSystemStatus } from './types';
+import { XDRSystemStatus } from './_lib/types';
 import { fetchXDRStatus } from './api';
 import { 
   XDRSystemOverview, 

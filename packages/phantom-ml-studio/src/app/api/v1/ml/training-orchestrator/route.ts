@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { TrainingOrchestrator } from '@/services/training-orchestrator';
-import { HuggingFaceModelRegistry, RegistryConfig } from '@/models/HuggingFaceModelRegistry';
+import { TrainingOrchestrator } from '@/features/training-orchestrator/lib';
+import { HuggingFaceModelRegistry, RegistryConfig } from '@/features/hugging-face/lib/HuggingFaceModelRegistry';
 
 const registryConfig: RegistryConfig = {
   dataDir: './.registry',

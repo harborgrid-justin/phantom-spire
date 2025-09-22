@@ -17,7 +17,7 @@ import {
   Warning,
   Error
 } from '@mui/icons-material';
-import { ReportDetailsProps, STATUS_COLORS, METRIC_STATUS_COLORS } from '../types';
+import { ReportDetailsProps, STATUS_COLORS, METRIC_STATUS_COLORS } from '../../_lib/types';
 
 export function ReportDetails({ report }: ReportDetailsProps) {
   const getStatusColor = (status: string) => {

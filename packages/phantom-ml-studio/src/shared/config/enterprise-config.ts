@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { ValidationUtils } from '../utils/validation';
+import { ValidationUtils } from '..\..\lib\utils\validation';
 
 // Configuration source types
 export enum ConfigSource {

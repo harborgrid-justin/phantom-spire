@@ -4,8 +4,8 @@
  */
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../lib/database';
-import { initializeCompleteDatabase } from '../../../lib/database-init';
+import { query } from '..\..\..\..\..\..\..\lib\database\database';
+import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
 
 export async function GET(request: NextRequest) {
   try {

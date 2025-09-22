@@ -58,7 +58,11 @@
       "Bash(timeout 30s npm run dev)",
       "Bash(xargs file:*)",
       "Bash(npx storybook dev:*)",
-      "Bash(while read file)"
+      "Bash(while read file)",
+      "Bash(ls:*)",
+      "Bash(do if grep -q \"from.*''''\\./components/\" \"$file\")",
+      "Bash(then echo \"$file\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

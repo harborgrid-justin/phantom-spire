@@ -44,7 +44,7 @@ import {
   Analytics as AnalyticsIcon,
   FilterList as FilterIcon
 } from '@mui/icons-material';
-import { Dataset, Feature, FeatureEngineering } from '../types';
+import { Dataset, Feature, FeatureEngineering } from '../../_lib/types';
 
 interface FeatureConfigurationProps {
   selectedDataset: Dataset | null;

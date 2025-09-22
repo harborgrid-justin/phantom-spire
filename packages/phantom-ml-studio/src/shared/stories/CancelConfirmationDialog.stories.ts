@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { fn } from 'storybook/test';
-import CancelConfirmationDialog from '../app/automlPipeline/components/CancelConfirmationDialog';
-import { Pipeline } from '../app/automlPipeline/types';
+import CancelConfirmationDialog from '..\..\lib\app\automlPipeline\components\CancelConfirmationDialog';
+import { Pipeline } from '..\..\lib\app\automlPipeline\types';
 
 // Mock pipeline data
 const mockPipeline: Pipeline = {

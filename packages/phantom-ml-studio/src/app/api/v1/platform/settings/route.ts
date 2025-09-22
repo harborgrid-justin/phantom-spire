@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { settingsService } from '@/services/settings';
+import { settingsService } from '@/features/settings/lib';
 
 export async function GET() {
   const data = await settingsService.getSettings({

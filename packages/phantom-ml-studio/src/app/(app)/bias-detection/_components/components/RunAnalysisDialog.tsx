@@ -25,7 +25,7 @@ import {
   Alert
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { RunAnalysisDialogProps } from '../types';
+import { RunAnalysisDialogProps } from '../../_lib/types';
 
 export function RunAnalysisDialog({
   open,

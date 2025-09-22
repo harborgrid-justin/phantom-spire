@@ -27,7 +27,7 @@ import {
   Download as DownloadIcon,
   Refresh as RefreshIcon
 } from '@mui/icons-material';
-import { ComplianceFramework } from '../types';
+import { ComplianceFramework } from '../../_lib/types';
 
 interface FrameworkSummaryProps {
   frameworks: ComplianceFramework[];

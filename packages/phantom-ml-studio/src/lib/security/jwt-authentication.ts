@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { AuditLogger } from './audit-logger';
-import { EnterpriseErrorManager } from '../services/error-handling/enterprise-error-manager';
+import { EnterpriseErrorManager } from '..\services\error-handling\enterprise-error-manager';
 
 export interface User {
   id: string;

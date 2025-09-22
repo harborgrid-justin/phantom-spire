@@ -20,7 +20,7 @@ import {
   LinearProgress,
   Chip
 } from '@mui/material';
-import { AlgorithmPerformance } from '../types';
+import { AlgorithmPerformance } from '../../_lib/types';
 
 interface AlgorithmPerformanceProps {
   performance: AlgorithmPerformance[];

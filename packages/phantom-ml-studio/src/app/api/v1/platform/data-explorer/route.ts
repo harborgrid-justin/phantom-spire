@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextResponse } from 'next/server';
-import { dataExplorerService } from '@/services/data-explorer';
+import { dataExplorerService } from '@/features/data-explorer/lib';
 
 export async function GET() {
   const data = await dataExplorerService.getDatasets({

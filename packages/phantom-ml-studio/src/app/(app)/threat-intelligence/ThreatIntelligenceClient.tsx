@@ -17,14 +17,14 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { Security } from '@mui/icons-material';
-import { ThreatFeed, ThreatData } from './types';
+import { ThreatFeed, ThreatData } from './_lib/types';
 import {
   FeedCard,
   FilterBar,
   ThreatDataTable,
   SubscriptionCard,
   FeedDetailsDialog
-} from './components';
+} from './_components/components';
 
 export default function ThreatIntelligenceClient() {
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { interactiveFeatureEngineeringService } from '@/services/interactive-feature-engineering';
+import { interactiveFeatureEngineeringService } from '@/features/feature-engineering/lib';
 
 export async function GET() {
   const data = await interactiveFeatureEngineeringService.getFeatureEngineeringPipeline({

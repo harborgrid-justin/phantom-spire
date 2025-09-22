@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { ViewColumn as ColumnIcon } from '@mui/icons-material';
 import { Column } from '../../types';
-import { sampleColumns } from '../../data/sampleData';
+import { sampleColumns } from '../../../_lib/data/sampleData';
 
 interface ChooseTargetStepProps {
   selectedTargetColumn: string;

@@ -1,7 +1,7 @@
 // src/services/settingsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
-import { Settings, ApiKey, GetSettingsRequest, GetSettingsResponse, UpdateSettingsRequest, UpdateSettingsResponse, CreateApiKeyRequest, CreateApiKeyResponse, DeleteApiKeyRequest, DeleteApiKeyResponse } from './settings.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '..\..\..\lib\core';
+import { Settings, ApiKey, GetSettingsRequest, GetSettingsResponse, UpdateSettingsRequest, UpdateSettingsResponse, CreateApiKeyRequest, CreateApiKeyResponse, DeleteApiKeyRequest, DeleteApiKeyResponse } from '..\..\..\lib\settings.types';
 
 const SETTINGS_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-settings',

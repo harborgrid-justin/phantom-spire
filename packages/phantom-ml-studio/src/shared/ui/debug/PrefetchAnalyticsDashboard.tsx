@@ -25,7 +25,7 @@ import {
   Clear as ClearIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import { prefetchAnalytics, type PrefetchMetrics } from '@/utils/prefetchAnalytics';
+import { prefetchAnalytics, type PrefetchMetrics } from '@/shared/utils/prefetchAnalytics';
 
 /**
  * Development-only component for monitoring prefetch performance

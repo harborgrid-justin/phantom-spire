@@ -2,7 +2,7 @@
  * Interactive Feature Engineering Service Type Definitions
  */
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
 
 export interface Feature {
   id: string;

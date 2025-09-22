@@ -1,7 +1,7 @@
 // src/services/real-time-monitoring/realTimeMonitoringService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../core';
-import { ModelMetrics, RealTimeEvent, GetModelMetricsRequest, GetModelMetricsResponse, GetRealTimeEventsRequest, GetRealTimeEventsResponse, GetPerformanceDataRequest, GetPerformanceDataResponse } from './realTimeMonitoring.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
+import { ModelMetrics, RealTimeEvent, GetModelMetricsRequest, GetModelMetricsResponse, GetRealTimeEventsRequest, GetRealTimeEventsResponse, GetPerformanceDataRequest, GetPerformanceDataResponse } from '..\..\..\lib\realTimeMonitoring.types';
 
 const REAL_TIME_MONITORING_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-real-time-monitoring',

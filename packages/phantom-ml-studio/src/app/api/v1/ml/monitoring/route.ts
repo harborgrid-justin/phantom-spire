@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { realTimeMonitoringService } from '@/services/real-time-monitoring';
+import { realTimeMonitoringService } from '@/features/monitoring/lib';
 
 export async function GET() {
   const data = await realTimeMonitoringService.getModelMetrics({

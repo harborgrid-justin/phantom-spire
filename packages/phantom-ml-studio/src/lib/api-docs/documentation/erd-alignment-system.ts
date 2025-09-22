@@ -4,8 +4,8 @@
  */
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { getSequelize } from '../sequelize';
-import { models } from '../models';
+import { getSequelize } from '..\..\sequelize';
+import { models } from '..\..\models';
 
 export interface ERDEntity {
   name: string;

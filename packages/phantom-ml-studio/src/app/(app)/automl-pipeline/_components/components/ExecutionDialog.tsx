@@ -17,7 +17,7 @@ import {
   Typography,
   Chip
 } from '@mui/material';
-import { Pipeline } from '../types';
+import { Pipeline } from '../../_lib/types';
 
 interface ExecutionDialogProps {
   open: boolean;

@@ -26,7 +26,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 // Import types, API functions, and components
-import { VerificationResponse } from './types';
+import { VerificationResponse } from './_lib/types';
 import { fetchVerificationResults } from './api';
 import { VerificationSummary, CoreDetails } from './components';
 

@@ -22,7 +22,7 @@ import {
   Visibility as PreviewIcon
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { Dataset, Column, SampleData } from '@/services/data-explorer';
+import { Dataset, Column, SampleData } from '@/features/data-explorer/lib';
 
 interface DataVisualizationProps {
   selectedDataset: Dataset | undefined;

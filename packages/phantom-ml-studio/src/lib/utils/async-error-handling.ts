@@ -3,7 +3,7 @@
  * Comprehensive error handling with retry mechanisms, circuit breakers, and async utilities
  */
 
-import type { LoggerService } from '../services/core/LoggerService';
+import type { LoggerService } from '..\services\core\LoggerService';
 
 // Semaphore class for concurrency control
 class Semaphore {

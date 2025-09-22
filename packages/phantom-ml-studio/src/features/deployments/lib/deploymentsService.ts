@@ -1,7 +1,7 @@
 // src/services/deploymentsService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '../core';
-import { Deployment, DeploymentConfig, CreateDeploymentRequest, CreateDeploymentResponse, GetDeploymentsRequest, GetDeploymentsResponse, GetDeploymentRequest, GetDeploymentResponse, UpdateDeploymentRequest, UpdateDeploymentResponse, DeleteDeploymentRequest, DeleteDeploymentResponse } from './deployment.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult } from '@/lib/core-logic/types/service.types';
+import { Deployment, DeploymentConfig, CreateDeploymentRequest, CreateDeploymentResponse, GetDeploymentsRequest, GetDeploymentsResponse, GetDeploymentRequest, GetDeploymentResponse, UpdateDeploymentRequest, UpdateDeploymentResponse, DeleteDeploymentRequest, DeleteDeploymentResponse } from '../types/deployment.types';
 
 const DEPLOYMENTS_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-deployments',

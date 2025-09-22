@@ -33,7 +33,7 @@ import {
   Timer as TimerIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
-import { Algorithm, Dataset } from '../types';
+import { Algorithm, Dataset } from '../../_lib/types';
 
 interface AlgorithmSelectionProps {
   selectedAlgorithm: string;

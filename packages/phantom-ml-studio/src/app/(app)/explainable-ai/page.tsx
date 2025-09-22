@@ -22,7 +22,7 @@ import {
   Psychology as PsychologyIcon,
   Analytics as AnalyticsIcon
 } from '@mui/icons-material';
-import { ServiceContext } from '@/services/core';
+import { ServiceContext } from '@/lib/core-logic';
 
 interface ModelExplanation {
   modelId: string;

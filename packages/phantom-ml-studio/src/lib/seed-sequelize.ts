@@ -3,8 +3,8 @@
  * Seeds the database with initial data using Sequelize models
  */
 import 'server-only';
-import { getSequelize } from './sequelize';
-import { Dataset, DatasetColumn, SampleData, Experiment, TrainingHistory, Model, Deployment, MetricsData } from './models';
+import { getSequelize } from 'sequelize';
+import { Dataset, DatasetColumn, SampleData, Experiment, TrainingHistory, Model, Deployment, MetricsData } from 'models';
 
 /**
  * Seed datasets

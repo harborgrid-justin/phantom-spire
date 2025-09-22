@@ -24,7 +24,7 @@ import {
   AutoFixHigh,
   Assessment
 } from '@mui/icons-material';
-import { MitigationRecommendationsProps } from '../types';
+import { MitigationRecommendationsProps } from '../../_lib/types';
 
 export function MitigationRecommendations({ report }: MitigationRecommendationsProps) {
   const getRecommendationIcon = (recommendation: string, status: string) => {

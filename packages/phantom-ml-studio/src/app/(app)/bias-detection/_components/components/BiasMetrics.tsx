@@ -18,7 +18,7 @@ import {
   Warning,
   Error
 } from '@mui/icons-material';
-import { BiasMetricsProps, METRIC_STATUS_COLORS } from '../types';
+import { BiasMetricsProps, METRIC_STATUS_COLORS } from '../../_lib/types';
 
 export function BiasMetrics({ metrics }: BiasMetricsProps) {
   const getMetricStatusColor = (status: string) => {

@@ -1,7 +1,7 @@
 // src/services/models.types.ts
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
-import { ModelResult } from '../model-builder/modelBuilder.types';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\core';
+import { ModelResult } from '..\..\..\model-builder\modelBuilder.types';
 
 export type ModelVersionStatus = 'registered' | 'staging' | 'production' | 'archived';
 

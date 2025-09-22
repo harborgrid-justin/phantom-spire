@@ -17,7 +17,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
-import { ThreatDataTableProps, SEVERITY_COLORS } from '../types';
+import { ThreatDataTableProps, SEVERITY_COLORS } from '../../_lib/types';
 
 export function ThreatDataTable({ 
   threatData, 

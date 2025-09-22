@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextResponse } from 'next/server';
-import { modelBuilderService } from '@/services/model-builder';
+import { modelBuilderService } from '@/features/model-builder/lib';
 
 export async function POST(request: Request) {
   try {

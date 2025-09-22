@@ -25,7 +25,7 @@ import {
   Tooltip as ChartTooltip,
   ResponsiveContainer
 } from 'recharts';
-import { ComplianceFramework } from '../types';
+import { ComplianceFramework } from '../../_lib/types';
 
 interface ComplianceChartsProps {
   frameworks: ComplianceFramework[];

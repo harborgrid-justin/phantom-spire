@@ -39,7 +39,7 @@ import {
   Schedule as TimeIcon,
   Memory as ResourceIcon
 } from '@mui/icons-material';
-import { Dataset, Algorithm, Feature, FeatureEngineering, TrainingJob, HyperparameterValue } from '../types';
+import { Dataset, Algorithm, Feature, FeatureEngineering, TrainingJob, HyperparameterValue } from '../../_lib/types';
 
 interface ReviewAndTrainProps {
   dataset: Dataset | null;

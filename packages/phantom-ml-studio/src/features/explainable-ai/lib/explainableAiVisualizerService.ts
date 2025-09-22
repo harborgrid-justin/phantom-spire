@@ -1,7 +1,7 @@
 // src/services/explainable-ai-visualizer/explainableAiVisualizerService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../core';
-import { ModelExplanation, GetModelExplanationRequest, GetModelExplanationResponse } from './explainableAiVisualizer.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
+import { ModelExplanation, GetModelExplanationRequest, GetModelExplanationResponse } from '..\..\..\lib\explainableAiVisualizer.types';
 
 const EXPLAINABLE_AI_VISUALIZER_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-explainable-ai-visualizer',

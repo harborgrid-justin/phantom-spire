@@ -24,7 +24,7 @@ import {
   Security as SecurityIcon,
   People as PeopleIcon
 } from '@mui/icons-material';
-import { FeedCardProps, CATEGORY_COLORS } from '../types';
+import { FeedCardProps, CATEGORY_COLORS } from '../../_lib/types';
 
 export function FeedCard({
   feed,

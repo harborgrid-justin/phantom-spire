@@ -24,15 +24,15 @@ import {
   Refresh as RefreshIcon,
   Download as DownloadIcon
 } from '@mui/icons-material';
-import { dataExplorerService } from '@/services/data-explorer';
-import { Dataset, Column, SampleData } from '@/services/data-explorer';
-import { ServiceContext } from '@/services/core/types/service.types';
+import { dataExplorerService } from '@/features/data-explorer/lib';
+import { Dataset, Column, SampleData } from '@/features/data-explorer/lib';
+import { ServiceContext } from '@/lib/core-logic/types/service.types';
 
 // Import components
-import DataExplorerErrorBoundary from './components/DataExplorerErrorBoundary';
-import DataUpload from './components/DataUpload';
-import DataPreview from './components/DataPreview';
-import DataVisualization from './components/DataVisualization';
+import DataExplorerErrorBoundary from './_components/components/DataExplorerErrorBoundary';
+import DataUpload from './_components/components/DataUpload';
+import DataPreview from './_components/components/DataPreview';
+import DataVisualization from './_components/components/DataVisualization';
 
 const DataExplorerClient: React.FC = () => {
   const [loading, setLoading] = useState(true);

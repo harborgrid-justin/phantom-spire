@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { multiModelAbTestingService } from '@/services/multi-model-ab-testing';
+import { multiModelAbTestingService } from '@/features/ab-testing/lib';
 
 export async function GET() {
   const data = await multiModelAbTestingService.getABTests({

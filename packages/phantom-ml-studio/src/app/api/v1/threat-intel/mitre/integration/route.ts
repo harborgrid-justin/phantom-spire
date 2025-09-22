@@ -3,7 +3,7 @@
  * Demonstrates MITRE data interoperability across phantom-ml-studio modules
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { getPhantomCoreIntegrator } from '@/services/phantom-core-integrator';
+import { getPhantomCoreIntegrator } from '@/lib/integrations/phantom-core-integrator';
 import { query } from '@/lib/database';
 
 /**

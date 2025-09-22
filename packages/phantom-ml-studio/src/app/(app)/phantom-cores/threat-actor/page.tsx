@@ -16,7 +16,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 
 // Import types, API functions, and components
-import { ThreatActorStatus } from './types';
+import { ThreatActorStatus } from './_lib/types';
 import { fetchThreatActorStatus } from './api';
 import { 
   ThreatActorOverview, 

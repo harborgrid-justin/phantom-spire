@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { useModels, useStarModel } from '../../hooks/useMLCore';
+import { useModels, useStarModel } from '@/shared/hooks/useMLCore';
 import { Model } from '../../lib/ml-core/types';
 import {
   Box,

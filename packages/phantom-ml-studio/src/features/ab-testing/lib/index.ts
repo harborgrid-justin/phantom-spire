@@ -1,2 +1,2 @@
 export * from './multiModelAbTestingService';
-export * from './multiModelAbTesting.types';
+export * from '../types/multiModelAbTesting.types';

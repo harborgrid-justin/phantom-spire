@@ -34,7 +34,7 @@
 
 // Metadata moved to layout.tsx
 import { Suspense } from 'react';
-import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
+import ErrorBoundary from '@/shared/ui/ErrorBoundary/ErrorBoundary';
 import dynamic from 'next/dynamic';
 
 // Dynamic imports for optimal deployment management interface loading

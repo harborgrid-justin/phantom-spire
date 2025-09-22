@@ -3,7 +3,7 @@
  * Multi-layer caching system with memory, Redis, and HTTP caching
  */
 
-import { BaseService, Injectable } from '../core/ServiceRegistry';
+import { BaseService, Injectable } from '..\core\ServiceRegistry';
 
 // Cache entry interface
 export interface CacheEntry<T = any> {

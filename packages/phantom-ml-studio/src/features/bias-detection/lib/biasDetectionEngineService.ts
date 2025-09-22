@@ -1,7 +1,7 @@
 // src/services/bias-detection-engine/biasDetectionEngineService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '../core';
-import { ModelBiasAnalysis, GetModelBiasAnalysisRequest, GetModelBiasAnalysisResponse } from './biasDetectionEngine.types';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult, FeatureEngineeringResult, FeatureSelectionResult, EngineeredFeature } from '..\..\..\lib\core';
+import { ModelBiasAnalysis, GetModelBiasAnalysisRequest, GetModelBiasAnalysisResponse } from '..\..\..\lib\biasDetectionEngine.types';
 
 const BIAS_DETECTION_ENGINE_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-bias-detection-engine',

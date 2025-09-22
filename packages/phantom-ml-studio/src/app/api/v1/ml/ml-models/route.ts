@@ -3,8 +3,8 @@
  * Machine Learning model lifecycle management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { Experiment } from '../../../lib/models/Experiment.model';
-import { initializeCompleteDatabase } from '../../../lib/database-init';
+import { Experiment } from '../../../../lib/database/models/Experiment.model';
+import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
 import { Op } from 'sequelize';
 
 /**

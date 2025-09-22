@@ -2,7 +2,7 @@
  * Sample datasets and algorithm definitions for the Model Builder
  */
 
-import { Dataset, AlgorithmInfo, Column } from '../types';
+import { Dataset, AlgorithmInfo, Column } from '../../../../../lib/ml-core/types';
 
 // Sample datasets for demo
 export const sampleDatasets: Dataset[] = [

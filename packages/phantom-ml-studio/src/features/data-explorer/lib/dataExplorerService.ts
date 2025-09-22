@@ -1,8 +1,8 @@
 // src/services/dataExplorerService.ts
 
-import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, BusinessLogicResponse, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult } from '../core';
-import { Dataset, Column, SampleData, GetDatasetsRequest, GetDatasetsResponse, GetColumnsRequest, GetColumnsResponse, GetSampleDataRequest, GetSampleDataResponse } from './dataExplorer.types';
-import { mockDatasets, mockColumns, mockSampleData } from '../shared/mockData';
+import { BusinessLogicBase, ServiceDefinition, ServiceContext, BusinessLogicRequest, BusinessLogicResponse, ProcessResult, ValidationResult, RuleEnforcementResult, InsightResult, MetricResult, TrendPrediction, IntegrationResult } from '@/lib/core-logic/types/service.types';
+import { Dataset, Column, SampleData, GetDatasetsRequest, GetDatasetsResponse, GetColumnsRequest, GetColumnsResponse, GetSampleDataRequest, GetSampleDataResponse } from '../types/dataExplorer.types';
+import { mockDatasets, mockColumns, mockSampleData } from '@/shared/lib/mockData';
 
 const DATA_EXPLORER_SERVICE_DEFINITION: ServiceDefinition = {
     id: 'phantom-ml-studio-data-explorer',

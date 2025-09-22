@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 
 // Dynamic import to ensure client-side rendering
 const MitreDashboard = dynamic(
-  () => import('@/components/mitre/MitreDashboard'),
+  () => import('@/shared/ui/mitre/MitreDashboard'),
   { 
     ssr: false,
     loading: () => <div>Loading MITRE Dashboard...</div>

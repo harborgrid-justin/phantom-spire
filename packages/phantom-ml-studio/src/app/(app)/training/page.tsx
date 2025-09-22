@@ -33,14 +33,14 @@ import {
   TrainingJob,
   HyperparameterValue,
   TRAINING_STEPS
-} from './types';
+} from './_lib/types';
 
 // Import step components
-import DatasetSelection from './components/DatasetSelection';
-import AlgorithmSelection from './components/AlgorithmSelection';
-import FeatureConfiguration from './components/FeatureConfiguration';
-import ParameterTuning from './components/ParameterTuning';
-import ReviewAndTrain from './components/ReviewAndTrain';
+import DatasetSelection from './_components/components/DatasetSelection';
+import AlgorithmSelection from './_components/components/AlgorithmSelection';
+import FeatureConfiguration from './_components/components/FeatureConfiguration';
+import ParameterTuning from './_components/components/ParameterTuning';
+import ReviewAndTrain from './_components/components/ReviewAndTrain';
 
 // Mock data - In a real app, this would come from API
 const mockDatasets: Dataset[] = [

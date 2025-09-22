@@ -25,9 +25,9 @@ import {
 } from '@mui/icons-material';
 
 // Component imports
-import ComplianceOverviewCards from './components/ComplianceOverviewCards';
-import ComplianceCharts from './components/ComplianceCharts';
-import FrameworkSummary from './components/FrameworkSummary';
+import ComplianceOverviewCards from './_components/components/ComplianceOverviewCards';
+import ComplianceCharts from './_components/components/ComplianceCharts';
+import FrameworkSummary from './_components/components/FrameworkSummary';
 
 // Type imports
 import type {
@@ -35,7 +35,7 @@ import type {
   SecurityMetrics,
   // AuditReport, // For future implementation
   TabValue
-} from './types';
+} from './_lib/types';
 
 export default function EnterpriseSecurityCompliancePage() {
   // State management

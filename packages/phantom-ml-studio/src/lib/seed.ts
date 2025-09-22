@@ -3,8 +3,8 @@
  * Populates database with initial data from mock data
  */
 import 'server-only';
-import { query, transaction } from './database';
-import { initializeSchema } from './schema';
+import { query, transaction } from 'database';
+import { initializeSchema } from 'schema';
 import { mitreService } from './services/mitreService';
 
 // Import mock data

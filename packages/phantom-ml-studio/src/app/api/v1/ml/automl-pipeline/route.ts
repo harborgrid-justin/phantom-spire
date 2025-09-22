@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { automlPipelineVisualizerService } from '@/services/automl-pipeline-visualizer';
+import { automlPipelineVisualizerService } from '@/features/automl-pipeline-visualizer/lib';
 
 export async function GET() {
   const data = await automlPipelineVisualizerService.getAutoMLExperiment({

@@ -16,9 +16,9 @@ import {
 import {
   Assessment as AssessmentIcon,
 } from '@mui/icons-material';
-import { multiModelAbTestingService } from '@/services/multi-model-ab-testing';
-import { ABTest } from '@/services/multi-model-ab-testing';
-import { ServiceContext } from '@/services/core';
+import { multiModelAbTestingService } from '@/features/ab-testing/lib';
+import { ABTest } from '@/features/ab-testing/lib';
+import { ServiceContext } from '@/lib/core-logic';
 
 export default function MultiModelABTestingPage() {
   const [loading, setLoading] = useState(true);

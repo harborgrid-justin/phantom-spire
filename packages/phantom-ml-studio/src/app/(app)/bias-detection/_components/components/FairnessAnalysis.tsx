@@ -18,7 +18,7 @@ import {
   Typography
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { FairnessAnalysisProps } from '../types';
+import { FairnessAnalysisProps } from '../../_lib/types';
 
 export function FairnessAnalysis({ analysis }: FairnessAnalysisProps) {
   const getDisparityColor = (value: number) => {

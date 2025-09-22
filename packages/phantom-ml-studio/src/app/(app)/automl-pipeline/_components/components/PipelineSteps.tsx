@@ -24,7 +24,7 @@ import {
   Schedule,
   Error
 } from '@mui/icons-material';
-import { PipelineStep } from '../types';
+import { PipelineStep } from '../../_lib/types';
 
 interface PipelineStepsProps {
   steps: PipelineStep[];

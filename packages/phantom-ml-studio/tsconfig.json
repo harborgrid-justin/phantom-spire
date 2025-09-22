@@ -46,13 +46,14 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./src/components/*"],
-      "@/services/*": ["./src/services/*"],
+      "@/features/*": ["./src/features/*"],
       "@/types/*": ["./src/types/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/utils/*": ["./src/utils/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/middleware/*": ["./src/middleware/*"],
-      "@/testing/*": ["./src/testing/*"]
+      "@/testing/*": ["./src/testing/*"],
+      "@/shared/*": ["./src/shared/*"]
     }
   },
   "include": [

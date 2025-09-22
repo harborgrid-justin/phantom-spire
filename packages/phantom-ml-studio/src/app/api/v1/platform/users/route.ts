@@ -3,8 +3,8 @@
  * User management and authentication
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '../../../lib/models/User.model';
-import { initializeCompleteDatabase } from '../../../lib/database-init';
+import { User } from '..\..\..\..\..\..\..\lib\database\models\User.model';
+import { initializeCompleteDatabase } from '..\..\..\..\..\..\..\lib\database\database-init';
 import { Op } from 'sequelize';
 
 /**

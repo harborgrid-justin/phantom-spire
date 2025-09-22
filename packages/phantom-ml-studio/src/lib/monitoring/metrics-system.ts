@@ -3,7 +3,7 @@
  * Comprehensive application monitoring with Prometheus-compatible metrics, alerting, and APM
  */
 
-import type { LoggerService } from '../services/core/LoggerService';
+import type { LoggerService } from '..\services\core\LoggerService';
 
 // Metric types
 export enum MetricType {

@@ -3,7 +3,7 @@
  * Generates sample bias reports and fairness analysis data
  */
 
-import { BiasReport, FairnessAnalysis } from '../types';
+import { BiasReport, FairnessAnalysis } from '../../../../../lib/ml-core/types';
 
 export class MockDataService {
   static generateBiasReports(): BiasReport[] {

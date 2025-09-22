@@ -11,7 +11,7 @@ import {
   Box, 
   Checkbox 
 } from '@mui/material';
-import { sampleColumns } from '../../data/sampleData';
+import { sampleColumns } from '../../../_lib/data/sampleData';
 
 interface SelectFeaturesStepProps {
   selectedFeatures: string[];

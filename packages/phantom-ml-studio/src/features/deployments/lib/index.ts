@@ -1,2 +1,2 @@
 export * from './deploymentsService';
-export * from './deployment.types';
+export * from '../types/deployment.types';

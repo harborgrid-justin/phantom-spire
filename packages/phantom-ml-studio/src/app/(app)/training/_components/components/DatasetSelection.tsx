@@ -31,7 +31,7 @@ import {
   Warning as WarningIcon,
   Error as ErrorIcon
 } from '@mui/icons-material';
-import { Dataset } from '../types';
+import { Dataset } from '../../_lib/types';
 
 interface DatasetSelectionProps {
   selectedDataset: Dataset | null;

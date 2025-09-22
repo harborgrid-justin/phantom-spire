@@ -2,7 +2,7 @@
  * Utility functions for Bias Detection Engine
  */
 
-import { BiasMetric } from '../types';
+import { BiasMetric } from '../../../../../lib/ml-core/types';
 
 export class BiasUtils {
   /**

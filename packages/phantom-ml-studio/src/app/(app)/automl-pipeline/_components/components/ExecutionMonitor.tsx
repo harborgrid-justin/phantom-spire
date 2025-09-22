@@ -20,7 +20,7 @@ import {
   Alert
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { Pipeline } from '../types';
+import { Pipeline } from '../../_lib/types';
 
 interface ExecutionMonitorProps {
   pipeline: Pipeline | null;

@@ -31,7 +31,7 @@ import {
   Warning,
   Error
 } from '@mui/icons-material';
-import { BiasReportTableProps, STATUS_COLORS } from '../types';
+import { BiasReportTableProps, STATUS_COLORS } from '../../_lib/types';
 
 export function BiasReportTable({
   reports,

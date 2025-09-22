@@ -1,6 +1,6 @@
 // src/services/settings.types.ts
 
-import { BusinessLogicRequest, BusinessLogicResponse } from '../core';
+import { BusinessLogicRequest, BusinessLogicResponse } from '..\..\..\lib\core';
 
 export interface UserPreferences {
     theme: 'light' | 'dark' | 'system';

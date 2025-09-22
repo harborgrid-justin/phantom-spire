@@ -5,7 +5,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { persistenceService } from '../persistence/enterprise-persistence.service';
+import { persistenceService } from '..\..\persistence\enterprise-persistence.service';
 import { enterpriseStateManager } from '../state/enterprise-state-manager.service';
 
 // ==================== SECURITY TYPES ====================

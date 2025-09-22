@@ -1,2 +1,2 @@
 export * from './dataExplorerService';
-export * from './dataExplorer.types';
+export * from '../types/dataExplorer.types';

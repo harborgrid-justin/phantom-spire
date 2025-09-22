@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useConnectionAwarePrefetch } from '@/hooks/useConnectionAwarePrefetch';
+import { useConnectionAwarePrefetch } from '@/shared/hooks/useConnectionAwarePrefetch';
 
 interface ConnectionAwareLinkProps {
   href: string;

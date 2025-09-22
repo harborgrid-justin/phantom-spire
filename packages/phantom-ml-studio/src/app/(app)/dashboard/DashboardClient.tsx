@@ -26,8 +26,8 @@ import {
 } from '@mui/icons-material';
 import { BarChart } from '@mui/x-charts/BarChart';
 
-import { dashboardService } from '@/services/dashboard';
-import { DashboardData } from '@/services/dashboard';
+import { dashboardService } from '@/features/dashboard/lib';
+import { DashboardData } from '@/features/dashboard/lib';
 
 // Error boundary component
 class DashboardErrorBoundary extends React.Component<

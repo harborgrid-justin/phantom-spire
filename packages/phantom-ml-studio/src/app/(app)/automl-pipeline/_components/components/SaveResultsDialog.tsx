@@ -19,7 +19,7 @@ import {
   Alert
 } from '@mui/material';
 import { Save } from '@mui/icons-material';
-import { Pipeline } from '../types';
+import { Pipeline } from '../../_lib/types';
 
 interface SaveResultsDialogProps {
   open: boolean;

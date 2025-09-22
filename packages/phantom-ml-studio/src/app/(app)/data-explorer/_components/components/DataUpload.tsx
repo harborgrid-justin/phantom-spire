@@ -13,7 +13,7 @@ import {
 import {
   CloudUploadOutlined as DragDropIcon
 } from '@mui/icons-material';
-import { Dataset } from '@/services/data-explorer';
+import { Dataset } from '@/features/data-explorer/lib';
 
 interface DataUploadProps {
   onDatasetUploaded: (dataset: Dataset) => void;

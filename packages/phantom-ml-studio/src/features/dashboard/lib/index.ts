@@ -4,4 +4,4 @@ export * from './dashboard.types';
 
 // Enhanced service with NAPI bindings is available but not auto-exported
 // Import it explicitly when needed on server-side:
-// import { enhancedDashboardService } from '@/services/dashboard/enhancedDashboardService';
+// import { enhancedDashboardService } from '@/features/dashboard/lib/enhancedDashboardService';

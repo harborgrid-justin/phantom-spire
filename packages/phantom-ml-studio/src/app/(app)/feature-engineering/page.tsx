@@ -16,9 +16,9 @@ import {
 import {
   Add as AddIcon,
 } from '@mui/icons-material';
-import { interactiveFeatureEngineeringService } from '@/services/interactive-feature-engineering';
-import { FeatureEngineeringPipeline } from '@/services/interactive-feature-engineering';
-import { ServiceContext } from '@/services/core';
+import { interactiveFeatureEngineeringService } from '@/features/feature-engineering/lib';
+import { FeatureEngineeringPipeline } from '@/features/feature-engineering/lib';
+import { ServiceContext } from '@/lib/core-logic';
 
 export default function InteractiveFeatureEngineeringPage(): JSX.Element {
   const [loading, setLoading] = useState(true);

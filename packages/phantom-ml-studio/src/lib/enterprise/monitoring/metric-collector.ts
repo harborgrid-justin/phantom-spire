@@ -18,7 +18,7 @@ import {
   generateMetricKey
 } from './monitoring.utils';
 import { enterpriseStateManager } from '../state/enterprise-state-manager.service';
-import { persistenceService } from '../persistence/enterprise-persistence.service';
+import { persistenceService } from '..\..\persistence\enterprise-persistence.service';
 
 export class MetricCollector extends EventEmitter {
   private metrics: Map<string, PerformanceMetric[]> = new Map();

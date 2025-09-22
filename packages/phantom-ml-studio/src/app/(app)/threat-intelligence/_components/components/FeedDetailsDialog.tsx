@@ -19,7 +19,7 @@ import {
   Typography
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { FeedDetailsDialogProps } from '../types';
+import { FeedDetailsDialogProps } from '../../_lib/types';
 
 export function FeedDetailsDialog({
   feed,

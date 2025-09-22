@@ -3,7 +3,7 @@
  * Comprehensive performance monitoring, metrics collection, and alerting
  */
 
-import { BaseService, Injectable } from '../core/ServiceRegistry';
+import { BaseService, Injectable } from '..\..\..\lib\core\ServiceRegistry';
 
 // Performance metric types
 export interface PerformanceMetric {

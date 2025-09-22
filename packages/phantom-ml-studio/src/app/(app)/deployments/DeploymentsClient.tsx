@@ -25,8 +25,8 @@ import {
   PlayArrow as StartIcon
 } from '@mui/icons-material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import { deploymentsService } from '@/services/deployments';
-import { Deployment } from '@/services/deployments';
+import { deploymentsService } from '@/features/deployments/lib';
+import { Deployment } from '@/features/deployments/lib';
 
 export default function DeploymentsClient() {
   const [deployments, setDeployments] = useState<Deployment[]>([]);

@@ -13,8 +13,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { HuggingFaceModelBase, TrainingConfig, TrainingProgress } from '@/models/HuggingFaceModelBase';
-import { HuggingFaceModelRegistry } from '@/models/HuggingFaceModelRegistry';
+import { HuggingFaceModelBase, TrainingConfig, TrainingProgress } from '@/features/hugging-face/lib/HuggingFaceModelBase';
+import { HuggingFaceModelRegistry } from '@/features/hugging-face/lib/HuggingFaceModelRegistry';
 
 export interface TrainingJob {
   id: string;

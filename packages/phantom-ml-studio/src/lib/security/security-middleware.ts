@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { inputValidator } from './input-validator';
-import type { LoggerService } from '../services/core/LoggerService';
+import type { LoggerService } from '..\services\core\LoggerService';
 
 export interface SecurityConfig {
   contentSecurityPolicy: {

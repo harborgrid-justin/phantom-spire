@@ -33,7 +33,7 @@ import {
   ListItemIcon
 } from '@mui/material';
 import { Storage as DatasetIcon, Upload as UploadIcon } from '@mui/icons-material';
-import type { PipelineConfig } from '../types';
+import type { PipelineConfig } from '../../_lib/types';
 
 interface PipelineWizardProps {
   open: boolean;
