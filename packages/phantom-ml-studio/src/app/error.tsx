@@ -8,6 +8,7 @@
  */
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { Box, Button, Typography, Paper, Container } from '@mui/material';
 import { ErrorOutline, Refresh, Home } from '@mui/icons-material';
 
@@ -111,16 +112,17 @@ export default function Error({ error, reset }: ErrorProps): JSX.Element {
             >
               Try Again
             </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<Home />}
-              onClick={() => window.location.href = '/'}
-              size="large"
-              aria-label="Go to home page"
-            >
-              Go Home
-            </Button>
+            <Link href="/" passHref>
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<Home />}
+                size="large"
+                aria-label="Go to home page"
+              >
+                Go Home
+              </Button>
+            </Link>
           </Box>
         </Paper>
       </Box>

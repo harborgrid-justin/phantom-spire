@@ -12,7 +12,7 @@ import {
   LinearProgress,
   Typography
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import {
   CheckCircle,
   Warning,
@@ -65,7 +65,7 @@ export function BiasMetrics({ metrics }: BiasMetricsProps) {
           {metrics.map((metric) => {
             const dataCyAttribute = metric.metric.toLowerCase().replace(/\s+/g, '-');
             return (
-              <Grid size={{ xs: 12, md: 6 }} key={metric.metric}>
+              <Grid item xs={12} md={6} key={metric.metric}>
                 <Card variant="outlined" sx={{ height: '100%' }} data-cy={dataCyAttribute}>
                   <CardContent>
                   {/* Metric Header */}

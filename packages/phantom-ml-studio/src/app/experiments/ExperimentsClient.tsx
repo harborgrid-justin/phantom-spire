@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -51,7 +52,7 @@ class ExperimentsErrorBoundary extends React.Component<
           <Alert
             severity="error"
             action={
-              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+              <Button color="inherit" size="small" onClick={() => router.refresh()}>
                 Refresh Page
               </Button>
             }
@@ -67,6 +68,7 @@ class ExperimentsErrorBoundary extends React.Component<
 }
 
 export default function ExperimentsClient() {
+  const router = useRouter();
   const [experiments, setExperiments] = useState<Experiment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

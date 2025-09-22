@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Grid,
@@ -32,6 +33,7 @@ interface ModelExplanation {
 }
 
 export default function ExplainableAIVisualizerPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [explanation, setExplanation] = useState<ModelExplanation | null>(null);
@@ -263,7 +265,7 @@ export default function ExplainableAIVisualizerPage() {
         <Button variant="contained" sx={{ mr: 2 }}>
           Export Analysis
         </Button>
-        <Button variant="outlined" onClick={() => window.location.reload()}>
+        <Button variant="outlined" onClick={() => router.refresh()}>
           Refresh Data
         </Button>
       </Box>

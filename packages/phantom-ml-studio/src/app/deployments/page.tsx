@@ -243,18 +243,22 @@ function DeploymentsErrorFallback() {
           <h2 className="text-lg font-semibold text-red-800 mb-2">Deployment Management Error</h2>
           <p className="text-red-600 mb-4">Unable to load deployment management interface</p>
           <div className="space-y-2 mb-4">
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
-            >
-              Retry Deployments
-            </button>
-            <button
-              onClick={() => window.location.href = '/dashboard'}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Return to Dashboard
-            </button>
+            <form action="" method="GET">
+              <button
+                type="submit"
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors mr-2"
+              >
+                Retry Deployments
+              </button>
+            </form>
+            <form action="/dashboard" method="GET">
+              <button
+                type="submit"
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Return to Dashboard
+              </button>
+            </form>
           </div>
           <p className="text-sm text-red-500">Production services remain operational</p>
         </div>

@@ -41,8 +41,14 @@ class DataExplorerErrorBoundary extends React.Component<
           <Alert
             severity="error"
             action={
-              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
-                Refresh Page
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  this.setState({ hasError: false });
+                }}
+              >
+                Reset Error
               </Button>
             }
           >

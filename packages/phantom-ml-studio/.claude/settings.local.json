@@ -56,7 +56,9 @@
       "Bash(tree:*)",
       "Bash(xargs dirname:*)",
       "Bash(timeout 30s npm run dev)",
-      "Bash(xargs file:*)"
+      "Bash(xargs file:*)",
+      "Bash(npx storybook dev:*)",
+      "Bash(while read file)"
     ],
     "deny": [],
     "ask": []

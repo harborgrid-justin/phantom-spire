@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Container,
   Typography,
@@ -54,7 +55,7 @@ class DashboardErrorBoundary extends React.Component<
           <Alert
             severity="error"
             action={
-              <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+              <Button color="inherit" size="small" onClick={() => router.refresh()}>
                 Refresh Page
               </Button>
             }
@@ -70,6 +71,7 @@ class DashboardErrorBoundary extends React.Component<
 }
 
 export default function DashboardClient() {
+  const router = useRouter();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
