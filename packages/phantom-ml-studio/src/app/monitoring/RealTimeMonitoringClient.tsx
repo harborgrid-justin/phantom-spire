@@ -155,7 +155,7 @@ export default function RealTimeMonitoringClient() {
     }
   };
 
-  const getStatusColor = (_status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy': return 'success';
       case 'warning': return 'warning';
@@ -164,7 +164,7 @@ export default function RealTimeMonitoringClient() {
     }
   };
 
-  const getSeverityColor = (_severity: string) => {
+  const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'low': return 'info';
       case 'medium': return 'warning';
@@ -174,7 +174,7 @@ export default function RealTimeMonitoringClient() {
     }
   };
 
-  const handleAcknowledgeAlert = (_alertId: string) => {
+  const handleAcknowledgeAlert = (alertId: string) => {
     setAlerts(alerts.map(alert =>
       alert.id === alertId ? { ...alert, acknowledged: true } : alert
     ));
@@ -318,7 +318,7 @@ export default function RealTimeMonitoringClient() {
                         <TableCell>
                           <Chip
                             label={model.status}
-                            color={getStatusColor($1) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
+                            color={getStatusColor(model.status) as 'primary' | 'success' | 'error' | 'warning' | 'default'}
                             size="small"
                           />
                         </TableCell>

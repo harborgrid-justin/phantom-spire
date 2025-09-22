@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
   Chip,
   Paper,
@@ -20,6 +19,7 @@ import {
   ListItemIcon,
   Alert
 } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import {
   Security as SecurityIcon,
   Flag as IOCIcon,
@@ -259,7 +259,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
 
       {/* Platform Statistics */}
       <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card sx={{ textAlign: 'center', background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)' }}>
             <CardContent>
               <Typography variant="h3" component="div" sx={{ color: 'white', fontWeight: 'bold' }}>
@@ -271,7 +271,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card sx={{ textAlign: 'center', background: 'linear-gradient(135deg, #388e3c 0%, #66bb6a 100%)' }}>
             <CardContent>
               <Typography variant="h3" component="div" sx={{ color: 'white', fontWeight: 'bold' }}>
@@ -283,7 +283,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card sx={{ textAlign: 'center', background: 'linear-gradient(135deg, #ed6c02 0%, #ff9800 100%)' }}>
             <CardContent>
               <Typography variant="h3" component="div" sx={{ color: 'white', fontWeight: 'bold' }}>
@@ -295,7 +295,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Card sx={{ textAlign: 'center', background: 'linear-gradient(135deg, #d32f2f 0%, #f44336 100%)' }}>
             <CardContent>
               <Typography variant="h3" component="div" sx={{ color: 'white', fontWeight: 'bold' }}>
@@ -327,7 +327,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
       
       <Grid container spacing={3}>
         {productionModules.map((module) => (
-          <Grid item xs={12} sm={6} md={4} key={module.path}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={module.path}>
             <Card 
               sx={{ 
                 height: '100%',
