@@ -476,16 +476,107 @@ export class PhantomCoreIntegrator {
         })
       },
       mitre: {
-        analyzeAttack: async (indicators: any[]) => ({
-          tactics: ['initial-access', 'execution'],
-          techniques: ['T1566', 'T1059'],
-          confidence: 0.85
+        analyzeAttack: async (indicators: any[]) => {
+          try {
+            // Use our MITRE service to analyze attack patterns
+            const { mitreService } = await import('../lib/services/mitreService');
+            
+            // Search for techniques based on indicators
+            const searchResults = await mitreService.searchMitreData('mitre_techniques', {
+              query: indicators.join(' '),
+              limit: 10
+            });
+            
+            const techniques = searchResults.items;
+            const tactics = techniques.reduce((acc: string[], technique: any) => {
+              technique.tactics?.forEach((tactic: string) => {
+                if (!acc.includes(tactic)) acc.push(tactic);
+              });
+              return acc;
+            }, []);
+
+            return {
+              tactics: tactics.slice(0, 5), // Top 5 tactics
+              techniques: techniques.map((t: any) => t.mitre_id).slice(0, 5), // Top 5 techniques
+              confidence: techniques.length > 0 ? 0.85 : 0.1,
+              details: {
+                matchedTechniques: techniques,
+                totalMatches: searchResults.total
+              }
+            };
+          } catch (error) {
+            console.warn('MITRE analysis failed, using fallback:', error);
+            return {
+              tactics: ['initial-access', 'execution'],
+              techniques: ['T1566', 'T1059'],
+              confidence: 0.5,
+              error: 'MITRE service unavailable'
+            };
+          }
         }),
-        mapToFramework: async (data: any) => ({
-          mapping: data,
-          framework: 'enterprise',
-          coverage: '78%'
-        })
+        mapToFramework: async (data: any) => {
+          try {
+            const { mitreService } = await import('../lib/services/mitreService');
+            const analytics = await mitreService.getAnalytics();
+            
+            // Calculate coverage based on available data
+            const totalTechniques = analytics.totalTechniques + analytics.totalSubTechniques;
+            const matchedTechniques = Math.min(data.techniques?.length || 0, totalTechniques);
+            const coverage = totalTechniques > 0 ? (matchedTechniques / totalTechniques * 100).toFixed(1) : '0';
+
+            return {
+              mapping: data,
+              framework: 'enterprise',
+              coverage: `${coverage}%`,
+              totalTechniques,
+              analytics
+            };
+          } catch (error) {
+            console.warn('MITRE framework mapping failed, using fallback:', error);
+            return {
+              mapping: data,
+              framework: 'enterprise',
+              coverage: '78%',
+              error: 'MITRE service unavailable'
+            };
+          }
+        }),
+        // New methods for direct MITRE data access
+        searchTechniques: async (query: string, options = {}) => {
+          try {
+            const { mitreService } = await import('../lib/services/mitreService');
+            return await mitreService.searchMitreData('mitre_techniques', { query, ...options });
+          } catch (error) {
+            console.warn('MITRE technique search failed:', error);
+            return { items: [], total: 0, limit: 50, offset: 0, hasMore: false };
+          }
+        },
+        getTechniqueDetails: async (techniqueId: string) => {
+          try {
+            const { query } = await import('../lib/database');
+            const result = await query('SELECT * FROM mitre_techniques WHERE mitre_id = $1', [techniqueId]);
+            return result.rows[0] || null;
+          } catch (error) {
+            console.warn('MITRE technique details failed:', error);
+            return null;
+          }
+        },
+        getIntegrationStatus: async () => {
+          try {
+            const { mitreService } = await import('../lib/services/mitreService');
+            return await mitreService.getIntegrationStatus();
+          } catch (error) {
+            console.warn('MITRE integration status failed:', error);
+            return {
+              isInitialized: false,
+              lastSync: null,
+              dataVersion: null,
+              totalRecords: 0,
+              syncInProgress: false,
+              errors: [error.message]
+            };
+          }
+        }
       },
       xdr: {
         detectThreats: async (data: any) => ({
