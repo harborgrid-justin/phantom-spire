@@ -6,7 +6,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const packagePath = join(__dirname, 'packages/phantom-xdr-core');
+const packagePath = join(__dirname, '../../packages/phantom-xdr-core');
 
 console.log('Testing phantom-xdr-core napi bindings...');
 
@@ -20,7 +20,7 @@ console.log('✅ Native module file found');
 
 // Try to import and test basic functionality
 try {
-  const phantomXdr = await import('./packages/phantom-xdr-core/index.js');
+  const phantomXdr = await import('../../packages/phantom-xdr-core/index.js');
   
   // Test basic hello function
   const greeting = phantomXdr.hello('Test');

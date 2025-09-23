@@ -92,21 +92,41 @@ mod zero_day_protection;
 // NAPI wrapper for Node.js integration
 mod napi_wrapper;
 
-// Re-export NAPI wrapper for Node.js integration
+// Re-export NAPI wrapper functions for Node.js integration
 #[cfg(feature = "napi")]
-pub use napi_wrapper::PhantomXdrCore;
+pub use napi_wrapper::{
+    hello, initialize_engine, get_module_count, 
+    list_new_enterprise_modules, get_extended_engine_status,
+    process_threat_indicator, evaluate_zero_trust_policy, 
+    analyze_behavioral_pattern, PhantomXdrCore
+};
 
-// For non-NAPI builds, provide a placeholder
+// For non-NAPI builds, provide simple implementations
 #[cfg(not(feature = "napi"))]
-pub struct PhantomXdrCore;
+pub fn hello(name: String) -> String {
+    format!("Phantom XDR Core says hello to {}", name)
+}
 
 #[cfg(not(feature = "napi"))]
-impl PhantomXdrCore {
-    pub fn new() -> Self {
-        Self
-    }
+pub fn initialize_engine() -> String {
+    "XDR Engine initialized successfully".to_string()
+}
 
-    pub fn hello(&self, name: String) -> String {
-        format!("Phantom XDR Core says hello to {name}")
-    }
+#[cfg(not(feature = "napi"))]
+pub fn get_module_count() -> u32 {
+    39
+}
+
+#[cfg(not(feature = "napi"))]
+pub fn list_new_enterprise_modules() -> Vec<String> {
+    vec![
+        "Advanced Analytics Engine".to_string(),
+        "API Security Monitor".to_string(),
+        "Cloud Security Analyzer".to_string(),
+    ]
+}
+
+#[cfg(not(feature = "napi"))]
+pub fn get_extended_engine_status() -> String {
+    r#"{"status": "operational", "modules": 39}"#.to_string()
 }
