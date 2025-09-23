@@ -1,0 +1,23 @@
+{
+  "name": "test-app-intel",
+  "version": "1.0.0",
+  "description": "Comprehensive test application for phantom-intel-core threat intelligence engine",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node test/performance-test.js"
+  },
+  "keywords": ["threat-intelligence", "security", "phantom-core", "enterprise"],
+  "author": "Phantom Spire Security",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/intel": "^1.0.0"
+  },
+  "devDependencies": {
+    "colors": "^1.4.0"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "@phantom-core/test-threat-actor-app",
+  "version": "1.0.0",
+  "description": "Comprehensive test application for Phantom Threat Actor Core APIs",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-all-tests.js",
+    "test:core": "node tests/core-apis.js",
+    "test:enterprise": "node tests/enterprise-apis.js",
+    "test:ocsf": "node tests/ocsf-apis.js",
+    "demo": "node examples/demo.js",
+    "dashboard": "node examples/enterprise-dashboard.js",
+    "attribution": "node examples/attribution-demo.js",
+    "campaign": "node examples/campaign-tracking.js",
+    "intelligence": "node examples/intelligence-feed.js"
+  },
+  "dependencies": {
+    "@phantom-core/threat-actor-core": "file:../phantom-threat-actor-core",
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.0",
+    "cli-table3": "^0.6.0",
+    "figlet": "^1.7.0",
+    "ora": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": [
+    "phantom-core",
+    "threat-actor",
+    "test-app",
+    "enterprise-cti",
+    "attribution",
+    "threat-intelligence"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT"
+}

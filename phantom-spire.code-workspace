@@ -1,0 +1,122 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "Core Packages",
+      "path": "./packages"
+    },
+    {
+      "name": "Documentation",
+      "path": "./docs"
+    },
+    {
+      "name": "Scripts",
+      "path": "./scripts"
+    },
+    {
+      "name": "Frontend",
+      "path": "./src/frontend"
+    }
+  ],
+  "settings": {
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "eslint.workingDirectories": [
+      ".",
+      "./packages/*"
+    ],
+    "rust-analyzer.cargo.features": "all",
+    "rust-analyzer.linkedProjects": [
+      "./packages/phantom-attribution-core/Cargo.toml",
+      "./packages/phantom-compliance-core/Cargo.toml",
+      "./packages/phantom-crypto-core/Cargo.toml",
+      "./packages/phantom-cve-core/Cargo.toml",
+      "./packages/phantom-feeds-core/Cargo.toml",
+      "./packages/phantom-forensics-core/Cargo.toml",
+      "./packages/phantom-hunting-core/Cargo.toml",
+      "./packages/phantom-incident-response-core/Cargo.toml",
+      "./packages/phantom-intel-core/Cargo.toml",
+      "./packages/phantom-ioc-core/Cargo.toml",
+      "./packages/phantom-malware-core/Cargo.toml",
+      "./packages/phantom-mitre-core/Cargo.toml",
+      "./packages/phantom-reputation-core/Cargo.toml",
+      "./packages/phantom-risk-core/Cargo.toml",
+      "./packages/phantom-sandbox-core/Cargo.toml",
+      "./packages/phantom-secop-core/Cargo.toml",
+      "./packages/phantom-threat-actor-core/Cargo.toml",
+      "./packages/phantom-vulnerability-core/Cargo.toml",
+      "./packages/phantom-xdr-core/Cargo.toml"
+    ],
+    "files.associations": {
+      "*.toml": "toml",
+      "Cargo.toml": "toml",
+      "*.rs": "rust",
+      "*.md": "markdown"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-vscode.vscode-typescript-next",
+      "rust-lang.rust-analyzer",
+      "tamasfe.even-better-toml",
+      "serayuzgur.crates",
+      "vadimcn.vscode-lldb",
+      "ms-vscode.vscode-json",
+      "redhat.vscode-yaml",
+      "github.vscode-pull-request-github",
+      "github.copilot",
+      "ms-vscode-remote.remote-containers",
+      "gruntfuggly.todo-tree",
+      "aaron-bond.better-comments",
+      "streetsidesoftware.code-spell-checker"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Workspace",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "build"],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "Test Workspace",
+        "type": "shell",
+        "command": "npm",
+        "args": ["run", "test:all"],
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        }
+      }
+    ]
+  }
+}

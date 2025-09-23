@@ -1,0 +1,52 @@
+{
+  "name": "@phantom-core/test-ioc-app",
+  "version": "1.0.0",
+  "description": "Comprehensive test suite and demonstration platform for Phantom IOC Core Enterprise APIs",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run-all-tests.js",
+    "test:core": "node tests/core-apis.js",
+    "test:enterprise": "node tests/enterprise-apis.js",
+    "test:correlation": "node tests/correlation-apis.js",
+    "demo": "node src/index.js",
+    "dashboard": "node examples/enterprise-dashboard.js",
+    "hunting": "node examples/threat-hunting-demo.js",
+    "enrichment": "node examples/enrichment-demo.js",
+    "reports": "node examples/reporting-demo.js"
+  },
+  "keywords": [
+    "ioc",
+    "indicators-of-compromise",
+    "threat-intelligence",
+    "cybersecurity",
+    "phantom-core",
+    "enterprise",
+    "testing",
+    "correlation",
+    "enrichment"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/ioc-core": "file:../phantom-ioc-core",
+    "chalk": "^5.0.0",
+    "figlet": "^1.5.0",
+    "cli-table3": "^0.6.0",
+    "ora": "^6.0.0",
+    "inquirer": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-core.git",
+    "directory": "packages/test-ioc-app"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-core/issues"
+  },
+  "homepage": "https://github.com/harborgrid-justin/phantom-core#readme"
+}

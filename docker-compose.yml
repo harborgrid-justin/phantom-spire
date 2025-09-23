@@ -1,30 +1,90 @@
+version: '3.8'
+
 services:
+  # Main application service
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: phantom-spire-app
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongo:27017/phantom-spire
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:phantom_secure_pass@mongo:27017/phantom-spire
       - REDIS_URL=redis://:phantom_redis_pass@redis:6379
       - POSTGRESQL_URI=postgresql://postgres:phantom_secure_pass@postgres:5432/phantom_spire
       - MYSQL_URI=mysql://phantom_user:phantom_secure_pass@mysql:3306/phantom_spire
       - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - SETUP_MODE=true
+      - WAIT_FOR_DB=true
+      - RUN_MIGRATIONS=true
     depends_on:
-      - mongo
-      - redis
-      - postgres
-      - mysql
-      - elasticsearch
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     volumes:
       - ./logs:/app/logs
       - ./setup:/app/setup
+      - app_data:/app/data
     networks:
       - phantom-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  # Development service
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: phantom-spire-dev
+    ports:
+      - "3000:3000"
+      - "9229:9229"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:phantom_secure_pass@mongo:27017/phantom-spire-dev
+      - REDIS_URL=redis://:phantom_redis_pass@redis:6379/1
+      - POSTGRESQL_URI=postgresql://postgres:phantom_secure_pass@postgres:5432/phantom_spire_dev
+      - MYSQL_URI=mysql://phantom_user:phantom_secure_pass@mysql:3306/phantom_spire_dev
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - node_modules_dev:/app/node_modules
+      - ./logs:/app/logs
+    networks:
+      - phantom-network
+    profiles:
+      - development
 
   mongo:
-    image: mongo:5.0
+    image: mongo:7
+    container_name: phantom-spire-mongo
     ports:
       - "27017:27017"
     volumes:
@@ -36,6 +96,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: phantom_secure_pass
     networks:
       - phantom-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:6.2-alpine
@@ -172,6 +238,10 @@ volumes:
   mysql_data:
     driver: local
   elasticsearch_data:
+    driver: local
+  app_data:
+    driver: local
+  node_modules_dev:
     driver: local
 
 networks:

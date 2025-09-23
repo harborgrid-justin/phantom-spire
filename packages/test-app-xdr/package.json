@@ -1,0 +1,28 @@
+{
+  "name": "test-app-xdr",
+  "version": "1.0.0",
+  "description": "Test application for Phantom XDR Core - Enterprise Extended Detection and Response system with comprehensive threat analysis capabilities",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node performance/benchmark.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "xdr",
+    "threat-detection",
+    "behavioral-analytics",
+    "phantom-core",
+    "enterprise",
+    "security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/xdr": "^1.0.0",
+    "@phantom-core/xdr-core": "file:../phantom-xdr-core"
+  }
+}

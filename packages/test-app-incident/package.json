@@ -1,0 +1,26 @@
+{
+  "name": "test-app-incident",
+  "version": "1.0.0",
+  "description": "Test application for Phantom Incident Response Core - Enterprise incident response and security automation",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node performance/benchmark.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "incident-response",
+    "phantom-core",
+    "security-automation",
+    "enterprise-security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/incident-response": "^1.0.0",
+    "@phantom-core/incident-response-core": "file:../phantom-incident-response-core"
+  }
+}

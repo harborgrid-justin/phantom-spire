@@ -1,0 +1,36 @@
+{
+  "name": "test-app-forensics",
+  "version": "1.0.0",
+  "description": "Comprehensive test application for Phantom Forensics Core - Enterprise Digital Forensics Engine",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node test/performance-test.js",
+    "case-study": "node demo/case-study.js"
+  },
+  "keywords": [
+    "digital-forensics",
+    "incident-response",
+    "evidence-collection",
+    "timeline-reconstruction",
+    "memory-analysis",
+    "network-forensics",
+    "registry-analysis",
+    "enterprise-security",
+    "phantom-core"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/forensics": "^1.0.0",
+    "@phantom-core/forensics-core": "file:../phantom-forensics-core"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

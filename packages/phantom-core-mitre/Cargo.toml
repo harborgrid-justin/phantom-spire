@@ -1,0 +1,128 @@
+[package]
+name = "phantom-core-mitre"
+version = "1.0.1"
+description = "Advanced MITRE ATT&CK framework integration and threat analysis system with enterprise-grade performance"
+edition = "2021"
+license = "MIT"
+authors = ["Phantom Spire Security Team"]
+homepage = "https://github.com/harborgrid-justin/phantom-core"
+repository = "https://github.com/harborgrid-justin/phantom-core"
+documentation = "https://docs.rs/phantom-core-mitre"
+keywords = ["cybersecurity", "mitre-attack", "threat-analysis", "phantom-core", "security"]
+categories = ["web-programming", "api-bindings"]
+
+# NAPI-RS specific metadata
+[package.metadata.napi]
+name = "phantom-core-mitre"
+triples = ["x86_64-pc-windows-msvc", "x86_64-apple-darwin", "aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+
+[lib]
+name = "phantom_mitre_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Core NAPI dependencies - stable versions that work on Windows
+napi = { version = "2.16", default-features = false, features = ["napi4"], optional = true }
+napi-derive = { version = "2.16", default-features = false, optional = true }
+
+# Core serialization and data handling - required for all packages
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+regex = "1.10"
+thiserror = "2.0.16"
+
+# Async runtime - standardized across platform
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Common utilities for all packages
+base64 = { version = "0.22.1", optional = true }
+sha2 = { version = "0.10", optional = true }
+url = "2.5"
+anyhow = "1.0"
+log = "0.4"
+env_logger = "0.11.8"
+
+# High-performance collections and concurrency
+dashmap = "6.1.0"
+parking_lot = "0.12"
+rayon = "1.7"
+indexmap = { version = "2.0", features = ["serde"] }
+once_cell = "1.19"
+
+# HTTP client - for MITRE data fetching
+reqwest = { version = "0.12.23", features = ["json", "rustls-tls"], default-features = false, optional = true }
+
+# Database backends - optional, standardized versions
+tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
+redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
+mongodb = { version = "3.3.0", optional = true }
+elasticsearch = { version = "8.15.0-alpha.1", optional = true }
+
+# Monitoring and observability - optional
+tracing = { version = "0.1", optional = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+prometheus = { version = "0.14.0", optional = true }
+metrics = { version = "0.24.2", optional = true }
+
+# High-performance serialization for enterprise workloads
+bincode = "1.3"
+rmp-serde = "1.1"
+rust_decimal = { version = "1.33", features = ["serde"] }
+time = { version = "0.3", features = ["macros", "serde", "parsing", "formatting"] }
+
+# Security and cryptography - optional
+ring = { version = "0.17", optional = true }
+rustls = { version = "0.23.31", optional = true }
+jsonwebtoken = { version = "9.2", optional = true }
+
+# Enterprise standards dependency
+phantom-enterprise-standards = { path = "../phantom-core-enterprise", optional = true }
+
+# Compression support - optional
+flate2 = { version = "1.0", optional = true }
+
+[features]
+default = ["local"]
+
+# Core features
+napi = ["dep:napi", "dep:napi-derive", "dep:napi-build", "napi-derive/type-def"]
+local = []
+
+# Database backends
+postgres = ["tokio-postgres", "sqlx"]
+redis-store = ["redis"]
+mongodb-store = ["mongodb"]
+elasticsearch-store = ["elasticsearch"]
+all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
+
+# Web and messaging
+web-full = ["reqwest"]
+messaging = ["redis-store"]  # Using Redis for pub/sub messaging
+caching = ["redis-store"]    # Redis-based caching layer
+
+# Enterprise monitoring and security
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+compression = ["dep:flate2"]
+advanced-config = []
+
+# Bundled feature sets
+enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
+full = ["enterprise", "web-full", "compression", "advanced-config"]
+# NAPI-specific profiles for optimized Node.js builds
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+panic = "abort"
+
+[build-dependencies]
+napi-build = { version = "2.0", optional = true }

@@ -1,0 +1,32 @@
+{
+  "name": "phantom-mitre-test-app",
+  "version": "1.0.0",
+  "description": "Test application for phantom-mitre-core Node.js package",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test.js",
+    "api-test": "node api-endpoint-test.js",
+    "database-test": "node database-features-test.js",
+    "demo": "node demo.js",
+    "express": "node express-server.js"
+  },
+  "keywords": [
+    "phantom-mitre-core",
+    "mitre-attack",
+    "threat-analysis",
+    "cybersecurity",
+    "test"
+  ],
+  "author": "Test Developer",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "@phantom-core/mitre": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

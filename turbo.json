@@ -1,0 +1,48 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**", "*.d.ts", "*.node"],
+      "inputs": ["src/**", "src-ts/**", "tsconfig.json", "package.json", "Cargo.toml", "build.rs"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "outputs": ["coverage/**"],
+      "inputs": ["src/**", "src-ts/**", "tests/**", "__tests__/**", "**/*.test.*", "**/*.spec.*"]
+    },
+    "lint": {
+      "outputs": [".eslintcache"],
+      "inputs": ["src/**", "src-ts/**", "eslint.config.js", ".eslintrc.*", "tsconfig.json"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": ["src/**", "src-ts/**", "tsconfig.json"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  },
+  "globalDotEnv": [".env.local", ".env"],
+  "globalPassThroughEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "VERCEL_URL",
+    "VERCEL_GIT_PROVIDER",
+    "VERCEL_GIT_REPO_SLUG",
+    "VERCEL_GIT_REPO_OWNER",
+    "VERCEL_GIT_REPO_ID",
+    "VERCEL_GIT_COMMIT_REF",
+    "VERCEL_GIT_COMMIT_SHA",
+    "VERCEL_GIT_COMMIT_MESSAGE",
+    "VERCEL_GIT_COMMIT_AUTHOR_LOGIN",
+    "VERCEL_GIT_COMMIT_AUTHOR_NAME"
+  ]
+}

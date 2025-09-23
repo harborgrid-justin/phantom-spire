@@ -1,0 +1,32 @@
+{
+  "name": "test-app-crypto",
+  "version": "1.0.0",
+  "description": "Comprehensive test application for Phantom Crypto Core - Enterprise cryptographic security engine",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node test/performance-test.js"
+  },
+  "keywords": [
+    "crypto",
+    "cryptography",
+    "security",
+    "enterprise",
+    "argon2",
+    "jwt",
+    "signatures",
+    "phantom-core"
+  ],
+  "author": "Phantom Spire Security",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/crypto": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

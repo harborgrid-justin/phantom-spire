@@ -1,0 +1,90 @@
+{
+  "name": "@phantom-core/xdr",
+  "version": "1.0.0",
+  "description": "Advanced XDR (Extended Detection and Response) core with threat detection, behavioral analytics, and automated response capabilities - Part of the Phantom Spire CTI Platform",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-core-xdr"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "napi": {
+    "name": "phantom-core-xdr",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "files": [
+    "index.js",
+    "enterprise-wrapper.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release --features napi",
+    "build:debug": "napi build --platform --features napi",
+    "build:enterprise": "napi build --platform --release --features enterprise",
+    "build:full": "napi build --platform --release --features full",
+    "clean": "rimraf dist",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test --features enterprise",
+    "test:native": "cargo test --all-features",
+    "universal": "napi universal",
+    "version": "napi version",
+    "lint": "cargo clippy --features enterprise",
+    "fmt": "cargo fmt"
+  },
+  "keywords": [
+    "@phantom-spire",
+    "enterprise-cti",
+    "xdr",
+    "threat-detection",
+    "behavioral-analytics",
+    "automated-response",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.2.0",
+    "rimraf": "^6.0.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "organization": {
+    "name": "Phantom Spire",
+    "url": "https://github.com/harborgrid-justin/phantom-spire"
+  },
+  "dependencies": {
+    "@phantom-core/ml": "file:../phantom-core-ml/nextgen"
+  },
+  "optionalDependencies": {
+    "@phantom-core/xdr-darwin-arm64": "1.0.0",
+    "@phantom-core/xdr-linux-arm64-gnu": "1.0.0",
+    "@phantom-core/xdr-win32-arm64-msvc": "1.0.0",
+    "@phantom-core/xdr-linux-x64-musl": "1.0.0"
+  }
+}

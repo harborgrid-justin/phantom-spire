@@ -1,0 +1,117 @@
+{
+  "name": "@phantom-core/enterprise",
+  "version": "1.0.0",
+  "description": "Enterprise standardization framework for all Phantom Spire security modules - Fortune 100 deployment readiness",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "homepage": "https://github.com/harborgrid-justin/phantom-spire#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/harborgrid-justin/phantom-spire.git",
+    "directory": "packages/phantom-core-enterprise"
+  },
+  "bugs": {
+    "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
+  },
+  "napi": {
+    "name": "phantom-core-enterprise",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-pc-windows-msvc",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --release --features napi",
+    "build:debug": "napi build --platform --features napi",
+    "build:enterprise": "napi build --platform --release --features enterprise",
+    "build:full": "napi build --platform --release --features full",
+    "clean": "rimraf dist",
+    "prepublishOnly": "napi prepublish -t npm",
+    "test": "cargo test --features enterprise",
+    "test:native": "cargo test --all-features",
+    "test:enterprise": "cargo test --features enterprise -- --test-threads=1",
+    "universal": "napi universal",
+    "version": "napi version",
+    "lint": "cargo clippy --features enterprise",
+    "fmt": "cargo fmt",
+    "benchmark": "cargo bench --features enterprise",
+    "validate": "cargo check --all-features",
+    "docs": "cargo doc --features enterprise --open"
+  },
+  "keywords": [
+    "@phantom-spire",
+    "enterprise-standards",
+    "business-readiness",
+    "multi-tenancy",
+    "cross-plugin-intelligence",
+    "compliance-framework",
+    "performance-monitoring",
+    "fortune-100-ready",
+    "palantir-competitive",
+    "cybersecurity",
+    "phantom-spire",
+    "napi",
+    "rust",
+    "security"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.2.0",
+    "rimraf": "^6.0.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "organization": {
+    "name": "Phantom Spire",
+    "url": "https://github.com/harborgrid-justin/phantom-spire"
+  },
+  "enterprise": {
+    "tier": "foundation",
+    "features": [
+      "business-readiness-assessment",
+      "enterprise-multi-tenancy",
+      "cross-plugin-intelligence",
+      "compliance-monitoring",
+      "performance-benchmarking",
+      "testing-framework"
+    ],
+    "deployment_targets": [
+      "fortune-100",
+      "enterprise",
+      "government",
+      "financial-services"
+    ],
+    "competitive_advantages": [
+      "Open-source cost model vs Palantir Foundry",
+      "NAPI-RS high-performance Rust implementation",
+      "Multi-database federated architecture",
+      "Real-time cross-plugin intelligence correlation",
+      "Enterprise-grade compliance automation"
+    ]
+  },
+  "optionalDependencies": {
+    "@phantom-core/enterprise-darwin-arm64": "1.0.0",
+    "@phantom-core/enterprise-linux-arm64-gnu": "1.0.0",
+    "@phantom-core/enterprise-win32-arm64-msvc": "1.0.0",
+    "@phantom-core/enterprise-linux-x64-musl": "1.0.0"
+  }
+}

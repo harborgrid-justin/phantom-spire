@@ -1,0 +1,26 @@
+{
+  "name": "test-app-attribution",
+  "version": "1.0.0",
+  "description": "Test application for Phantom Attribution Core - Enterprise threat attribution and actor analysis system",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node test/test-suite.js",
+    "demo": "node demo/demo.js",
+    "enterprise": "node demo/enterprise-demo.js",
+    "performance": "node performance/benchmark.js"
+  },
+  "keywords": [
+    "cybersecurity",
+    "attribution",
+    "threat-actors",
+    "phantom-core",
+    "threat-intelligence",
+    "actor-profiling"
+  ],
+  "author": "Phantom Spire Security Team",
+  "license": "MIT",
+  "dependencies": {
+    "@phantom-core/attribution": "^1.0.0"
+  }
+}

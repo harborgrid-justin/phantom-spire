@@ -1,0 +1,193 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Phantom Spire
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Your ideas help make Phantom Spire better.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify the following before submitting
+      options:
+        - label: I have searched existing issues and discussions to avoid duplicates
+          required: true
+        - label: I have read the project roadmap and this feature isn't already planned
+          required: true
+        - label: This feature aligns with the project's goals and scope
+          required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What category does this feature belong to?
+      options:
+        - Core Functionality
+        - API Enhancement
+        - User Interface
+        - Performance Improvement
+        - Security Enhancement
+        - Developer Experience
+        - Documentation
+        - Testing
+        - CI/CD
+        - Package-specific
+        - Integration
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which component would this feature affect?
+      options:
+        - Core Application
+        - phantom-attribution-core
+        - phantom-compliance-core
+        - phantom-crypto-core
+        - phantom-cve-core
+        - phantom-feeds-core
+        - phantom-forensics-core
+        - phantom-hunting-core
+        - phantom-incident-response-core
+        - phantom-intel-core
+        - phantom-ioc-core
+        - phantom-malware-core
+        - phantom-mitre-core
+        - phantom-ml-core
+        - phantom-ml-studio
+        - phantom-reputation-core
+        - phantom-risk-core
+        - phantom-sandbox-core
+        - phantom-secop-core
+        - phantom-threat-actor-core
+        - phantom-vulnerability-core
+        - phantom-xdr-core
+        - Frontend/UI
+        - Documentation
+        - CI/CD
+        - Multiple Components
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What is the current limitation?
+      placeholder: Describe the problem or limitation...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: A clear and concise description of what you want to happen
+      placeholder: Describe your proposed solution...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: A clear and concise description of any alternative solutions you've considered
+      placeholder: Describe alternative approaches...
+
+  - type: textarea
+    id: use-cases
+    attributes:
+      label: Use Cases
+      description: Describe specific use cases and scenarios where this feature would be valuable
+      placeholder: |
+        1. As a [user type], I want to [action] so that [benefit]
+        2. When [scenario], this feature would help by [benefit]
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What would constitute a successful implementation?
+      placeholder: |
+        - [ ] Feature should do X
+        - [ ] Feature should handle Y
+        - [ ] Feature should validate Z
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be useful
+        - Important
+        - Critical
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Low (few hours)
+        - Medium (few days)
+        - High (few weeks)
+        - Very High (months)
+        - Unknown
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Are there any dependencies or prerequisites for this feature?
+      placeholder: List any dependencies, libraries, or other features this depends on...
+
+  - type: textarea
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: Would this feature introduce any breaking changes?
+      placeholder: Describe any potential breaking changes...
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementation Willingness
+      description: Are you willing to help implement this feature?
+      options:
+        - label: I am willing to submit a pull request for this feature
+        - label: I can help with testing this feature
+        - label: I can help with documentation for this feature
+        - label: I can provide feedback during development
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, mockups, or examples about the feature request here
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Any relevant links, papers, or resources related to this feature
+      placeholder: |
+        - [Related issue #123]
+        - [External documentation](https://example.com)
+        - [Similar implementation](https://example.com)

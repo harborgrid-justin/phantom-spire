@@ -1,35 +1,89 @@
-# Use the official Node.js runtime as the base image
-FROM node:18-alpine
+# Multi-stage Docker build for enterprise deployment
+FROM node:18-alpine AS base
 
-# Set the working directory inside the container
+# Install system dependencies required for native modules
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    libc6-compat \
+    curl
+
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy workspace configuration
 COPY package*.json ./
+COPY .nvmrc ./
+COPY turbo.json ./
+COPY tsconfig*.json ./
+
+# Development stage
+FROM base AS development
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Build all packages
+RUN npm run build:packages
+RUN npm run build
+
+# Production dependencies stage
+FROM base AS deps
 
 # Install only production dependencies
-RUN npm ci --only=production
+RUN npm ci --only=production --ignore-scripts
 
-# Copy the pre-built dist directory
-COPY dist ./dist
+# Production stage
+FROM node:18-alpine AS production
 
-# Copy other necessary files
+# Install runtime dependencies
+RUN apk add --no-cache \
+    curl \
+    ca-certificates \
+    tzdata
+
+# Create application directory
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S phantomspire && \
+    adduser -S phantom -u 1001 -G phantomspire
+
+# Copy package files
+COPY --from=deps /app/node_modules ./node_modules
+COPY package*.json ./
+
+# Copy built application
+COPY --from=development /app/dist ./dist
+COPY --from=development /app/packages/*/dist ./packages/
+COPY --from=development /app/packages/*/*.node ./packages/
+
+# Copy runtime files
 COPY healthcheck.js ./
+COPY scripts/docker-entrypoint.sh ./scripts/
 
-# Create a non-root user to run the application
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S phantom -u 1001
+# Set correct permissions
+RUN chown -R phantom:phantomspire /app && \
+    chmod +x scripts/docker-entrypoint.sh
 
-# Change ownership of the app directory to the nodejs user
-RUN chown -R phantom:nodejs /app
+# Switch to non-root user
 USER phantom
 
-# Expose the port the app runs on
+# Expose application port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-  CMD node healthcheck.js
+# Health check configuration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
 
-# Start the application
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Use entrypoint script for better signal handling
+ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
 CMD ["npm", "start"]
