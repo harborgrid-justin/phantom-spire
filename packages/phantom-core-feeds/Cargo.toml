@@ -55,7 +55,10 @@ actix-web = { version = "4.4", optional = true }
 
 # Database backends - optional, standardized versions
 tokio-postgres = { version = "0.7", features = ["with-chrono-0_4", "with-uuid-1", "with-serde_json-1"], optional = true }
+deadpool-postgres = { version = "0.14.1", optional = true }
 sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json"], optional = true }
+diesel = { version = "2.1", features = ["postgres", "mysql", "sqlite", "r2d2", "chrono", "uuid"], optional = true }
+diesel_migrations = { version = "2.1", optional = true }
 redis = { version = "0.32.5", features = ["tokio-comp", "connection-manager"], optional = true }
 mongodb = { version = "3.3.0", optional = true }
 elasticsearch = { version = "8.15.0-alpha.1", optional = true }
@@ -85,14 +88,14 @@ napi = ["dep:napi", "dep:napi-derive"]
 local = []
 
 # Database backends
-postgres = ["tokio-postgres", "deadpool-postgres", "sqlx", "diesel"]
-redis-store = ["redis"]
-mongodb-store = ["mongodb"]
-elasticsearch-store = ["elasticsearch"]
+postgres = ["dep:tokio-postgres", "dep:deadpool-postgres", "dep:sqlx", "dep:diesel"]
+redis-store = ["dep:redis"]
+mongodb-store = ["dep:mongodb"]
+elasticsearch-store = ["dep:elasticsearch"]
 all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
 # Web and messaging
-web-full = ["actix-web", "reqwest"]
+web-full = ["dep:actix-web", "dep:reqwest"]
 messaging = ["redis-store"]  # Using Redis for pub/sub messaging
 caching = ["redis-store"]    # Redis-based caching layer
 
@@ -100,11 +103,11 @@ caching = ["redis-store"]    # Redis-based caching layer
 monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
 crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
 compression = ["dep:flate2"]
-diesel-orm = ["diesel", "diesel_migrations"]
+diesel-orm = ["dep:diesel", "dep:diesel_migrations"]
 advanced-config = []
 
 # Bundled feature sets
 enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 [build-dependencies]
-napi-build = "2.1.0"
+napi-build = "2.0.1"

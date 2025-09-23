@@ -20,7 +20,13 @@
       "Bash(timeout:*)",
       "Bash(./test_all_apps.sh)",
       "Bash(do echo \"=== $dir ===\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(do echo \"=== phantom-core-$package ===\")",
+      "Bash(do echo \"=== $package ===\")",
+      "Bash(do echo \"Processing: $file\")",
+      "Bash(do echo \"Fixing: $file\")",
+      "Bash(do echo \"Verifying: $file\")",
+      "Read(//c//**)"
     ],
     "deny": [],
     "ask": []

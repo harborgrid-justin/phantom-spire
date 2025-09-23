@@ -72,15 +72,15 @@ napi = ["dep:napi", "dep:napi-derive"]
 local = []
 
 # Database backends
-postgres = ["tokio-postgres"]
-redis-store = ["redis"]
-mongodb-store = ["mongodb"]
-elasticsearch-store = ["elasticsearch"]
+postgres = ["dep:tokio-postgres"]
+redis-store = ["dep:redis"]
+mongodb-store = ["dep:mongodb"]
+elasticsearch-store = ["dep:elasticsearch"]
 all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
 # Enterprise monitoring and security
-monitoring = ["tracing", "tracing-subscriber", "prometheus", "metrics"]
-crypto = ["ring", "jsonwebtoken", "aes-gcm"]
+monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
+crypto = ["dep:ring", "dep:jsonwebtoken", "dep:aes-gcm"]
 
 # Bundled feature sets
 enterprise = ["all-databases", "monitoring", "crypto"]

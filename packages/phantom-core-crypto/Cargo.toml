@@ -116,6 +116,9 @@ advanced-config = []
 enterprise = ["all-databases", "messaging", "caching", "monitoring", "crypto", "phantom-enterprise-standards"]
 full = ["enterprise", "web-full", "diesel-orm", "compression", "advanced-config"]
 
+[build-dependencies]
+napi-build = "2.0.1"
+
 # NAPI-specific profiles for optimized Node.js builds
 [profile.release]
 lto = true
@@ -126,5 +129,3 @@ strip = true
 [profile.dev]
 panic = "abort"
 
-[build-dependencies]
-napi-build = { version = "=2.0.0", optional = true }

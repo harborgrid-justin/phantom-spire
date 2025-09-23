@@ -17,7 +17,7 @@ name = "phantom-core-ioc"
 triples = ["x86_64-pc-windows-msvc", "x86_64-apple-darwin", "aarch64-apple-darwin", "x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
 
 [lib]
-name = "phantom_ioc_core"
+name = "phantom_core_ioc"
 crate-type = ["cdylib"]
 
 [dependencies]
@@ -33,9 +33,6 @@ uuid = { version = "1.0", features = ["v4", "serde"] }
 regex = "1.10"
 thiserror = "2.0.16"
 
-# Async runtime (minimal)
-tokio = { version = "1.0", features = ["macros", "rt"] }
-
 # Async runtime - standardized across platform
 tokio = { version = "1.0", features = ["full"] }
 async-trait = "0.1"
@@ -46,8 +43,6 @@ anyhow = "1.0"
 log = "0.4"
 env_logger = "0.11.8"
 url = "2.5"
-regex = "1.10"
-thiserror = "2.0.16"
 bincode = "1.3"
 
 # High-performance collections and concurrency
@@ -94,7 +89,7 @@ phantom-enterprise-standards = { path = "../phantom-core-enterprise", optional =
 
 [features]
 default = ["local"]
-napi = ["dep:napi", "dep:napi-derive", "dep:napi-build", "napi-derive/type-def"]
+napi = ["dep:napi", "dep:napi-derive", "napi-derive/type-def"]
 local = []
 reqwest = ["dep:reqwest"]
 
@@ -132,11 +127,4 @@ strip = true
 panic = "abort"
 
 [build-dependencies]
-napi-build = { version = "=2.0.0", optional = true }
-["local"]
-
-# Core features
-napi = ["dep:napi", "dep:napi-derive"]
-local = []
-[build-dependencies]
-napi-build = { version = "2.0" }
+napi-build = "2.0.1"

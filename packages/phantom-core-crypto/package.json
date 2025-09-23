@@ -1,6 +1,6 @@
 {
   "name": "@phantom-core/crypto",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cryptographic analysis and security assessment core with algorithm validation and key management - Part of the Phantom Spire CTI Platform",
   "main": "index.js",
   "types": "index.d.ts",
@@ -82,9 +82,9 @@
     "@phantom-core/ml": "file:../phantom-core-ml/nextgen"
   },
   "optionalDependencies": {
-    "@phantom-core/crypto-darwin-arm64": "1.0.0",
-    "@phantom-core/crypto-linux-arm64-gnu": "1.0.0",
-    "@phantom-core/crypto-win32-arm64-msvc": "1.0.0",
-    "@phantom-core/crypto-linux-x64-musl": "1.0.0"
+    "@phantom-core/crypto-darwin-arm64": "1.0.1",
+    "@phantom-core/crypto-linux-arm64-gnu": "1.0.1",
+    "@phantom-core/crypto-win32-arm64-msvc": "1.0.1",
+    "@phantom-core/crypto-linux-x64-musl": "1.0.1"
   }
 }

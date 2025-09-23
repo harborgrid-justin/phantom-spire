@@ -153,4 +153,4 @@ strip = true
 panic = "abort"
 
 [build-dependencies]
-napi-build = "2.2.3"
+napi-build = "2.0.1"

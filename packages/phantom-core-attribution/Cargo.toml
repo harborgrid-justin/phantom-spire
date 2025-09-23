@@ -88,7 +88,7 @@ phantom-enterprise-standards = { path = "../phantom-core-enterprise", optional =
 
 [features]
 default = ["local"]
-napi = ["dep:napi", "dep:napi-derive", "dep:napi-build", "napi-derive/type-def"]
+napi = ["dep:napi", "dep:napi-derive", "napi-derive/type-def"]
 local = []
 
 # Database backends
@@ -125,4 +125,4 @@ strip = true
 panic = "abort"
 
 [build-dependencies]
-napi-build = { version = "2.0", optional = true }
+napi-build = "2.0.1"

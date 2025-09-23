@@ -90,14 +90,14 @@ flate2 = { version = "1.0", optional = true }
 default = ["local"]
 
 # Core features
-napi = ["dep:napi", "dep:napi-derive", "dep:napi-build", "napi-derive/type-def"]
+napi = ["dep:napi", "dep:napi-derive", "napi-derive/type-def"]
 local = []
 
 # Database backends
-postgres = ["tokio-postgres", "sqlx"]
-redis-store = ["redis"]
-mongodb-store = ["mongodb"]
-elasticsearch-store = ["elasticsearch"]
+postgres = ["dep:tokio-postgres", "dep:sqlx"]
+redis-store = ["dep:redis"]
+mongodb-store = ["dep:mongodb"]
+elasticsearch-store = ["dep:elasticsearch"]
 all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-store"]
 
 # Web and messaging
@@ -125,4 +125,4 @@ strip = true
 panic = "abort"
 
 [build-dependencies]
-napi-build = { version = "2.0", optional = true }
+napi-build = "2.0.1"
