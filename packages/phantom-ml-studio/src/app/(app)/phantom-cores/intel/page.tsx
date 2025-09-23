@@ -3,241 +3,60 @@
 // Phantom Intel Core Management - Intelligence Gathering & Analysis
 // Provides comprehensive GUI for intelligence gathering and analysis operations
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Grid,
   Button,
-  Alert,
   LinearProgress,
+  Alert,
   Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  CircularProgress,
-  Tabs,
-  Tab
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   Psychology as IntelIcon,
-  Insights as AnalysisIcon,
   Public as OSINTIcon,
-  Language as SIGINTIcon,
-  Groups as HUMINTIcon,
+  Verified as VerifiedIcon,
   Assessment as ReportIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
-  ExpandMore as ExpandMoreIcon,
   Security as SecurityIcon,
   TrendingUp as TrendIcon,
-  Verified as VerifiedIcon
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Interfaces
-interface IntelStatus {
-  success: boolean;
-  data?: {
-    status: string;
-    components: Record<string, any>;
-    metrics: {
-      uptime: string;
-      active_operations: number;
-      intelligence_quality: number;
-      source_diversity: number;
-      analysis_accuracy: number;
-    };
-  };
-}
+// Import modular components and hooks
+import IntelOverview from './components/IntelOverview';
+import { useIntelStatus } from './hooks/useIntelStatus';
+import { CollectionMethod, TargetDomain, IntelAnalysis } from './types';
+import {
+  analyzeIntelligence,
+  gatherIntelligence,
+  validateSources,
+  generateIntelReport
+} from './api';
 
-interface IntelAnalysis {
-  analysis_id: string;
-  intelligence_profile: {
-    operation_name: string;
-    collection_method: string;
-    confidence_level: number;
-    threat_assessment: string;
-  };
-  findings: any;
-  source_assessment: any;
-  recommendations: string[];
-}
-
-// API functions
-const fetchIntelStatus = async (): Promise<IntelStatus> => {
-  const response = await fetch('/api/phantom-cores/intel?operation=status');
-  return response.json();
-};
-
-const gatherIntelligence = async (intelData: any) => {
-  const response = await fetch('/api/phantom-cores/intel', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'gather-intelligence',
-      intelData
-    })
-  });
-  return response.json();
-};
-
-const analyzeIntelligence = async (analysisData: any) => {
-  const response = await fetch('/api/phantom-cores/intel', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'analyze-intelligence',
-      analysisData
-    })
-  });
-  return response.json();
-};
-
-const validateSources = async (sourceData: any) => {
-  const response = await fetch('/api/phantom-cores/intel', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'validate-sources',
-      sourceData
-    })
-  });
-  return response.json();
-};
-
-const generateIntelReport = async (reportData: any) => {
-  const response = await fetch('/api/phantom-cores/intel', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'generate-intel-report',
-      reportData
-    })
-  });
-  return response.json();
-};
-
-// Component: Intel Overview
-const IntelOverview: React.FC<{ status: IntelStatus | undefined }> = ({ status }) => {
-  if (!status?.data) {
-    return (
-      <Alert severity="warning">Intel system status unavailable</Alert>
-    );
-  }
-
-  const { metrics } = status.data;
-
-  const getQualityColor = (quality: number) => {
-    if (quality >= 0.8) return 'success';
-    if (quality >= 0.6) return 'warning';
-    return 'error';
-  };
-
-  return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} md={3}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>System Status</Typography>
-            <Chip
-              icon={status.data.status === 'operational' ? <CheckCircleIcon /> : <WarningIcon />}
-              label={status.data.status}
-              color={status.data.status === 'operational' ? 'success' : 'warning'}
-            />
-            <Typography variant="body2" color="textSecondary" mt={1}>
-              Uptime: {metrics.uptime}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12} md={3}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>Active Operations</Typography>
-            <Typography variant="h3" color="primary">
-              {metrics.active_operations}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Intelligence collections
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12} md={3}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>Intelligence Quality</Typography>
-            <Box display="flex" alignItems="center">
-              <CircularProgress
-                variant="determinate"
-                value={metrics.intelligence_quality * 100}
-                size={60}
-                color={getQualityColor(metrics.intelligence_quality)}
-              />
-              <Box ml={2}>
-                <Typography variant="h4" color={getQualityColor(metrics.intelligence_quality)}>
-                  {(metrics.intelligence_quality * 100).toFixed(1)}%
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Quality Score
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      <Grid item xs={12} md={3}>
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>Source Diversity</Typography>
-            <Typography variant="h3" color="secondary">
-              {metrics.source_diversity}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              Unique intel sources
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  );
-};
-
-// Component: Intelligence Analysis Panel
+// Intelligence Analysis Panel Component
 const IntelligenceAnalysisPanel: React.FC = () => {
   const [analysis, setAnalysis] = useState<IntelAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
-  const [collectionMethod, setCollectionMethod] = useState('OSINT');
-  const [targetDomain, setTargetDomain] = useState('cyber_threats');
+  const [collectionMethod, setCollectionMethod] = useState<CollectionMethod>('OSINT');
+  const [targetDomain, setTargetDomain] = useState<TargetDomain>('cyber_threats');
 
-  const collectionMethods = ['OSINT', 'SIGINT', 'HUMINT', 'GEOINT', 'MASINT', 'TECHINT'];
-  const targetDomains = [
+  const collectionMethods: CollectionMethod[] = ['OSINT', 'SIGINT', 'HUMINT', 'GEOINT', 'MASINT', 'TECHINT'];
+  const targetDomains: TargetDomain[] = [
     'cyber_threats', 'nation_state_actors', 'criminal_organizations',
     'terrorist_groups', 'insider_threats', 'supply_chain_risks'
   ];
@@ -271,7 +90,7 @@ const IntelligenceAnalysisPanel: React.FC = () => {
               <InputLabel>Collection Method</InputLabel>
               <Select
                 value={collectionMethod}
-                onChange={(e) => setCollectionMethod(e.target.value)}
+                onChange={(e) => setCollectionMethod(e.target.value as CollectionMethod)}
                 label="Collection Method"
               >
                 {collectionMethods.map((method) => (
@@ -285,7 +104,7 @@ const IntelligenceAnalysisPanel: React.FC = () => {
               <InputLabel>Target Domain</InputLabel>
               <Select
                 value={targetDomain}
-                onChange={(e) => setTargetDomain(e.target.value)}
+                onChange={(e) => setTargetDomain(e.target.value as TargetDomain)}
                 label="Target Domain"
               >
                 {targetDomains.map((domain) => (
@@ -310,8 +129,8 @@ const IntelligenceAnalysisPanel: React.FC = () => {
 
         {analysis && (
           <Box>
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} md={6}>
+            <Box display="flex" flexWrap="wrap" gap={2} mb={2}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Intelligence Profile</Typography>
                   <Typography variant="body2" mb={1}>
@@ -338,9 +157,9 @@ const IntelligenceAnalysisPanel: React.FC = () => {
                     <strong>Analysis ID:</strong> {analysis.analysis_id}
                   </Typography>
                 </Paper>
-              </Grid>
+              </Box>
 
-              <Grid item xs={12} md={6}>
+              <Box flex="1 1 400px" minWidth="400px">
                 <Paper sx={{ p: 2 }}>
                   <Typography variant="subtitle1" gutterBottom>Key Intelligence</Typography>
                   <List dense>
@@ -382,8 +201,8 @@ const IntelligenceAnalysisPanel: React.FC = () => {
                     </ListItem>
                   </List>
                 </Paper>
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" gutterBottom>Intelligence Recommendations</Typography>
@@ -408,7 +227,7 @@ const IntelligenceAnalysisPanel: React.FC = () => {
   );
 };
 
-// Component: Intel Operations Panel
+// Intel Operations Panel Component
 const IntelOperationsPanel: React.FC = () => {
   const [activeOperation, setActiveOperation] = useState<string | null>(null);
   const [operationResult, setOperationResult] = useState<any>(null);
@@ -471,6 +290,7 @@ const IntelOperationsPanel: React.FC = () => {
       setOperationResult(result);
     } catch (error) {
       console.error(`${operation.title} failed:`, error);
+      setOperationResult({ error: `${operation.title} failed: ${error}` });
     } finally {
       setLoading(false);
     }
@@ -480,10 +300,9 @@ const IntelOperationsPanel: React.FC = () => {
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>Intelligence Operations</Typography>
-
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" gap={2}>
           {operations.map((operation) => (
-            <Grid item xs={12} md={4} key={operation.id}>
+            <Box flex="1 1 300px" minWidth="300px" key={operation.id}>
               <Card variant="outlined">
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
@@ -505,10 +324,9 @@ const IntelOperationsPanel: React.FC = () => {
                   </Button>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
-
+        </Box>
         {loading && (
           <Box mt={2}>
             <LinearProgress />
@@ -517,7 +335,6 @@ const IntelOperationsPanel: React.FC = () => {
             </Typography>
           </Box>
         )}
-
         {operationResult && (
           <Box mt={2}>
             <Accordion>
@@ -539,11 +356,7 @@ const IntelOperationsPanel: React.FC = () => {
 
 // Main Component: Intel Management Dashboard
 const IntelManagementDashboard: React.FC = () => {
-  const { data: intelStatus, isLoading, error } = useQuery({
-    queryKey: ['intel-status'],
-    queryFn: fetchIntelStatus,
-    refetchInterval: 30000,
-  });
+  const { data: intelStatus, isLoading, error } = useIntelStatus();
 
   if (isLoading) {
     return (
@@ -578,19 +391,11 @@ const IntelManagementDashboard: React.FC = () => {
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <IntelOverview status={intelStatus} />
-        </Grid>
-
-        <Grid item xs={12}>
-          <IntelligenceAnalysisPanel />
-        </Grid>
-
-        <Grid item xs={12}>
-          <IntelOperationsPanel />
-        </Grid>
-      </Grid>
+      <Box display="flex" flexDirection="column" gap={3}>
+        <IntelOverview status={intelStatus} />
+        <IntelligenceAnalysisPanel />
+        <IntelOperationsPanel />
+      </Box>
     </Box>
   );
 };

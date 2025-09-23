@@ -1,9 +1,10 @@
 // API functions for Phantom Cores verification
 
 import { VerificationResponse, TestApiParams } from './types';
+import { phantomCoresClient } from '../../../../lib/api/phantom-cores-client';
 
 export const fetchVerificationResults = async (): Promise<VerificationResponse> => {
-  const response = await fetch('/api/phantom-cores/verify');
+  const response = await phantomCoresClient.get('/api/phantom-cores/verify');
   if (!response.ok) {
     throw new Error('Failed to fetch verification results');
   }
@@ -11,13 +12,9 @@ export const fetchVerificationResults = async (): Promise<VerificationResponse> 
 };
 
 export const testSpecificApi = async (data: TestApiParams) => {
-  const response = await fetch('/api/phantom-cores/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'test-api',
-      ...data
-    })
+  const response = await phantomCoresClient.post('/api/phantom-cores/verify', {
+    operation: 'test-api',
+    ...data
   });
   return response.json();
 };

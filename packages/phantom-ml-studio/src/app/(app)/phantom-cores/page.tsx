@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { phantomCoresClient } from '../../../lib/api/phantom-cores-client';
 import {
   Box,
   Card,
@@ -87,43 +88,35 @@ interface CrossModuleAnalysis {
 
 // API functions
 const fetchSystemStatus = async (): Promise<SystemStatus> => {
-  const response = await fetch('/api/phantom-cores?operation=status');
+  const response = await phantomCoresClient.get('/api/phantom-cores?operation=status');
   return response.json();
 };
 
 const initializePhantomCores = async () => {
-  const response = await fetch('/api/phantom-cores', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'initialize',
-      config: {
-        organizationName: 'ML Studio Enterprise',
-        enterpriseMode: true,
-        integrationMode: 'full',
-        enabledModules: [
-          'ml', 'xdr', 'compliance', 'attribution', 'crypto', 'cve', 
-          'feeds', 'forensics', 'hunting', 'incidentResponse', 'intel', 
-          'ioc', 'malware', 'mitre', 'reputation', 'risk', 'sandbox', 
-          'secop', 'threatActor', 'vulnerability'
-        ]
-      }
-    })
+  const response = await phantomCoresClient.post('/api/phantom-cores', {
+    operation: 'initialize',
+    config: {
+      organizationName: 'ML Studio Enterprise',
+      enterpriseMode: true,
+      integrationMode: 'full',
+      enabledModules: [
+        'ml', 'xdr', 'compliance', 'attribution', 'crypto', 'cve', 
+        'feeds', 'forensics', 'hunting', 'incidentResponse', 'intel', 
+        'ioc', 'malware', 'mitre', 'reputation', 'risk', 'sandbox', 
+        'secop', 'threatActor', 'vulnerability'
+      ]
+    }
   });
   return response.json();
 };
 
 const performCrossAnalysis = async (): Promise<CrossModuleAnalysis> => {
-  const response = await fetch('/api/phantom-cores', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'cross-analysis',
-      analysisType: 'enterprise_security_ml',
-      includeML: true,
-      includeXDR: true,
-      includeCompliance: true
-    })
+  const response = await phantomCoresClient.post('/api/phantom-cores', {
+    operation: 'cross-analysis',
+    analysisType: 'enterprise_security_ml',
+    includeML: true,
+    includeXDR: true,
+    includeCompliance: true
   });
   const result = await response.json();
   return result.data;

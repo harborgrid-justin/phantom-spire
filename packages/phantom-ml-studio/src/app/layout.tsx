@@ -12,9 +12,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClientLayout } from "./components/ClientLayout";
-import ThemeRegistry from "../theme/ThemeRegistry";
-import { QueryProvider } from "../components/providers/QueryProvider";
+import { ClientLayout } from "../shared/ui/ClientLayout";
+import ThemeRegistry from "../shared/theme/ThemeRegistry";
+import { QueryProvider } from "../shared/ui/providers/QueryProvider";
 
 const inter = Inter({
   subsets: ["latin"],

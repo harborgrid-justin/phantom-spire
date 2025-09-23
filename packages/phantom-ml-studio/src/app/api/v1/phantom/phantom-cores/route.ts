@@ -3,7 +3,6 @@
  * Modular cybersecurity components management
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { initializeCompleteDatabase } from '../../../../../../../lib/database/database-init';
 
 /**
  * @swagger
@@ -72,9 +71,6 @@ import { initializeCompleteDatabase } from '../../../../../../../lib/database/da
  */
 export async function GET(request: NextRequest) {
   try {
-    // Ensure database is initialized
-    await initializeCompleteDatabase();
-
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100);
@@ -467,9 +463,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Ensure database is initialized
-    await initializeCompleteDatabase();
-
     const body = await request.json();
 
     // Validate required fields
