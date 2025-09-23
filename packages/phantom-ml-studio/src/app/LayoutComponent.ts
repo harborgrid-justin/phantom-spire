@@ -42,8 +42,9 @@ import {
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { layout } from '../shared/theme';
 
-const drawerWidth = 240;
+const drawerWidth = layout.sidebar.width;
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -120,6 +121,8 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
                   },
                 },
               }}
+              aria-label={`Navigate to ${item.text}`}
+              role="menuitem"
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
@@ -221,9 +224,9 @@ const LayoutComponent: React.FC<LayoutProps> = ({ children }) => {
             flexGrow: 1,
             p: 3,
             width: { md: `calc(100% - ${drawerWidth}px)` },
-            mt: '64px',
+            mt: `${layout.header.height}px`,
             backgroundColor: muiTheme.palette.background.default,
-            minHeight: 'calc(100vh - 64px)',
+            minHeight: `calc(100vh - ${layout.header.height}px)`,
           }}
         >
           {children}

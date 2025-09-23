@@ -22,6 +22,7 @@ import icon1 from 'src/assets/images/frontend-pages/icons/icon-react.svg';
 import icon2 from 'src/assets/images/frontend-pages/icons/icon-mui.svg';
 import icon3 from 'src/assets/images/frontend-pages/icons/icon-next.svg';
 import icon4 from 'src/assets/images/frontend-pages/icons/icon-ts.svg';
+import { AUTH_PATHS } from 'src/shared/config/paths';
 import icon5 from 'src/assets/images/frontend-pages/icons/logos_swr.svg';
 import icon6 from 'src/assets/images/frontend-pages/icons/icon-tabler.svg';
 
@@ -168,7 +169,7 @@ const Banner = () => {
               mb={4}
               justifyContent="center"
             >
-              <Button color="primary" size="large" variant="contained" href="/auth/login">
+              <Button color="primary" size="large" variant="contained" href={AUTH_PATHS.LOGIN}
                 Log In
               </Button>
               <Button

@@ -5,6 +5,7 @@
  * Metadata and configuration is handled in layout.tsx.
  */
 import Link from 'next/link';
+import { PATHS } from '@/config/paths';
 
 export default function Dashboard(): JSX.Element {
   return (
@@ -18,9 +19,9 @@ export default function Dashboard(): JSX.Element {
         <div data-cy="metric-card" role="region" aria-label="Deployments count">Deployments: 5</div>
       </section>
       <nav data-cy="dashboard-nav" aria-label="Main navigation">
-        <Link href="/modelBuilder" data-cy="nav-link" aria-label="Go to Model Builder">Model Builder</Link>
-        <Link href="/dataExplorer" data-cy="nav-link" aria-label="Go to Data Explorer">Data Explorer</Link>
-        <Link href="/experiments" data-cy="nav-link" aria-label="Go to Experiments">Experiments</Link>
+        <Link href={PATHS.MODEL_BUILDER} data-cy="nav-link" aria-label="Go to Model Builder">Model Builder</Link>
+        <Link href={PATHS.DATA_EXPLORER} data-cy="nav-link" aria-label="Go to Data Explorer">Data Explorer</Link>
+        <Link href={PATHS.EXPERIMENTS} data-cy="nav-link" aria-label="Go to Experiments">Experiments</Link>
       </nav>
     </main>
   );

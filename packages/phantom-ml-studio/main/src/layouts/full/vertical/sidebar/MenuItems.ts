@@ -1,4 +1,15 @@
 import { uniqueId } from 'lodash';
+import {
+  DASHBOARD_PATHS,
+  CONTENT_PATHS,
+  APP_PATHS,
+  UI_PATHS,
+  TABLE_PATHS,
+  CHART_PATHS,
+  TREE_PATHS,
+  AUTH_PATHS,
+  UTILITY_PATHS
+} from 'src/shared/config/paths';
 
 interface MenuitemsType {
   [x: string]: any;
@@ -82,7 +93,7 @@ const Menuitems: MenuitemsType[] = [
     id: uniqueId(),
     title: 'Modern',
     icon: IconAperture,
-    href: '/dashboards/modern',
+    href: DASHBOARD_PATHS.MODERN,
     chip: 'New',
     chipColor: 'secondary',
   },
@@ -90,7 +101,7 @@ const Menuitems: MenuitemsType[] = [
     id: uniqueId(),
     title: 'eCommerce',
     icon: IconShoppingCart,
-    href: '/dashboards/ecommerce',
+    href: DASHBOARD_PATHS.ECOMMERCE,
   },
   {
     id: uniqueId(),
@@ -152,7 +163,7 @@ const Menuitems: MenuitemsType[] = [
     icon: IconPackage,
     chip: '2',
     chipColor: 'secondary',
-    href: '/apps/contacts',
+    href: APP_PATHS.CONTACTS,
   },
 
   {
@@ -229,13 +240,13 @@ const Menuitems: MenuitemsType[] = [
     id: uniqueId(),
     title: 'Users',
     icon: IconUserCircle,
-    href: '/user-profile',
+    href: AUTH_PATHS.USER_PROFILE,
     children: [
       {
         id: uniqueId(),
         title: 'Profile',
         icon: IconPoint,
-        href: '/user-profile',
+        href: AUTH_PATHS.USER_PROFILE,
       },
       {
         id: uniqueId(),
@@ -829,19 +840,19 @@ const Menuitems: MenuitemsType[] = [
     id: uniqueId(),
     title: 'Login',
     icon: IconLogin,
-    href: '/auth/login',
+    href: AUTH_PATHS.LOGIN,
     children: [
       {
         id: uniqueId(),
         title: 'Side Login',
         icon: IconPoint,
-        href: '/auth/login',
+        href: AUTH_PATHS.LOGIN,
       },
       {
         id: uniqueId(),
         title: 'Boxed Login',
         icon: IconPoint,
-        href: '/auth/login2',
+        href: AUTH_PATHS.LOGIN_V2,
       },
     ],
   },
@@ -849,19 +860,19 @@ const Menuitems: MenuitemsType[] = [
     id: uniqueId(),
     title: 'Register',
     icon: IconUserPlus,
-    href: '/auth/register',
+    href: AUTH_PATHS.REGISTER,
     children: [
       {
         id: uniqueId(),
         title: 'Side Register',
         icon: IconPoint,
-        href: '/auth/register',
+        href: AUTH_PATHS.REGISTER,
       },
       {
         id: uniqueId(),
         title: 'Boxed Register',
         icon: IconPoint,
-        href: '/auth/register2',
+        href: AUTH_PATHS.REGISTER_V2,
       },
     ],
   },

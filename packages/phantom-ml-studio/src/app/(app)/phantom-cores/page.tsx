@@ -4,8 +4,9 @@
 // Provides comprehensive enterprise cybersecurity and ML management
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { phantomCoresClient } from '../../../lib/api/phantom-cores-client';
+import Link from 'next/link'
+import { PATHS } from '@/config/paths';
+import { phantomCoresClient } from '@/api/phantom-cores-client';
 import {
   Box,
   Card,
@@ -540,7 +541,7 @@ const PhantomModulesGrid: React.FC = () => {
         <Box display="flex" flexWrap="wrap" gap={2}>
           {modules.map((module) => (
             <Box key={module.path} flex="1 1 280px" minWidth="280px" maxWidth="300px">
-              <Link href={`/phantom-cores/${module.path}`} style={{ textDecoration: 'none' }}>
+              <Link href={PATHS.PHANTOM_CORE_DETAIL(module.path)} style={{ textDecoration: 'none' }}>
                 <Card 
                   sx={{ 
                     height: '100%',

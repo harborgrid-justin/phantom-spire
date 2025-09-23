@@ -6,6 +6,7 @@ import { IconChevronDown } from '@tabler/icons-react';
 import AppLinks from 'src/layouts/full/vertical/header/AppLinks';
 import QuickLinks from 'src/layouts/full/vertical/header/QuickLinks';
 import DemosDD from './DemosDD';
+import { EXTERNAL_URLS } from 'src/shared/config/paths';
 
 const Navigations = () => {
 
@@ -122,7 +123,7 @@ const Navigations = () => {
         <StyledButton color="inherit" variant="text" href="https://adminmart.com/support/">
             Support
         </StyledButton>
-        <Button color="primary" target="_blank" variant="contained" href="#">
+        <Button color="primary" target="_blank" rel="noopener noreferrer" variant="contained" href={EXTERNAL_URLS.PURCHASE}
             Buy Now
         </Button>
     </>);

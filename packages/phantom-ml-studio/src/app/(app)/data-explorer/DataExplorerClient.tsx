@@ -1,162 +1,67 @@
+/**
+ * Data Explorer Client Component
+ * 
+ * Main data exploration interface providing:
+ * - Dataset selection and management
+ * - Data preview and visualization
+ * - Column analysis and sample data views
+ * - Upload functionality for new datasets
+ *
+ * REFACTORED: Now uses modular components and custom hooks for better maintainability:
+ * - useDataExplorerState: Manages all data explorer state and operations
+ * - DataExplorerHeader: Header with title and action buttons
+ * - DatasetSelector: Dataset selection and refresh controls
+ * - DataExplorerTabs: Navigation tabs for different views
+ * - Existing components: DataUpload, DataPreview, DataVisualization
+ */
+
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import {
   Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Card,
-  CardContent,
-  Tabs,
-  Tab,
   CircularProgress,
   Alert,
-  Container,
-  Tooltip,
-  IconButton,
-  Button
+  Container
 } from '@mui/material';
-import {
-  CloudUpload as UploadIcon,
-  Refresh as RefreshIcon,
-  Download as DownloadIcon
-} from '@mui/icons-material';
-import { dataExplorerService } from '@/features/data-explorer/lib';
-import { Dataset, Column, SampleData } from '@/features/data-explorer/lib';
-import { ServiceContext } from '@/lib/core-logic/types/service.types';
 
-// Import components
-import DataExplorerErrorBoundary from './_components/components/DataExplorerErrorBoundary';
-import DataUpload from './_components/components/DataUpload';
-import DataPreview from './_components/components/DataPreview';
-import DataVisualization from './_components/components/DataVisualization';
+// Custom hooks
+import { useDataExplorerState } from './_hooks/useDataExplorerState';
+
+// Components
+import {
+  DataExplorerErrorBoundary,
+  DataExplorerHeader,
+  DatasetSelector,
+  DataExplorerTabs,
+  DataUpload,
+  DataPreview,
+  DataVisualization
+} from './_components';
 
 const DataExplorerClient: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [datasets, setDatasets] = useState<Dataset[]>([]);
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [sampleData, setSampleData] = useState<SampleData[]>([]);
-  const [selectedDatasetId, setSelectedDatasetId] = useState<number>(1);
-  const [selectedTab, setSelectedTab] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  
-  // Upload states
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  // Use the custom hook for state management
+  const {
+    loading,
+    refreshing,
+    datasets,
+    columns,
+    sampleData,
+    selectedDatasetId,
+    selectedTab,
+    error,
+    lastUpdated,
+    uploadedFile,
+    uploadSuccess,
+    selectedDataset,
+    handleDatasetChange,
+    handleRefresh,
+    handleDatasetUploaded,
+    handleTabChange,
+    handleErrorDismiss
+  } = useDataExplorerState();
 
-  const createServiceContext = useCallback((): ServiceContext => ({
-    requestId: `req-${Date.now()}-${Math.random()}`,
-    startTime: new Date(),
-    timeout: 10000,
-    permissions: [],
-    metadata: {},
-    trace: {
-      traceId: `trace-${Date.now()}`,
-      spanId: `span-${Date.now()}`,
-      sampled: true,
-      baggage: {},
-    }
-  }), []);
-
-  const fetchData = useCallback(async (isRefresh = false) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-      setError(null);
-
-      const context = createServiceContext();
-
-      // Fetch datasets
-      const datasetsResponse = await dataExplorerService.getDatasets({
-        id: `req-datasets-${Date.now()}`,
-        type: 'getDatasets',
-        data: null,
-        metadata: { category: 'data-explorer', module: 'data-explorer-page', version: '1.0.0' },
-        context: { environment: 'development' },
-        timestamp: new Date(),
-      }, context);
-
-      if (datasetsResponse.success && datasetsResponse.data) {
-        setDatasets(datasetsResponse.data);
-      } else {
-        throw new Error(datasetsResponse.error?.message || 'Failed to fetch datasets');
-      }
-
-      // Fetch columns for selected dataset
-      const columnsResponse = await dataExplorerService.getColumns({
-        id: `req-columns-${Date.now()}`,
-        type: 'getColumns',
-        data: { datasetId: selectedDatasetId },
-        metadata: { category: 'data-explorer', module: 'data-explorer-page', version: '1.0.0' },
-        context: { environment: 'development' },
-        timestamp: new Date(),
-      }, context);
-
-      if (columnsResponse.success && columnsResponse.data) {
-        setColumns(columnsResponse.data);
-      } else {
-        console.warn('Failed to fetch columns:', columnsResponse.error?.message);
-      }
-
-      // Fetch sample data for selected dataset
-      const sampleDataResponse = await dataExplorerService.getSampleData({
-        id: `req-sample-${Date.now()}`,
-        type: 'getSampleData',
-        data: { datasetId: selectedDatasetId },
-        metadata: { category: 'data-explorer', module: 'data-explorer-page', version: '1.0.0' },
-        context: { environment: 'development' },
-        timestamp: new Date(),
-      }, context);
-
-      if (sampleDataResponse.success && sampleDataResponse.data) {
-        setSampleData(sampleDataResponse.data);
-      } else {
-        console.warn('Failed to fetch sample data:', sampleDataResponse.error?.message);
-      }
-
-      setLastUpdated(new Date());
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setError(errorMessage);
-      console.error('Data Explorer fetch error:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [selectedDatasetId, createServiceContext]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleDatasetChange = useCallback((newDatasetId: number) => {
-    setSelectedDatasetId(newDatasetId);
-    setSelectedTab(0); // Reset to overview tab
-  }, []);
-
-  const handleRefresh = useCallback(() => {
-    fetchData(true);
-  }, [fetchData]);
-
-  const handleDatasetUploaded = useCallback((newDataset: Dataset) => {
-    setDatasets(prev => [...prev, newDataset]);
-    setUploadSuccess(true);
-    // Simulate setting uploadedFile for preview
-    if (uploadedFile) {
-      setUploadedFile(uploadedFile);
-    }
-  }, [uploadedFile]);
-
-  const selectedDataset = datasets.find(d => d.id === selectedDatasetId);
-
+  // Loading state
   if (loading && !datasets.length) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
@@ -169,33 +74,11 @@ const DataExplorerClient: React.FC = () => {
     <DataExplorerErrorBoundary>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         {/* Header */}
-        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Data Explorer
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Explore, analyze, and understand your datasets before training models
-            </Typography>
-            {lastUpdated && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                Last updated: {lastUpdated.toLocaleTimeString()}
-              </Typography>
-            )}
-          </Box>
-          <Button
-            variant="contained"
-            startIcon={<UploadIcon />}
-            disabled
-            sx={{ minWidth: 200 }}
-          >
-            Upload Dataset (Coming Soon)
-          </Button>
-        </Box>
+        <DataExplorerHeader lastUpdated={lastUpdated} />
 
         {/* Error Display */}
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          <Alert severity="error" sx={{ mb: 3 }} onClose={handleErrorDismiss}>
             {error}
           </Alert>
         )}
@@ -207,71 +90,36 @@ const DataExplorerClient: React.FC = () => {
           </Alert>
         )}
 
-        {/* Upload Area */}
+        {/* Upload Area - Show when no datasets or empty datasets */}
         {(!datasets.length || datasets.length === 0) && (
           <DataUpload onDatasetUploaded={handleDatasetUploaded} />
         )}
 
-        {/* Dataset Preview */}
+        {/* Dataset Preview - Show when file is uploaded */}
         {uploadedFile && (
           <DataPreview uploadedFile={uploadedFile} uploadSuccess={uploadSuccess} />
         )}
 
-        {/* Dataset Selection and Actions */}
+        {/* Dataset Selection and Actions - Show when datasets exist */}
         {datasets.length > 0 && (
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3, mb: 4 }}>
-            <FormControl fullWidth>
-              <InputLabel>Select Dataset</InputLabel>
-              <Select
-                value={selectedDatasetId}
-                onChange={(e) => handleDatasetChange(e.target.value as number)}
-                label="Select Dataset"
-              >
-                {datasets.map((dataset) => (
-                  <MenuItem key={dataset.id} value={dataset.id}>
-                    <Box>
-                      <Typography variant="body1">{dataset.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {dataset.rows.toLocaleString()} rows × {dataset.columns} columns
-                      </Typography>
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Tooltip title="Refresh data">
-                <IconButton onClick={handleRefresh} disabled={refreshing}>
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-              <Button
-                variant="outlined"
-                startIcon={<DownloadIcon />}
-                disabled
-                sx={{ flex: 1 }}
-              >
-                Export
-              </Button>
-            </Box>
-          </Box>
+          <DatasetSelector
+            datasets={datasets}
+            selectedDatasetId={selectedDatasetId}
+            refreshing={refreshing}
+            onDatasetChange={handleDatasetChange}
+            onRefresh={handleRefresh}
+          />
         )}
 
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Show when datasets exist */}
         {datasets.length > 0 && (
-          <Card sx={{ mb: 4 }} elevation={1}>
-            <CardContent sx={{ pb: 1 }}>
-              <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
-                <Tab label="Overview" />
-                <Tab label="Columns" />
-                <Tab label="Sample Data" />
-              </Tabs>
-            </CardContent>
-          </Card>
+          <DataExplorerTabs
+            selectedTab={selectedTab}
+            onTabChange={handleTabChange}
+          />
         )}
 
-        {/* Content */}
+        {/* Content - Show when datasets exist */}
         {datasets.length > 0 && (
           <DataVisualization
             selectedDataset={selectedDataset}

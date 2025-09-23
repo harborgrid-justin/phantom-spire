@@ -39,51 +39,18 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMLCoreStatus, useSystemInfo } from '../providers/MLCoreProvider'
+import { PATHS, getMainNavigationItems } from '@/config/paths'
 
-const navigationItems = [
-  {
-    title: 'Home',
-    href: '/',
-    icon: HomeIcon,
-    description: 'Platform overview and quick access',
-    isResourceHeavy: false
-  },
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: DashboardIcon,
-    description: 'ML operations dashboard and monitoring',
-    isResourceHeavy: false
-  },
-  {
-    title: 'Models',
-    href: '/models',
-    icon: ModelIcon,
-    description: 'Model management and deployment',
-    isResourceHeavy: false
-  },
-  {
-    title: 'Training',
-    href: '/training',
-    icon: AnalyticsIcon,
-    description: 'Model training and optimization',
-    isResourceHeavy: true
-  },
-  {
-    title: 'Datasets',
-    href: '/datasets',
-    icon: DataIcon,
-    description: 'Data management and preprocessing',
-    isResourceHeavy: true
-  },
-  {
-    title: 'Experiments',
-    href: '/experiments',
-    icon: ExperimentIcon,
-    description: 'Experiment tracking and comparison',
-    isResourceHeavy: false
-  }
-]
+const navigationItems = getMainNavigationItems().map(item => ({
+  ...item,
+  icon: item.title === 'Home' ? HomeIcon :
+        item.title === 'Dashboard' ? DashboardIcon :
+        item.title === 'Models' ? ModelIcon :
+        item.title === 'Training' ? AnalyticsIcon :
+        item.title === 'Datasets' ? DataIcon :
+        item.title === 'Experiments' ? ExperimentIcon :
+        HomeIcon
+}))
 
 const drawerWidth = 280
 
@@ -221,7 +188,7 @@ export function Navigation() {
 
       <List sx={{ px: 1, py: 1 }}>
         <ListItem disablePadding>
-          <Link href="/settings" prefetch={true} style={{ textDecoration: 'none', width: '100%' }}>
+          <Link href={PATHS.SETTINGS} prefetch={true} style={{ textDecoration: 'none', width: '100%' }}>
             <ListItemButton sx={{ borderRadius: 2, mx: 1 }}>
               <ListItemIcon>
                 <SettingsIcon />

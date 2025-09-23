@@ -24,46 +24,30 @@ const PaymentMethods = () => {
         mt={4}
         gap="56px"
       >
-        <Link href="#">
-          <Tooltip title="Visa">
-            <img src={IconVisa} width={60} height={20} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="Mastercard">
-            <img src={IconMasterCard} width={45} height={25} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="American express">
-            <img src={IconAmericanExpress} width={80} height={34} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="Discover">
-            <img src={IconDiscover} width={95} height={16} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="Paypal">
-            <img src={IconPaypal} width={90} height={24} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="Maestro">
-            <img src={IcoMasetro} width={45} height={28} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="JCB">
-            <img src={IconJcb} width={31} height={24} alt="payment" />
-          </Tooltip>
-        </Link>
-        <Link href="#">
-          <Tooltip title="Diners">
-            <img src={IconDiners} width={92} height={24} alt="payment" />
-          </Tooltip>
-        </Link>
+        <Tooltip title="Visa">
+          <img src={IconVisa} width={60} height={20} alt="Visa payment method" />
+        </Tooltip>
+        <Tooltip title="Mastercard">
+          <img src={IconMasterCard} width={45} height={25} alt="Mastercard payment method" />
+        </Tooltip>
+        <Tooltip title="American express">
+          <img src={IconAmericanExpress} width={80} height={34} alt="American Express payment method" />
+        </Tooltip>
+        <Tooltip title="Discover">
+          <img src={IconDiscover} width={95} height={16} alt="Discover payment method" />
+        </Tooltip>
+        <Tooltip title="Paypal">
+          <img src={IconPaypal} width={90} height={24} alt="PayPal payment method" />
+        </Tooltip>
+        <Tooltip title="Maestro">
+          <img src={IcoMasetro} width={45} height={28} alt="Maestro payment method" />
+        </Tooltip>
+        <Tooltip title="JCB">
+          <img src={IconJcb} width={31} height={24} alt="JCB payment method" />
+        </Tooltip>
+        <Tooltip title="Diners">
+          <img src={IconDiners} width={92} height={24} alt="Diners Club payment method" />
+        </Tooltip>
       </Box>
     </>
   );

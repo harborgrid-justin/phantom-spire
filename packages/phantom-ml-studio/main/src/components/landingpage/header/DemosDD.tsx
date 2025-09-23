@@ -144,6 +144,7 @@ const DemosDD = () => {
                   size="small"
                   href={demo.link}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Live Preview
                 </Button>

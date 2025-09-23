@@ -8,6 +8,7 @@
 
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { CONTENT_PATHS } from '@/config/paths';
 
 interface PageProps {
   params: Promise<{ slug?: string[] }>;
@@ -56,7 +57,7 @@ export default async function BlogPage({ params }: PageProps): Promise<JSX.Eleme
             <div className="space-y-4">
               <article className="border-b pb-4">
                 <h3 className="text-lg font-medium mb-2">
-                  <Link href="/blog/2024/machine-learning-trends" className="text-blue-600 hover:underline">
+                  <Link href={CONTENT_PATHS.BLOG_TRENDS} className="text-blue-600 hover:underline">
                     Machine Learning Trends in 2024
                   </Link>
                 </h3>
@@ -68,7 +69,7 @@ export default async function BlogPage({ params }: PageProps): Promise<JSX.Eleme
 
               <article className="border-b pb-4">
                 <h3 className="text-lg font-medium mb-2">
-                  <Link href="/blog/tutorials/getting-started" className="text-blue-600 hover:underline">
+                  <Link href={CONTENT_PATHS.BLOG_TUTORIAL} className="text-blue-600 hover:underline">
                     Getting Started with ML Platform
                   </Link>
                 </h3>

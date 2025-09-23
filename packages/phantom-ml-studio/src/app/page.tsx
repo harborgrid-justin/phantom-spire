@@ -10,6 +10,7 @@
  */
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { PATHS } from '@/config/paths';
 import {
   Box,
   Typography,
@@ -322,7 +323,7 @@ function HomePage() {
         >
           <Button
             component={Link}
-            href="/dashboard"
+            href={PATHS.DASHBOARD}
             variant="contained"
             size="large"
             sx={{
@@ -337,7 +338,7 @@ function HomePage() {
           </Button>
           <Button
             component={Link}
-            href="/modelBuilder"
+            href={PATHS.MODEL_BUILDER}
             variant="outlined"
             size="large"
             sx={{

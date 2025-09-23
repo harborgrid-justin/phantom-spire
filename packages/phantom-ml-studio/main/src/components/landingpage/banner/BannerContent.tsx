@@ -8,6 +8,7 @@ import { IconRocket } from '@tabler/icons-react';
 // third party
 
 import { motion } from 'framer-motion';
+import { AUTH_PATHS, DASHBOARD_PATHS } from 'src/shared/config/paths';
 
 const StyledButton = styled(Button)(() => ({
   padding: '13px 48px',
@@ -83,11 +84,11 @@ const BannerContent = () => {
         }}
       >
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mt={3}>
-          <StyledButton variant="contained" color="primary" href="/auth/login">
+          <StyledButton variant="contained" color="primary" href={AUTH_PATHS.LOGIN}>
             Login
           </StyledButton>
 
-          <StyledButton variant="outlined" href="/dashboards/modern">
+          <StyledButton variant="outlined" href={DASHBOARD_PATHS.MODERN}>
             Live Preview
           </StyledButton>
         </Stack>

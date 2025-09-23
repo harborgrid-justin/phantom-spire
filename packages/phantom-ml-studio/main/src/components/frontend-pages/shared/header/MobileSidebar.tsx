@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack';
 import Logo from '../../../../layouts/full/shared/logo/Logo';
 import { NavLinks } from './Navigations';
 import { Chip } from '@mui/material';
+import { AUTH_PATHS } from 'src/shared/config/paths';
 
 const MobileSidebar = () => {
   return (
@@ -47,7 +48,7 @@ const MobileSidebar = () => {
           >
             Support
           </Button>
-          <Button color="primary" variant="contained" href="/auth/login">
+          <Button color="primary" variant="contained" href={AUTH_PATHS.LOGIN}
             Get Started
           </Button>
         </Stack>

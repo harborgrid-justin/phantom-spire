@@ -4,6 +4,7 @@ import React from 'react';
 import { Grid, Typography, Box, Button, styled, Container, Stack } from '@mui/material';
 import c2aImg from 'src/assets/images/landingpage/background/c2a.png';
 import GuaranteeCard from './GuaranteeCard';
+import { AUTH_PATHS } from 'src/shared/config/paths';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: '13px 34px',
@@ -48,13 +49,13 @@ const C2a2 = () => {
               </Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} mt={3}>
-                <StyledButton variant="contained" color="inherit" href="/auth/login">
+                <StyledButton variant="contained" color="inherit" href={AUTH_PATHS.LOGIN}>
                   Login
                 </StyledButton>
                 <StyledButton2
                   variant="outlined"
                   color="inherit"
-                  href="/auth/register"
+                  href={AUTH_PATHS.REGISTER}
                 >
                   Register
                 </StyledButton2>

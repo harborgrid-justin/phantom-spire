@@ -1,68 +1,43 @@
-'use client';
-
 /**
- * Project Loading Component
- * Displays loading state while project data is being fetched
+ * Loading UI for Project Dynamic Route
+ * Provides immediate feedback during navigation to project pages
  */
 
-import { Box, Skeleton, Container, Typography, Card, CardContent } from '@mui/material';
+import { Container, Paper, Skeleton, Box } from '@mui/material';
 
-export default function Loading(): JSX.Element {
+export default function ProjectLoading() {
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ py: 4 }}>
-        {/* Breadcrumb Loading */}
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Paper sx={{ p: 4 }}>
+        {/* Breadcrumb skeleton */}
         <Box sx={{ mb: 3 }}>
-          <Skeleton variant="text" width={200} height={24} />
+          <Skeleton variant="text" width={300} height={24} />
         </Box>
-
-        {/* Page Title Loading */}
-        <Box sx={{ mb: 4 }}>
-          <Skeleton variant="text" width={300} height={40} />
-          <Skeleton variant="text" width={500} height={24} sx={{ mt: 1 }} />
+        
+        {/* Title skeleton */}
+        <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
+        
+        {/* Content skeleton */}
+        <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
+          <Box sx={{ flex: 1 }}>
+            <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width="80%" />
+            <Skeleton variant="text" width="60%" />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Skeleton variant="rectangular" height={120} sx={{ mb: 2 }} />
+            <Skeleton variant="text" width="70%" />
+            <Skeleton variant="text" width="50%" />
+          </Box>
         </Box>
-
-        {/* Project Details Card Loading */}
-        <Card sx={{ mb: 4 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', gap: 3, mb: 3 }}>
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  <Skeleton variant="text" width={150} />
-                </Typography>
-                <Skeleton variant="text" width="100%" height={20} sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="80%" height={20} sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="60%" height={20} />
-              </Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  <Skeleton variant="text" width={120} />
-                </Typography>
-                <Skeleton variant="text" width="100%" height={20} sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="90%" height={20} sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="70%" height={20} />
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-
-        {/* Models Grid Loading */}
-        <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' } }}>
-          {[...Array(6)].map((_, index) => (
-            <Card key={index}>
-              <CardContent>
-                <Skeleton variant="text" width="80%" height={24} sx={{ mb: 2 }} />
-                <Skeleton variant="text" width="100%" height={20} sx={{ mb: 1 }} />
-                <Skeleton variant="text" width="60%" height={20} sx={{ mb: 2 }} />
-                <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                  <Skeleton variant="rectangular" width={80} height={32} />
-                  <Skeleton variant="rectangular" width={70} height={32} />
-                </Box>
-              </CardContent>
-            </Card>
-          ))}
+        
+        {/* Action buttons skeleton */}
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Skeleton variant="rectangular" width={120} height={36} />
+          <Skeleton variant="rectangular" width={100} height={36} />
+          <Skeleton variant="rectangular" width={80} height={36} />
         </Box>
-      </Box>
+      </Paper>
     </Container>
   );
 }

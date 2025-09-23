@@ -1,17 +1,44 @@
 /* @import "tailwindcss"; */
 
+/* Global CSS Variables for Theme Integration */
+:root {
+  --background: #f9fafb;
+  --foreground: #111827;
+  --primary: #6366f1;
+  --secondary: #14b8a6;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #818cf8;
+    --secondary: #5eead4;
   }
 }
 
+/* Global font styles - matches theme typography */
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+/* Base layout styles */
 #root {
   min-height: 100vh;
+}
+
+/* Additional global resets and utilities */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: "Inter", "Roboto", "Helvetica", "Arial", sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--background);
+  color: var(--foreground);
 }

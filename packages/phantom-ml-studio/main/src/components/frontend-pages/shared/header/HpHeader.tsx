@@ -12,6 +12,7 @@ import Logo from '../../../../layouts/full/shared/logo/Logo';
 import Navigations from './Navigations';
 import MobileSidebar from './MobileSidebar';
 import { IconMenu2 } from '@tabler/icons-react';
+import { AUTH_PATHS } from 'src/shared/config/paths';
 
 const HpHeader = () => {
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
@@ -63,7 +64,7 @@ const HpHeader = () => {
               <Stack spacing={1} direction="row" alignItems="center">
                 <Navigations />
               </Stack>
-              <Button color="primary" variant="contained" href="/auth/login">
+              <Button color="primary" variant="contained" href={AUTH_PATHS.LOGIN}
                 Log In
               </Button>
             </>

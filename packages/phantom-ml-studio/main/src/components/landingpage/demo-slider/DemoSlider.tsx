@@ -263,6 +263,7 @@ const DemoSlider = () => {
                       size="small"
                       href={demo.link}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Live Preview
                     </Button>
@@ -311,6 +312,7 @@ const DemoSlider = () => {
                         size="small"
                         href={page.link}
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         Live Preview
                       </Button>
@@ -359,6 +361,7 @@ const DemoSlider = () => {
                       size="small"
                       href={demo.link}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Live Preview
                     </Button>

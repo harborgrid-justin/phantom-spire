@@ -7,6 +7,7 @@ import Logo from "src/layouts/full/shared/logo/Logo"
 import DemosDD from './DemosDD';
 import AppLinks from 'src/layouts/full/vertical/header/AppLinks';
 import QuickLinks from 'src/layouts/full/vertical/header/QuickLinks';
+import { EXTERNAL_URLS, AUTH_PATHS } from 'src/shared/config/paths';
 
 const MobileSidebar = () => {
     const [toggle, setToggle] = useState(false)
@@ -53,13 +54,13 @@ const MobileSidebar = () => {
                             </Box>
                         </Collapse>
                     )}
-                    <Button color="inherit" href="#" sx={{
+                    <Button color="inherit" href={EXTERNAL_URLS.DOCS} target="_blank" rel="noopener noreferrer" sx={{
                         justifyContent: 'start'
                     }}>Documentation</Button>
-                    <Button color="inherit" href="https://adminmart.com/support" sx={{
+                    <Button color="inherit" href={EXTERNAL_URLS.SUPPORT} target="_blank" rel="noopener noreferrer" sx={{
                         justifyContent: 'start'
                     }}>Support</Button>
-                    <Button color="primary" variant="contained" href="#">Login</Button>
+                    <Button color="primary" variant="contained" href={AUTH_PATHS.LOGIN_ALT}>Login</Button>
                 </Stack>
             </Box>
         </>

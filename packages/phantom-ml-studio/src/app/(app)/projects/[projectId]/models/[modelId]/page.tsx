@@ -9,6 +9,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { PATHS } from '@/config/paths';
 
 interface PageProps {
   params: Promise<{ projectId: string; modelId: string }>;
@@ -59,7 +60,7 @@ export default async function ProjectModelPage({ params }: PageProps): Promise<J
             <li>projects</li>
             <span className="mx-2">/</span>
             <li className="text-blue-600">
-              <Link href={`/projects/${projectId}`} className="hover:underline">
+              <Link href={PATHS.PROJECT_DETAIL(projectId)} className="hover:underline">
                 {projectId}
               </Link>
             </li>

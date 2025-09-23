@@ -8,11 +8,17 @@
  *
  * IMPORTANT: This component runs on the client and uses React hooks,
  * event handlers, and browser APIs. Marked with 'use client' directive.
+ *
+ * REFACTORED: Now uses custom hooks and services for better separation of concerns:
+ * - usePipelineState: Manages pipeline data and loading states
+ * - useDialogState: Manages dialogs and notifications
+ * - usePipelineActions: Handles all pipeline operations
+ * - PipelineService: API calls and business logic
  */
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
@@ -35,473 +41,81 @@ import CancelConfirmationDialog from './_components/components/CancelConfirmatio
 import SaveResultsDialog from './_components/components/SaveResultsDialog';
 import PipelineWizard from './_components/components/PipelineWizard';
 
-// Type imports
-import type {
-  Pipeline,
-  PipelineStep,
-  AlgorithmPerformance,
-  PipelineConfig,
-  PipelineTemplate,
-  ExecutionState,
-  DialogStates,
-  NotificationStates
-} from './_lib/types';
+// Custom hooks
+import { usePipelineState } from './_hooks/usePipelineState';
+import { useDialogState } from './_hooks/useDialogState';
+import { usePipelineActions } from './_hooks/usePipelineActions';
 
 export default function AutoMLPipelineClient() {
-  // State management
-  const [pipelines, setPipelines] = useState<Pipeline[]>([]);
-  const [selectedPipeline, setSelectedPipeline] = useState<Pipeline | null>(null);
-  const [pipelineSteps, setPipelineSteps] = useState<PipelineStep[]>([]);
-  const [algorithmPerformance, setAlgorithmPerformance] = useState<AlgorithmPerformance[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Dialog states - for future dialog implementations
-  const [dialogStates, setDialogStates] = useState<DialogStates>({
-    createDialogOpen: false,
-    cloneDialogOpen: false,
-    templateDetailsOpen: false,
-    draftNameDialog: false,
-    estimationDialog: false,
-    executionConfirmOpen: false
+  // Pipeline data state
+  const {
+    pipelines,
+    selectedPipeline,
+    pipelineSteps,
+    algorithmPerformance,
+    loading,
+    error,
+    selectPipeline,
+    updatePipeline,
+    addPipeline,
+    updateSteps,
+    fetchPipelines,
+    setError,
+    setLoading
+  } = usePipelineState();
+
+  // Dialog and notification state
+  const {
+    dialogStates,
+    cancelDialogOpen,
+    saveResultsDialogOpen,
+    notificationStates,
+    executionState,
+    openDialog,
+    closeDialog,
+    openCancelDialog,
+    closeCancelDialog,
+    openSaveResultsDialog,
+    closeSaveResultsDialog,
+    showNotification,
+    hideNotification,
+    startExecution,
+    completeExecution,
+    failExecution,
+    pauseExecution,
+    resumeExecution
+  } = useDialogState();
+
+  // Pipeline actions
+  const {
+    handleTemplateSelect,
+    handleShowTemplateDetails,
+    handleCreatePipeline,
+    handlePipelineCreated,
+    handlePipelineAction,
+    handleExecutePipeline,
+    handleConfirmExecution,
+    handlePausePipeline,
+    handleResumePipeline,
+    handleStopPipeline,
+    handleConfirmCancel,
+    handleSaveResults
+  } = usePipelineActions({
+    selectedPipeline,
+    updatePipeline,
+    addPipeline,
+    updateSteps,
+    startExecution,
+    completeExecution,
+    failExecution,
+    pauseExecution,
+    resumeExecution,
+    showNotification,
+    openDialog,
+    closeDialog,
+    openCancelDialog,
+    openSaveResultsDialog
   });
-  
-  // Additional dialog states for execution control
-  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [saveResultsDialogOpen, setSaveResultsDialogOpen] = useState(false);
-  
-  // Notification states
-  const [notificationStates, setNotificationStates] = useState<NotificationStates>({
-    showTemplateApplied: false,
-    showPipelineCloned: false,
-    showDraftSaved: false,
-    showCreationError: false,
-    showTimeEstimation: false,
-    showDatasetPreview: false,
-    uploadProgress: false,
-    uploadSuccess: false
-  });
-  
-  // Execution states - for future execution monitoring
-  const [executionState, setExecutionState] = useState<ExecutionState>({
-    isExecuting: false,
-    executionPaused: false,
-    executionComplete: false,
-    executionError: false
-  });
-  
-  // Pipeline configuration - for future create dialog
-  const [newPipelineConfig, setNewPipelineConfig] = useState<PipelineConfig>({
-    name: '',
-    datasetId: '',
-    maxTrainingTime: 60,
-    algorithms: [],
-    objective: '',
-    targetColumn: '',
-    optimizationMetric: 'accuracy',
-    timeConstraint: 60,
-    memoryConstraint: 8,
-    modelComplexity: 'medium',
-    interpretabilityLevel: 'high'
-  });
-
-  // Effect for data fetching
-  useEffect(() => {
-    fetchPipelines();
-    const interval = setInterval(fetchPipelines, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Data fetching function
-  const fetchPipelines = async () => {
-    try {
-      // Mock data - replace with actual API calls
-      const mockPipelines: Pipeline[] = [
-        {
-          id: 'pipeline_4',
-          name: 'Employee Performance Prediction',
-          status: 'pending',
-          progress: 0,
-          currentStep: 'Ready to Execute',
-          algorithm: 'Not Selected',
-          accuracy: 0.0,
-          startTime: new Date(),
-          estimatedTime: 0,
-          datasetId: 'dataset_employee_performance'
-        },
-        {
-          id: 'pipeline_1',
-          name: 'Customer Churn Prediction',
-          status: 'running',
-          progress: 65,
-          currentStep: 'Feature Engineering',
-          algorithm: 'Random Forest',
-          accuracy: 0.87,
-          startTime: new Date(Date.now() - 1800000),
-          estimatedTime: 900000,
-          datasetId: 'dataset_customer_churn'
-        },
-        {
-          id: 'pipeline_2',
-          name: 'Fraud Detection Model',
-          status: 'completed',
-          progress: 100,
-          currentStep: 'Model Validation',
-          algorithm: 'Gradient Boosting',
-          accuracy: 0.94,
-          startTime: new Date(Date.now() - 3600000),
-          estimatedTime: 0,
-          datasetId: 'dataset_fraud'
-        },
-        {
-          id: 'pipeline_3',
-          name: 'Revenue Forecasting',
-          status: 'failed',
-          progress: 45,
-          currentStep: 'Model Training',
-          algorithm: 'XGBoost',
-          accuracy: 0.0,
-          startTime: new Date(Date.now() - 2400000),
-          estimatedTime: 0,
-          datasetId: 'dataset_revenue'
-        }
-      ];
-
-      const mockSteps: PipelineStep[] = [
-        { id: 'step_1', name: 'Data Preprocessing', status: 'completed', duration: 30000 },
-        { id: 'step_2', name: 'Feature Engineering', status: 'running', duration: 0 },
-        { id: 'step_3', name: 'Algorithm Selection', status: 'pending', duration: 0 },
-        { id: 'step_4', name: 'Model Training', status: 'pending', duration: 0 },
-        { id: 'step_5', name: 'Hyperparameter Tuning', status: 'pending', duration: 0 },
-        { id: 'step_6', name: 'Model Validation', status: 'pending', duration: 0 }
-      ];
-
-      const mockAlgorithmPerformance: AlgorithmPerformance[] = [
-        { 
-          algorithm: 'Random Forest', 
-          accuracy: 0.87, 
-          f1Score: 0.85, 
-          precision: 0.88, 
-          recall: 0.83, 
-          trainingTime: 45000, 
-          status: 'completed' 
-        },
-        { 
-          algorithm: 'Gradient Boosting', 
-          accuracy: 0.89, 
-          f1Score: 0.87, 
-          precision: 0.90, 
-          recall: 0.85, 
-          trainingTime: 62000, 
-          status: 'completed' 
-        },
-        { 
-          algorithm: 'XGBoost', 
-          accuracy: 0.91, 
-          f1Score: 0.89, 
-          precision: 0.92, 
-          recall: 0.87, 
-          trainingTime: 78000, 
-          status: 'running' 
-        },
-        { 
-          algorithm: 'Neural Network', 
-          accuracy: 0.0, 
-          f1Score: 0.0, 
-          precision: 0.0, 
-          recall: 0.0, 
-          trainingTime: 0, 
-          status: 'running' 
-        }
-      ];
-
-      setPipelines(mockPipelines);
-      setPipelineSteps(mockSteps);
-      setAlgorithmPerformance(mockAlgorithmPerformance);
-      
-      // Select the first pipeline by default (now a pending pipeline)
-      setSelectedPipeline(mockPipelines[0] || null);
-      setLoading(false);
-    } catch {
-      setError('Failed to fetch pipeline data');
-      setLoading(false);
-    }
-  };
-
-  // Event handlers
-  const handlePipelineSelect = (pipeline: Pipeline) => {
-    setSelectedPipeline(pipeline);
-  };
-
-  const handlePipelineAction = (pipeline: Pipeline, action: 'start' | 'pause' | 'stop' | 'clone') => {
-    console.log(`${action} pipeline ${pipeline.id}`);
-    
-    if (action === 'clone') {
-      setDialogStates(prev => ({ ...prev, cloneDialogOpen: true }));
-    } else {
-      // Handle other actions
-      fetchPipelines();
-    }
-  };
-
-  const handleTemplateSelect = (template: PipelineTemplate) => {
-    // Update configuration with template settings
-    setNewPipelineConfig(prev => ({
-      ...prev,
-      ...template.defaultConfig
-    }));
-    setNotificationStates(prev => ({ ...prev, showTemplateApplied: true }));
-    setTimeout(() => {
-      setNotificationStates(prev => ({ ...prev, showTemplateApplied: false }));
-    }, 3000);
-  };
-
-  const handleShowTemplateDetails = (template: PipelineTemplate) => {
-    console.log('Show template details:', template);
-    setDialogStates(prev => ({ ...prev, templateDetailsOpen: true }));
-  };
-
-  const handleCreatePipeline = () => {
-    setDialogStates(prev => ({ ...prev, createDialogOpen: true }));
-  };
-
-  const handlePipelineCreated = (config: PipelineConfig) => {
-    // Create new pipeline with the configuration
-    const newPipeline: Pipeline = {
-      id: `pipeline_${Date.now()}`,
-      name: config.name || 'New Pipeline',
-      status: 'pending',
-      progress: 0,
-      currentStep: 'Ready to Execute',
-      algorithm: 'Not Selected',
-      accuracy: 0.0,
-      startTime: new Date(),
-      estimatedTime: 0,
-      datasetId: config.datasetId || 'default'
-    };
-
-    // Add to pipelines list
-    setPipelines(prev => [newPipeline, ...prev]);
-    setSelectedPipeline(newPipeline);
-    
-    // Close dialog and show success notification
-    setDialogStates(prev => ({ ...prev, createDialogOpen: false }));
-    setNotificationStates(prev => ({ ...prev, showDraftSaved: true }));
-  };
-
-  // Execution handlers
-  const handleExecutePipeline = () => {
-    if (selectedPipeline) {
-      setDialogStates(prev => ({ ...prev, executionConfirmOpen: true }));
-    }
-  };
-
-  const handleConfirmExecution = async () => {
-    if (selectedPipeline) {
-      // Close dialog first
-      setDialogStates(prev => ({ ...prev, executionConfirmOpen: false }));
-      
-      try {
-        // Make API call that tests can intercept
-        const response = await fetch('/api/automl/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pipelineId: selectedPipeline.id })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        // Update pipeline status to running with estimated time
-        setPipelines(prev => prev.map(p => 
-          p.id === selectedPipeline.id 
-            ? { 
-                ...p, 
-                status: 'running' as const, 
-                progress: 10, 
-                startTime: new Date(),
-                estimatedTime: 1800000, // 30 minutes
-                currentStep: 'Data Preprocessing'
-              }
-            : p
-        ));
-        setSelectedPipeline(prev => prev ? 
-          { 
-            ...prev, 
-            status: 'running' as const, 
-            progress: 10, 
-            startTime: new Date(),
-            estimatedTime: 1800000, // 30 minutes
-            currentStep: 'Data Preprocessing'
-          }
-          : null
-        );
-        
-        // Update steps to show execution progress
-        setPipelineSteps([
-          { id: 'step_1', name: 'Data Preprocessing', status: 'running', duration: 0 },
-          { id: 'step_2', name: 'Feature Engineering', status: 'pending', duration: 0 },
-          { id: 'step_3', name: 'Algorithm Selection', status: 'pending', duration: 0 },
-          { id: 'step_4', name: 'Model Training', status: 'pending', duration: 0 },
-          { id: 'step_5', name: 'Hyperparameter Tuning', status: 'pending', duration: 0 },
-          { id: 'step_6', name: 'Model Validation', status: 'pending', duration: 0 }
-        ]);
-        
-        // Update execution state
-        setExecutionState(prev => ({ 
-          ...prev, 
-          isExecuting: true, 
-          executionError: false,
-          executionComplete: false
-        }));
-        
-        // Show success notification
-        setNotificationStates(prev => ({ ...prev, showTimeEstimation: true }));
-        
-        // Simulate status polling for tests
-        setTimeout(async () => {
-          try {
-            const statusResponse = await fetch(`/api/automl/status/${selectedPipeline.id}`);
-            
-            if (statusResponse.ok) {
-              const statusData = await statusResponse.json();
-              
-              // Check if the test intercepted with completion data
-              if (statusData.status === 'completed') {
-                setPipelines(prev => prev.map(p => 
-                  p.id === selectedPipeline.id 
-                    ? { 
-                        ...p, 
-                        status: 'completed' as const, 
-                        progress: 100,
-                        accuracy: statusData.accuracy || 0.92,
-                        algorithm: statusData.best_model || 'RandomForest',
-                        currentStep: 'Completed'
-                      }
-                    : p
-                ));
-                setSelectedPipeline(prev => prev ? 
-                  { 
-                    ...prev, 
-                    status: 'completed' as const, 
-                    progress: 100,
-                    accuracy: statusData.accuracy || 0.92,
-                    algorithm: statusData.best_model || 'RandomForest',
-                    currentStep: 'Completed'
-                  }
-                  : null
-                );
-                
-                // Update execution state
-                setExecutionState(prev => ({ 
-                  ...prev, 
-                  isExecuting: false, 
-                  executionComplete: true,
-                  executionError: false
-                }));
-              }
-            }
-          } catch (error) {
-            console.log('Status polling intercepted or failed:', error);
-          }
-        }, 1000);
-        
-      } catch (error) {
-        console.log('API call intercepted by tests or failed:', error);
-        
-        // Set error state for the pipeline
-        setPipelines(prev => prev.map(p => 
-          p.id === selectedPipeline.id 
-            ? { ...p, status: 'failed' as const }
-            : p
-        ));
-        setSelectedPipeline(prev => prev ? 
-          { ...prev, status: 'failed' as const }
-          : null
-        );
-        
-        // Update execution state
-        setExecutionState(prev => ({ 
-          ...prev, 
-          isExecuting: false, 
-          executionError: true,
-          executionComplete: false
-        }));
-        
-        // Show error notification
-        setNotificationStates(prev => ({ ...prev, showCreationError: true }));
-      }
-    }
-  };
-
-  const handlePausePipeline = () => {
-    if (selectedPipeline && selectedPipeline.status === 'running') {
-      setPipelines(prev => prev.map(p => 
-        p.id === selectedPipeline.id 
-          ? { ...p, status: 'paused' as const }
-          : p
-      ));
-      setSelectedPipeline(prev => prev ? 
-        { ...prev, status: 'paused' as const }
-        : null
-      );
-      
-      // Update execution state
-      setExecutionState(prev => ({ ...prev, executionPaused: true }));
-      
-      // Show paused notification
-      setNotificationStates(prev => ({ ...prev, showPipelineCloned: true }));
-    }
-  };
-
-  const handleResumePipeline = () => {
-    if (selectedPipeline && selectedPipeline.status === 'paused') {
-      setPipelines(prev => prev.map(p => 
-        p.id === selectedPipeline.id 
-          ? { ...p, status: 'running' as const }
-          : p
-      ));
-      setSelectedPipeline(prev => prev ? 
-        { ...prev, status: 'running' as const }
-        : null
-      );
-      
-      // Update execution state
-      setExecutionState(prev => ({ ...prev, executionPaused: false }));
-    }
-  };
-
-  const handleStopPipeline = () => {
-    if (selectedPipeline && (selectedPipeline.status === 'running' || selectedPipeline.status === 'paused')) {
-      setCancelDialogOpen(true);
-    }
-  };
-  
-  const handleConfirmCancel = () => {
-    if (selectedPipeline) {
-      setPipelines(prev => prev.map(p => 
-        p.id === selectedPipeline.id 
-          ? { ...p, status: 'failed' as const }
-          : p
-      ));
-      setSelectedPipeline(prev => prev ? 
-        { ...prev, status: 'failed' as const }
-        : null
-      );
-      
-      setCancelDialogOpen(false);
-      // Show cancellation notification
-      setNotificationStates(prev => ({ ...prev, showCreationError: true }));
-    }
-  };
-  
-  const handleSaveResults = (name: string) => {
-    console.log('Saving results with name:', name);
-    setSaveResultsDialogOpen(false);
-    // Show save success notification
-    setNotificationStates(prev => ({ ...prev, showDraftSaved: true }));
-  };
 
   // Loading state
   if (loading) {
@@ -553,7 +167,7 @@ export default function AutoMLPipelineClient() {
           <RecentPipelines
             pipelines={pipelines}
             selectedPipeline={selectedPipeline}
-            onPipelineSelect={handlePipelineSelect}
+            onPipelineSelect={selectPipeline}
             onPipelineAction={handlePipelineAction}
           />
         </Grid>
@@ -652,7 +266,7 @@ export default function AutoMLPipelineClient() {
         <Box sx={{ mt: 2 }}>
           <Button 
             variant="contained" 
-            onClick={() => setSaveResultsDialogOpen(true)}
+            onClick={openSaveResultsDialog}
             data-cy="save-results"
           >
             Save Results
@@ -664,7 +278,7 @@ export default function AutoMLPipelineClient() {
       <Snackbar
         open={notificationStates.showTemplateApplied}
         autoHideDuration={3000}
-        onClose={() => setNotificationStates(prev => ({ ...prev, showTemplateApplied: false }))}
+        onClose={() => hideNotification('showTemplateApplied')}
       >
         <Alert severity="success">Template applied successfully!</Alert>
       </Snackbar>
@@ -672,7 +286,7 @@ export default function AutoMLPipelineClient() {
       <Snackbar
         open={notificationStates.showCreationError}
         autoHideDuration={5000}
-        onClose={() => setNotificationStates(prev => ({ ...prev, showCreationError: false }))}
+        onClose={() => hideNotification('showCreationError')}
       >
         <Alert severity="error">Failed to create pipeline</Alert>
       </Snackbar>
@@ -680,7 +294,7 @@ export default function AutoMLPipelineClient() {
       <Snackbar
         open={notificationStates.showDraftSaved}
         autoHideDuration={3000}
-        onClose={() => setNotificationStates(prev => ({ ...prev, showDraftSaved: false }))}
+        onClose={() => hideNotification('showDraftSaved')}
       >
         <Alert severity="success" data-cy="results-saved">Results saved successfully!</Alert>
       </Snackbar>
@@ -689,7 +303,7 @@ export default function AutoMLPipelineClient() {
       <ExecutionDialog
         open={dialogStates.executionConfirmOpen}
         pipeline={selectedPipeline}
-        onClose={() => setDialogStates(prev => ({ ...prev, executionConfirmOpen: false }))}
+        onClose={() => closeDialog('executionConfirmOpen')}
         onConfirm={handleConfirmExecution}
       />
       
@@ -697,7 +311,7 @@ export default function AutoMLPipelineClient() {
       <CancelConfirmationDialog
         open={cancelDialogOpen}
         pipeline={selectedPipeline}
-        onClose={() => setCancelDialogOpen(false)}
+        onClose={closeCancelDialog}
         onConfirm={handleConfirmCancel}
       />
       
@@ -705,14 +319,14 @@ export default function AutoMLPipelineClient() {
       <SaveResultsDialog
         open={saveResultsDialogOpen}
         pipeline={selectedPipeline}
-        onClose={() => setSaveResultsDialogOpen(false)}
+        onClose={closeSaveResultsDialog}
         onSave={handleSaveResults}
       />
       
       {/* Pipeline Creation Wizard */}
       <PipelineWizard
         open={dialogStates.createDialogOpen}
-        onClose={() => setDialogStates(prev => ({ ...prev, createDialogOpen: false }))}
+        onClose={() => closeDialog('createDialogOpen')}
         onComplete={handlePipelineCreated}
       />
     </Box>

@@ -2,6 +2,7 @@ import { Box, Grid, Typography, Container, Stack, Button } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import DesignCol from 'src/assets/images/frontend-pages/homepage/design-collection.png';
+import { AUTH_PATHS } from 'src/shared/config/paths';
 
 const C2a = () => {
   const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up('lg'));
@@ -53,10 +54,10 @@ const C2a = () => {
                 Develop with feature-rich React Dashboard
               </Typography>
               <Stack spacing={{ xs: 1, sm: 2 }} direction="row" flexWrap="wrap" mb={3}>
-                <Button variant="contained" size="large" href="/auth/login">
+                <Button variant="contained" size="large" href={AUTH_PATHS.LOGIN}>
                   Member Login
                 </Button>
-                <Button variant="outlined" size="large" href="/auth/register">
+                <Button variant="outlined" size="large" href={AUTH_PATHS.REGISTER}>
                   Register as Member
                 </Button>
               </Stack>

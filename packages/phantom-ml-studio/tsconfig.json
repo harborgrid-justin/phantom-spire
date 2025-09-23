@@ -53,7 +53,17 @@
       "@/hooks/*": ["./src/hooks/*"],
       "@/middleware/*": ["./src/middleware/*"],
       "@/testing/*": ["./src/testing/*"],
-      "@/shared/*": ["./src/shared/*"]
+      "@/shared/*": ["./src/shared/*"],
+      "@/config/*": ["./src/config/*"],
+      "@/theme/*": ["./src/theme/*"],
+      "@/security/*": ["./src/security/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/api/*": ["./src/lib/api/*"],
+      "@/models/*": ["./src/lib/models/*"],
+      "@/monitoring/*": ["./src/lib/monitoring/*"],
+      "@/analytics/*": ["./src/lib/analytics/*"],
+      "@/caching/*": ["./src/lib/caching/*"],
+      "@/core/*": ["./src/lib/core/*"]
     }
   },
   "include": [

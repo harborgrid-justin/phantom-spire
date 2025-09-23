@@ -3,6 +3,7 @@
 import React from 'react';
 import { Box, Container, Typography, Link, Divider, Grid } from '@mui/material';
 import NextLink from 'next/link';
+import { EXTERNAL_URLS } from '@/config/paths';
 
 interface FooterProps {
   className?: string;
@@ -197,7 +198,7 @@ export function Footer({ className }: FooterProps): JSX.Element {
           <Box sx={{ display: 'flex', gap: 2 }}>
             {/* Social/External Links - External so no prefetch needed */}
             <Link
-              href="https://github.com/phantom-spire"
+              href={EXTERNAL_URLS.GITHUB}
               target="_blank"
               rel="noopener noreferrer"
               color="text.secondary"
@@ -206,7 +207,7 @@ export function Footer({ className }: FooterProps): JSX.Element {
               <Typography variant="body2">GitHub</Typography>
             </Link>
             <Link
-              href="https://twitter.com/phantom_spire"
+              href={EXTERNAL_URLS.TWITTER}
               target="_blank"
               rel="noopener noreferrer"
               color="text.secondary"

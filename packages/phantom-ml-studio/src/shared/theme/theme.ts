@@ -1,111 +1,55 @@
 import { createTheme } from '@mui/material/styles'
+import { colors } from './colors'
+import { typography } from './typography'
+import { borderRadius, shadows } from './spacing'
 
 export const theme = createTheme({
   palette: {
-    primary: {
-      main: '#6366f1', // Indigo
-      light: '#818cf8',
-      dark: '#4338ca',
-      contrastText: '#ffffff',
-    },
-    secondary: {
-      main: '#14b8a6', // Teal
-      light: '#5eead4',
-      dark: '#0f766e',
-      contrastText: '#ffffff',
-    },
-    success: {
-      main: '#10b981',
-      light: '#6ee7b7',
-      dark: '#047857',
-    },
-    warning: {
-      main: '#f59e0b',
-      light: '#fbbf24',
-      dark: '#d97706',
-    },
-    error: {
-      main: '#ef4444',
-      light: '#f87171',
-      dark: '#dc2626',
-    },
-    info: {
-      main: '#3b82f6',
-      light: '#60a5fa',
-      dark: '#2563eb',
-    },
+    primary: colors.primary,
+    secondary: colors.secondary,
+    success: colors.success,
+    warning: colors.warning,
+    error: colors.error,
+    info: colors.info,
     background: {
-      default: '#f9fafb',
-      paper: '#ffffff',
+      default: colors.background.default,
+      paper: colors.background.paper,
     },
     text: {
-      primary: '#111827',
-      secondary: '#6b7280',
+      primary: colors.text.primary,
+      secondary: colors.text.secondary,
     },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-      fontWeight: 700,
-      lineHeight: 1.2,
-    },
-    h2: {
-      fontSize: '2rem',
-      fontWeight: 600,
-      lineHeight: 1.3,
-    },
-    h3: {
-      fontSize: '1.5rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    h4: {
-      fontSize: '1.25rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    h5: {
-      fontSize: '1.125rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    h6: {
-      fontSize: '1rem',
-      fontWeight: 600,
-      lineHeight: 1.4,
-    },
-    body1: {
-      fontSize: '1rem',
-      lineHeight: 1.6,
-    },
-    body2: {
-      fontSize: '0.875rem',
-      lineHeight: 1.6,
-    },
-    caption: {
-      fontSize: '0.75rem',
-      lineHeight: 1.4,
-    },
+    fontFamily: typography.fontFamily,
+    h1: typography.headings.h1,
+    h2: typography.headings.h2,
+    h3: typography.headings.h3,
+    h4: typography.headings.h4,
+    h5: typography.headings.h5,
+    h6: typography.headings.h6,
+    body1: typography.body.body1,
+    body2: typography.body.body2,
+    caption: typography.body.caption,
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: borderRadius.md,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           textTransform: 'none',
-          fontWeight: 500,
-          borderRadius: 8,
+          fontWeight: typography.fontWeights.medium,
+          borderRadius: borderRadius.md,
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-          borderRadius: 12,
+          boxShadow: shadows.md,
+          borderRadius: borderRadius.lg,
         },
       },
     },
@@ -119,23 +63,23 @@ export const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-          backgroundColor: '#ffffff',
-          color: '#111827',
+          boxShadow: shadows.md,
+          backgroundColor: colors.background.paper,
+          color: colors.text.primary,
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
+          borderRadius: borderRadius.sm + 2, // 6px
         },
       },
     },
     MuiAlert: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: borderRadius.md,
         },
       },
     },

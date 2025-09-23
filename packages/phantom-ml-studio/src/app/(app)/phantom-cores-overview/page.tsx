@@ -5,6 +5,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { PATHS } from '@/config/paths';
 import {
   Box,
   Card,
@@ -410,7 +411,7 @@ const PhantomCoresOverview: React.FC = (): React.ReactElement => {
                 <Box>
                   <Grid container spacing={1}>
                     <Grid item xs={6}>
-                      <Link href={`/phantom-cores/${module.path}`} style={{ textDecoration: 'none' }}>
+                      <Link href={PATHS.PHANTOM_CORE_DETAIL(module.path)} style={{ textDecoration: 'none' }}>
                         <Button 
                           fullWidth 
                           variant="contained" 
