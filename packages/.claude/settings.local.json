@@ -26,7 +26,10 @@
       "Bash(do echo \"Processing: $file\")",
       "Bash(do echo \"Fixing: $file\")",
       "Bash(do echo \"Verifying: $file\")",
-      "Read(//c//**)"
+      "Read(//c//**)",
+      "Bash(while read dir)",
+      "Bash(/dev/null)",
+      "Bash(then echo \"✅ $dir%/\")"
     ],
     "deny": [],
     "ask": []

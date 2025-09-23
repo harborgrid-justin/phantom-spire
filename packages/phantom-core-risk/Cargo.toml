@@ -128,10 +128,4 @@ strip = true
 panic = "abort"
 
 [build-dependencies]
-napi-build = { version = "=2.0.0", optional = true }
-["local"]
-napi = ["dep:napi", "dep:napi-derive"]
-local = []
-
-[build-dependencies]
 napi-build = "2.0.1"

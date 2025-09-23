@@ -105,6 +105,9 @@ compression = ["dep:flate2"]
 
 # Web and messaging
 web-full = ["dep:actix-web", "dep:reqwest"]
+actix-web = ["dep:actix-web"]
+rocket = []
+diesel = ["dep:diesel"]
 messaging = ["redis-store"]
 caching = ["redis-store"]
 diesel-orm = ["dep:diesel", "dep:diesel_migrations"]
