@@ -5,6 +5,7 @@
 
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
+use napi::{Result, Error as NapiError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use chrono::{DateTime, Utc};
@@ -12,7 +13,7 @@ use uuid::Uuid;
 use tokio::sync::RwLock;
 use std::sync::Arc;
 use md5;
-use sha1;
+use sha1::{Sha1, Digest as Sha1Digest};
 use sha2::{Sha256, Digest};
 
 // Enterprise Sandbox Configuration
@@ -1521,7 +1522,7 @@ impl SandboxCore {
         
         // Calculate file hashes
         let md5_hash = format!("{:x}", md5::compute(file_data));
-        let sha1_hash = format!("{:x}", sha1::digest(file_data));
+        let sha1_hash = format!("{:x}", Sha1::digest(file_data));
         let sha256_hash = format!("{:x}", sha2::Sha256::digest(file_data));
 
         // Create sample info
@@ -2482,7 +2483,7 @@ impl SandboxCoreNapi {
         let batch_id = self.inner.submit_batch(batch_request).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to submit batch: {}", e)))?;
 
-        serde_json::json!({"batch_id": batch_id}).to_string()
+        Ok(serde_json::json!({"batch_id": batch_id}).to_string())
     }
 
     /// Get comprehensive analysis results for a sample
@@ -2786,7 +2787,7 @@ impl SandboxCoreNapi {
                 }).collect::<Vec<_>>()
             } else {
                 // Full export would include complete analysis objects
-                serde_json::json!("Full analysis data (truncated for demo)")
+                vec![serde_json::json!("Full analysis data (truncated for demo)")]
             },
             "compliance_metadata": {
                 "data_classification": "TLP:AMBER",

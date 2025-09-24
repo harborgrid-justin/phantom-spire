@@ -67,6 +67,8 @@ rustls = { version = "0.23.31", optional = true }
 jsonwebtoken = { version = "9.2", optional = true }
 base64 = { version = "0.22.1", optional = true }
 sha2 = { version = "0.10", optional = true }
+md5 = { version = "0.7", optional = true }
+sha1 = { version = "0.10", optional = true }
 
 # Enterprise standards dependency
 phantom-enterprise-standards = { path = "../phantom-core-enterprise", optional = true }
@@ -90,7 +92,7 @@ all-databases = ["postgres", "redis-store", "mongodb-store", "elasticsearch-stor
 
 # Enterprise monitoring and security
 monitoring = ["dep:tracing", "dep:tracing-subscriber", "dep:prometheus", "dep:metrics"]
-crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64"]
+crypto = ["dep:ring", "dep:rustls", "dep:jsonwebtoken", "dep:sha2", "dep:base64", "dep:md5", "dep:sha1"]
 compression = ["dep:flate2"]
 
 # Web and messaging
