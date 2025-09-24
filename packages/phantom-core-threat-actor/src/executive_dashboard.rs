@@ -40,12 +40,6 @@ impl PartialEq for IndicatorStatus {
     }
 }
 
-impl PartialEq for IndicatorStatus {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-
 impl ExecutiveDashboardModule {
     /// Create a new executive dashboard module
     pub fn new() -> Self {

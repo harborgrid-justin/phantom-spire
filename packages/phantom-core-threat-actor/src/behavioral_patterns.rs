@@ -113,6 +113,7 @@ impl BehavioralPatternsModule {
         if !is_business_hours && activity.activity_type == ActivityType::InitialAccess {
             return Some(BehavioralPattern {
                 pattern_id: Uuid::new_v4().to_string(),
+                id: Uuid::new_v4().to_string(),
                 pattern_type: PatternType::Temporal,
                 pattern_name: "OffHoursInitialAccess".to_string(),
                 description: "Initial access attempts outside business hours".to_string(),
@@ -120,8 +121,13 @@ impl BehavioralPatternsModule {
                 frequency: 1,
                 first_observed: activity.timestamp,
                 last_observed: activity.timestamp,
+                first_seen: activity.timestamp,
+                last_seen: activity.timestamp,
                 indicators: vec![format!("Access at hour {}", hour)],
                 related_activities: vec![activity.activity_id.clone()],
+                source_ips: Vec::new(),
+                affected_users: Vec::new(),
+                user_agents: Vec::new(),
             });
         }
 
@@ -136,6 +142,7 @@ impl BehavioralPatternsModule {
         if techniques.contains(&"T1078".to_string()) && techniques.contains(&"T1059".to_string()) {
             return Some(BehavioralPattern {
                 pattern_id: Uuid::new_v4().to_string(),
+                id: Uuid::new_v4().to_string(),
                 pattern_type: PatternType::TechniqueSequence,
                 pattern_name: "ValidAccountsPlusCommandExecution".to_string(),
                 description: "Use of valid accounts followed by command execution".to_string(),
@@ -143,8 +150,13 @@ impl BehavioralPatternsModule {
                 frequency: 1,
                 first_observed: activity.timestamp,
                 last_observed: activity.timestamp,
+                first_seen: activity.timestamp,
+                last_seen: activity.timestamp,
                 indicators: techniques.clone(),
                 related_activities: vec![activity.activity_id.clone()],
+                source_ips: Vec::new(),
+                affected_users: Vec::new(),
+                user_agents: Vec::new(),
             });
         }
 
@@ -163,6 +175,7 @@ impl BehavioralPatternsModule {
         if high_value_targets > targets.len() / 2 {
             return Some(BehavioralPattern {
                 pattern_id: Uuid::new_v4().to_string(),
+                id: Uuid::new_v4().to_string(),
                 pattern_type: PatternType::TargetSelection,
                 pattern_name: "HighValueTargetFocus".to_string(),
                 description: "Focus on high-value targets".to_string(),
@@ -170,8 +183,13 @@ impl BehavioralPatternsModule {
                 frequency: 1,
                 first_observed: activity.timestamp,
                 last_observed: activity.timestamp,
+                first_seen: activity.timestamp,
+                last_seen: activity.timestamp,
                 indicators: vec![format!("{} high-value targets", high_value_targets)],
                 related_activities: vec![activity.activity_id.clone()],
+                source_ips: Vec::new(),
+                affected_users: Vec::new(),
+                user_agents: Vec::new(),
             });
         }
 
@@ -190,6 +208,7 @@ impl BehavioralPatternsModule {
         if c2_servers > 0 {
             return Some(BehavioralPattern {
                 pattern_id: Uuid::new_v4().to_string(),
+                id: Uuid::new_v4().to_string(),
                 pattern_type: PatternType::Infrastructure,
                 pattern_name: "C2InfrastructureUsage".to_string(),
                 description: "Usage of command and control infrastructure".to_string(),
@@ -197,8 +216,13 @@ impl BehavioralPatternsModule {
                 frequency: 1,
                 first_observed: activity.timestamp,
                 last_observed: activity.timestamp,
+                first_seen: activity.timestamp,
+                last_seen: activity.timestamp,
                 indicators: vec![format!("{} C2 servers used", c2_servers)],
                 related_activities: vec![activity.activity_id.clone()],
+                source_ips: Vec::new(),
+                affected_users: Vec::new(),
+                user_agents: Vec::new(),
             });
         }
 

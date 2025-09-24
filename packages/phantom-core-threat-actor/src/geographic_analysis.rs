@@ -171,7 +171,7 @@ impl GeographicAnalysisModule {
 
     /// Calculate base location risk
     fn calculate_base_location_risk(&self, location: &LocationData) -> f64 {
-        let mut risk = 3.0; // Base risk
+        let mut risk: f64 = 3.0; // Base risk
 
         // Adjust based on country
         match location.country.as_str() {

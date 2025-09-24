@@ -388,6 +388,16 @@ pub enum CVEState {
     Rejected,
 }
 
+impl std::fmt::Display for CVEState {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CVEState::Published => write!(f, "published"),
+            CVEState::Reserved => write!(f, "reserved"),
+            CVEState::Rejected => write!(f, "rejected"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CVEContainers {
     pub cna: Option<CVEContainer>,

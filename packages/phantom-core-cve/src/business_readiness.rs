@@ -179,7 +179,7 @@ impl CVEBusinessReadinessAssessor {
         
         // Generate capabilities map
         let mut capabilities_map = HashMap::new();
-        capabilities_map.insert("Real-time Processing".to_string(), capabilities.real_time_processing);
+        capabilities_map.insert("Real-time Processing".to_string(), capabilities.real_time_alerting);
         capabilities_map.insert("Multi-tenant".to_string(), capabilities.multi_tenant_processing);
         capabilities_map.insert("ML Prediction".to_string(), capabilities.ml_threat_prediction);
         capabilities_map.insert("Cross-plugin Correlation".to_string(), capabilities.cross_plugin_correlation);

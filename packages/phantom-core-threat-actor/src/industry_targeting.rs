@@ -155,7 +155,7 @@ impl IndustryTargetingModule {
         if industry.contains("financial") || industry.contains("banking") {
             patterns.push(TargetingPattern {
                 pattern_id: Uuid::new_v4().to_string(),
-                industry,
+                industry: industry.to_string(),
                 threat_actor_type: ThreatActorType::CriminalSyndicate,
                 attack_vector: AttackVector::Phishing,
                 target_priority: TargetPriority::High,
@@ -178,7 +178,7 @@ impl IndustryTargetingModule {
         if industry.contains("healthcare") || industry.contains("medical") {
             patterns.push(TargetingPattern {
                 pattern_id: Uuid::new_v4().to_string(),
-                industry,
+                industry: industry.to_string(),
                 threat_actor_type: ThreatActorType::Cybercrime,
                 attack_vector: AttackVector::Ransomware,
                 target_priority: TargetPriority::Critical,
@@ -201,7 +201,7 @@ impl IndustryTargetingModule {
         if industry.contains("technology") || industry.contains("software") {
             patterns.push(TargetingPattern {
                 pattern_id: Uuid::new_v4().to_string(),
-                industry,
+                industry: industry.to_string(),
                 threat_actor_type: ThreatActorType::NationState,
                 attack_vector: AttackVector::SupplyChain,
                 target_priority: TargetPriority::High,
@@ -650,6 +650,20 @@ pub enum AttackVector {
     ZeroDay,
     InsiderThreat,
     Malware,
+}
+
+impl std::fmt::Display for AttackVector {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AttackVector::Phishing => write!(f, "Phishing"),
+            AttackVector::Ransomware => write!(f, "Ransomware"),
+            AttackVector::DDoS => write!(f, "DDoS"),
+            AttackVector::SupplyChain => write!(f, "SupplyChain"),
+            AttackVector::ZeroDay => write!(f, "ZeroDay"),
+            AttackVector::InsiderThreat => write!(f, "InsiderThreat"),
+            AttackVector::Malware => write!(f, "Malware"),
+        }
+    }
 }
 
 /// Target priority

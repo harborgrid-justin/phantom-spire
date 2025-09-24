@@ -126,8 +126,9 @@ impl RiskAssessmentModule {
 
         let assessment = RiskAssessment {
             assessment_id: assessment_id.clone(),
+            id: assessment_id.clone(),
             model_id: assessment_config.model_id.clone(),
-            target_entity: assessment_config.target_entity,
+            target_entity: assessment_config.target_entity.clone(),
             assessment_type: assessment_config.assessment_type,
             risk_scores: risk_scores.clone(),
             impact_analysis,
@@ -135,9 +136,18 @@ impl RiskAssessmentModule {
             overall_risk_level: self.calculate_overall_risk(&risk_scores),
             status: AssessmentStatus::Completed,
             created_at: Utc::now(),
+            assessed_at: Utc::now(),
             completed_at: Some(Utc::now()),
             assessed_by: assessment_config.assessed_by,
             review_required: self.requires_review(&risk_scores),
+            context_data: HashMap::new(),
+            mitigation_steps: Vec::new(),
+            risk_description: "Automated risk assessment".to_string(),
+            risk_level: "TBD".to_string(),
+            overall_risk_score: 0.0,
+            asset_value: 1.0,
+            asset_type: "System".to_string(),
+            asset_name: "Unknown".to_string(),
             context_data: assessment_config.context_data,
         };
 
@@ -176,8 +186,9 @@ impl RiskAssessmentModule {
 
         // Apply updates
         if let Some(new_scores) = updates.risk_scores {
+            let overall_risk_level = self.calculate_overall_risk(&new_scores);
             assessment.risk_scores = new_scores.clone();
-            assessment.overall_risk_level = self.calculate_overall_risk(&new_scores);
+            assessment.overall_risk_level = overall_risk_level;
         }
 
         if let Some(new_impact) = updates.impact_analysis {
@@ -195,7 +206,8 @@ impl RiskAssessmentModule {
             }
         }
 
-        assessment.review_required = self.requires_review(&assessment.risk_scores);
+        let review_required = self.requires_review(&assessment.risk_scores);
+        assessment.review_required = review_required;
 
         Ok(())
     }
@@ -245,7 +257,7 @@ impl RiskAssessmentModule {
             generated_at: Utc::now(),
             generated_by: report_config.generated_by,
             summary,
-            assessments: assessments.clone(),
+            assessments: assessments.iter().cloned().cloned().collect(),
             trends,
             recommendations,
             executive_summary: self.generate_executive_summary(&summary),

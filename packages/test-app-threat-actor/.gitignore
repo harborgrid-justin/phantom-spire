@@ -1,0 +1,61 @@
+# Rust/Cargo
+/target/
+/temp_target/
+Cargo.lock
+*.pdb
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tgz
+*.log
+
+# Native modules
+*.node
+*.dll
+*.so
+*.dylib
+
+# Build outputs
+/dist/
+/build/
+*.js.map
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.test
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Misc
+*.backup
+*.bak
+

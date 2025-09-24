@@ -2,9 +2,12 @@
 //! 
 //! Configuration structures for all supported data stores
 
+use crate::data_stores::traits::ComprehensiveCVEStore;
+use crate::data_stores::{DataStoreResult, DataStoreError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::time::Duration;
+use std::sync::Arc;
 
 /// Overall data store configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,6 +24,7 @@ pub struct DataStoreConfig {
 /// Data store type enumeration
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DataStoreType {
+    Local,
     Redis,
     PostgreSQL,
     MongoDB,
@@ -214,8 +218,8 @@ impl Default for DataStoreConfig {
             postgres: Some(PostgresConfig::default()),
             mongodb: Some(MongoDBConfig::default()),
             elasticsearch: Some(ElasticsearchConfig::default()),
-            default_store: DataStoreType::MongoDB,
-            multi_tenant: true,
+            default_store: DataStoreType::Local,
+            multi_tenant: false,
             cache_ttl_seconds: 3600,
         }
     }
@@ -276,6 +280,9 @@ impl DataStoreConfig {
     /// Validate configuration
     pub fn validate(&self) -> Result<(), String> {
         match self.default_store {
+            DataStoreType::Local => {
+                // No validation needed for local store
+            }
             DataStoreType::Redis => {
                 if self.redis.is_none() {
                     return Err("Redis configuration is required when Redis is the default store".to_string());
@@ -299,5 +306,26 @@ impl DataStoreConfig {
         }
         
         Ok(())
+    }
+
+    /// Create a data store instance based on this configuration
+    pub fn create_store(&self) -> DataStoreResult<Arc<dyn ComprehensiveCVEStore + Send + Sync>> {
+        match self.default_store {
+            DataStoreType::Local => {
+                Ok(Arc::new(crate::data_stores::LocalDataStore::new()))
+            }
+            DataStoreType::Redis => {
+                Err(DataStoreError::Configuration("Redis store not implemented yet".to_string()))
+            }
+            DataStoreType::PostgreSQL => {
+                Err(DataStoreError::Configuration("PostgreSQL store not implemented yet".to_string()))
+            }
+            DataStoreType::MongoDB => {
+                Err(DataStoreError::Configuration("MongoDB store not implemented yet".to_string()))
+            }
+            DataStoreType::Elasticsearch => {
+                Err(DataStoreError::Configuration("Elasticsearch store not implemented yet".to_string()))
+            }
+        }
     }
 }

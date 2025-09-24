@@ -26,8 +26,8 @@ impl CVECore {
         // Initialize data store from configuration or environment
         let data_store_config = config.data_store.clone().unwrap_or_else(|| DataStoreConfig::from_env());
         data_store_config.validate().map_err(|e| format!("Data store configuration error: {}", e))?;
-        let data_store = Arc::new(DataStoreFactory::create_store(&data_store_config)
-            .map_err(|e| format!("Failed to create data store: {}", e))?);
+        let data_store = DataStoreFactory::create_store(&data_store_config)
+            .map_err(|e| format!("Failed to create data store: {}", e))?;
         
         // Create default tenant context - can be overridden per operation
         let tenant_context = TenantContext::new("default".to_string())

@@ -75,7 +75,7 @@ impl ImpactAssessmentModule {
             incident_id: incident.incident_id.clone(),
             assessed_at: Utc::now(),
             overall_impact_score: overall_score.score,
-            impact_level: overall_score.level,
+            impact_level: overall_score.level.clone(),
             business_impact,
             technical_impact,
             operational_impact,
@@ -106,7 +106,7 @@ impl ImpactAssessmentModule {
     /// Assess technical impact
     async fn assess_technical_impact(&self, incident: &ThreatIncident) -> Result<TechnicalImpact> {
         let affected_systems = self.identify_affected_systems(incident).await?;
-        let data_compromised = self.assess_data_compromise(incident).await?;
+        let data_compromised = self.assess_data_compromise(incident).await;
         let system_downtime = self.calculate_system_downtime(incident).await?;
         let recovery_complexity = self.assess_recovery_complexity(&affected_systems).await?;
 
@@ -128,7 +128,7 @@ impl ImpactAssessmentModule {
     async fn assess_operational_impact(&self, incident: &ThreatIncident) -> Result<OperationalImpact> {
         let business_processes_affected = self.identify_affected_processes(incident).await?;
         let operational_downtime = self.calculate_operational_downtime(incident).await?;
-        let resource_impact = self.assess_resource_impact(incident).await?;
+        let resource_impact = self.assess_resource_impact(incident).await;
         let productivity_loss = self.calculate_productivity_loss(&business_processes_affected, operational_downtime).await?;
 
         let operational_score = self.calculate_operational_score(&business_processes_affected, operational_downtime, &resource_impact);
@@ -146,9 +146,9 @@ impl ImpactAssessmentModule {
 
     /// Assess reputational impact
     async fn assess_reputational_impact(&self, incident: &ThreatIncident) -> Result<ReputationalImpact> {
-        let media_coverage = self.assess_media_coverage(incident).await?;
-        let customer_trust_impact = self.assess_customer_trust_impact(incident).await?;
-        let stakeholder_confidence = self.assess_stakeholder_confidence(incident).await?;
+        let media_coverage = self.assess_media_coverage(incident).await;
+        let customer_trust_impact = self.assess_customer_trust_impact(incident).await;
+        let stakeholder_confidence = self.assess_stakeholder_confidence(incident).await;
         let brand_damage = self.calculate_brand_damage(&media_coverage, &customer_trust_impact).await?;
 
         let reputational_score = self.calculate_reputational_score(&media_coverage, &customer_trust_impact, &stakeholder_confidence);
@@ -176,7 +176,7 @@ impl ImpactAssessmentModule {
         Ok(ComplianceImpact {
             regulatory_violations_count: regulatory_violations.len(),
             regulatory_violations,
-            compliance_breach_severity,
+            compliance_breach_severity: compliance_breach_severity.clone(),
             reporting_requirements,
             penalty_exposure,
             compliance_impact_score: compliance_score,
@@ -1138,7 +1138,7 @@ impl QuantificationEngine {
         let insurance_claims = 75000.0; // Insurance payouts
 
         let total_cost = direct_costs + indirect_costs + opportunity_costs + regulatory_fines + insurance_claims;
-        let financial_score = (total_cost / 1000000.0).min(10.0); // Normalize to 0-10 scale
+        let financial_score: f64 = (total_cost / 1000000.0).min(10.0); // Normalize to 0-10 scale
 
         let mut cost_breakdown = HashMap::new();
         cost_breakdown.insert("Direct Costs".to_string(), direct_costs);
@@ -1174,9 +1174,9 @@ impl BusinessImpactAnalyzer {
 
     async fn analyze_business_impact(&self, incident: &ThreatIncident) -> Result<BusinessImpact> {
         // Analyze business impact based on incident characteristics
-        let revenue_impact = -150000.0; // Negative impact
-        let market_share_impact = -0.02; // 2% loss
-        let competitive_advantage_impact = -0.05; // 5% loss
+        let revenue_impact: f64 = -150000.0; // Negative impact
+        let market_share_impact: f64 = -0.02; // 2% loss
+        let competitive_advantage_impact: f64 = -0.05; // 5% loss
 
         let strategic_objectives_impact = vec![
             "Customer trust maintenance".to_string(),

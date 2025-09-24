@@ -143,13 +143,16 @@ impl SupplyChainRiskModule {
 
     /// Perform vendor risk assessment
     pub async fn assess_vendor_risk(&mut self, vendor_id: &str, assessment_config: VendorAssessmentConfig) -> Result<String> {
-        let vendor = self.vendors.get_mut(vendor_id)
-            .ok_or_else(|| anyhow::anyhow!("Vendor not found: {}", vendor_id))?;
-
         let assessment_id = Uuid::new_v4().to_string();
-
-        // Perform assessment
-        let assessment_result = self.vendor_assessment_engine.assess_vendor(vendor, &assessment_config).await?;
+        
+        // Perform assessment and calculate risk level before mutable borrows
+        let assessment_result = {
+            let vendor = self.vendors.get_mut(vendor_id)
+                .ok_or_else(|| anyhow::anyhow!("Vendor not found: {}", vendor_id))?;
+            self.vendor_assessment_engine.assess_vendor(vendor, &assessment_config).await?
+        };
+        
+        let risk_level = self.calculate_risk_level(assessment_result.overall_score);
 
         let assessment = SupplyChainRiskAssessment {
             assessment_id: assessment_id.clone(),
@@ -157,7 +160,7 @@ impl SupplyChainRiskModule {
             target_type: AssessmentTargetType::Vendor,
             assessment_type: AssessmentType::VendorRisk,
             risk_score: assessment_result.overall_score,
-            risk_level: self.calculate_risk_level(assessment_result.overall_score),
+            risk_level,
             findings: assessment_result.findings,
             recommendations: assessment_result.recommendations,
             mitigation_actions: assessment_result.mitigation_actions,
@@ -169,13 +172,17 @@ impl SupplyChainRiskModule {
 
         self.risk_assessments.insert(assessment_id.clone(), assessment.clone());
 
-        // Update vendor
-        vendor.assessment_history.push(assessment.clone());
-        vendor.last_assessment = Some(Utc::now());
-        vendor.risk_profile.overall_score = assessment_result.overall_score;
+        // Update vendor and propagate risk
+        {
+            let vendor = self.vendors.get_mut(vendor_id)
+                .ok_or_else(|| anyhow::anyhow!("Vendor not found: {}", vendor_id))?;
+            
+            vendor.assessment_history.push(assessment.clone());
+            vendor.last_assessment = Some(Utc::now());
+            vendor.risk_profile.overall_score = assessment_result.overall_score;
 
-        // Propagate risk through supply chain
-        self.risk_propagation_engine.propagate_vendor_risk(vendor).await?;
+            self.risk_propagation_engine.propagate_vendor_risk(vendor).await?;
+        }
 
         Ok(assessment_id)
     }
@@ -197,10 +204,31 @@ impl SupplyChainRiskModule {
         self.supply_chain_map.update_dependency_risk(dependency_id, scan_result.overall_risk_score);
 
         // Check for critical vulnerabilities
-        for vulnerability in &scan_result.vulnerabilities {
-            if vulnerability.severity == VulnerabilitySeverity::Critical {
-                self.create_vulnerability_alert(vulnerability, dependency).await?;
-            }
+        let critical_vulnerabilities: Vec<_> = scan_result.vulnerabilities.iter()
+            .filter(|v| v.severity == VulnerabilitySeverity::Critical)
+            .cloned()
+            .collect();
+
+        // Update dependency
+        dependency.security_scan_results.push(scan_result.clone());
+        dependency.last_scan = Some(Utc::now());
+        dependency.vulnerabilities = scan_result.vulnerabilities.clone();
+        dependency.risk_score = scan_result.overall_risk_score;
+
+        // Update supply chain map
+        self.supply_chain_map.update_dependency_risk(dependency_id, scan_result.overall_risk_score);
+
+        // Create alerts for critical vulnerabilities
+        for vulnerability in &critical_vulnerabilities {
+            let alert = SupplyChainAlert {
+                alert_id: Uuid::new_v4().to_string(),
+                alert_type: AlertType::VulnerabilityDetected,
+                message: format!("Critical vulnerability detected: {}", vulnerability.cve_id),
+                severity: AlertSeverity::Critical,
+                created_at: Utc::now(),
+                status: AlertStatus::Active,
+            };
+            self.monitoring_alerts.push_back(alert);
         }
 
         Ok(scan_result)
@@ -830,6 +858,7 @@ pub enum AlertSeverity {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AlertStatus {
     New,
+    Active,
     Investigating,
     Mitigated,
     Closed,

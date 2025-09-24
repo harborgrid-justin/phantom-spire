@@ -2,7 +2,7 @@
 //! 
 //! Handles serialization/deserialization of CVE data for different data stores
 
-use crate::models::{CVE, ExploitTimeline, RemediationStrategy};
+use crate::models::CVE;
 use super::{DataStoreError, DataStoreResult, TenantContext};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -220,9 +220,12 @@ impl DataTransformer {
         // Add CVSS-based tags if available
         if let Some(containers) = cve.containers.cna.as_ref() {
             if let Some(metrics) = containers.metrics.as_ref() {
-                if let Some(cvss_v3) = metrics.cvss_v3_1.as_ref() {
-                    tags.push(format!("severity:{:?}", cvss_v3.base_severity).to_lowercase());
-                    tags.push(format!("attack_vector:{:?}", cvss_v3.attack_vector).to_lowercase());
+                for metric in metrics {
+                    if let Some(cvss_v3) = metric.cvss_v3_1.as_ref() {
+                        tags.push(format!("severity:{:?}", cvss_v3.base_severity).to_lowercase());
+                        tags.push(format!("attack_vector:{:?}", cvss_v3.attack_vector).to_lowercase());
+                        break; // Use first CVSS metric found
+                    }
                 }
             }
         }

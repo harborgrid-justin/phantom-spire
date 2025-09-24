@@ -6,6 +6,7 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::sync::Arc;
 use chrono::{DateTime, Utc};
 
 // Re-export all data store implementations and utilities
@@ -13,11 +14,13 @@ pub mod config;
 pub mod traits;
 pub mod serialization;
 pub mod redis_store;
+pub mod local_store;
 
 // Re-export commonly used types
 pub use config::*;
 pub use traits::*;
 pub use serialization::{TenantData, DataSerializer, DataTransformer};
+pub use local_store::LocalDataStore;
 #[cfg(feature = "redis-store")]
 pub use redis_store::RedisDataStore;
 
@@ -142,12 +145,22 @@ pub struct DataStoreFactory;
 
 impl DataStoreFactory {
     /// Create a data store instance based on configuration
-    pub fn create_store(config: &DataStoreConfig) -> DataStoreResult<Box<dyn ComprehensiveCVEStore + Send + Sync>> {
+    pub fn create_store(config: &DataStoreConfig) -> DataStoreResult<Arc<dyn ComprehensiveCVEStore + Send + Sync>> {
         match config.default_store {
+            DataStoreType::Local => {
+                Ok(Arc::new(LocalDataStore::new()))
+            }
             DataStoreType::Redis => {
-                let redis_config = config.redis.as_ref()
-                    .ok_or_else(|| DataStoreError::Configuration("Redis configuration not found".to_string()))?;
-                Ok(Box::new(RedisDataStore::new(redis_config.clone())))
+                #[cfg(feature = "redis-store")]
+                {
+                    let redis_config = config.redis.as_ref()
+                        .ok_or_else(|| DataStoreError::Configuration("Redis configuration not found".to_string()))?;
+                    Ok(Arc::new(RedisDataStore::new(redis_config.clone())))
+                }
+                #[cfg(not(feature = "redis-store"))]
+                {
+                    Err(DataStoreError::Configuration("Redis store feature not enabled".to_string()))
+                }
             }
             DataStoreType::PostgreSQL => {
                 Err(DataStoreError::Configuration("PostgreSQL store not implemented yet".to_string()))
@@ -162,7 +175,7 @@ impl DataStoreFactory {
     }
     
     /// Create store from environment variables
-    pub fn from_env() -> DataStoreResult<Box<dyn ComprehensiveCVEStore + Send + Sync>> {
+    pub fn from_env() -> DataStoreResult<Arc<dyn ComprehensiveCVEStore + Send + Sync>> {
         let config = DataStoreConfig::from_env();
         config.validate().map_err(|e| DataStoreError::Configuration(e))?;
         Self::create_store(&config)

@@ -40,12 +40,6 @@ impl PartialEq for InsightType {
     }
 }
 
-impl PartialEq for TrendType {
-    fn eq(&self, other: &Self) -> bool {
-        todo!()
-    }
-}
-
 impl PartialEq for ThreatLikelihood {
     fn eq(&self, other: &Self) -> bool {
         todo!()
@@ -121,7 +115,7 @@ impl ThreatLandscapeModule {
             analysis_id,
             time_range,
             scope,
-            threat_intelligence,
+            threat_intelligence: threat_intelligence.clone(),
             current_threats,
             emerging_threats,
             attack_patterns,
@@ -179,8 +173,8 @@ impl ThreatLandscapeModule {
             prediction_id,
             prediction_horizon,
             based_on_analysis: current_analysis.analysis_id,
-            threat_evolution,
-            emerging_risks,
+            threat_evolution: threat_evolution.clone(),
+            emerging_risks: emerging_risks.clone(),
             attack_trend_projections,
             mitigation_recommendations: self.generate_mitigation_recommendations(&threat_evolution, &emerging_risks).await?,
             prediction_confidence,
@@ -204,7 +198,7 @@ impl ThreatLandscapeModule {
 
         Ok(LandscapeMonitoring {
             monitoring_id,
-            monitoring_config,
+            monitoring_config: monitoring_config.clone(),
             baseline_analysis: baseline_analysis.analysis_id,
             active_alerts: Vec::new(),
             change_thresholds: monitoring_config.change_thresholds,
@@ -466,7 +460,7 @@ impl ThreatLandscapeModule {
         let threat_actor_adaptation = self.analyze_threat_adaptation(time_range).await?;
 
         Ok(LandscapeEvolution {
-            evolution_patterns,
+            evolution_patterns: evolution_patterns.clone(),
             technology_adoption,
             threat_actor_adaptation,
             evolution_rate: self.calculate_evolution_rate(&evolution_patterns),
@@ -581,8 +575,8 @@ impl ThreatLandscapeModule {
     ) -> LandscapeScore {
         let current_threat_score = current_threats.severity_distribution.values()
             .zip(&[1.0, 2.0, 3.0, 4.0, 5.0]) // Weights for severity levels
-            .map(|(count, weight)| count * weight)
-            .sum::<u32>() as f64 / current_threats.active_threat_actors.len() as f64;
+            .map(|(count, weight)| *count as f64 * weight)
+            .sum::<f64>() / current_threats.active_threat_actors.len() as f64;
 
         let emerging_threat_score = emerging_threats.iter()
             .map(|t| match t.potential_impact {

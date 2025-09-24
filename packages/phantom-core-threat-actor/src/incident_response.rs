@@ -114,6 +114,7 @@ impl IncidentResponseModule {
 
         let incident = Incident {
             incident_id: incident_id.clone(),
+            id: incident_id.clone(),
             title: incident_config.title,
             description: incident_config.description,
             severity: incident_config.severity,
@@ -123,8 +124,11 @@ impl IncidentResponseModule {
             threat_actors: incident_config.threat_actors,
             created_at: Utc::now(),
             last_updated: Utc::now(),
+            updated_at: Utc::now(),
             assigned_to: incident_config.assigned_to,
             priority: incident_config.priority,
+            indicators: Vec::new(),
+            mitigation_steps: Vec::new(),
             timeline: vec![IncidentTimelineEntry {
                 timestamp: Utc::now(),
                 entry_type: TimelineEntryType::Created,
@@ -284,7 +288,12 @@ impl IncidentResponseModule {
             .ok_or_else(|| anyhow::anyhow!("Playbook not found: {}", playbook_id))?;
 
         // Apply automated actions
-        for action in &playbook.automated_actions {
+        let actions_to_execute: Vec<_> = playbook.automated_actions.iter()
+            .filter(|action| !action.requires_approval)
+            .cloned()
+            .collect();
+
+        for action in &actions_to_execute {
             let remediation_action = RemediationAction {
                 action_id: Uuid::new_v4().to_string(),
                 description: action.description.clone(),
@@ -295,9 +304,7 @@ impl IncidentResponseModule {
                 requires_approval: action.requires_approval,
             };
 
-            if !remediation_action.requires_approval {
-                self.execute_remediation(incident_id, remediation_action).await?;
-            }
+            self.execute_remediation(incident_id, remediation_action).await?;
         }
 
         // Update playbook usage
