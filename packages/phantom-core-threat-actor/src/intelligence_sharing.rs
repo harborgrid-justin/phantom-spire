@@ -82,12 +82,12 @@ impl IntelligenceSharingModule {
 
         // Find eligible partners
         let eligible_partners = self.find_eligible_partners(sharing_criteria)?;
+        let partner_ids: Vec<String> = eligible_partners.iter().map(|p| p.partner_id.clone()).collect();
 
         for partner in eligible_partners {
             match self.share_with_partner(intelligence, &partner, sharing_criteria).await {
                 Ok(_) => {
                     shared_with.push(partner.partner_id.clone());
-                    self.update_partner_activity(&partner.partner_id);
                 }
                 Err(e) => {
                     failed_shares.push(SharingFailure {
@@ -96,6 +96,11 @@ impl IntelligenceSharingModule {
                     });
                 }
             }
+        }
+
+        // Update partner activity for successful shares
+        for partner_id in &shared_with {
+            self.update_partner_activity(partner_id);
         }
 
         // Record the sharing activity

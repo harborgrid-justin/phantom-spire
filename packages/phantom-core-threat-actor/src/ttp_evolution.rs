@@ -91,7 +91,7 @@ impl TTPEvolutionModule {
             analysis_id,
             time_range,
             scope,
-            ttp_data,
+            ttp_data: ttp_data.clone(),
             evolution_patterns,
             adaptation_events,
             technique_effectiveness,
@@ -133,7 +133,7 @@ impl TTPEvolutionModule {
         Ok(TTPTracking {
             tracking_id,
             tracking_config,
-            baseline_ttps,
+            baseline_ttps: format!("{:?}", baseline_ttps),
             active_monitors: Vec::new(),
             change_alerts: Vec::new(),
             last_update: Utc::now(),
@@ -184,8 +184,8 @@ impl TTPEvolutionModule {
         Ok(TTPEvolutionPrediction {
             prediction_id,
             prediction_horizon,
-            predicted_techniques,
-            predicted_adaptations,
+            predicted_techniques: predicted_techniques.clone(),
+            predicted_adaptations: predicted_adaptations.clone(),
             predicted_effectiveness,
             mitigation_strategies: self.generate_mitigation_strategies(&predicted_techniques, &predicted_adaptations).await?,
             prediction_confidence,
@@ -321,7 +321,7 @@ impl TTPEvolutionModule {
         let mitigation_rates = self.calculate_mitigation_rates(&ttp_data.techniques).await?;
 
         Ok(TechniqueEffectiveness {
-            effectiveness_scores,
+            effectiveness_scores: effectiveness_scores.clone(),
             success_rates,
             detection_rates,
             mitigation_rates,
@@ -389,7 +389,7 @@ impl TTPEvolutionModule {
         Ok(AdaptationAssessment {
             adaptation_effectiveness,
             adaptation_patterns,
-            successful_strategies,
+            successful_strategies: successful_strategies.clone(),
             adaptation_trends: self.analyze_adaptation_trends(adaptation_events).await?,
             key_insights: self.generate_adaptation_insights(&successful_strategies).await?,
         })

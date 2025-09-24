@@ -88,7 +88,7 @@ phantom-enterprise-standards = { path = "../phantom-core-enterprise", optional =
 
 
 [features]
-default = ["local"]
+default = ["napi"]
 napi = ["dep:napi", "dep:napi-derive", "napi-derive/type-def"]
 local = []
 reqwest = ["dep:reqwest"]

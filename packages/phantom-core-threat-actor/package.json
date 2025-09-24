@@ -14,15 +14,17 @@
     "url": "https://github.com/harborgrid-justin/phantom-spire/issues"
   },
   "napi": {
-    "name": "phantom-core-threat-actor",
-    "triples": {
-      "additional": [
-        "aarch64-apple-darwin",
-        "aarch64-unknown-linux-gnu",
-        "aarch64-pc-windows-msvc",
-        "x86_64-unknown-linux-musl"
-      ]
-    }
+    "binaryName": "phantom-core-threat-actor",
+    "targets": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-pc-windows-gnu",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-pc-windows-msvc"
+    ]
   },
   "files": [
     "index.js",
@@ -39,7 +41,7 @@
     "build:enterprise": "napi build --platform --release --features enterprise",
     "build:full": "napi build --platform --release --features full",
     "clean": "rimraf dist",
-    "prepublishOnly": "napi prepublish -t npm",
+    "prepublishOnly": "napi pre-publish -t npm",
     "test": "cargo test --features enterprise",
     "test:native": "cargo test --all-features",
     "universal": "napi universal",
@@ -82,9 +84,13 @@
     "@phantom-core/ml": "file:../phantom-core-ml/nextgen"
   },
   "optionalDependencies": {
+    "@phantom-core/threat-actor-win32-x64-msvc": "1.0.0",
+    "@phantom-core/threat-actor-win32-x64-gnu": "1.0.0",
+    "@phantom-core/threat-actor-darwin-x64": "1.0.0",
     "@phantom-core/threat-actor-darwin-arm64": "1.0.0",
+    "@phantom-core/threat-actor-linux-x64-gnu": "1.0.0",
+    "@phantom-core/threat-actor-linux-x64-musl": "1.0.0",
     "@phantom-core/threat-actor-linux-arm64-gnu": "1.0.0",
-    "@phantom-core/threat-actor-win32-arm64-msvc": "1.0.0",
-    "@phantom-core/threat-actor-linux-x64-musl": "1.0.0"
+    "@phantom-core/threat-actor-win32-arm64-msvc": "1.0.0"
   }
 }

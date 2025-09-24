@@ -50,7 +50,6 @@ pub struct ValidationWarning {
 }
 
 /// OCSF Validator
-#[derive(Clone)]
 pub struct OcsfValidator {
     /// Validation rules
     pub rules: HashMap<String, ValidationRule>,
@@ -457,12 +456,12 @@ impl OcsfValidator {
 
         // Run custom validators
         for validator in &self.custom_validators {
-            errors.extend(validator.validate(event));
+            errors.extend(validator.validate(&event.base));
         }
 
         // Validate against rules
         for rule in self.rules.values() {
-            let result = self.validate_rule(event, rule);
+            let result = self.validate_rule(&event.base, rule);
             errors.extend(result.errors);
             warnings.extend(result.warnings);
         }

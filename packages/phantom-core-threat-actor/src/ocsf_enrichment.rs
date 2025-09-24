@@ -539,8 +539,7 @@ impl EnrichmentEngine {
         // Check cache first
         if let Some(cached) = self.cache.get(&cache_key) {
             if !self.is_cache_expired(cached) {
-                let mut cached_enrichment = cached.enrichment.clone();
-                cached_enrichment.hit_count += 1;
+                let cached_enrichment = cached.enrichment.clone();
                 return Ok(vec![cached_enrichment]);
             }
         }

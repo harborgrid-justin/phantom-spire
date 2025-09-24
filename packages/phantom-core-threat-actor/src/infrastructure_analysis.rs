@@ -182,7 +182,7 @@ impl InfrastructureAnalysisModule {
             let node = InfrastructureNode {
                 node_id: Uuid::new_v4().to_string(),
                 node_type: NodeType::C2Server,
-                ip_address: Some(server.ip_address.clone()),
+                ip_address: server.ip_address.clone(),
                 domain: server.domain.clone(),
                 location: server.geographic_location.clone(),
                 asn: server.asn,

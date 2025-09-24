@@ -104,24 +104,32 @@ impl RealtimeAlertsModule {
 
         // Check all active rules
         for rule_id in rule_ids {
-            if let Some(rule) = self.alert_rules.get_mut(&rule_id) {
-                if !rule.enabled {
-                    continue;
-                }
-
-                // Check cooldown period
-                if let Some(last_triggered) = rule.last_triggered {
-                    if Utc::now().signed_duration_since(last_triggered) < rule.cooldown_period {
-                        continue;
+            let should_trigger = {
+                if let Some(rule) = self.alert_rules.get(&rule_id) {
+                    if !rule.enabled {
+                        false
+                    } else if let Some(last_triggered) = rule.last_triggered {
+                        if Utc::now().signed_duration_since(last_triggered) < rule.cooldown_period {
+                            false
+                        } else {
+                            self.evaluate_rule_conditions(&rule.conditions, &event).await?
+                        }
+                    } else {
+                        self.evaluate_rule_conditions(&rule.conditions, &event).await?
                     }
+                } else {
+                    false
                 }
+            };
 
-                // Evaluate rule conditions
-                if self.evaluate_rule_conditions(&rule.conditions, &event).await? {
+            if should_trigger {
+                if let Some(rule) = self.alert_rules.get(&rule_id) {
                     let alert = self.create_alert_from_rule(rule, &event).await?;
                     triggered_alerts.push(alert);
+                }
 
-                    // Update rule statistics
+                // Update rule statistics
+                if let Some(rule) = self.alert_rules.get_mut(&rule_id) {
                     rule.last_triggered = Some(Utc::now());
                     rule.trigger_count += 1;
                 }

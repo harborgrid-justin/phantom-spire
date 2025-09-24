@@ -222,11 +222,15 @@ impl SupplyChainRiskModule {
         for vulnerability in &critical_vulnerabilities {
             let alert = SupplyChainAlert {
                 alert_id: Uuid::new_v4().to_string(),
-                alert_type: AlertType::VulnerabilityDetected,
-                message: format!("Critical vulnerability detected: {}", vulnerability.cve_id),
+                alert_type: AlertType::Vulnerability,
+                title: "Critical Vulnerability Detected".to_string(),
+                description: format!("Critical vulnerability detected: {}", vulnerability.cve_id.as_ref().unwrap_or(&"Unknown CVE".to_string())),
+                affected_components: vec![vulnerability.title.clone()],
+                triggered_at: Utc::now(),
                 severity: AlertSeverity::Critical,
-                created_at: Utc::now(),
                 status: AlertStatus::Active,
+                assigned_to: None,
+                remediation_deadline: Some(Utc::now() + Duration::days(7)),
             };
             self.monitoring_alerts.push_back(alert);
         }

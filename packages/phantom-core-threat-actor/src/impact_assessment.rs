@@ -114,8 +114,8 @@ impl ImpactAssessmentModule {
 
         Ok(TechnicalImpact {
             affected_systems_count: affected_systems.len(),
-            affected_systems,
-            data_compromised,
+            affected_systems: affected_systems.clone(),
+            data_compromised: data_compromised.clone(),
             system_downtime_hours: system_downtime,
             recovery_complexity,
             technical_impact_score: technical_score,
@@ -135,7 +135,7 @@ impl ImpactAssessmentModule {
 
         Ok(OperationalImpact {
             business_processes_affected: business_processes_affected.len(),
-            business_processes: business_processes_affected,
+            business_processes: business_processes_affected.clone(),
             operational_downtime_hours: operational_downtime,
             resource_impact,
             productivity_loss_percentage: productivity_loss,
@@ -154,9 +154,9 @@ impl ImpactAssessmentModule {
         let reputational_score = self.calculate_reputational_score(&media_coverage, &customer_trust_impact, &stakeholder_confidence);
 
         Ok(ReputationalImpact {
-            media_coverage_level: media_coverage.level,
-            media_coverage_description: media_coverage.description,
-            customer_trust_impact,
+            media_coverage_level: media_coverage.level.clone(),
+            media_coverage_description: media_coverage.description.clone(),
+            customer_trust_impact: customer_trust_impact.clone(),
             stakeholder_confidence_impact: stakeholder_confidence,
             brand_damage_score: brand_damage,
             reputational_impact_score: reputational_score,
@@ -1138,7 +1138,7 @@ impl QuantificationEngine {
         let insurance_claims = 75000.0; // Insurance payouts
 
         let total_cost = direct_costs + indirect_costs + opportunity_costs + regulatory_fines + insurance_claims;
-        let financial_score: f64 = (total_cost / 1000000.0).min(10.0); // Normalize to 0-10 scale
+        let financial_score: f64 = (total_cost / 1000000.0_f64).min(10.0_f64); // Normalize to 0-10 scale
 
         let mut cost_breakdown = HashMap::new();
         cost_breakdown.insert("Direct Costs".to_string(), direct_costs);

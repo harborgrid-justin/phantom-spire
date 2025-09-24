@@ -140,7 +140,6 @@ impl RiskAssessmentModule {
             completed_at: Some(Utc::now()),
             assessed_by: assessment_config.assessed_by,
             review_required: self.requires_review(&risk_scores),
-            context_data: HashMap::new(),
             mitigation_steps: Vec::new(),
             risk_description: "Automated risk assessment".to_string(),
             risk_level: "TBD".to_string(),
@@ -181,14 +180,22 @@ impl RiskAssessmentModule {
 
     /// Update risk assessment
     pub async fn update_assessment(&mut self, assessment_id: &str, updates: AssessmentUpdate) -> Result<()> {
+        // Calculate values before getting mutable reference
+        let overall_risk_level = if let Some(ref new_scores) = updates.risk_scores {
+            Some(self.calculate_overall_risk(new_scores))
+        } else {
+            None
+        };
+
         let assessment = self.active_assessments.get_mut(assessment_id)
             .ok_or_else(|| anyhow::anyhow!("Assessment not found: {}", assessment_id))?;
 
         // Apply updates
         if let Some(new_scores) = updates.risk_scores {
-            let overall_risk_level = self.calculate_overall_risk(&new_scores);
             assessment.risk_scores = new_scores.clone();
-            assessment.overall_risk_level = overall_risk_level;
+            if let Some(risk_level) = overall_risk_level {
+                assessment.overall_risk_level = risk_level;
+            }
         }
 
         if let Some(new_impact) = updates.impact_analysis {
@@ -206,7 +213,15 @@ impl RiskAssessmentModule {
             }
         }
 
-        let review_required = self.requires_review(&assessment.risk_scores);
+        // Separate the borrows by dropping the mutable borrow first
+        let risk_scores_copy = assessment.risk_scores.clone();
+        drop(assessment); // Drop the mutable borrow
+        
+        let review_required = self.requires_review(&risk_scores_copy);
+        
+        // Get a new mutable borrow to update the review_required field
+        let assessment = self.active_assessments.get_mut(assessment_id)
+            .ok_or_else(|| anyhow::anyhow!("Assessment not found: {}", assessment_id))?;
         assessment.review_required = review_required;
 
         Ok(())
@@ -256,7 +271,7 @@ impl RiskAssessmentModule {
             time_range: report_config.time_range,
             generated_at: Utc::now(),
             generated_by: report_config.generated_by,
-            summary,
+            summary: summary.clone(),
             assessments: assessments.iter().cloned().cloned().collect(),
             trends,
             recommendations,

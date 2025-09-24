@@ -333,6 +333,26 @@ impl ThreatActorCoreNapi {
 }
 */
 
+/// Simple NAPI constructor
+#[cfg(feature = "napi")]
+#[napi]
+impl ThreatActorCoreNapi {
+    #[napi(constructor)]
+    pub fn new() -> napi::Result<Self> {
+        // Create a minimal async runtime for constructor
+        let rt = tokio::runtime::Runtime::new()
+            .map_err(|e| napi::Error::from_reason(format!("Failed to create runtime: {}", e)))?;
+        
+        let inner = rt.block_on(async {
+            ThreatActorCore::with_default_config().await
+        }).map_err(|e| napi::Error::from_reason(format!("Failed to create core: {}", e)))?;
+        
+        Ok(Self {
+            inner: tokio::sync::Mutex::new(inner),
+        })
+    }
+}
+
 /// Legacy compatibility functions
 #[cfg(feature = "napi")]
 #[napi]
@@ -383,7 +403,7 @@ pub fn get_all_engines_status() -> Result<String> {
 
 /// Analyze threat infrastructure
 #[napi]
-pub fn analyze_infrastructure(infrastructure_data: String) -> Result<String> {
+pub fn analyze_infrastructure(infrastructure_data: String) -> napi::Result<String> {
     let analysis = serde_json::json!({
             "analysis_id": Uuid::new_v4().to_string(),
             "infrastructure_type": "c2_server",
@@ -404,7 +424,7 @@ pub fn analyze_infrastructure(infrastructure_data: String) -> Result<String> {
 
 /// Generate executive threat report
 #[napi]
-pub fn generate_executive_report(time_period: String) -> Result<String> {
+pub fn generate_executive_report(time_period: String) -> napi::Result<String> {
     let report = serde_json::json!({
             "report_id": Uuid::new_v4().to_string(),
             "time_period": time_period,
@@ -438,7 +458,7 @@ pub fn generate_executive_report(time_period: String) -> Result<String> {
 
 /// Perform TTP evolution analysis
 #[napi]
-pub fn analyze_ttp_evolution(actor_id: String, timeframe: String) -> Result<String> {
+pub fn analyze_ttp_evolution(actor_id: String, timeframe: String) -> napi::Result<String> {
         let evolution = serde_json::json!({
             "analysis_id": Uuid::new_v4().to_string(),
             "actor_id": actor_id,
@@ -477,7 +497,7 @@ pub fn analyze_ttp_evolution(actor_id: String, timeframe: String) -> Result<Stri
 
 /// Generate OCSF-compliant threat event
 #[napi]
-pub fn generate_ocsf_event(event_type: String, threat_data: String) -> Result<String> {
+pub fn generate_ocsf_event(event_type: String, threat_data: String) -> napi::Result<String> {
         let ocsf_event = serde_json::json!({
             "metadata": {
                 "version": "1.0.0",
@@ -522,7 +542,7 @@ pub fn generate_ocsf_event(event_type: String, threat_data: String) -> Result<St
 
 /// Get real-time threat intelligence feed
 #[napi]
-pub fn get_threat_intelligence_feed(feed_type: String) -> Result<String> {
+pub fn get_threat_intelligence_feed(feed_type: String) -> napi::Result<String> {
         let feed = serde_json::json!({
             "feed_id": Uuid::new_v4().to_string(),
             "feed_type": feed_type,
@@ -567,7 +587,7 @@ pub fn get_threat_intelligence_feed(feed_type: String) -> Result<String> {
 
 /// Simple hello function for testing
 #[napi]
-pub fn hello(name: String) -> Result<String> {
+pub fn hello(name: String) -> napi::Result<String> {
     Ok(format!("Phantom Threat Actor Core says hello to {name}"))
 }
 
@@ -591,7 +611,7 @@ pub fn create_threat_actor_standalone(name: String, actor_type: String) -> Resul
 /// Create threat actor (legacy compatibility)
 #[cfg(feature = "napi")]
 #[napi]
-pub fn create_threat_actor(name: String, actor_type: String) -> Result<String> {
+pub fn create_threat_actor(name: String, actor_type: String) -> napi::Result<String> {
     let id = Uuid::new_v4().to_string();
     Ok(id)
 }

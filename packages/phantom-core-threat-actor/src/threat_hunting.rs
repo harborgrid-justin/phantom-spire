@@ -101,12 +101,27 @@ impl ThreatHuntingModule {
     pub async fn execute_hunting_queries(&mut self, data_sources: &[DataSource]) -> Result<Vec<HuntingFinding>> {
         let mut all_findings = Vec::new();
 
-        for campaign in self.hunting_campaigns.values_mut() {
-            if campaign.status == CampaignStatus::Active {
-                let findings = self.execute_campaign_queries(campaign, data_sources).await?;
+        let campaign_ids: Vec<String> = self.hunting_campaigns.iter()
+            .filter(|(_, campaign)| campaign.status == CampaignStatus::Active)
+            .map(|(id, _)| id.clone())
+            .collect();
+
+        for campaign_id in campaign_ids {
+            // Get campaign data for execution (clone what we need)
+            let campaign_copy = {
+                let campaign = self.hunting_campaigns.get(&campaign_id)
+                    .ok_or_else(|| anyhow::anyhow!("Campaign not found: {}", campaign_id))?;
+                campaign.clone()
+            };
+            
+            let findings = self.execute_campaign_queries(&campaign_copy, data_sources).await?;
+            
+            // Update the actual campaign with findings
+            if let Some(campaign) = self.hunting_campaigns.get_mut(&campaign_id) {
                 campaign.findings.extend(findings.clone());
-                all_findings.extend(findings);
             }
+            
+            all_findings.extend(findings);
         }
 
         // Correlate findings across campaigns
@@ -626,9 +641,10 @@ impl CorrelationEngine {
 
     async fn correlate_findings(&self, findings: &mut Vec<HuntingFinding>) -> Result<()> {
         // Apply correlation rules to boost confidence of related findings
+        let findings_clone = findings.clone();
         for finding in findings.iter_mut() {
             for rule in &self.correlation_rules {
-                if self.matches_correlation_rule(finding, rule, findings) {
+                if self.matches_correlation_rule(finding, rule, &findings_clone) {
                     finding.confidence = (finding.confidence + rule.confidence_boost).min(1.0);
                     finding.tags.push(format!("correlated:{}", rule.name));
                 }

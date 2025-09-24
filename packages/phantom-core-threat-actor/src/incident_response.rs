@@ -281,17 +281,25 @@ impl IncidentResponseModule {
 
     /// Apply playbook to incident
     pub async fn apply_playbook(&mut self, incident_id: &str, playbook_id: &str, applied_by: &str) -> Result<()> {
-        let incident = self.active_incidents.get_mut(incident_id)
-            .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
+        // Check incident exists first
+        if !self.active_incidents.contains_key(incident_id) {
+            return Err(anyhow::anyhow!("Incident not found: {}", incident_id));
+        }
 
-        let playbook = self.response_playbooks.get_mut(playbook_id)
-            .ok_or_else(|| anyhow::anyhow!("Playbook not found: {}", playbook_id))?;
+        let actions_to_execute: Vec<_> = {
+            let playbook = self.response_playbooks.get_mut(playbook_id)
+                .ok_or_else(|| anyhow::anyhow!("Playbook not found: {}", playbook_id))?;
+            
+            // Update playbook usage
+            playbook.last_used = Some(Utc::now());
+            playbook.usage_count += 1;
 
-        // Apply automated actions
-        let actions_to_execute: Vec<_> = playbook.automated_actions.iter()
-            .filter(|action| !action.requires_approval)
-            .cloned()
-            .collect();
+            // Apply automated actions
+            playbook.automated_actions.iter()
+                .filter(|action| !action.requires_approval)
+                .cloned()
+                .collect()
+        };
 
         for action in &actions_to_execute {
             let remediation_action = RemediationAction {
@@ -307,15 +315,13 @@ impl IncidentResponseModule {
             self.execute_remediation(incident_id, remediation_action).await?;
         }
 
-        // Update playbook usage
-        playbook.last_used = Some(Utc::now());
-        playbook.usage_count += 1;
-
         // Add timeline entry
+        let incident = self.active_incidents.get_mut(incident_id)
+            .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
         incident.timeline.push(IncidentTimelineEntry {
             timestamp: Utc::now(),
             entry_type: TimelineEntryType::PlaybookApplied,
-            description: format!("Playbook '{}' applied", playbook.name),
+            description: format!("Playbook '{}' applied", playbook_id),
             user: applied_by.to_string(),
         });
 
