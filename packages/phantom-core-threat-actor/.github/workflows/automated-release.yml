@@ -169,12 +169,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          # Temporarily disable prepublishOnly for automated builds
           npm config set //registry.npmjs.org/:_authToken $NODE_AUTH_TOKEN
-          sed -i 's/"prepublishOnly":/"prepublishOnly-disabled":/g' package.json
           npm publish --access public
-          # Restore prepublishOnly
-          sed -i 's/"prepublishOnly-disabled":/"prepublishOnly":/g' package.json
       
       - name: Create GitHub Discussion
         continue-on-error: true

@@ -1,9 +1,9 @@
 // phantom-threat-actor-core/src/config.rs
 // Configuration management for threat actor intelligence
 
+use crate::models::EvidenceType;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::models::{EvidenceType};
 
 /// Main configuration for Threat Actor Core
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -244,7 +244,7 @@ impl ThreatActorCoreConfig {
     /// Load configuration from environment variables
     pub fn from_env() -> Self {
         let mut config = Self::default();
-        
+
         if let Ok(backend) = std::env::var("THREAT_ACTOR_STORAGE_BACKEND") {
             config.storage.backend = match backend.as_str() {
                 "postgresql" => StorageBackend::PostgreSQL,
@@ -275,20 +275,29 @@ impl ThreatActorCoreConfig {
             return Err("Analysis confidence threshold must be between 0.0 and 1.0".to_string());
         }
 
-        if self.attribution.confidence_threshold < 0.0 || self.attribution.confidence_threshold > 1.0 {
+        if self.attribution.confidence_threshold < 0.0
+            || self.attribution.confidence_threshold > 1.0
+        {
             return Err("Attribution confidence threshold must be between 0.0 and 1.0".to_string());
         }
 
-        if self.behavioral.pattern_detection_threshold < 0.0 || self.behavioral.pattern_detection_threshold > 1.0 {
-            return Err("Behavioral pattern detection threshold must be between 0.0 and 1.0".to_string());
+        if self.behavioral.pattern_detection_threshold < 0.0
+            || self.behavioral.pattern_detection_threshold > 1.0
+        {
+            return Err(
+                "Behavioral pattern detection threshold must be between 0.0 and 1.0".to_string(),
+            );
         }
 
         if self.storage.pool_size == 0 {
             return Err("Storage pool size must be greater than 0".to_string());
         }
 
-        if matches!(self.storage.backend, StorageBackend::PostgreSQL | StorageBackend::MongoDB | StorageBackend::Elasticsearch) 
-            && self.storage.connection_string.is_none() {
+        if matches!(
+            self.storage.backend,
+            StorageBackend::PostgreSQL | StorageBackend::MongoDB | StorageBackend::Elasticsearch
+        ) && self.storage.connection_string.is_none()
+        {
             return Err("Connection string required for selected storage backend".to_string());
         }
 

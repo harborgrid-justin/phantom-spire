@@ -4,13 +4,13 @@
 //! evolution over time, including pattern recognition, adaptation analysis, and
 //! predictive modeling of threat actor behavior changes.
 
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
 use tokio::sync::RwLock;
-use futures::stream::Stream;
-use anyhow::Result;
+use uuid::Uuid;
 
 /// TTP Evolution Analysis Engine
 #[derive(Debug)]
@@ -49,11 +49,20 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze TTP evolution over time
-    pub async fn analyze_ttp_evolution(&self, time_range: DateRange, scope: EvolutionScope) -> Result<TTPEvolutionAnalysis> {
+    pub async fn analyze_ttp_evolution(
+        &self,
+        time_range: DateRange,
+        scope: EvolutionScope,
+    ) -> Result<TTPEvolutionAnalysis> {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
-        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope)?);
+        let cache_key = format!(
+            "{}_{}_{}",
+            time_range.start.timestamp(),
+            time_range.end.timestamp(),
+            serde_json::to_string(&scope)?
+        );
         if let Some(cached) = self.analysis_cache.read().await.get(&cache_key) {
             if Utc::now().signed_duration_since(cached.created_at) < Duration::hours(2) {
                 return Ok(cached.analysis.clone());
@@ -64,28 +73,45 @@ impl TTPEvolutionModule {
         let ttp_data = self.gather_ttp_data(&time_range, &scope).await?;
 
         // Analyze evolution patterns
-        let evolution_patterns = self.analyze_evolution_patterns(&ttp_data, &time_range).await?;
+        let evolution_patterns = self
+            .analyze_evolution_patterns(&ttp_data, &time_range)
+            .await?;
 
         // Identify adaptation events
-        let adaptation_events = self.identify_adaptation_events(&ttp_data, &time_range).await?;
+        let adaptation_events = self
+            .identify_adaptation_events(&ttp_data, &time_range)
+            .await?;
 
         // Analyze technique effectiveness
         let technique_effectiveness = self.analyze_technique_effectiveness(&ttp_data).await?;
 
         // Generate evolution trends
-        let evolution_trends = self.generate_evolution_trends(&evolution_patterns, &time_range).await?;
+        let evolution_trends = self
+            .generate_evolution_trends(&evolution_patterns, &time_range)
+            .await?;
 
         // Predict future TTP evolution
-        let evolution_predictions = self.predict_ttp_evolution(&evolution_patterns, Duration::days(180)).await?;
+        let evolution_predictions = self
+            .predict_ttp_evolution(&evolution_patterns, Duration::days(180))
+            .await?;
 
         // Assess adaptation strategies
-        let adaptation_assessment = self.assess_adaptation_strategies(&adaptation_events).await?;
+        let adaptation_assessment = self
+            .assess_adaptation_strategies(&adaptation_events)
+            .await?;
 
         // Generate strategic insights
-        let strategic_insights = self.generate_ttp_insights(&evolution_patterns, &adaptation_events, &evolution_predictions).await?;
+        let strategic_insights = self
+            .generate_ttp_insights(
+                &evolution_patterns,
+                &adaptation_events,
+                &evolution_predictions,
+            )
+            .await?;
 
         // Calculate evolution score
-        let evolution_score = self.calculate_evolution_score(&evolution_patterns, &technique_effectiveness);
+        let evolution_score =
+            self.calculate_evolution_score(&evolution_patterns, &technique_effectiveness);
 
         let analysis = TTPEvolutionAnalysis {
             analysis_id,
@@ -118,17 +144,23 @@ impl TTPEvolutionModule {
         self.analysis_cache.write().await.insert(cache_key, cached);
 
         // Send TTP event
-        self.send_ttp_event(TTPEvent::AnalysisCompleted(analysis.clone())).await?;
+        self.send_ttp_event(TTPEvent::AnalysisCompleted(analysis.clone()))
+            .await?;
 
         Ok(analysis)
     }
 
     /// Track TTP changes in real-time
-    pub async fn track_ttp_changes(&self, tracking_config: TTPTrackingConfig) -> Result<TTPTracking> {
+    pub async fn track_ttp_changes(
+        &self,
+        tracking_config: TTPTrackingConfig,
+    ) -> Result<TTPTracking> {
         let tracking_id = Uuid::new_v4().to_string();
 
         // Set up tracking
-        let baseline_ttps = self.establish_ttp_baseline(&tracking_config.baseline_period).await?;
+        let baseline_ttps = self
+            .establish_ttp_baseline(&tracking_config.baseline_period)
+            .await?;
 
         Ok(TTPTracking {
             tracking_id,
@@ -142,20 +174,30 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze technique adaptation patterns
-    pub async fn analyze_technique_adaptation(&self, technique_id: &str, time_range: DateRange) -> Result<TechniqueAdaptationAnalysis> {
+    pub async fn analyze_technique_adaptation(
+        &self,
+        technique_id: &str,
+        time_range: DateRange,
+    ) -> Result<TechniqueAdaptationAnalysis> {
         let adaptation_id = Uuid::new_v4().to_string();
 
         // Get technique history
-        let technique_history = self.get_technique_history(technique_id, &time_range).await?;
+        let technique_history = self
+            .get_technique_history(technique_id, &time_range)
+            .await?;
 
         // Analyze adaptation patterns
         let adaptation_patterns = self.analyze_adaptation_patterns(&technique_history).await?;
 
         // Identify successful adaptations
-        let successful_adaptations = self.identify_successful_adaptations(&adaptation_patterns).await?;
+        let successful_adaptations = self
+            .identify_successful_adaptations(&adaptation_patterns)
+            .await?;
 
         // Assess adaptation effectiveness
-        let adaptation_effectiveness = self.assess_adaptation_effectiveness(&successful_adaptations).await?;
+        let adaptation_effectiveness = self
+            .assess_adaptation_effectiveness(&successful_adaptations)
+            .await?;
 
         Ok(TechniqueAdaptationAnalysis {
             adaptation_id,
@@ -170,16 +212,27 @@ impl TTPEvolutionModule {
     }
 
     /// Predict TTP evolution
-    pub async fn predict_ttp_evolution(&self, current_patterns: &[EvolutionPattern], prediction_horizon: Duration) -> Result<TTPEvolutionPrediction> {
+    pub async fn predict_ttp_evolution(
+        &self,
+        current_patterns: &[EvolutionPattern],
+        prediction_horizon: Duration,
+    ) -> Result<TTPEvolutionPrediction> {
         let prediction_id = Uuid::new_v4().to_string();
 
         // Generate evolution predictions
-        let predicted_techniques = self.predict_new_techniques(current_patterns, prediction_horizon).await?;
-        let predicted_adaptations = self.predict_adaptation_strategies(current_patterns, prediction_horizon).await?;
-        let predicted_effectiveness = self.predict_technique_effectiveness(current_patterns, prediction_horizon).await?;
+        let predicted_techniques = self
+            .predict_new_techniques(current_patterns, prediction_horizon)
+            .await?;
+        let predicted_adaptations = self
+            .predict_adaptation_strategies(current_patterns, prediction_horizon)
+            .await?;
+        let predicted_effectiveness = self
+            .predict_technique_effectiveness(current_patterns, prediction_horizon)
+            .await?;
 
         // Calculate prediction confidence
-        let prediction_confidence = self.calculate_prediction_confidence(&predicted_techniques, &predicted_adaptations);
+        let prediction_confidence =
+            self.calculate_prediction_confidence(&predicted_techniques, &predicted_adaptations);
 
         Ok(TTPEvolutionPrediction {
             prediction_id,
@@ -187,7 +240,9 @@ impl TTPEvolutionModule {
             predicted_techniques: predicted_techniques.clone(),
             predicted_adaptations: predicted_adaptations.clone(),
             predicted_effectiveness,
-            mitigation_strategies: self.generate_mitigation_strategies(&predicted_techniques, &predicted_adaptations).await?,
+            mitigation_strategies: self
+                .generate_mitigation_strategies(&predicted_techniques, &predicted_adaptations)
+                .await?,
             prediction_confidence,
             generated_at: Utc::now(),
             valid_until: Utc::now() + prediction_horizon,
@@ -195,24 +250,39 @@ impl TTPEvolutionModule {
     }
 
     /// Generate TTP evolution report
-    pub async fn generate_ttp_report(&self, report_config: TTPReportConfig) -> Result<TTPEvolutionReport> {
+    pub async fn generate_ttp_report(
+        &self,
+        report_config: TTPReportConfig,
+    ) -> Result<TTPEvolutionReport> {
         let report_id = Uuid::new_v4().to_string();
 
         // Gather data for the report
-        let evolution_analysis = self.analyze_ttp_evolution(
-            report_config.time_range.clone(),
-            report_config.scope.clone(),
-        ).await?;
+        let evolution_analysis = self
+            .analyze_ttp_evolution(
+                report_config.time_range.clone(),
+                report_config.scope.clone(),
+            )
+            .await?;
 
         // Generate report sections
         let executive_summary = self.generate_executive_summary(&evolution_analysis).await?;
-        let evolution_analysis_section = self.generate_evolution_analysis(&evolution_analysis).await?;
-        let adaptation_assessment = self.generate_adaptation_assessment(&evolution_analysis).await?;
-        let predictions = self.generate_predictions_section(&evolution_analysis).await?;
-        let recommendations = self.generate_ttp_recommendations(&evolution_analysis).await?;
+        let evolution_analysis_section = self
+            .generate_evolution_analysis(&evolution_analysis)
+            .await?;
+        let adaptation_assessment = self
+            .generate_adaptation_assessment(&evolution_analysis)
+            .await?;
+        let predictions = self
+            .generate_predictions_section(&evolution_analysis)
+            .await?;
+        let recommendations = self
+            .generate_ttp_recommendations(&evolution_analysis)
+            .await?;
 
         // Generate visualizations
-        let visualizations = self.generate_ttp_visualizations(&evolution_analysis).await?;
+        let visualizations = self
+            .generate_ttp_visualizations(&evolution_analysis)
+            .await?;
 
         Ok(TTPEvolutionReport {
             report_id,
@@ -234,14 +304,20 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze TTP correlation patterns
-    pub async fn analyze_ttp_correlations(&self, time_range: DateRange) -> Result<TTPCorrelationAnalysis> {
+    pub async fn analyze_ttp_correlations(
+        &self,
+        time_range: DateRange,
+    ) -> Result<TTPCorrelationAnalysis> {
         let correlation_id = Uuid::new_v4().to_string();
 
         // Identify TTP combinations
         let ttp_combinations = self.identify_ttp_combinations(&time_range).await?;
 
         // Analyze correlation patterns
-        let correlation_patterns = self.correlation_engine.analyze_correlations(&ttp_combinations).await?;
+        let correlation_patterns = self
+            .correlation_engine
+            .analyze_correlations(&ttp_combinations)
+            .await?;
 
         // Identify attack chains
         let attack_chains = self.identify_attack_chains(&correlation_patterns).await?;
@@ -261,7 +337,11 @@ impl TTPEvolutionModule {
     }
 
     /// Gather TTP data
-    async fn gather_ttp_data(&self, time_range: &DateRange, scope: &EvolutionScope) -> Result<TTPData> {
+    async fn gather_ttp_data(
+        &self,
+        time_range: &DateRange,
+        scope: &EvolutionScope,
+    ) -> Result<TTPData> {
         // Gather techniques
         let techniques = self.gather_techniques(time_range, scope).await?;
 
@@ -272,7 +352,9 @@ impl TTPEvolutionModule {
         let tactics = self.gather_tactics(&techniques, time_range).await?;
 
         // Calculate usage statistics
-        let usage_stats = self.calculate_usage_statistics(&techniques, &procedures).await?;
+        let usage_stats = self
+            .calculate_usage_statistics(&techniques, &procedures)
+            .await?;
 
         Ok(TTPData {
             techniques,
@@ -285,40 +367,75 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze evolution patterns
-    async fn analyze_evolution_patterns(&self, ttp_data: &TTPData, time_range: &DateRange) -> Result<Vec<EvolutionPattern>> {
+    async fn analyze_evolution_patterns(
+        &self,
+        ttp_data: &TTPData,
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionPattern>> {
         let mut patterns = Vec::new();
 
         // Analyze technique evolution
-        patterns.extend(self.pattern_recognizer.analyze_technique_evolution(&ttp_data.techniques, time_range).await?);
+        patterns.extend(
+            self.pattern_recognizer
+                .analyze_technique_evolution(&ttp_data.techniques, time_range)
+                .await?,
+        );
 
         // Analyze procedure evolution
-        patterns.extend(self.pattern_recognizer.analyze_procedure_evolution(&ttp_data.procedures, time_range).await?);
+        patterns.extend(
+            self.pattern_recognizer
+                .analyze_procedure_evolution(&ttp_data.procedures, time_range)
+                .await?,
+        );
 
         // Analyze tactic evolution
-        patterns.extend(self.pattern_recognizer.analyze_tactic_evolution(&ttp_data.tactics, time_range).await?);
+        patterns.extend(
+            self.pattern_recognizer
+                .analyze_tactic_evolution(&ttp_data.tactics, time_range)
+                .await?,
+        );
 
         Ok(patterns)
     }
 
     /// Identify adaptation events
-    async fn identify_adaptation_events(&self, ttp_data: &TTPData, time_range: &DateRange) -> Result<Vec<AdaptationEvent>> {
+    async fn identify_adaptation_events(
+        &self,
+        ttp_data: &TTPData,
+        time_range: &DateRange,
+    ) -> Result<Vec<AdaptationEvent>> {
         let mut events = Vec::new();
 
         // Identify technique adaptations
-        events.extend(self.adaptation_analyzer.identify_technique_adaptations(&ttp_data.techniques, time_range).await?);
+        events.extend(
+            self.adaptation_analyzer
+                .identify_technique_adaptations(&ttp_data.techniques, time_range)
+                .await?,
+        );
 
         // Identify procedure adaptations
-        events.extend(self.adaptation_analyzer.identify_procedure_adaptations(&ttp_data.procedures, time_range).await?);
+        events.extend(
+            self.adaptation_analyzer
+                .identify_procedure_adaptations(&ttp_data.procedures, time_range)
+                .await?,
+        );
 
         Ok(events)
     }
 
     /// Analyze technique effectiveness
-    async fn analyze_technique_effectiveness(&self, ttp_data: &TTPData) -> Result<TechniqueEffectiveness> {
-        let effectiveness_scores = self.calculate_effectiveness_scores(&ttp_data.techniques).await?;
+    async fn analyze_technique_effectiveness(
+        &self,
+        ttp_data: &TTPData,
+    ) -> Result<TechniqueEffectiveness> {
+        let effectiveness_scores = self
+            .calculate_effectiveness_scores(&ttp_data.techniques)
+            .await?;
         let success_rates = self.calculate_success_rates(&ttp_data.techniques).await?;
         let detection_rates = self.calculate_detection_rates(&ttp_data.techniques).await?;
-        let mitigation_rates = self.calculate_mitigation_rates(&ttp_data.techniques).await?;
+        let mitigation_rates = self
+            .calculate_mitigation_rates(&ttp_data.techniques)
+            .await?;
 
         Ok(TechniqueEffectiveness {
             effectiveness_scores: effectiveness_scores.clone(),
@@ -330,7 +447,11 @@ impl TTPEvolutionModule {
     }
 
     /// Generate evolution trends
-    async fn generate_evolution_trends(&self, patterns: &[EvolutionPattern], time_range: &DateRange) -> Result<Vec<EvolutionTrend>> {
+    async fn generate_evolution_trends(
+        &self,
+        patterns: &[EvolutionPattern],
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionTrend>> {
         let mut trends = Vec::new();
 
         // Sophistication trend
@@ -338,7 +459,8 @@ impl TTPEvolutionModule {
             trend_id: Uuid::new_v4().to_string(),
             trend_name: "Technique Sophistication Increase".to_string(),
             trend_type: TrendType::Increasing,
-            description: "Threat actors are adopting more sophisticated techniques over time".to_string(),
+            description: "Threat actors are adopting more sophisticated techniques over time"
+                .to_string(),
             time_range: time_range.clone(),
             data_points: self.generate_trend_data_points(time_range, "sophistication"),
             growth_rate: 0.18,
@@ -381,17 +503,26 @@ impl TTPEvolutionModule {
     }
 
     /// Assess adaptation strategies
-    async fn assess_adaptation_strategies(&self, adaptation_events: &[AdaptationEvent]) -> Result<AdaptationAssessment> {
-        let adaptation_effectiveness = self.calculate_adaptation_effectiveness(adaptation_events).await?;
+    async fn assess_adaptation_strategies(
+        &self,
+        adaptation_events: &[AdaptationEvent],
+    ) -> Result<AdaptationAssessment> {
+        let adaptation_effectiveness = self
+            .calculate_adaptation_effectiveness(adaptation_events)
+            .await?;
         let adaptation_patterns = self.identify_adaptation_patterns(adaptation_events).await?;
-        let successful_strategies = self.identify_successful_strategies(&adaptation_patterns).await?;
+        let successful_strategies = self
+            .identify_successful_strategies(&adaptation_patterns)
+            .await?;
 
         Ok(AdaptationAssessment {
             adaptation_effectiveness,
             adaptation_patterns,
             successful_strategies: successful_strategies.clone(),
             adaptation_trends: self.analyze_adaptation_trends(adaptation_events).await?,
-            key_insights: self.generate_adaptation_insights(&successful_strategies).await?,
+            key_insights: self
+                .generate_adaptation_insights(&successful_strategies)
+                .await?,
         })
     }
 
@@ -405,18 +536,26 @@ impl TTPEvolutionModule {
         let mut insights = Vec::new();
 
         // High-impact evolution insight
-        if let Some(high_impact_pattern) = evolution_patterns.iter()
-            .find(|p| p.impact_score > 8.0 && p.confidence > 0.8) {
+        if let Some(high_impact_pattern) = evolution_patterns
+            .iter()
+            .find(|p| p.impact_score > 8.0 && p.confidence > 0.8)
+        {
             insights.push(TTPInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::EvolutionPattern,
-                title: format!("Critical TTP Evolution: {}", high_impact_pattern.pattern_name),
+                title: format!(
+                    "Critical TTP Evolution: {}",
+                    high_impact_pattern.pattern_name
+                ),
                 description: format!(
                     "{} is evolving rapidly with high impact potential",
                     high_impact_pattern.pattern_name
                 ),
                 confidence: high_impact_pattern.confidence,
-                impact_assessment: format!("High impact (score: {:.1})", high_impact_pattern.impact_score),
+                impact_assessment: format!(
+                    "High impact (score: {:.1})",
+                    high_impact_pattern.impact_score
+                ),
                 time_horizon: Duration::days(90),
                 affected_techniques: high_impact_pattern.affected_techniques.clone(),
                 recommended_actions: vec![
@@ -426,7 +565,10 @@ impl TTPEvolutionModule {
                 ],
                 evidence: vec![
                     format!("Evolution rate: {:.2}", high_impact_pattern.evolution_rate),
-                    format!("{} affected techniques", high_impact_pattern.affected_techniques.len()),
+                    format!(
+                        "{} affected techniques",
+                        high_impact_pattern.affected_techniques.len()
+                    ),
                 ],
                 generated_at: Utc::now(),
             });
@@ -438,9 +580,12 @@ impl TTPEvolutionModule {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::AdaptationTrend,
                 title: "Accelerated TTP Adaptation".to_string(),
-                description: "Threat actors are rapidly adapting techniques in response to defenses".to_string(),
+                description:
+                    "Threat actors are rapidly adapting techniques in response to defenses"
+                        .to_string(),
                 confidence: 0.85,
-                impact_assessment: "High - Rapid adaptation reduces defense effectiveness".to_string(),
+                impact_assessment: "High - Rapid adaptation reduces defense effectiveness"
+                    .to_string(),
                 time_horizon: Duration::days(60),
                 affected_techniques: vec!["Multiple".to_string()],
                 recommended_actions: vec![
@@ -469,7 +614,9 @@ impl TTPEvolutionModule {
                 confidence: predictions.prediction_confidence,
                 impact_assessment: "Medium to High - Proactive preparation needed".to_string(),
                 time_horizon: predictions.prediction_horizon,
-                affected_techniques: predictions.predicted_techniques.iter()
+                affected_techniques: predictions
+                    .predicted_techniques
+                    .iter()
                     .map(|t| t.technique_name.clone())
                     .collect(),
                 recommended_actions: vec![
@@ -478,8 +625,14 @@ impl TTPEvolutionModule {
                     "Defense preparation".to_string(),
                 ],
                 evidence: vec![
-                    format!("Prediction confidence: {:.1}%", predictions.prediction_confidence * 100.0),
-                    format!("{} predicted techniques", predictions.predicted_techniques.len()),
+                    format!(
+                        "Prediction confidence: {:.1}%",
+                        predictions.prediction_confidence * 100.0
+                    ),
+                    format!(
+                        "{} predicted techniques",
+                        predictions.predicted_techniques.len()
+                    ),
                 ],
                 generated_at: Utc::now(),
             });
@@ -489,10 +642,16 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate evolution score
-    fn calculate_evolution_score(&self, patterns: &[EvolutionPattern], effectiveness: &TechniqueEffectiveness) -> EvolutionScore {
-        let pattern_score = patterns.iter()
+    fn calculate_evolution_score(
+        &self,
+        patterns: &[EvolutionPattern],
+        effectiveness: &TechniqueEffectiveness,
+    ) -> EvolutionScore {
+        let pattern_score = patterns
+            .iter()
             .map(|p| p.evolution_rate * p.impact_score)
-            .sum::<f64>() / patterns.len() as f64;
+            .sum::<f64>()
+            / patterns.len() as f64;
 
         let effectiveness_score = effectiveness.overall_effectiveness;
 
@@ -527,7 +686,11 @@ impl TTPEvolutionModule {
 
     /// Calculate analysis confidence
     fn calculate_analysis_confidence(&self, ttp_data: &TTPData) -> f64 {
-        let data_completeness = if ttp_data.techniques.is_empty() { 0.2 } else { 0.9 };
+        let data_completeness = if ttp_data.techniques.is_empty() {
+            0.2
+        } else {
+            0.9
+        };
         let data_quality = ttp_data.data_quality_score;
         let temporal_coverage = 0.85; // Placeholder
 
@@ -535,7 +698,11 @@ impl TTPEvolutionModule {
     }
 
     /// Generate mitigation strategies
-    async fn generate_mitigation_strategies(&self, _predicted_techniques: &[PredictedTechnique], _predicted_adaptations: &[PredictedAdaptation]) -> Result<Vec<MitigationStrategy>> {
+    async fn generate_mitigation_strategies(
+        &self,
+        _predicted_techniques: &[PredictedTechnique],
+        _predicted_adaptations: &[PredictedAdaptation],
+    ) -> Result<Vec<MitigationStrategy>> {
         let mut strategies = Vec::new();
 
         strategies.push(MitigationStrategy {
@@ -578,13 +745,19 @@ impl TTPEvolutionModule {
     }
 
     /// Gather techniques
-    async fn gather_techniques(&self, time_range: &DateRange, _scope: &EvolutionScope) -> Result<Vec<Technique>> {
+    async fn gather_techniques(
+        &self,
+        time_range: &DateRange,
+        _scope: &EvolutionScope,
+    ) -> Result<Vec<Technique>> {
         // Mock techniques data
         Ok(vec![
             Technique {
                 technique_id: "T1059".to_string(),
                 name: "Command and Scripting Interpreter".to_string(),
-                description: "Adversaries may abuse command and script interpreters to execute commands".to_string(),
+                description:
+                    "Adversaries may abuse command and script interpreters to execute commands"
+                        .to_string(),
                 tactic: "Execution".to_string(),
                 platform: vec!["Windows".to_string(), "Linux".to_string()],
                 detection: DetectionLevel::Medium,
@@ -599,9 +772,14 @@ impl TTPEvolutionModule {
             Technique {
                 technique_id: "T1078".to_string(),
                 name: "Valid Accounts".to_string(),
-                description: "Adversaries may obtain and abuse credentials of existing accounts".to_string(),
+                description: "Adversaries may obtain and abuse credentials of existing accounts"
+                    .to_string(),
                 tactic: "Initial Access".to_string(),
-                platform: vec!["Windows".to_string(), "Linux".to_string(), "macOS".to_string()],
+                platform: vec![
+                    "Windows".to_string(),
+                    "Linux".to_string(),
+                    "macOS".to_string(),
+                ],
                 detection: DetectionLevel::Low,
                 mitigation: MitigationLevel::Medium,
                 first_seen: Utc::now() - Duration::days(730),
@@ -615,7 +793,11 @@ impl TTPEvolutionModule {
     }
 
     /// Gather procedures
-    async fn gather_procedures(&self, techniques: &[Technique], time_range: &DateRange) -> Result<Vec<Procedure>> {
+    async fn gather_procedures(
+        &self,
+        techniques: &[Technique],
+        time_range: &DateRange,
+    ) -> Result<Vec<Procedure>> {
         Ok(vec![
             Procedure {
                 procedure_id: Uuid::new_v4().to_string(),
@@ -633,7 +815,9 @@ impl TTPEvolutionModule {
                 procedure_id: Uuid::new_v4().to_string(),
                 technique_id: techniques[1].technique_id.clone(),
                 name: "Password Spraying".to_string(),
-                description: "Attempting to authenticate with common passwords across many accounts".to_string(),
+                description:
+                    "Attempting to authenticate with common passwords across many accounts"
+                        .to_string(),
                 implementation: "Automated password spraying tool".to_string(),
                 detection_difficulty: DetectionDifficulty::High,
                 success_rate: 0.55,
@@ -645,13 +829,18 @@ impl TTPEvolutionModule {
     }
 
     /// Gather tactics
-    async fn gather_tactics(&self, techniques: &[Technique], time_range: &DateRange) -> Result<Vec<Tactic>> {
+    async fn gather_tactics(
+        &self,
+        techniques: &[Technique],
+        time_range: &DateRange,
+    ) -> Result<Vec<Tactic>> {
         Ok(vec![
             Tactic {
                 tactic_id: "TA0002".to_string(),
                 name: "Execution".to_string(),
                 description: "The adversary is trying to run malicious code".to_string(),
-                techniques_count: techniques.iter()
+                techniques_count: techniques
+                    .iter()
                     .filter(|t| t.tactic == "Execution")
                     .count(),
                 usage_frequency: 0.88,
@@ -662,7 +851,8 @@ impl TTPEvolutionModule {
                 tactic_id: "TA0001".to_string(),
                 name: "Initial Access".to_string(),
                 description: "The adversary is trying to get into your network".to_string(),
-                techniques_count: techniques.iter()
+                techniques_count: techniques
+                    .iter()
                     .filter(|t| t.tactic == "Initial Access")
                     .count(),
                 usage_frequency: 0.95,
@@ -673,10 +863,15 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate usage statistics
-    async fn calculate_usage_statistics(&self, techniques: &[Technique], procedures: &[Procedure]) -> Result<UsageStatistics> {
+    async fn calculate_usage_statistics(
+        &self,
+        techniques: &[Technique],
+        procedures: &[Procedure],
+    ) -> Result<UsageStatistics> {
         let total_techniques = techniques.len();
         let total_procedures = procedures.len();
-        let active_techniques = techniques.iter()
+        let active_techniques = techniques
+            .iter()
             .filter(|t| t.last_seen > Utc::now() - Duration::days(30))
             .count();
 
@@ -691,19 +886,25 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate effectiveness scores
-    async fn calculate_effectiveness_scores(&self, techniques: &[Technique]) -> Result<HashMap<String, f64>> {
+    async fn calculate_effectiveness_scores(
+        &self,
+        techniques: &[Technique],
+    ) -> Result<HashMap<String, f64>> {
         let mut scores = HashMap::new();
         for technique in techniques {
-            let score = (technique.success_rate * 0.4) +
-                       ((1.0 - technique.detection_rate) * 0.4) +
-                       (technique.usage_frequency * 0.2);
+            let score = (technique.success_rate * 0.4)
+                + ((1.0 - technique.detection_rate) * 0.4)
+                + (technique.usage_frequency * 0.2);
             scores.insert(technique.technique_id.clone(), score);
         }
         Ok(scores)
     }
 
     /// Calculate success rates
-    async fn calculate_success_rates(&self, techniques: &[Technique]) -> Result<HashMap<String, f64>> {
+    async fn calculate_success_rates(
+        &self,
+        techniques: &[Technique],
+    ) -> Result<HashMap<String, f64>> {
         let mut rates = HashMap::new();
         for technique in techniques {
             rates.insert(technique.technique_id.clone(), technique.success_rate);
@@ -712,7 +913,10 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate detection rates
-    async fn calculate_detection_rates(&self, techniques: &[Technique]) -> Result<HashMap<String, f64>> {
+    async fn calculate_detection_rates(
+        &self,
+        techniques: &[Technique],
+    ) -> Result<HashMap<String, f64>> {
         let mut rates = HashMap::new();
         for technique in techniques {
             rates.insert(technique.technique_id.clone(), technique.detection_rate);
@@ -721,7 +925,10 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate mitigation rates
-    async fn calculate_mitigation_rates(&self, techniques: &[Technique]) -> Result<HashMap<String, f64>> {
+    async fn calculate_mitigation_rates(
+        &self,
+        techniques: &[Technique],
+    ) -> Result<HashMap<String, f64>> {
         let mut rates = HashMap::new();
         for technique in techniques {
             let mitigation_score = match technique.mitigation {
@@ -743,7 +950,11 @@ impl TTPEvolutionModule {
     }
 
     /// Generate trend data points
-    fn generate_trend_data_points(&self, time_range: &DateRange, trend_type: &str) -> Vec<TrendDataPoint> {
+    fn generate_trend_data_points(
+        &self,
+        time_range: &DateRange,
+        trend_type: &str,
+    ) -> Vec<TrendDataPoint> {
         let mut data_points = Vec::new();
         let duration = time_range.end.signed_duration_since(time_range.start);
         let days = duration.num_days();
@@ -767,20 +978,24 @@ impl TTPEvolutionModule {
     }
 
     /// Calculate adaptation effectiveness
-    async fn calculate_adaptation_effectiveness(&self, adaptation_events: &[AdaptationEvent]) -> Result<f64> {
+    async fn calculate_adaptation_effectiveness(
+        &self,
+        adaptation_events: &[AdaptationEvent],
+    ) -> Result<f64> {
         if adaptation_events.is_empty() {
             return Ok(0.0);
         }
 
-        let successful_adaptations = adaptation_events.iter()
-            .filter(|e| e.success)
-            .count();
+        let successful_adaptations = adaptation_events.iter().filter(|e| e.success).count();
 
         Ok(successful_adaptations as f64 / adaptation_events.len() as f64)
     }
 
     /// Identify adaptation patterns
-    async fn identify_adaptation_patterns(&self, _adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationPattern>> {
+    async fn identify_adaptation_patterns(
+        &self,
+        _adaptation_events: &[AdaptationEvent],
+    ) -> Result<Vec<AdaptationPattern>> {
         Ok(vec![
             AdaptationPattern {
                 pattern_id: Uuid::new_v4().to_string(),
@@ -810,38 +1025,43 @@ impl TTPEvolutionModule {
     }
 
     /// Identify successful strategies
-    async fn identify_successful_strategies(&self, patterns: &[AdaptationPattern]) -> Result<Vec<SuccessfulStrategy>> {
-        Ok(vec![
-            SuccessfulStrategy {
-                strategy_id: Uuid::new_v4().to_string(),
-                strategy_name: "Dynamic Obfuscation".to_string(),
-                success_rate: 0.78,
-                adoption_rate: 0.45,
-                effectiveness_score: 8.2,
-                key_factors: vec![
-                    "Runtime adaptation".to_string(),
-                    "Anti-analysis techniques".to_string(),
-                    "Polymorphic code".to_string(),
-                ],
-            },
-        ])
+    async fn identify_successful_strategies(
+        &self,
+        patterns: &[AdaptationPattern],
+    ) -> Result<Vec<SuccessfulStrategy>> {
+        Ok(vec![SuccessfulStrategy {
+            strategy_id: Uuid::new_v4().to_string(),
+            strategy_name: "Dynamic Obfuscation".to_string(),
+            success_rate: 0.78,
+            adoption_rate: 0.45,
+            effectiveness_score: 8.2,
+            key_factors: vec![
+                "Runtime adaptation".to_string(),
+                "Anti-analysis techniques".to_string(),
+                "Polymorphic code".to_string(),
+            ],
+        }])
     }
 
     /// Analyze adaptation trends
-    async fn analyze_adaptation_trends(&self, _adaptation_events: &[AdaptationEvent]) -> Result<Vec<AdaptationTrend>> {
-        Ok(vec![
-            AdaptationTrend {
-                trend_name: "Adaptation Frequency".to_string(),
-                current_level: 7.5,
-                trend_direction: TrendDirection::Increasing,
-                growth_rate: 0.22,
-                confidence: 0.8,
-            },
-        ])
+    async fn analyze_adaptation_trends(
+        &self,
+        _adaptation_events: &[AdaptationEvent],
+    ) -> Result<Vec<AdaptationTrend>> {
+        Ok(vec![AdaptationTrend {
+            trend_name: "Adaptation Frequency".to_string(),
+            current_level: 7.5,
+            trend_direction: TrendDirection::Increasing,
+            growth_rate: 0.22,
+            confidence: 0.8,
+        }])
     }
 
     /// Generate adaptation insights
-    async fn generate_adaptation_insights(&self, strategies: &[SuccessfulStrategy]) -> Result<Vec<String>> {
+    async fn generate_adaptation_insights(
+        &self,
+        strategies: &[SuccessfulStrategy],
+    ) -> Result<Vec<String>> {
         Ok(vec![
             "Threat actors are rapidly adapting to new defenses".to_string(),
             "Successful strategies focus on evasion and obfuscation".to_string(),
@@ -851,7 +1071,11 @@ impl TTPEvolutionModule {
     }
 
     /// Predict new techniques
-    async fn predict_new_techniques(&self, _current_patterns: &[EvolutionPattern], _horizon: Duration) -> Result<Vec<PredictedTechnique>> {
+    async fn predict_new_techniques(
+        &self,
+        _current_patterns: &[EvolutionPattern],
+        _horizon: Duration,
+    ) -> Result<Vec<PredictedTechnique>> {
         Ok(vec![
             PredictedTechnique {
                 technique_id: Uuid::new_v4().to_string(),
@@ -875,46 +1099,56 @@ impl TTPEvolutionModule {
     }
 
     /// Predict adaptation strategies
-    async fn predict_adaptation_strategies(&self, _current_patterns: &[EvolutionPattern], _horizon: Duration) -> Result<Vec<PredictedAdaptation>> {
-        Ok(vec![
-            PredictedAdaptation {
-                adaptation_id: Uuid::new_v4().to_string(),
-                adaptation_name: "Adaptive Evasion".to_string(),
-                description: "Dynamic technique modification based on detection".to_string(),
-                likelihood: 0.8,
-                effectiveness: 0.7,
-                time_to_adoption: Duration::days(60),
-            },
-        ])
+    async fn predict_adaptation_strategies(
+        &self,
+        _current_patterns: &[EvolutionPattern],
+        _horizon: Duration,
+    ) -> Result<Vec<PredictedAdaptation>> {
+        Ok(vec![PredictedAdaptation {
+            adaptation_id: Uuid::new_v4().to_string(),
+            adaptation_name: "Adaptive Evasion".to_string(),
+            description: "Dynamic technique modification based on detection".to_string(),
+            likelihood: 0.8,
+            effectiveness: 0.7,
+            time_to_adoption: Duration::days(60),
+        }])
     }
 
     /// Predict technique effectiveness
-    async fn predict_technique_effectiveness(&self, _current_patterns: &[EvolutionPattern], horizon: Duration) -> Result<Vec<PredictedEffectiveness>> {
-        Ok(vec![
-            PredictedEffectiveness {
-                technique_type: "AI-Enhanced".to_string(),
-                predicted_effectiveness: 0.82,
-                confidence: 0.75,
-                time_horizon: horizon,
-            },
-        ])
+    async fn predict_technique_effectiveness(
+        &self,
+        _current_patterns: &[EvolutionPattern],
+        horizon: Duration,
+    ) -> Result<Vec<PredictedEffectiveness>> {
+        Ok(vec![PredictedEffectiveness {
+            technique_type: "AI-Enhanced".to_string(),
+            predicted_effectiveness: 0.82,
+            confidence: 0.75,
+            time_horizon: horizon,
+        }])
     }
 
     /// Calculate prediction confidence
-    fn calculate_prediction_confidence(&self, techniques: &[PredictedTechnique], adaptations: &[PredictedAdaptation]) -> f64 {
-        let technique_confidence = techniques.iter()
-            .map(|t| t.likelihood)
-            .sum::<f64>() / techniques.len() as f64;
+    fn calculate_prediction_confidence(
+        &self,
+        techniques: &[PredictedTechnique],
+        adaptations: &[PredictedAdaptation],
+    ) -> f64 {
+        let technique_confidence =
+            techniques.iter().map(|t| t.likelihood).sum::<f64>() / techniques.len() as f64;
 
-        let adaptation_confidence = adaptations.iter()
-            .map(|a| a.likelihood)
-            .sum::<f64>() / adaptations.len() as f64;
+        let adaptation_confidence =
+            adaptations.iter().map(|a| a.likelihood).sum::<f64>() / adaptations.len() as f64;
 
         (technique_confidence + adaptation_confidence) / 2.0
     }
 
     /// Get technique history
-    async fn get_technique_history(&self, _technique_id: &str, time_range: &DateRange) -> Result<Vec<TechniqueSnapshot>> {
+    async fn get_technique_history(
+        &self,
+        _technique_id: &str,
+        time_range: &DateRange,
+    ) -> Result<Vec<TechniqueSnapshot>> {
         Ok(vec![
             TechniqueSnapshot {
                 timestamp: time_range.start,
@@ -941,43 +1175,47 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze adaptation patterns
-    async fn analyze_adaptation_patterns(&self, _history: &[TechniqueSnapshot]) -> Result<Vec<AdaptationPattern>> {
-        Ok(vec![
-            AdaptationPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_type: "Progressive Enhancement".to_string(),
-                frequency: 0.4,
-                success_rate: 0.7,
-                description: "Gradual improvement of technique effectiveness".to_string(),
-                examples: vec![
-                    "Detection rate reduction".to_string(),
-                    "Success rate increase".to_string(),
-                ],
-            },
-        ])
+    async fn analyze_adaptation_patterns(
+        &self,
+        _history: &[TechniqueSnapshot],
+    ) -> Result<Vec<AdaptationPattern>> {
+        Ok(vec![AdaptationPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_type: "Progressive Enhancement".to_string(),
+            frequency: 0.4,
+            success_rate: 0.7,
+            description: "Gradual improvement of technique effectiveness".to_string(),
+            examples: vec![
+                "Detection rate reduction".to_string(),
+                "Success rate increase".to_string(),
+            ],
+        }])
     }
 
     /// Identify successful adaptations
-    async fn identify_successful_adaptations(&self, patterns: &[AdaptationPattern]) -> Result<Vec<SuccessfulAdaptation>> {
-        Ok(vec![
-            SuccessfulAdaptation {
-                adaptation_id: Uuid::new_v4().to_string(),
-                adaptation_type: "Evasion Improvement".to_string(),
-                success_score: 0.82,
-                impact_score: 0.75,
-                key_changes: vec![
-                    "Better obfuscation".to_string(),
-                    "Anti-analysis techniques".to_string(),
-                ],
-            },
-        ])
+    async fn identify_successful_adaptations(
+        &self,
+        patterns: &[AdaptationPattern],
+    ) -> Result<Vec<SuccessfulAdaptation>> {
+        Ok(vec![SuccessfulAdaptation {
+            adaptation_id: Uuid::new_v4().to_string(),
+            adaptation_type: "Evasion Improvement".to_string(),
+            success_score: 0.82,
+            impact_score: 0.75,
+            key_changes: vec![
+                "Better obfuscation".to_string(),
+                "Anti-analysis techniques".to_string(),
+            ],
+        }])
     }
 
     /// Assess adaptation effectiveness
-    async fn assess_adaptation_effectiveness(&self, adaptations: &[SuccessfulAdaptation]) -> Result<AdaptationEffectiveness> {
-        let average_success = adaptations.iter()
-            .map(|a| a.success_score)
-            .sum::<f64>() / adaptations.len() as f64;
+    async fn assess_adaptation_effectiveness(
+        &self,
+        adaptations: &[SuccessfulAdaptation],
+    ) -> Result<AdaptationEffectiveness> {
+        let average_success =
+            adaptations.iter().map(|a| a.success_score).sum::<f64>() / adaptations.len() as f64;
 
         Ok(AdaptationEffectiveness {
             overall_effectiveness: average_success,
@@ -994,7 +1232,9 @@ impl TTPEvolutionModule {
             end: Utc::now(),
         };
 
-        let baseline_data = self.gather_ttp_data(&time_range, &EvolutionScope::Global).await?;
+        let baseline_data = self
+            .gather_ttp_data(&time_range, &EvolutionScope::Global)
+            .await?;
 
         Ok(TTPBaseline {
             baseline_id: Uuid::new_v4().to_string(),
@@ -1006,54 +1246,59 @@ impl TTPEvolutionModule {
     }
 
     /// Identify TTP combinations
-    async fn identify_ttp_combinations(&self, time_range: &DateRange) -> Result<Vec<TTPCombination>> {
-        Ok(vec![
-            TTPCombination {
-                combination_id: Uuid::new_v4().to_string(),
-                techniques: vec!["T1059".to_string(), "T1078".to_string()],
-                frequency: 0.35,
-                success_rate: 0.72,
-                typical_sequence: vec!["Initial Access".to_string(), "Execution".to_string()],
-                first_observed: Utc::now() - Duration::days(120),
-                last_observed: Utc::now(),
-            },
-        ])
+    async fn identify_ttp_combinations(
+        &self,
+        time_range: &DateRange,
+    ) -> Result<Vec<TTPCombination>> {
+        Ok(vec![TTPCombination {
+            combination_id: Uuid::new_v4().to_string(),
+            techniques: vec!["T1059".to_string(), "T1078".to_string()],
+            frequency: 0.35,
+            success_rate: 0.72,
+            typical_sequence: vec!["Initial Access".to_string(), "Execution".to_string()],
+            first_observed: Utc::now() - Duration::days(120),
+            last_observed: Utc::now(),
+        }])
     }
 
     /// Identify attack chains
-    async fn identify_attack_chains(&self, _correlation_patterns: &[CorrelationPattern]) -> Result<Vec<AttackChain>> {
-        Ok(vec![
-            AttackChain {
-                chain_id: Uuid::new_v4().to_string(),
-                chain_name: "Credential-Based Attack".to_string(),
-                stages: vec![
-                    ChainStage {
-                        stage_name: "Initial Access".to_string(),
-                        techniques: vec!["T1078".to_string()],
-                        success_probability: 0.65,
-                    },
-                    ChainStage {
-                        stage_name: "Execution".to_string(),
-                        techniques: vec!["T1059".to_string()],
-                        success_probability: 0.78,
-                    },
-                ],
-                overall_success_rate: 0.51,
-                average_duration: Duration::hours(48),
-                detection_probability: 0.45,
-            },
-        ])
+    async fn identify_attack_chains(
+        &self,
+        _correlation_patterns: &[CorrelationPattern],
+    ) -> Result<Vec<AttackChain>> {
+        Ok(vec![AttackChain {
+            chain_id: Uuid::new_v4().to_string(),
+            chain_name: "Credential-Based Attack".to_string(),
+            stages: vec![
+                ChainStage {
+                    stage_name: "Initial Access".to_string(),
+                    techniques: vec!["T1078".to_string()],
+                    success_probability: 0.65,
+                },
+                ChainStage {
+                    stage_name: "Execution".to_string(),
+                    techniques: vec!["T1059".to_string()],
+                    success_probability: 0.78,
+                },
+            ],
+            overall_success_rate: 0.51,
+            average_duration: Duration::hours(48),
+            detection_probability: 0.45,
+        }])
     }
 
     /// Assess chain effectiveness
-    async fn assess_chain_effectiveness(&self, chains: &[AttackChain]) -> Result<ChainEffectiveness> {
-        let average_success = chains.iter()
-            .map(|c| c.overall_success_rate)
-            .sum::<f64>() / chains.len() as f64;
+    async fn assess_chain_effectiveness(
+        &self,
+        chains: &[AttackChain],
+    ) -> Result<ChainEffectiveness> {
+        let average_success =
+            chains.iter().map(|c| c.overall_success_rate).sum::<f64>() / chains.len() as f64;
 
         Ok(ChainEffectiveness {
             overall_effectiveness: average_success,
-            chain_success_rates: chains.iter()
+            chain_success_rates: chains
+                .iter()
                 .map(|c| (c.chain_id.clone(), c.overall_success_rate))
                 .collect(),
             stage_effectiveness: self.calculate_stage_effectiveness(chains).await?,
@@ -1080,19 +1325,23 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze temporal patterns
-    async fn analyze_temporal_patterns(&self, techniques: &[Technique]) -> Result<Vec<TemporalPattern>> {
-        Ok(vec![
-            TemporalPattern {
-                pattern_name: "Peak Hours".to_string(),
-                time_period: "Business Hours".to_string(),
-                frequency_increase: 1.8,
-                confidence: 0.75,
-            },
-        ])
+    async fn analyze_temporal_patterns(
+        &self,
+        techniques: &[Technique],
+    ) -> Result<Vec<TemporalPattern>> {
+        Ok(vec![TemporalPattern {
+            pattern_name: "Peak Hours".to_string(),
+            time_period: "Business Hours".to_string(),
+            frequency_increase: 1.8,
+            confidence: 0.75,
+        }])
     }
 
     /// Calculate success distribution
-    fn calculate_success_distribution(&self, adaptations: &[SuccessfulAdaptation]) -> HashMap<String, f64> {
+    fn calculate_success_distribution(
+        &self,
+        adaptations: &[SuccessfulAdaptation],
+    ) -> HashMap<String, f64> {
         let mut distribution = HashMap::new();
         for adaptation in adaptations {
             distribution.insert(adaptation.adaptation_id.clone(), adaptation.success_score);
@@ -1101,10 +1350,12 @@ impl TTPEvolutionModule {
     }
 
     /// Assess adaptation impact
-    async fn assess_adaptation_impact(&self, adaptations: &[SuccessfulAdaptation]) -> Result<AdaptationImpact> {
-        let average_impact = adaptations.iter()
-            .map(|a| a.impact_score)
-            .sum::<f64>() / adaptations.len() as f64;
+    async fn assess_adaptation_impact(
+        &self,
+        adaptations: &[SuccessfulAdaptation],
+    ) -> Result<AdaptationImpact> {
+        let average_impact =
+            adaptations.iter().map(|a| a.impact_score).sum::<f64>() / adaptations.len() as f64;
 
         Ok(AdaptationImpact {
             overall_impact: average_impact,
@@ -1121,20 +1372,24 @@ impl TTPEvolutionModule {
     }
 
     /// Analyze effectiveness trends
-    async fn analyze_effectiveness_trends(&self, _adaptations: &[SuccessfulAdaptation]) -> Result<Vec<EffectivenessTrend>> {
-        Ok(vec![
-            EffectivenessTrend {
-                trend_name: "Adaptation Success Rate".to_string(),
-                current_level: 0.75,
-                trend_direction: TrendDirection::Increasing,
-                growth_rate: 0.15,
-                confidence: 0.8,
-            },
-        ])
+    async fn analyze_effectiveness_trends(
+        &self,
+        _adaptations: &[SuccessfulAdaptation],
+    ) -> Result<Vec<EffectivenessTrend>> {
+        Ok(vec![EffectivenessTrend {
+            trend_name: "Adaptation Success Rate".to_string(),
+            current_level: 0.75,
+            trend_direction: TrendDirection::Increasing,
+            growth_rate: 0.15,
+            confidence: 0.8,
+        }])
     }
 
     /// Calculate stage effectiveness
-    async fn calculate_stage_effectiveness(&self, chains: &[AttackChain]) -> Result<HashMap<String, f64>> {
+    async fn calculate_stage_effectiveness(
+        &self,
+        chains: &[AttackChain],
+    ) -> Result<HashMap<String, f64>> {
         let mut effectiveness = HashMap::new();
 
         for chain in chains {
@@ -1149,15 +1404,13 @@ impl TTPEvolutionModule {
 
     /// Analyze chain trends
     async fn analyze_chain_trends(&self, _chains: &[AttackChain]) -> Result<Vec<ChainTrend>> {
-        Ok(vec![
-            ChainTrend {
-                trend_name: "Chain Complexity".to_string(),
-                current_level: 6.5,
-                trend_direction: TrendDirection::Increasing,
-                growth_rate: 0.12,
-                confidence: 0.75,
-            },
-        ])
+        Ok(vec![ChainTrend {
+            trend_name: "Chain Complexity".to_string(),
+            current_level: 6.5,
+            trend_direction: TrendDirection::Increasing,
+            growth_rate: 0.12,
+            confidence: 0.75,
+        }])
     }
 
     /// Generate executive summary
@@ -1192,7 +1445,10 @@ impl TTPEvolutionModule {
     }
 
     /// Generate adaptation assessment section
-    async fn generate_adaptation_assessment(&self, analysis: &TTPEvolutionAnalysis) -> Result<String> {
+    async fn generate_adaptation_assessment(
+        &self,
+        analysis: &TTPEvolutionAnalysis,
+    ) -> Result<String> {
         Ok(format!(
             "Adaptation assessment shows {} adaptation events with {:.1}% effectiveness. Key adaptation patterns include {} and {}, indicating {} threat actor capabilities.",
             analysis.adaptation_events.len(),
@@ -1204,7 +1460,10 @@ impl TTPEvolutionModule {
     }
 
     /// Generate predictions section
-    async fn generate_predictions_section(&self, analysis: &TTPEvolutionAnalysis) -> Result<String> {
+    async fn generate_predictions_section(
+        &self,
+        analysis: &TTPEvolutionAnalysis,
+    ) -> Result<String> {
         Ok(format!(
             "TTP evolution predictions indicate {} new techniques emerging within {} days with {:.1}% confidence. Key predictions include {} and {}, requiring {} and {}.",
             analysis.evolution_predictions.predicted_techniques.len(),
@@ -1218,7 +1477,10 @@ impl TTPEvolutionModule {
     }
 
     /// Generate TTP recommendations
-    async fn generate_ttp_recommendations(&self, analysis: &TTPEvolutionAnalysis) -> Result<Vec<String>> {
+    async fn generate_ttp_recommendations(
+        &self,
+        analysis: &TTPEvolutionAnalysis,
+    ) -> Result<Vec<String>> {
         Ok(vec![
             "Implement continuous TTP monitoring and analysis".to_string(),
             "Develop adaptive defense strategies".to_string(),
@@ -1230,7 +1492,10 @@ impl TTPEvolutionModule {
     }
 
     /// Generate TTP visualizations
-    async fn generate_ttp_visualizations(&self, analysis: &TTPEvolutionAnalysis) -> Result<Vec<Visualization>> {
+    async fn generate_ttp_visualizations(
+        &self,
+        analysis: &TTPEvolutionAnalysis,
+    ) -> Result<Vec<Visualization>> {
         Ok(vec![
             Visualization {
                 visualization_id: Uuid::new_v4().to_string(),
@@ -1260,7 +1525,9 @@ impl TTPEvolutionModule {
 
     /// Send TTP event
     async fn send_ttp_event(&self, event: TTPEvent) -> Result<()> {
-        self.ttp_sender.send(event).await
+        self.ttp_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send TTP event: {}", e))
     }
 
@@ -1968,16 +2235,18 @@ impl TTPCorrelationEngine {
         }
     }
 
-    async fn analyze_correlations(&self, _combinations: &[TTPCombination]) -> Result<Vec<CorrelationPattern>> {
-        Ok(vec![
-            CorrelationPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_type: "Technique Chaining".to_string(),
-                strength: 0.75,
-                confidence: 0.8,
-                description: "Common pattern of combining initial access with execution techniques".to_string(),
-            },
-        ])
+    async fn analyze_correlations(
+        &self,
+        _combinations: &[TTPCombination],
+    ) -> Result<Vec<CorrelationPattern>> {
+        Ok(vec![CorrelationPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_type: "Technique Chaining".to_string(),
+            strength: 0.75,
+            confidence: 0.8,
+            description: "Common pattern of combining initial access with execution techniques"
+                .to_string(),
+        }])
     }
 }
 
@@ -1998,79 +2267,85 @@ impl PatternRecognizer {
         }
     }
 
-    async fn analyze_technique_evolution(&self, techniques: &[Technique], time_range: &DateRange) -> Result<Vec<EvolutionPattern>> {
-        Ok(vec![
-            EvolutionPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_name: "Technique Sophistication Increase".to_string(),
-                description: "Techniques becoming more sophisticated over time".to_string(),
-                evolution_rate: 0.18,
-                impact_score: 8.5,
-                confidence: 0.82,
-                affected_techniques: techniques.iter().map(|t| t.technique_id.clone()).collect(),
-                key_changes: vec![
-                    "Better evasion techniques".to_string(),
-                    "Advanced obfuscation".to_string(),
-                    "Multi-stage approaches".to_string(),
-                ],
-                drivers: vec![
-                    "Defense improvements".to_string(),
-                    "Technology advancement".to_string(),
-                ],
-                first_observed: time_range.start,
-                trend_direction: TrendDirection::Increasing,
-            },
-        ])
+    async fn analyze_technique_evolution(
+        &self,
+        techniques: &[Technique],
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionPattern>> {
+        Ok(vec![EvolutionPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_name: "Technique Sophistication Increase".to_string(),
+            description: "Techniques becoming more sophisticated over time".to_string(),
+            evolution_rate: 0.18,
+            impact_score: 8.5,
+            confidence: 0.82,
+            affected_techniques: techniques.iter().map(|t| t.technique_id.clone()).collect(),
+            key_changes: vec![
+                "Better evasion techniques".to_string(),
+                "Advanced obfuscation".to_string(),
+                "Multi-stage approaches".to_string(),
+            ],
+            drivers: vec![
+                "Defense improvements".to_string(),
+                "Technology advancement".to_string(),
+            ],
+            first_observed: time_range.start,
+            trend_direction: TrendDirection::Increasing,
+        }])
     }
 
-    async fn analyze_procedure_evolution(&self, procedures: &[Procedure], time_range: &DateRange) -> Result<Vec<EvolutionPattern>> {
-        Ok(vec![
-            EvolutionPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_name: "Procedure Automation".to_string(),
-                description: "Procedures becoming more automated and efficient".to_string(),
-                evolution_rate: 0.22,
-                impact_score: 7.8,
-                confidence: 0.78,
-                affected_techniques: procedures.iter().map(|p| p.technique_id.clone()).collect(),
-                key_changes: vec![
-                    "Script automation".to_string(),
-                    "Tool integration".to_string(),
-                    "Process optimization".to_string(),
-                ],
-                drivers: vec![
-                    "Technology availability".to_string(),
-                    "Efficiency requirements".to_string(),
-                ],
-                first_observed: time_range.start,
-                trend_direction: TrendDirection::Increasing,
-            },
-        ])
+    async fn analyze_procedure_evolution(
+        &self,
+        procedures: &[Procedure],
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionPattern>> {
+        Ok(vec![EvolutionPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_name: "Procedure Automation".to_string(),
+            description: "Procedures becoming more automated and efficient".to_string(),
+            evolution_rate: 0.22,
+            impact_score: 7.8,
+            confidence: 0.78,
+            affected_techniques: procedures.iter().map(|p| p.technique_id.clone()).collect(),
+            key_changes: vec![
+                "Script automation".to_string(),
+                "Tool integration".to_string(),
+                "Process optimization".to_string(),
+            ],
+            drivers: vec![
+                "Technology availability".to_string(),
+                "Efficiency requirements".to_string(),
+            ],
+            first_observed: time_range.start,
+            trend_direction: TrendDirection::Increasing,
+        }])
     }
 
-    async fn analyze_tactic_evolution(&self, tactics: &[Tactic], time_range: &DateRange) -> Result<Vec<EvolutionPattern>> {
-        Ok(vec![
-            EvolutionPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_name: "Tactic Diversification".to_string(),
-                description: "Threat actors diversifying their tactical approaches".to_string(),
-                evolution_rate: 0.15,
-                impact_score: 7.2,
-                confidence: 0.75,
-                affected_techniques: vec!["Multiple".to_string()],
-                key_changes: vec![
-                    "Multi-tactic campaigns".to_string(),
-                    "Tactic combination".to_string(),
-                    "Adaptive approaches".to_string(),
-                ],
-                drivers: vec![
-                    "Defense adaptation".to_string(),
-                    "Success optimization".to_string(),
-                ],
-                first_observed: time_range.start,
-                trend_direction: TrendDirection::Increasing,
-            },
-        ])
+    async fn analyze_tactic_evolution(
+        &self,
+        tactics: &[Tactic],
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionPattern>> {
+        Ok(vec![EvolutionPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_name: "Tactic Diversification".to_string(),
+            description: "Threat actors diversifying their tactical approaches".to_string(),
+            evolution_rate: 0.15,
+            impact_score: 7.2,
+            confidence: 0.75,
+            affected_techniques: vec!["Multiple".to_string()],
+            key_changes: vec![
+                "Multi-tactic campaigns".to_string(),
+                "Tactic combination".to_string(),
+                "Adaptive approaches".to_string(),
+            ],
+            drivers: vec![
+                "Defense adaptation".to_string(),
+                "Success optimization".to_string(),
+            ],
+            first_observed: time_range.start,
+            trend_direction: TrendDirection::Increasing,
+        }])
     }
 }
 
@@ -2109,40 +2384,44 @@ impl AdaptationAnalyzer {
         }
     }
 
-    async fn identify_technique_adaptations(&self, techniques: &[Technique], time_range: &DateRange) -> Result<Vec<AdaptationEvent>> {
-        Ok(vec![
-            AdaptationEvent {
-                event_id: Uuid::new_v4().to_string(),
-                technique_id: techniques[0].technique_id.clone(),
-                adaptation_type: "Evasion Improvement".to_string(),
-                description: "Technique modified to better evade detection".to_string(),
-                success: true,
-                impact_score: 0.8,
-                timestamp: Utc::now() - Duration::days(15),
-                evidence: vec![
-                    "Detection rate decreased".to_string(),
-                    "Success rate increased".to_string(),
-                ],
-            },
-        ])
+    async fn identify_technique_adaptations(
+        &self,
+        techniques: &[Technique],
+        time_range: &DateRange,
+    ) -> Result<Vec<AdaptationEvent>> {
+        Ok(vec![AdaptationEvent {
+            event_id: Uuid::new_v4().to_string(),
+            technique_id: techniques[0].technique_id.clone(),
+            adaptation_type: "Evasion Improvement".to_string(),
+            description: "Technique modified to better evade detection".to_string(),
+            success: true,
+            impact_score: 0.8,
+            timestamp: Utc::now() - Duration::days(15),
+            evidence: vec![
+                "Detection rate decreased".to_string(),
+                "Success rate increased".to_string(),
+            ],
+        }])
     }
 
-    async fn identify_procedure_adaptations(&self, procedures: &[Procedure], time_range: &DateRange) -> Result<Vec<AdaptationEvent>> {
-        Ok(vec![
-            AdaptationEvent {
-                event_id: Uuid::new_v4().to_string(),
-                technique_id: procedures[0].technique_id.clone(),
-                adaptation_type: "Automation Enhancement".to_string(),
-                description: "Procedure enhanced with automation capabilities".to_string(),
-                success: true,
-                impact_score: 0.7,
-                timestamp: Utc::now() - Duration::days(10),
-                evidence: vec![
-                    "Execution time reduced".to_string(),
-                    "Success rate improved".to_string(),
-                ],
-            },
-        ])
+    async fn identify_procedure_adaptations(
+        &self,
+        procedures: &[Procedure],
+        time_range: &DateRange,
+    ) -> Result<Vec<AdaptationEvent>> {
+        Ok(vec![AdaptationEvent {
+            event_id: Uuid::new_v4().to_string(),
+            technique_id: procedures[0].technique_id.clone(),
+            adaptation_type: "Automation Enhancement".to_string(),
+            description: "Procedure enhanced with automation capabilities".to_string(),
+            success: true,
+            impact_score: 0.7,
+            timestamp: Utc::now() - Duration::days(10),
+            evidence: vec![
+                "Execution time reduced".to_string(),
+                "Success rate improved".to_string(),
+            ],
+        }])
     }
 }
 

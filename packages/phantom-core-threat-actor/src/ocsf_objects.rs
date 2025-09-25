@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use uuid;
 
@@ -545,7 +545,10 @@ impl Vulnerability {
     pub fn new(name: String, cve_id: Option<String>) -> Self {
         let cve = cve_id.map(|id| Cve {
             cve_id: id.clone(),
-            url: Some(format!("https://cve.mitre.org/cgi-bin/cvename.cgi?name={}", id)),
+            url: Some(format!(
+                "https://cve.mitre.org/cgi-bin/cvename.cgi?name={}",
+                id
+            )),
             summary: None,
             published: None,
             modified: None,
@@ -682,7 +685,11 @@ mod tests {
         assert_eq!(user_actor.r#type, Some("user".to_string()));
         assert!(user_actor.user.is_some());
 
-        let process_actor = Actor::new_process("malware.exe".to_string(), 1234, "/tmp/malware.exe".to_string());
+        let process_actor = Actor::new_process(
+            "malware.exe".to_string(),
+            1234,
+            "/tmp/malware.exe".to_string(),
+        );
         assert_eq!(process_actor.name, Some("malware.exe".to_string()));
         assert_eq!(process_actor.r#type, Some("process".to_string()));
         assert!(process_actor.process.is_some());
@@ -719,13 +726,23 @@ mod tests {
 
     #[test]
     fn test_vulnerability_creation() {
-        let mut vuln = Vulnerability::new("Remote Code Execution".to_string(), Some("CVE-2023-12345".to_string()));
+        let mut vuln = Vulnerability::new(
+            "Remote Code Execution".to_string(),
+            Some("CVE-2023-12345".to_string()),
+        );
         assert_eq!(vuln.name, Some("Remote Code Execution".to_string()));
         assert!(vuln.cve.is_some());
 
-        vuln.set_cvss(9.8, "Critical".to_string(), "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H".to_string());
+        vuln.set_cvss(
+            9.8,
+            "Critical".to_string(),
+            "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H".to_string(),
+        );
         assert_eq!(vuln.cvss.as_ref().unwrap().base_score, Some(9.8));
-        assert_eq!(vuln.cvss.as_ref().unwrap().base_severity, Some("Critical".to_string()));
+        assert_eq!(
+            vuln.cvss.as_ref().unwrap().base_severity,
+            Some("Critical".to_string())
+        );
     }
 
     #[test]

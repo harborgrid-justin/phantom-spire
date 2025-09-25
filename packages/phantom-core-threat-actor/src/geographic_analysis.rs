@@ -3,13 +3,13 @@
 //! Advanced geospatial analysis for threat actor activities, including location tracking,
 //! regional pattern analysis, border analysis, and geographic intelligence.
 
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Geographic analysis engine
 #[derive(Debug)]
@@ -77,7 +77,10 @@ impl GeographicAnalysisModule {
     }
 
     /// Record location data
-    pub async fn record_location_data(&mut self, location_config: LocationDataConfig) -> Result<String> {
+    pub async fn record_location_data(
+        &mut self,
+        location_config: LocationDataConfig,
+    ) -> Result<String> {
         let location_id = Uuid::new_v4().to_string();
 
         let location_data = LocationData {
@@ -97,7 +100,8 @@ impl GeographicAnalysisModule {
             recorded_at: Utc::now(),
         };
 
-        self.location_data.insert(location_id.clone(), location_data.clone());
+        self.location_data
+            .insert(location_id.clone(), location_data.clone());
 
         // Update regional patterns
         self.update_regional_patterns(&location_data).await?;
@@ -106,14 +110,25 @@ impl GeographicAnalysisModule {
     }
 
     /// Analyze threat activities by location
-    pub async fn analyze_location_threats(&self, location_id: &str) -> Result<LocationThreatAnalysis> {
-        let location = self.location_data.get(location_id)
+    pub async fn analyze_location_threats(
+        &self,
+        location_id: &str,
+    ) -> Result<LocationThreatAnalysis> {
+        let location = self
+            .location_data
+            .get(location_id)
             .ok_or_else(|| anyhow::anyhow!("Location not found: {}", location_id))?;
 
         let threat_activities = self.get_threat_activities_in_location(location).await?;
-        let risk_assessment = self.assess_location_risk(location, &threat_activities).await?;
-        let patterns = self.identify_location_patterns(location, &threat_activities).await?;
-        let recommendations = self.generate_location_recommendations(location, &risk_assessment).await?;
+        let risk_assessment = self
+            .assess_location_risk(location, &threat_activities)
+            .await?;
+        let patterns = self
+            .identify_location_patterns(location, &threat_activities)
+            .await?;
+        let recommendations = self
+            .generate_location_recommendations(location, &risk_assessment)
+            .await?;
 
         Ok(LocationThreatAnalysis {
             location_id: location_id.to_string(),
@@ -127,7 +142,10 @@ impl GeographicAnalysisModule {
     }
 
     /// Get threat activities in a location
-    async fn get_threat_activities_in_location(&self, location: &LocationData) -> Result<Vec<ThreatActivity>> {
+    async fn get_threat_activities_in_location(
+        &self,
+        location: &LocationData,
+    ) -> Result<Vec<ThreatActivity>> {
         // In a real implementation, this would query threat activity data
         // For now, return mock data based on location
         let mut activities = Vec::new();
@@ -149,13 +167,20 @@ impl GeographicAnalysisModule {
     }
 
     /// Assess location risk
-    async fn assess_location_risk(&self, location: &LocationData, activities: &[ThreatActivity]) -> Result<LocationRiskAssessment> {
+    async fn assess_location_risk(
+        &self,
+        location: &LocationData,
+        activities: &[ThreatActivity],
+    ) -> Result<LocationRiskAssessment> {
         let base_risk = self.calculate_base_location_risk(location);
         let activity_risk = self.calculate_activity_risk(activities);
         let geopolitical_risk = self.assess_geopolitical_risk(location);
         let infrastructure_risk = self.assess_infrastructure_risk(location);
 
-        let overall_risk = (base_risk * 0.3) + (activity_risk * 0.4) + (geopolitical_risk * 0.2) + (infrastructure_risk * 0.1);
+        let overall_risk = (base_risk * 0.3)
+            + (activity_risk * 0.4)
+            + (geopolitical_risk * 0.2)
+            + (infrastructure_risk * 0.1);
 
         Ok(LocationRiskAssessment {
             overall_risk_score: overall_risk,
@@ -196,7 +221,8 @@ impl GeographicAnalysisModule {
             return 1.0;
         }
 
-        let max_severity = activities.iter()
+        let max_severity = activities
+            .iter()
             .map(|a| match a.severity {
                 ActivitySeverity::Critical => 10.0,
                 ActivitySeverity::High => 7.0,
@@ -227,7 +253,11 @@ impl GeographicAnalysisModule {
         let mut risk = 3.0;
 
         // Check for known infrastructure vulnerabilities
-        if location.infrastructure.iter().any(|infra| infra.contains("outdated")) {
+        if location
+            .infrastructure
+            .iter()
+            .any(|infra| infra.contains("outdated"))
+        {
             risk += 2.0;
         }
 
@@ -235,7 +265,11 @@ impl GeographicAnalysisModule {
     }
 
     /// Identify risk factors
-    fn identify_risk_factors(&self, location: &LocationData, activities: &[ThreatActivity]) -> Vec<RiskFactor> {
+    fn identify_risk_factors(
+        &self,
+        location: &LocationData,
+        activities: &[ThreatActivity],
+    ) -> Vec<RiskFactor> {
         let mut factors = Vec::new();
 
         if location.country == "Russia" || location.country == "China" {
@@ -260,7 +294,11 @@ impl GeographicAnalysisModule {
     }
 
     /// Identify location patterns
-    async fn identify_location_patterns(&self, location: &LocationData, activities: &[ThreatActivity]) -> Result<Vec<LocationPattern>> {
+    async fn identify_location_patterns(
+        &self,
+        location: &LocationData,
+        activities: &[ThreatActivity],
+    ) -> Result<Vec<LocationPattern>> {
         let mut patterns = Vec::new();
 
         // Analyze activity timing patterns
@@ -276,7 +314,9 @@ impl GeographicAnalysisModule {
         }
 
         // Analyze geographic clustering
-        let cluster_pattern = self.analyze_geographic_clustering(location, activities).await?;
+        let cluster_pattern = self
+            .analyze_geographic_clustering(location, activities)
+            .await?;
         if let Some(pattern) = cluster_pattern {
             patterns.push(pattern);
         }
@@ -285,26 +325,34 @@ impl GeographicAnalysisModule {
     }
 
     /// Analyze timing patterns
-    async fn analyze_timing_patterns(&self, activities: &[ThreatActivity]) -> Result<Option<LocationPattern>> {
+    async fn analyze_timing_patterns(
+        &self,
+        activities: &[ThreatActivity],
+    ) -> Result<Option<LocationPattern>> {
         if activities.len() < 3 {
             return Ok(None);
         }
 
         // Check for patterns in activity timing
         let timestamps: Vec<_> = activities.iter().map(|a| a.detected_at).collect();
-        let intervals: Vec<_> = timestamps.windows(2)
+        let intervals: Vec<_> = timestamps
+            .windows(2)
             .map(|w| w[1].signed_duration_since(w[0]))
             .collect();
 
         // Check for regular intervals
         let avg_interval = intervals.iter().sum::<Duration>() / intervals.len() as i32;
-        let regular_pattern = intervals.iter()
+        let regular_pattern = intervals
+            .iter()
             .all(|interval| (*interval - avg_interval).abs() < Duration::hours(1));
 
         if regular_pattern {
             Ok(Some(LocationPattern {
                 pattern_type: PatternType::Timing,
-                description: format!("Regular activity pattern with ~{} hour intervals", avg_interval.num_hours()),
+                description: format!(
+                    "Regular activity pattern with ~{} hour intervals",
+                    avg_interval.num_hours()
+                ),
                 confidence: 0.8,
                 supporting_evidence: activities.len(),
                 first_observed: timestamps[0],
@@ -316,7 +364,10 @@ impl GeographicAnalysisModule {
     }
 
     /// Analyze activity type patterns
-    async fn analyze_activity_type_patterns(&self, activities: &[ThreatActivity]) -> Result<Option<LocationPattern>> {
+    async fn analyze_activity_type_patterns(
+        &self,
+        activities: &[ThreatActivity],
+    ) -> Result<Option<LocationPattern>> {
         if activities.is_empty() {
             return Ok(None);
         }
@@ -328,17 +379,22 @@ impl GeographicAnalysisModule {
         }
 
         // Find dominant activity type
-        let dominant_type = type_counts.iter()
+        let dominant_type = type_counts
+            .iter()
             .max_by_key(|(_, count)| *count)
             .map(|(activity_type, _)| *activity_type);
 
         if let Some(activity_type) = dominant_type {
-            let percentage = (*type_counts.get(activity_type).unwrap() as f64 / activities.len() as f64) * 100.0;
+            let percentage =
+                (*type_counts.get(activity_type).unwrap() as f64 / activities.len() as f64) * 100.0;
 
             if percentage > 70.0 {
                 Ok(Some(LocationPattern {
                     pattern_type: PatternType::ActivityType,
-                    description: format!("Dominant activity type: {:?} ({}% of activities)", activity_type, percentage as u32),
+                    description: format!(
+                        "Dominant activity type: {:?} ({}% of activities)",
+                        activity_type, percentage as u32
+                    ),
                     confidence: 0.9,
                     supporting_evidence: activities.len(),
                     first_observed: activities[0].detected_at,
@@ -353,7 +409,11 @@ impl GeographicAnalysisModule {
     }
 
     /// Analyze geographic clustering
-    async fn analyze_geographic_clustering(&self, location: &LocationData, activities: &[ThreatActivity]) -> Result<Option<LocationPattern>> {
+    async fn analyze_geographic_clustering(
+        &self,
+        location: &LocationData,
+        activities: &[ThreatActivity],
+    ) -> Result<Option<LocationPattern>> {
         if activities.len() < 5 {
             return Ok(None);
         }
@@ -361,9 +421,11 @@ impl GeographicAnalysisModule {
         // Calculate clustering coefficient
         let coordinates: Vec<_> = activities.iter().map(|a| &a.coordinates).collect();
         let centroid = self.calculate_centroid(&coordinates);
-        let avg_distance = coordinates.iter()
+        let avg_distance = coordinates
+            .iter()
             .map(|coord| self.calculate_distance(coord, &centroid))
-            .sum::<f64>() / coordinates.len() as f64;
+            .sum::<f64>()
+            / coordinates.len() as f64;
 
         // Check if activities are clustered
         let clustered = avg_distance < 10.0; // Within 10km
@@ -371,7 +433,10 @@ impl GeographicAnalysisModule {
         if clustered {
             Ok(Some(LocationPattern {
                 pattern_type: PatternType::Geographic,
-                description: format!("Activities clustered within {:.1}km radius around location", avg_distance),
+                description: format!(
+                    "Activities clustered within {:.1}km radius around location",
+                    avg_distance
+                ),
                 confidence: 0.85,
                 supporting_evidence: activities.len(),
                 first_observed: activities[0].detected_at,
@@ -401,8 +466,8 @@ impl GeographicAnalysisModule {
         let delta_lat = (coord2.latitude - coord1.latitude).to_radians();
         let delta_lon = (coord2.longitude - coord1.longitude).to_radians();
 
-        let a = (delta_lat / 2.0).sin().powi(2) +
-                lat1_rad.cos() * lat2_rad.cos() * (delta_lon / 2.0).sin().powi(2);
+        let a = (delta_lat / 2.0).sin().powi(2)
+            + lat1_rad.cos() * lat2_rad.cos() * (delta_lon / 2.0).sin().powi(2);
         let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
 
         // Earth's radius in kilometers
@@ -410,7 +475,11 @@ impl GeographicAnalysisModule {
     }
 
     /// Generate location recommendations
-    async fn generate_location_recommendations(&self, location: &LocationData, risk_assessment: &LocationRiskAssessment) -> Result<Vec<LocationRecommendation>> {
+    async fn generate_location_recommendations(
+        &self,
+        location: &LocationData,
+        risk_assessment: &LocationRiskAssessment,
+    ) -> Result<Vec<LocationRecommendation>> {
         let mut recommendations = Vec::new();
 
         if risk_assessment.overall_risk_score > 7.0 {
@@ -448,7 +517,9 @@ impl GeographicAnalysisModule {
     async fn update_regional_patterns(&mut self, location: &LocationData) -> Result<()> {
         let region_key = format!("{}-{}", location.country, location.region);
 
-        let pattern = self.regional_patterns.entry(region_key.clone())
+        let pattern = self
+            .regional_patterns
+            .entry(region_key.clone())
             .or_insert_with(|| RegionalPattern {
                 region: region_key,
                 activity_count: 0,
@@ -468,8 +539,14 @@ impl GeographicAnalysisModule {
     pub async fn analyze_regional_threats(&self, region: &str) -> Result<RegionalThreatAnalysis> {
         let regional_activities = self.get_regional_activities(region).await?;
         let threat_actors = self.get_regional_threat_actors(region).await?;
-        let cross_border_activities = self.border_analysis.analyze_cross_border_activities(region).await?;
-        let jurisdictional_issues = self.jurisdictional_analyzer.analyze_jurisdictional_complexity(region).await?;
+        let cross_border_activities = self
+            .border_analysis
+            .analyze_cross_border_activities(region)
+            .await?;
+        let jurisdictional_issues = self
+            .jurisdictional_analyzer
+            .analyze_jurisdictional_complexity(region)
+            .await?;
 
         Ok(RegionalThreatAnalysis {
             region: region.to_string(),
@@ -478,7 +555,9 @@ impl GeographicAnalysisModule {
             dominant_threat_types: self.calculate_dominant_threat_types(&regional_activities),
             cross_border_risk: cross_border_activities.risk_score,
             jurisdictional_complexity: jurisdictional_issues.complexity_score,
-            regional_recommendations: self.generate_regional_recommendations(region, &regional_activities).await?,
+            regional_recommendations: self
+                .generate_regional_recommendations(region, &regional_activities)
+                .await?,
             analyzed_at: Utc::now(),
         })
     }
@@ -496,7 +575,10 @@ impl GeographicAnalysisModule {
     }
 
     /// Calculate dominant threat types
-    fn calculate_dominant_threat_types(&self, activities: &[ThreatActivity]) -> HashMap<String, usize> {
+    fn calculate_dominant_threat_types(
+        &self,
+        activities: &[ThreatActivity],
+    ) -> HashMap<String, usize> {
         let mut type_counts = HashMap::new();
 
         for activity in activities {
@@ -518,20 +600,28 @@ impl GeographicAnalysisModule {
     }
 
     /// Generate regional recommendations
-    async fn generate_regional_recommendations(&self, region: &str, activities: &[ThreatActivity]) -> Result<Vec<RegionalRecommendation>> {
+    async fn generate_regional_recommendations(
+        &self,
+        region: &str,
+        activities: &[ThreatActivity],
+    ) -> Result<Vec<RegionalRecommendation>> {
         let mut recommendations = Vec::new();
 
         if activities.len() > 10 {
             recommendations.push(RegionalRecommendation {
                 recommendation_type: RecommendationType::RegionalCoordination,
-                description: format!("High activity region {} requires coordinated response", region),
+                description: format!(
+                    "High activity region {} requires coordinated response",
+                    region
+                ),
                 priority: RecommendationPriority::High,
                 regional_actions: vec![
                     "Establish regional threat intelligence sharing".to_string(),
                     "Coordinate with local authorities".to_string(),
                     "Deploy regional monitoring capabilities".to_string(),
                 ],
-                expected_regional_impact: "Improved regional threat visibility and response".to_string(),
+                expected_regional_impact: "Improved regional threat visibility and response"
+                    .to_string(),
             });
         }
 
@@ -574,7 +664,11 @@ impl GeographicAnalysisModule {
                         zone_id: zone.zone_id.clone(),
                         alert_type: ZoneAlertType::ActivityDetected,
                         severity: AlertSeverity::Medium,
-                        description: format!("{} activities detected in threat zone {}", activities_in_zone.len(), zone.name),
+                        description: format!(
+                            "{} activities detected in threat zone {}",
+                            activities_in_zone.len(),
+                            zone.name
+                        ),
                         detected_activities: activities_in_zone.len(),
                         triggered_at: Utc::now(),
                     });
@@ -593,7 +687,9 @@ impl GeographicAnalysisModule {
 
     /// Send geographic event
     pub async fn send_geographic_event(&self, event: GeographicEvent) -> Result<()> {
-        self.location_sender.send(event).await
+        self.location_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send geographic event: {}", e))
     }
 
@@ -993,9 +1089,7 @@ struct MappingEngine {
 
 impl MappingEngine {
     fn new() -> Self {
-        Self {
-            map_layers: vec![],
-        }
+        Self { map_layers: vec![] }
     }
 }
 
@@ -1045,7 +1139,10 @@ impl JurisdictionalAnalyzer {
         }
     }
 
-    async fn analyze_jurisdictional_complexity(&self, region: &str) -> Result<JurisdictionalAnalysis> {
+    async fn analyze_jurisdictional_complexity(
+        &self,
+        region: &str,
+    ) -> Result<JurisdictionalAnalysis> {
         Ok(JurisdictionalAnalysis {
             region: region.to_string(),
             jurisdiction_count: 1,

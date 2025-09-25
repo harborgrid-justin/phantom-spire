@@ -3,13 +3,13 @@
 //! Comprehensive compliance reporting and monitoring system for threat actor intelligence.
 //! Generates regulatory reports, tracks compliance status, and ensures adherence to standards.
 
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
 use tokio::sync::mpsc;
-use futures::stream::Stream;
-use anyhow::Result;
+use uuid::Uuid;
 
 /// Compliance reporting and monitoring engine
 #[derive(Debug)]
@@ -62,7 +62,10 @@ impl ComplianceReportingModule {
     async fn process_compliance_event(event: ComplianceEvent) {
         match event {
             ComplianceEvent::ComplianceViolation(violation) => {
-                println!("Processing compliance violation: {}", violation.violation_id);
+                println!(
+                    "Processing compliance violation: {}",
+                    violation.violation_id
+                );
                 // Process compliance violation
             }
             ComplianceEvent::ReportGenerated(report) => {
@@ -77,7 +80,10 @@ impl ComplianceReportingModule {
     }
 
     /// Register a compliance framework
-    pub async fn register_framework(&mut self, framework_config: FrameworkConfig) -> Result<String> {
+    pub async fn register_framework(
+        &mut self,
+        framework_config: FrameworkConfig,
+    ) -> Result<String> {
         let framework_id = Uuid::new_v4().to_string();
 
         let framework = ComplianceFramework {
@@ -96,7 +102,8 @@ impl ComplianceReportingModule {
             compliance_score: 0.0,
         };
 
-        self.compliance_frameworks.insert(framework_id.clone(), framework);
+        self.compliance_frameworks
+            .insert(framework_id.clone(), framework);
 
         Ok(framework_id)
     }
@@ -106,8 +113,12 @@ impl ComplianceReportingModule {
         let report_id = Uuid::new_v4().to_string();
 
         // Get framework data
-        let framework = self.compliance_frameworks.get(&report_config.framework_id)
-            .ok_or_else(|| anyhow::anyhow!("Framework not found: {}", report_config.framework_id))?;
+        let framework = self
+            .compliance_frameworks
+            .get(&report_config.framework_id)
+            .ok_or_else(|| {
+                anyhow::anyhow!("Framework not found: {}", report_config.framework_id)
+            })?;
 
         // Generate report sections
         let executive_summary = self.generate_executive_summary(framework).await?;
@@ -136,16 +147,21 @@ impl ComplianceReportingModule {
             distribution_list: report_config.distribution_list,
         };
 
-        self.active_reports.insert(report_id.clone(), report.clone());
+        self.active_reports
+            .insert(report_id.clone(), report.clone());
 
         // Log report generation
-        self.log_compliance_event(ComplianceEvent::ReportGenerated(report)).await?;
+        self.log_compliance_event(ComplianceEvent::ReportGenerated(report))
+            .await?;
 
         Ok(report_id)
     }
 
     /// Assess compliance status
-    async fn assess_compliance_status(&self, framework: &ComplianceFramework) -> Result<ComplianceStatus> {
+    async fn assess_compliance_status(
+        &self,
+        framework: &ComplianceFramework,
+    ) -> Result<ComplianceStatus> {
         let overall_score = framework.compliance_score;
         let control_compliance = self.calculate_control_compliance(framework).await?;
         let requirement_compliance = self.calculate_requirement_compliance(framework).await?;
@@ -157,9 +173,10 @@ impl ComplianceReportingModule {
             requirement_compliance_percentage: requirement_compliance,
             risk_level,
             last_assessment: framework.last_assessment,
-            next_assessment_due: framework.last_assessment
+            next_assessment_due: framework
+                .last_assessment
                 .map(|date| date + framework.assessment_frequency),
-            critical_findings: 0, // Would be calculated
+            critical_findings: 0,                      // Would be calculated
             compliance_trend: ComplianceTrend::Stable, // Would be calculated
         })
     }
@@ -170,7 +187,9 @@ impl ComplianceReportingModule {
             return Ok(0.0);
         }
 
-        let compliant_controls = framework.controls.iter()
+        let compliant_controls = framework
+            .controls
+            .iter()
             .filter(|control| control.compliance_status == ComplianceStatusEnum::Compliant)
             .count();
 
@@ -178,12 +197,17 @@ impl ComplianceReportingModule {
     }
 
     /// Calculate requirement compliance percentage
-    async fn calculate_requirement_compliance(&self, framework: &ComplianceFramework) -> Result<f64> {
+    async fn calculate_requirement_compliance(
+        &self,
+        framework: &ComplianceFramework,
+    ) -> Result<f64> {
         if framework.requirements.is_empty() {
             return Ok(0.0);
         }
 
-        let compliant_requirements = framework.requirements.iter()
+        let compliant_requirements = framework
+            .requirements
+            .iter()
             .filter(|req| req.compliance_status == ComplianceStatusEnum::Compliant)
             .count();
 
@@ -201,7 +225,10 @@ impl ComplianceReportingModule {
     }
 
     /// Assess controls
-    async fn assess_controls(&self, framework: &ComplianceFramework) -> Result<Vec<ControlAssessment>> {
+    async fn assess_controls(
+        &self,
+        framework: &ComplianceFramework,
+    ) -> Result<Vec<ControlAssessment>> {
         let mut assessments = Vec::new();
 
         for control in &framework.controls {
@@ -223,7 +250,10 @@ impl ComplianceReportingModule {
     }
 
     /// Identify findings
-    async fn identify_findings(&self, framework: &ComplianceFramework) -> Result<Vec<ComplianceFinding>> {
+    async fn identify_findings(
+        &self,
+        framework: &ComplianceFramework,
+    ) -> Result<Vec<ComplianceFinding>> {
         let mut findings = Vec::new();
 
         // Check for non-compliant controls
@@ -277,7 +307,10 @@ impl ComplianceReportingModule {
     }
 
     /// Generate recommendations
-    async fn generate_recommendations(&self, findings: &[ComplianceFinding]) -> Result<Vec<ComplianceRecommendation>> {
+    async fn generate_recommendations(
+        &self,
+        findings: &[ComplianceFinding],
+    ) -> Result<Vec<ComplianceRecommendation>> {
         let mut recommendations = Vec::new();
 
         if !findings.is_empty() {
@@ -341,7 +374,9 @@ impl ComplianceReportingModule {
     /// Log compliance event
     async fn log_compliance_event(&mut self, event: ComplianceEvent) -> Result<()> {
         self.audit_trail.push(event.clone());
-        self.report_sender.send(event).await
+        self.report_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to log compliance event: {}", e))
     }
 
@@ -353,13 +388,17 @@ impl ComplianceReportingModule {
             // Check for overdue assessments
             if let Some(last_assessment) = framework.last_assessment {
                 let next_due = last_assessment + framework.assessment_frequency;
-                if Utc::now() > next_due + Duration::days(7) { // 7-day grace period
+                if Utc::now() > next_due + Duration::days(7) {
+                    // 7-day grace period
                     alerts.push(ComplianceAlert {
                         alert_id: Uuid::new_v4().to_string(),
                         alert_type: AlertType::AssessmentOverdue,
                         severity: AlertSeverity::High,
                         title: format!("Assessment overdue for {}", framework.name),
-                        description: format!("Compliance assessment for {} is significantly overdue", framework.name),
+                        description: format!(
+                            "Compliance assessment for {} is significantly overdue",
+                            framework.name
+                        ),
                         framework_id: framework.framework_id.clone(),
                         triggered_at: Utc::now(),
                         recommended_actions: vec![
@@ -378,7 +417,10 @@ impl ComplianceReportingModule {
                     alert_type: AlertType::ComplianceThreshold,
                     severity: AlertSeverity::High,
                     title: format!("Compliance threshold breached for {}", framework.name),
-                    description: format!("Compliance score ({:.1}%) is below threshold ({:.1}%)", framework.compliance_score, framework.compliance_threshold),
+                    description: format!(
+                        "Compliance score ({:.1}%) is below threshold ({:.1}%)",
+                        framework.compliance_score, framework.compliance_threshold
+                    ),
                     framework_id: framework.framework_id.clone(),
                     triggered_at: Utc::now(),
                     recommended_actions: vec![
@@ -401,7 +443,9 @@ impl ComplianceReportingModule {
     /// Get compliance dashboard data
     pub fn get_compliance_dashboard(&self) -> ComplianceDashboard {
         let total_frameworks = self.compliance_frameworks.len();
-        let compliant_frameworks = self.compliance_frameworks.values()
+        let compliant_frameworks = self
+            .compliance_frameworks
+            .values()
             .filter(|f| f.compliance_score >= f.compliance_threshold)
             .count();
 
@@ -411,11 +455,15 @@ impl ComplianceReportingModule {
             0.0
         };
 
-        let critical_findings = self.compliance_alerts.iter()
+        let critical_findings = self
+            .compliance_alerts
+            .iter()
             .filter(|a| a.severity == AlertSeverity::Critical)
             .count();
 
-        let upcoming_assessments = self.compliance_frameworks.values()
+        let upcoming_assessments = self
+            .compliance_frameworks
+            .values()
             .filter(|f| {
                 if let Some(last) = f.last_assessment {
                     let next = last + f.assessment_frequency;
@@ -463,7 +511,9 @@ impl ComplianceReportingModule {
 
     /// Send compliance event
     pub async fn send_compliance_event(&self, event: ComplianceEvent) -> Result<()> {
-        self.report_sender.send(event).await
+        self.report_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send compliance event: {}", e))
     }
 

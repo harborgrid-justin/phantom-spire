@@ -3,11 +3,11 @@
 #[cfg(feature = "diesel-orm")]
 use super::schema::*;
 #[cfg(feature = "diesel-orm")]
+use chrono::{DateTime, Utc};
+#[cfg(feature = "diesel-orm")]
 use diesel::prelude::*;
 #[cfg(feature = "diesel-orm")]
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "diesel-orm")]
-use chrono::{DateTime, Utc};
 #[cfg(feature = "diesel-orm")]
 use std::collections::HashMap;
 

@@ -3,13 +3,13 @@
 //! Comprehensive analysis of threat actor infrastructure including command and control servers,
 //! malware distribution networks, and operational technology.
 
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
 use tokio::sync::RwLock;
-use futures::stream::Stream;
-use anyhow::Result;
+use uuid::Uuid;
 
 /// Infrastructure analysis engine
 #[derive(Debug)]
@@ -46,7 +46,11 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze threat actor infrastructure
-    pub async fn analyze_infrastructure(&self, threat_actor_id: &str, time_range: DateRange) -> Result<InfrastructureAnalysis> {
+    pub async fn analyze_infrastructure(
+        &self,
+        threat_actor_id: &str,
+        time_range: DateRange,
+    ) -> Result<InfrastructureAnalysis> {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
@@ -58,14 +62,31 @@ impl InfrastructureAnalysisModule {
         }
 
         // Discover infrastructure components
-        let c2_servers = self.c2_analyzer.discover_c2_servers(threat_actor_id, &time_range).await?;
-        let malware_infrastructure = self.malware_distributor.analyze_distribution_network(threat_actor_id, &time_range).await?;
-        let domain_infrastructure = self.domain_analyzer.analyze_domains(threat_actor_id, &time_range).await?;
-        let ip_infrastructure = self.ip_analyzer.analyze_ip_ranges(threat_actor_id, &time_range).await?;
-        let certificate_infrastructure = self.certificate_analyzer.analyze_certificates(threat_actor_id, &time_range).await?;
+        let c2_servers = self
+            .c2_analyzer
+            .discover_c2_servers(threat_actor_id, &time_range)
+            .await?;
+        let malware_infrastructure = self
+            .malware_distributor
+            .analyze_distribution_network(threat_actor_id, &time_range)
+            .await?;
+        let domain_infrastructure = self
+            .domain_analyzer
+            .analyze_domains(threat_actor_id, &time_range)
+            .await?;
+        let ip_infrastructure = self
+            .ip_analyzer
+            .analyze_ip_ranges(threat_actor_id, &time_range)
+            .await?;
+        let certificate_infrastructure = self
+            .certificate_analyzer
+            .analyze_certificates(threat_actor_id, &time_range)
+            .await?;
 
         // Build network topology
-        let topology = self.build_network_topology(&c2_servers, &malware_infrastructure, &domain_infrastructure).await?;
+        let topology = self
+            .build_network_topology(&c2_servers, &malware_infrastructure, &domain_infrastructure)
+            .await?;
 
         // Analyze infrastructure patterns
         let patterns = self.analyze_infrastructure_patterns(&topology).await?;
@@ -74,10 +95,13 @@ impl InfrastructureAnalysisModule {
         let resilience = self.assess_infrastructure_resilience(&topology).await?;
 
         // Generate infrastructure insights
-        let insights = self.generate_infrastructure_insights(&patterns, &resilience).await?;
+        let insights = self
+            .generate_infrastructure_insights(&patterns, &resilience)
+            .await?;
 
         // Calculate infrastructure score
-        let infrastructure_score = self.calculate_infrastructure_score(&topology, &patterns, &resilience);
+        let infrastructure_score =
+            self.calculate_infrastructure_score(&topology, &patterns, &resilience);
 
         let analysis = InfrastructureAnalysis {
             analysis_id,
@@ -94,7 +118,8 @@ impl InfrastructureAnalysisModule {
             insights,
             infrastructure_score,
             analyzed_at: Utc::now(),
-            confidence_level: self.calculate_analysis_confidence(&c2_servers, &domain_infrastructure),
+            confidence_level: self
+                .calculate_analysis_confidence(&c2_servers, &domain_infrastructure),
             data_sources: vec![
                 "Passive DNS".to_string(),
                 "Certificate Transparency Logs".to_string(),
@@ -111,17 +136,27 @@ impl InfrastructureAnalysisModule {
         self.analysis_cache.write().await.insert(cache_key, cached);
 
         // Send infrastructure event
-        self.send_infrastructure_event(InfrastructureEvent::AnalysisCompleted(analysis.clone())).await?;
+        self.send_infrastructure_event(InfrastructureEvent::AnalysisCompleted(analysis.clone()))
+            .await?;
 
         Ok(analysis)
     }
 
     /// Discover and analyze C2 infrastructure
-    pub async fn analyze_c2_infrastructure(&self, threat_actor_id: &str) -> Result<C2Infrastructure> {
-        let servers = self.c2_analyzer.discover_c2_servers(threat_actor_id, &DateRange {
-            start: Utc::now() - Duration::days(90),
-            end: Utc::now(),
-        }).await?;
+    pub async fn analyze_c2_infrastructure(
+        &self,
+        threat_actor_id: &str,
+    ) -> Result<C2Infrastructure> {
+        let servers = self
+            .c2_analyzer
+            .discover_c2_servers(
+                threat_actor_id,
+                &DateRange {
+                    start: Utc::now() - Duration::days(90),
+                    end: Utc::now(),
+                },
+            )
+            .await?;
 
         let patterns = self.c2_analyzer.analyze_c2_patterns(&servers).await?;
         let resilience = self.c2_analyzer.assess_c2_resilience(&servers).await?;
@@ -137,24 +172,41 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze malware distribution infrastructure
-    pub async fn analyze_malware_distribution(&self, threat_actor_id: &str) -> Result<MalwareDistributionInfrastructure> {
-        self.malware_distributor.analyze_distribution_network(threat_actor_id, &DateRange {
-            start: Utc::now() - Duration::days(30),
-            end: Utc::now(),
-        }).await
+    pub async fn analyze_malware_distribution(
+        &self,
+        threat_actor_id: &str,
+    ) -> Result<MalwareDistributionInfrastructure> {
+        self.malware_distributor
+            .analyze_distribution_network(
+                threat_actor_id,
+                &DateRange {
+                    start: Utc::now() - Duration::days(30),
+                    end: Utc::now(),
+                },
+            )
+            .await
     }
 
     /// Track infrastructure changes
-    pub async fn track_infrastructure_changes(&self, threat_actor_id: &str, time_range: DateRange) -> Result<InfrastructureChanges> {
-        let current_analysis = self.analyze_infrastructure(threat_actor_id, time_range.clone()).await?;
+    pub async fn track_infrastructure_changes(
+        &self,
+        threat_actor_id: &str,
+        time_range: DateRange,
+    ) -> Result<InfrastructureChanges> {
+        let current_analysis = self
+            .analyze_infrastructure(threat_actor_id, time_range.clone())
+            .await?;
         let previous_time_range = DateRange {
             start: time_range.start - Duration::days(30),
             end: time_range.start,
         };
-        let previous_analysis = self.analyze_infrastructure(threat_actor_id, previous_time_range).await?;
+        let previous_analysis = self
+            .analyze_infrastructure(threat_actor_id, previous_time_range)
+            .await?;
 
         let new_servers = self.identify_new_servers(&current_analysis, &previous_analysis);
-        let decommissioned_servers = self.identify_decommissioned_servers(&current_analysis, &previous_analysis);
+        let decommissioned_servers =
+            self.identify_decommissioned_servers(&current_analysis, &previous_analysis);
         let changed_patterns = self.identify_pattern_changes(&current_analysis, &previous_analysis);
 
         Ok(InfrastructureChanges {
@@ -163,7 +215,11 @@ impl InfrastructureAnalysisModule {
             new_infrastructure: new_servers.clone(),
             decommissioned_infrastructure: decommissioned_servers.clone(),
             pattern_changes: changed_patterns.clone(),
-            change_summary: self.summarize_changes(&new_servers, &decommissioned_servers, &changed_patterns),
+            change_summary: self.summarize_changes(
+                &new_servers,
+                &decommissioned_servers,
+                &changed_patterns,
+            ),
             change_impact: self.assess_change_impact(&new_servers, &decommissioned_servers),
         })
     }
@@ -222,7 +278,10 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze infrastructure patterns
-    async fn analyze_infrastructure_patterns(&self, topology: &NetworkTopology) -> Result<InfrastructurePatterns> {
+    async fn analyze_infrastructure_patterns(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<InfrastructurePatterns> {
         let hosting_patterns = self.analyze_hosting_patterns(topology).await?;
         let geographic_distribution = self.analyze_geographic_distribution(topology).await?;
         let temporal_patterns = self.analyze_temporal_patterns(topology).await?;
@@ -233,18 +292,23 @@ impl InfrastructureAnalysisModule {
             geographic_distribution: geographic_distribution.clone(),
             temporal_patterns,
             resilience_patterns,
-            pattern_confidence: self.calculate_pattern_confidence(&hosting_patterns, &geographic_distribution),
+            pattern_confidence: self
+                .calculate_pattern_confidence(&hosting_patterns, &geographic_distribution),
         })
     }
 
     /// Assess infrastructure resilience
-    async fn assess_infrastructure_resilience(&self, topology: &NetworkTopology) -> Result<InfrastructureResilience> {
+    async fn assess_infrastructure_resilience(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<InfrastructureResilience> {
         let redundancy_level = self.calculate_redundancy_level(topology);
         let failover_capability = self.assess_failover_capability(topology);
         let detection_resistance = self.assess_detection_resistance(topology);
         let recovery_speed = self.assess_recovery_speed(topology);
 
-        let resilience_score = (redundancy_level + failover_capability + detection_resistance + recovery_speed) / 4.0;
+        let resilience_score =
+            (redundancy_level + failover_capability + detection_resistance + recovery_speed) / 4.0;
 
         Ok(InfrastructureResilience {
             resilience_score,
@@ -266,8 +330,11 @@ impl InfrastructureAnalysisModule {
         let mut insights = Vec::new();
 
         // Hosting concentration insight
-        if let Some(concentration) = patterns.hosting_patterns.iter()
-            .find(|p| p.provider == "Major Cloud Provider" && p.percentage > 0.6) {
+        if let Some(concentration) = patterns
+            .hosting_patterns
+            .iter()
+            .find(|p| p.provider == "Major Cloud Provider" && p.percentage > 0.6)
+        {
             insights.push(InfrastructureInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::RiskAlert,
@@ -292,15 +359,19 @@ impl InfrastructureAnalysisModule {
         }
 
         // Geographic concentration insight
-        if let Some(geo) = patterns.geographic_distribution.iter()
-            .find(|g| g.percentage > 0.5) {
+        if let Some(geo) = patterns
+            .geographic_distribution
+            .iter()
+            .find(|g| g.percentage > 0.5)
+        {
             insights.push(InfrastructureInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::Operational,
                 title: "Geographic Infrastructure Concentration".to_string(),
                 description: format!(
                     "{:.1}% of infrastructure concentrated in {}, increasing regional risk",
-                    geo.percentage * 100.0, geo.country
+                    geo.percentage * 100.0,
+                    geo.country
                 ),
                 confidence: 0.78,
                 impact: "Medium - Regional events could impact operations".to_string(),
@@ -361,16 +432,27 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Calculate analysis confidence
-    fn calculate_analysis_confidence(&self, c2_servers: &[C2Server], domain_infrastructure: &DomainInfrastructure) -> f64 {
+    fn calculate_analysis_confidence(
+        &self,
+        c2_servers: &[C2Server],
+        domain_infrastructure: &DomainInfrastructure,
+    ) -> f64 {
         let c2_confidence = if c2_servers.is_empty() { 0.3 } else { 0.8 };
-        let domain_confidence = if domain_infrastructure.domains.is_empty() { 0.3 } else { 0.85 };
+        let domain_confidence = if domain_infrastructure.domains.is_empty() {
+            0.3
+        } else {
+            0.85
+        };
         let data_quality = 0.75; // Placeholder
 
         (c2_confidence + domain_confidence + data_quality) / 3.0
     }
 
     /// Analyze hosting patterns
-    async fn analyze_hosting_patterns(&self, topology: &NetworkTopology) -> Result<Vec<HostingPattern>> {
+    async fn analyze_hosting_patterns(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<Vec<HostingPattern>> {
         let mut provider_counts = HashMap::new();
         let total_nodes = topology.nodes.len() as f64;
 
@@ -386,7 +468,11 @@ impl InfrastructureAnalysisModule {
                 provider,
                 count,
                 percentage: count as f64 / total_nodes,
-                risk_level: if count as f64 / total_nodes > 0.5 { RiskLevel::High } else { RiskLevel::Low },
+                risk_level: if count as f64 / total_nodes > 0.5 {
+                    RiskLevel::High
+                } else {
+                    RiskLevel::Low
+                },
             });
         }
 
@@ -394,7 +480,10 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze geographic distribution
-    async fn analyze_geographic_distribution(&self, topology: &NetworkTopology) -> Result<Vec<GeographicDistribution>> {
+    async fn analyze_geographic_distribution(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<Vec<GeographicDistribution>> {
         let mut country_counts = HashMap::new();
         let total_nodes = topology.nodes.len() as f64;
 
@@ -418,7 +507,10 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze temporal patterns
-    async fn analyze_temporal_patterns(&self, topology: &NetworkTopology) -> Result<TemporalPatterns> {
+    async fn analyze_temporal_patterns(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<TemporalPatterns> {
         let mut activation_times = Vec::new();
         let mut deactivation_times = Vec::new();
 
@@ -430,7 +522,8 @@ impl InfrastructureAnalysisModule {
         }
 
         let average_lifespan = if !activation_times.is_empty() {
-            let total_lifespan: i64 = activation_times.iter()
+            let total_lifespan: i64 = activation_times
+                .iter()
                 .map(|t| Utc::now().signed_duration_since(*t).num_days())
                 .sum();
             total_lifespan as f64 / activation_times.len() as f64
@@ -447,7 +540,10 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Analyze resilience patterns
-    async fn analyze_resilience_patterns(&self, topology: &NetworkTopology) -> Result<ResiliencePatterns> {
+    async fn analyze_resilience_patterns(
+        &self,
+        topology: &NetworkTopology,
+    ) -> Result<ResiliencePatterns> {
         let redundancy_score = self.calculate_redundancy_level(topology);
         let geographic_diversity = self.calculate_geographic_diversity(topology);
         let hosting_diversity = self.calculate_hosting_diversity(topology);
@@ -477,9 +573,8 @@ impl InfrastructureAnalysisModule {
     /// Assess failover capability
     fn assess_failover_capability(&self, topology: &NetworkTopology) -> f64 {
         // Assess based on node diversity and connection patterns
-        let node_types: std::collections::HashSet<_> = topology.nodes.iter()
-            .map(|n| n.node_type.clone())
-            .collect();
+        let node_types: std::collections::HashSet<_> =
+            topology.nodes.iter().map(|n| n.node_type.clone()).collect();
 
         let type_diversity = node_types.len() as f64 / 5.0; // Assume 5 possible node types
         let connection_redundancy = self.calculate_connection_redundancy(topology);
@@ -490,9 +585,16 @@ impl InfrastructureAnalysisModule {
     /// Assess detection resistance
     fn assess_detection_resistance(&self, topology: &NetworkTopology) -> f64 {
         // Assess based on use of CDNs, proxies, etc.
-        let cdn_usage = topology.nodes.iter()
-            .filter(|n| n.hosting_provider.as_ref().map_or(false, |p| p.contains("CDN")))
-            .count() as f64 / topology.nodes.len() as f64;
+        let cdn_usage = topology
+            .nodes
+            .iter()
+            .filter(|n| {
+                n.hosting_provider
+                    .as_ref()
+                    .map_or(false, |p| p.contains("CDN"))
+            })
+            .count() as f64
+            / topology.nodes.len() as f64;
 
         let domain_diversity = self.calculate_domain_diversity(topology);
 
@@ -502,7 +604,11 @@ impl InfrastructureAnalysisModule {
     /// Assess recovery speed
     fn assess_recovery_speed(&self, topology: &NetworkTopology) -> f64 {
         // Assess based on infrastructure agility and backup systems
-        let backup_score = if self.detect_backup_systems(topology) { 8.0 } else { 4.0 };
+        let backup_score = if self.detect_backup_systems(topology) {
+            8.0
+        } else {
+            4.0
+        };
         let agility_score = self.calculate_infrastructure_agility(topology);
 
         (backup_score + agility_score) / 2.0
@@ -513,7 +619,9 @@ impl InfrastructureAnalysisModule {
         let mut weak_points = Vec::new();
 
         // Check for single points of failure
-        let provider_counts: std::collections::HashMap<_, _> = topology.nodes.iter()
+        let provider_counts: std::collections::HashMap<_, _> = topology
+            .nodes
+            .iter()
             .filter_map(|n| n.hosting_provider.as_ref())
             .fold(std::collections::HashMap::new(), |mut acc, p| {
                 *acc.entry(p).or_insert(0) += 1;
@@ -527,7 +635,9 @@ impl InfrastructureAnalysisModule {
         }
 
         // Check geographic concentration
-        let country_counts: std::collections::HashMap<_, _> = topology.nodes.iter()
+        let country_counts: std::collections::HashMap<_, _> = topology
+            .nodes
+            .iter()
             .filter_map(|n| n.location.as_ref())
             .map(|l| &l.country)
             .fold(std::collections::HashMap::new(), |mut acc, c| {
@@ -537,7 +647,10 @@ impl InfrastructureAnalysisModule {
 
         for (country, count) in country_counts {
             if count > topology.nodes.len() / 2 {
-                weak_points.push(format!("Geographic concentration in {} ({})", country, count));
+                weak_points.push(format!(
+                    "Geographic concentration in {} ({})",
+                    country, count
+                ));
             }
         }
 
@@ -564,7 +677,11 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Calculate pattern confidence
-    fn calculate_pattern_confidence(&self, hosting: &[HostingPattern], geographic: &[GeographicDistribution]) -> f64 {
+    fn calculate_pattern_confidence(
+        &self,
+        hosting: &[HostingPattern],
+        geographic: &[GeographicDistribution],
+    ) -> f64 {
         let hosting_confidence = if hosting.is_empty() { 0.5 } else { 0.8 };
         let geographic_confidence = if geographic.is_empty() { 0.5 } else { 0.85 };
 
@@ -582,7 +699,9 @@ impl InfrastructureAnalysisModule {
 
     /// Calculate geographic diversity
     fn calculate_geographic_diversity(&self, topology: &NetworkTopology) -> f64 {
-        let unique_countries: std::collections::HashSet<_> = topology.nodes.iter()
+        let unique_countries: std::collections::HashSet<_> = topology
+            .nodes
+            .iter()
             .filter_map(|n| n.location.as_ref())
             .map(|l| &l.country)
             .collect();
@@ -592,7 +711,9 @@ impl InfrastructureAnalysisModule {
 
     /// Calculate hosting diversity
     fn calculate_hosting_diversity(&self, topology: &NetworkTopology) -> f64 {
-        let unique_providers: std::collections::HashSet<_> = topology.nodes.iter()
+        let unique_providers: std::collections::HashSet<_> = topology
+            .nodes
+            .iter()
             .filter_map(|n| n.hosting_provider.as_ref())
             .collect();
 
@@ -602,9 +723,8 @@ impl InfrastructureAnalysisModule {
     /// Detect backup systems
     fn detect_backup_systems(&self, topology: &NetworkTopology) -> bool {
         // Simple heuristic: look for nodes with similar configurations
-        let node_types: std::collections::HashSet<_> = topology.nodes.iter()
-            .map(|n| n.node_type.clone())
-            .collect();
+        let node_types: std::collections::HashSet<_> =
+            topology.nodes.iter().map(|n| n.node_type.clone()).collect();
 
         node_types.len() > 1
     }
@@ -612,11 +732,14 @@ impl InfrastructureAnalysisModule {
     /// Detect failover mechanisms
     fn detect_failover_mechanisms(&self, topology: &NetworkTopology) -> bool {
         // Look for multiple nodes of the same type
-        let type_counts: std::collections::HashMap<_, _> = topology.nodes.iter()
-            .fold(std::collections::HashMap::new(), |mut acc, n| {
-                *acc.entry(&n.node_type).or_insert(0) += 1;
-                acc
-            });
+        let type_counts: std::collections::HashMap<_, _> =
+            topology
+                .nodes
+                .iter()
+                .fold(std::collections::HashMap::new(), |mut acc, n| {
+                    *acc.entry(&n.node_type).or_insert(0) += 1;
+                    acc
+                });
 
         type_counts.values().any(|&count| count > 1)
     }
@@ -633,7 +756,9 @@ impl InfrastructureAnalysisModule {
 
     /// Calculate domain diversity
     fn calculate_domain_diversity(&self, topology: &NetworkTopology) -> f64 {
-        let unique_domains: std::collections::HashSet<_> = topology.nodes.iter()
+        let unique_domains: std::collections::HashSet<_> = topology
+            .nodes
+            .iter()
             .filter_map(|n| n.domain.as_ref())
             .collect();
 
@@ -644,9 +769,12 @@ impl InfrastructureAnalysisModule {
     fn calculate_infrastructure_agility(&self, topology: &NetworkTopology) -> f64 {
         // Assess based on node age distribution
         let now = Utc::now();
-        let average_age_days: f64 = topology.nodes.iter()
+        let average_age_days: f64 = topology
+            .nodes
+            .iter()
             .map(|n| now.signed_duration_since(n.first_seen).num_days() as f64)
-            .sum::<f64>() / topology.nodes.len() as f64;
+            .sum::<f64>()
+            / topology.nodes.len() as f64;
 
         // Younger infrastructure = more agile (lower age = higher agility)
         (30.0 / average_age_days.max(1.0)).min(10.0)
@@ -662,12 +790,18 @@ impl InfrastructureAnalysisModule {
                 let node2 = &nodes[j];
 
                 // Connect if they share the same hosting provider or country
-                let should_connect = node1.hosting_provider == node2.hosting_provider ||
-                    (node1.location.is_some() && node2.location.is_some() &&
-                     node1.location.as_ref().unwrap().country == node2.location.as_ref().unwrap().country);
+                let should_connect = node1.hosting_provider == node2.hosting_provider
+                    || (node1.location.is_some()
+                        && node2.location.is_some()
+                        && node1.location.as_ref().unwrap().country
+                            == node2.location.as_ref().unwrap().country);
 
                 if should_connect {
-                    topology.add_connection(node1.node_id.clone(), node2.node_id.clone(), ConnectionType::Infrastructure);
+                    topology.add_connection(
+                        node1.node_id.clone(),
+                        node2.node_id.clone(),
+                        ConnectionType::Infrastructure,
+                    );
                 }
             }
         }
@@ -676,13 +810,25 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Identify new servers
-    fn identify_new_servers(&self, current: &InfrastructureAnalysis, previous: &InfrastructureAnalysis) -> Vec<InfrastructureNode> {
-        let previous_ips: std::collections::HashSet<_> = previous.c2_servers.iter()
+    fn identify_new_servers(
+        &self,
+        current: &InfrastructureAnalysis,
+        previous: &InfrastructureAnalysis,
+    ) -> Vec<InfrastructureNode> {
+        let previous_ips: std::collections::HashSet<_> = previous
+            .c2_servers
+            .iter()
             .filter_map(|s| s.ip_address.as_ref())
             .collect();
 
-        current.c2_servers.iter()
-            .filter(|s| s.ip_address.as_ref().map_or(true, |ip| !previous_ips.contains(ip)))
+        current
+            .c2_servers
+            .iter()
+            .filter(|s| {
+                s.ip_address
+                    .as_ref()
+                    .map_or(true, |ip| !previous_ips.contains(ip))
+            })
             .cloned()
             .map(|s| InfrastructureNode {
                 node_id: Uuid::new_v4().to_string(),
@@ -702,13 +848,25 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Identify decommissioned servers
-    fn identify_decommissioned_servers(&self, current: &InfrastructureAnalysis, previous: &InfrastructureAnalysis) -> Vec<InfrastructureNode> {
-        let current_ips: std::collections::HashSet<_> = current.c2_servers.iter()
+    fn identify_decommissioned_servers(
+        &self,
+        current: &InfrastructureAnalysis,
+        previous: &InfrastructureAnalysis,
+    ) -> Vec<InfrastructureNode> {
+        let current_ips: std::collections::HashSet<_> = current
+            .c2_servers
+            .iter()
             .filter_map(|s| s.ip_address.as_ref())
             .collect();
 
-        previous.c2_servers.iter()
-            .filter(|s| s.ip_address.as_ref().map_or(false, |ip| !current_ips.contains(ip)))
+        previous
+            .c2_servers
+            .iter()
+            .filter(|s| {
+                s.ip_address
+                    .as_ref()
+                    .map_or(false, |ip| !current_ips.contains(ip))
+            })
             .cloned()
             .map(|s| InfrastructureNode {
                 node_id: Uuid::new_v4().to_string(),
@@ -728,7 +886,11 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Identify pattern changes
-    fn identify_pattern_changes(&self, current: &InfrastructureAnalysis, previous: &InfrastructureAnalysis) -> Vec<PatternChange> {
+    fn identify_pattern_changes(
+        &self,
+        current: &InfrastructureAnalysis,
+        previous: &InfrastructureAnalysis,
+    ) -> Vec<PatternChange> {
         let mut changes = Vec::new();
 
         // Compare hosting patterns
@@ -739,9 +901,21 @@ impl InfrastructureAnalysisModule {
             if (curr.percentage - prev.percentage).abs() > 0.1 {
                 changes.push(PatternChange {
                     change_type: ChangeType::HostingPattern,
-                    description: format!("Hosting concentration changed from {:.1}% to {:.1}%", prev.percentage * 100.0, curr.percentage * 100.0),
-                    impact: if curr.percentage > prev.percentage { "Increased risk".to_string() } else { "Reduced risk".to_string() },
-                    severity: if (curr.percentage - prev.percentage).abs() > 0.2 { Severity::High } else { Severity::Medium },
+                    description: format!(
+                        "Hosting concentration changed from {:.1}% to {:.1}%",
+                        prev.percentage * 100.0,
+                        curr.percentage * 100.0
+                    ),
+                    impact: if curr.percentage > prev.percentage {
+                        "Increased risk".to_string()
+                    } else {
+                        "Reduced risk".to_string()
+                    },
+                    severity: if (curr.percentage - prev.percentage).abs() > 0.2 {
+                        Severity::High
+                    } else {
+                        Severity::Medium
+                    },
                 });
             }
         }
@@ -750,7 +924,12 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Summarize changes
-    fn summarize_changes(&self, new_servers: &[InfrastructureNode], decommissioned: &[InfrastructureNode], pattern_changes: &[PatternChange]) -> String {
+    fn summarize_changes(
+        &self,
+        new_servers: &[InfrastructureNode],
+        decommissioned: &[InfrastructureNode],
+        pattern_changes: &[PatternChange],
+    ) -> String {
         format!(
             "Infrastructure changes: {} new servers, {} decommissioned servers, {} pattern changes detected",
             new_servers.len(),
@@ -760,7 +939,11 @@ impl InfrastructureAnalysisModule {
     }
 
     /// Assess change impact
-    fn assess_change_impact(&self, new_servers: &[InfrastructureNode], decommissioned: &[InfrastructureNode]) -> ChangeImpact {
+    fn assess_change_impact(
+        &self,
+        new_servers: &[InfrastructureNode],
+        decommissioned: &[InfrastructureNode],
+    ) -> ChangeImpact {
         let net_change = new_servers.len() as i32 - decommissioned.len() as i32;
 
         match net_change {
@@ -774,7 +957,9 @@ impl InfrastructureAnalysisModule {
 
     /// Send infrastructure event
     async fn send_infrastructure_event(&self, event: InfrastructureEvent) -> Result<()> {
-        self.infrastructure_sender.send(event).await
+        self.infrastructure_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send infrastructure event: {}", e))
     }
 
@@ -1222,30 +1407,32 @@ impl C2Analyzer {
         }
     }
 
-    async fn discover_c2_servers(&self, threat_actor_id: &str, time_range: &DateRange) -> Result<Vec<C2Server>> {
+    async fn discover_c2_servers(
+        &self,
+        threat_actor_id: &str,
+        time_range: &DateRange,
+    ) -> Result<Vec<C2Server>> {
         // Mock C2 server discovery
-        Ok(vec![
-            C2Server {
-                server_id: Uuid::new_v4().to_string(),
-                ip_address: Some("192.168.1.100".to_string()),
-                domain: Some("c2.example.com".to_string()),
-                port: 443,
-                protocol: "HTTPS".to_string(),
-                geographic_location: Some(GeographicLocation {
-                    country: "Russia".to_string(),
-                    region: Some("Moscow".to_string()),
-                    city: Some("Moscow".to_string()),
-                    coordinates: Some((55.7558, 37.6173)),
-                }),
-                asn: Some(12345),
-                hosting_provider: Some("Bulletproof Hosting Ltd".to_string()),
-                first_seen: Utc::now() - Duration::days(30),
-                last_seen: Some(Utc::now()),
-                malware_families: vec!["TrickBot".to_string(), "Ryuk".to_string()],
-                communication_patterns: vec!["Beaconing".to_string(), "Data Exfiltration".to_string()],
-                detection_status: DetectionStatus::Detected,
-            }
-        ])
+        Ok(vec![C2Server {
+            server_id: Uuid::new_v4().to_string(),
+            ip_address: Some("192.168.1.100".to_string()),
+            domain: Some("c2.example.com".to_string()),
+            port: 443,
+            protocol: "HTTPS".to_string(),
+            geographic_location: Some(GeographicLocation {
+                country: "Russia".to_string(),
+                region: Some("Moscow".to_string()),
+                city: Some("Moscow".to_string()),
+                coordinates: Some((55.7558, 37.6173)),
+            }),
+            asn: Some(12345),
+            hosting_provider: Some("Bulletproof Hosting Ltd".to_string()),
+            first_seen: Utc::now() - Duration::days(30),
+            last_seen: Some(Utc::now()),
+            malware_families: vec!["TrickBot".to_string(), "Ryuk".to_string()],
+            communication_patterns: vec!["Beaconing".to_string(), "Data Exfiltration".to_string()],
+            detection_status: DetectionStatus::Detected,
+        }])
     }
 
     async fn analyze_c2_patterns(&self, _servers: &[C2Server]) -> Result<C2CommunicationPatterns> {
@@ -1285,28 +1472,30 @@ impl MalwareDistributionAnalyzer {
         }
     }
 
-    async fn analyze_distribution_network(&self, threat_actor_id: &str, time_range: &DateRange) -> Result<MalwareDistributionInfrastructure> {
+    async fn analyze_distribution_network(
+        &self,
+        threat_actor_id: &str,
+        time_range: &DateRange,
+    ) -> Result<MalwareDistributionInfrastructure> {
         Ok(MalwareDistributionInfrastructure {
-            distribution_sites: vec![
-                DistributionSite {
-                    site_id: Uuid::new_v4().to_string(),
-                    url: "https://malicious-site.com/payload".to_string(),
-                    ip_address: "10.0.0.1".to_string(),
-                    domain: Some("malicious-site.com".to_string()),
-                    location: Some(GeographicLocation {
-                        country: "Netherlands".to_string(),
-                        region: None,
-                        city: None,
-                        coordinates: None,
-                    }),
-                    asn: Some(12345),
-                    hosting_provider: Some("Bulletproof Hosting".to_string()),
-                    first_seen: Utc::now() - Duration::days(15),
-                    last_seen: Utc::now(),
-                    malware_samples: vec!["sample1.exe".to_string()],
-                    access_patterns: vec!["Drive-by download".to_string()],
-                }
-            ],
+            distribution_sites: vec![DistributionSite {
+                site_id: Uuid::new_v4().to_string(),
+                url: "https://malicious-site.com/payload".to_string(),
+                ip_address: "10.0.0.1".to_string(),
+                domain: Some("malicious-site.com".to_string()),
+                location: Some(GeographicLocation {
+                    country: "Netherlands".to_string(),
+                    region: None,
+                    city: None,
+                    coordinates: None,
+                }),
+                asn: Some(12345),
+                hosting_provider: Some("Bulletproof Hosting".to_string()),
+                first_seen: Utc::now() - Duration::days(15),
+                last_seen: Utc::now(),
+                malware_samples: vec!["sample1.exe".to_string()],
+                access_patterns: vec!["Drive-by download".to_string()],
+            }],
             delivery_mechanisms: vec![DeliveryMechanism::DriveByDownload],
             obfuscation_techniques: vec!["Code packing".to_string()],
             targeting_effectiveness: 0.75,
@@ -1328,19 +1517,21 @@ impl DomainAnalyzer {
         }
     }
 
-    async fn analyze_domains(&self, threat_actor_id: &str, time_range: &DateRange) -> Result<DomainInfrastructure> {
+    async fn analyze_domains(
+        &self,
+        threat_actor_id: &str,
+        time_range: &DateRange,
+    ) -> Result<DomainInfrastructure> {
         Ok(DomainInfrastructure {
-            domains: vec![
-                DomainInfo {
-                    domain: "c2-domain.com".to_string(),
-                    registrar: Some("NameCheap".to_string()),
-                    creation_date: Some(Utc::now() - Duration::days(60)),
-                    expiration_date: Some(Utc::now() + Duration::days(300)),
-                    name_servers: vec!["ns1.example.com".to_string()],
-                    whois_privacy: true,
-                    suspicious_patterns: vec!["Recently registered".to_string()],
-                }
-            ],
+            domains: vec![DomainInfo {
+                domain: "c2-domain.com".to_string(),
+                registrar: Some("NameCheap".to_string()),
+                creation_date: Some(Utc::now() - Duration::days(60)),
+                expiration_date: Some(Utc::now() + Duration::days(300)),
+                name_servers: vec!["ns1.example.com".to_string()],
+                whois_privacy: true,
+                suspicious_patterns: vec!["Recently registered".to_string()],
+            }],
             registration_patterns: vec!["Bulk registration".to_string()],
             name_server_patterns: vec!["Suspicious NS".to_string()],
             domain_generation_algorithms: vec!["DGA".to_string()],
@@ -1363,17 +1554,19 @@ impl IPAnalyzer {
         }
     }
 
-    async fn analyze_ip_ranges(&self, threat_actor_id: &str, time_range: &DateRange) -> Result<IPInfrastructure> {
+    async fn analyze_ip_ranges(
+        &self,
+        threat_actor_id: &str,
+        time_range: &DateRange,
+    ) -> Result<IPInfrastructure> {
         Ok(IPInfrastructure {
-            ip_ranges: vec![
-                IPRange {
-                    range: "192.168.1.0/24".to_string(),
-                    asn: 12345,
-                    organization: "Bulletproof Hosting".to_string(),
-                    country: "Russia".to_string(),
-                    abuse_score: 0.9,
-                }
-            ],
+            ip_ranges: vec![IPRange {
+                range: "192.168.1.0/24".to_string(),
+                asn: 12345,
+                organization: "Bulletproof Hosting".to_string(),
+                country: "Russia".to_string(),
+                abuse_score: 0.9,
+            }],
             ip_reputation_scores: HashMap::new(),
             ip_geographic_distribution: vec![],
             ip_hosting_patterns: vec![],
@@ -1395,20 +1588,22 @@ impl CertificateAnalyzer {
         }
     }
 
-    async fn analyze_certificates(&self, threat_actor_id: &str, time_range: &DateRange) -> Result<CertificateInfrastructure> {
+    async fn analyze_certificates(
+        &self,
+        threat_actor_id: &str,
+        time_range: &DateRange,
+    ) -> Result<CertificateInfrastructure> {
         Ok(CertificateInfrastructure {
-            certificates: vec![
-                CertificateInfo {
-                    fingerprint: "abc123".to_string(),
-                    subject: "c2.example.com".to_string(),
-                    issuer: "Self-Signed".to_string(),
-                    valid_from: Utc::now() - Duration::days(30),
-                    valid_until: Utc::now() + Duration::days(335),
-                    domains: vec!["c2.example.com".to_string()],
-                    key_size: 2048,
-                    signature_algorithm: "SHA256-RSA".to_string(),
-                }
-            ],
+            certificates: vec![CertificateInfo {
+                fingerprint: "abc123".to_string(),
+                subject: "c2.example.com".to_string(),
+                issuer: "Self-Signed".to_string(),
+                valid_from: Utc::now() - Duration::days(30),
+                valid_until: Utc::now() + Duration::days(335),
+                domains: vec!["c2.example.com".to_string()],
+                key_size: 2048,
+                signature_algorithm: "SHA256-RSA".to_string(),
+            }],
             certificate_authorities: vec!["Self-Signed".to_string()],
             certificate_patterns: vec!["Self-signed certificates".to_string()],
             self_signed_certificates: 1,
@@ -1461,7 +1656,12 @@ impl NetworkTopology {
         self.nodes.push(node);
     }
 
-    fn add_connection(&mut self, source_id: String, target_id: String, connection_type: ConnectionType) {
+    fn add_connection(
+        &mut self,
+        source_id: String,
+        target_id: String,
+        connection_type: ConnectionType,
+    ) {
         let connection = NetworkConnection {
             connection_id: Uuid::new_v4().to_string(),
             source_node: source_id,

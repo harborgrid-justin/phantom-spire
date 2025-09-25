@@ -1,9 +1,9 @@
 use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId};
-use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
 use chrono::{DateTime, Utc};
-use std::collections::HashMap;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+use std::collections::HashMap;
 
 /// OCSF Event Normalization
 /// Provides functionality for normalizing events to OCSF format and validation
@@ -245,12 +245,17 @@ impl EventNormalizer {
         let source_type = self.determine_source_type(source_event)?;
 
         // Find applicable rules
-        let applicable_rules: Vec<&NormalizationRule> = self.rules.iter()
+        let applicable_rules: Vec<&NormalizationRule> = self
+            .rules
+            .iter()
             .filter(|rule| rule.source_type == source_type)
             .collect();
 
         if applicable_rules.is_empty() {
-            return Err(format!("No normalization rules found for source type: {}", source_type));
+            return Err(format!(
+                "No normalization rules found for source type: {}",
+                source_type
+            ));
         }
 
         // Apply the first matching rule
@@ -268,14 +273,14 @@ impl EventNormalizer {
         // Apply transformations
         for transformation in &rule.transformations {
             match self.apply_transformation(&transformation, source_event, &mut ocsf_event) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(e) => warnings.push(format!("Transformation failed: {}", e)),
             }
         }
 
         // Validate the normalized event
         match self.validator.validate_event(&ocsf_event) {
-            Ok(_) => {},
+            Ok(_) => {}
             Err(validation_errors) => {
                 errors.extend(validation_errors);
             }
@@ -332,40 +337,50 @@ impl EventNormalizer {
                 ConditionOperator::Equals => field_value == condition.value,
                 ConditionOperator::NotEquals => field_value != condition.value,
                 ConditionOperator::Contains => {
-                    if let (Some(str_val), Some(condition_str)) = (field_value.as_str(), condition.value.as_str()) {
+                    if let (Some(str_val), Some(condition_str)) =
+                        (field_value.as_str(), condition.value.as_str())
+                    {
                         str_val.contains(condition_str)
                     } else {
                         false
                     }
-                },
+                }
                 ConditionOperator::NotContains => {
-                    if let (Some(str_val), Some(condition_str)) = (field_value.as_str(), condition.value.as_str()) {
+                    if let (Some(str_val), Some(condition_str)) =
+                        (field_value.as_str(), condition.value.as_str())
+                    {
                         !str_val.contains(condition_str)
                     } else {
                         false
                     }
-                },
+                }
                 ConditionOperator::RegexMatch => {
-                    if let (Some(str_val), Some(pattern)) = (field_value.as_str(), condition.value.as_str()) {
+                    if let (Some(str_val), Some(pattern)) =
+                        (field_value.as_str(), condition.value.as_str())
+                    {
                         Regex::new(pattern).unwrap().is_match(str_val)
                     } else {
                         false
                     }
-                },
+                }
                 ConditionOperator::GreaterThan => {
-                    if let (Some(num_val), Some(condition_num)) = (field_value.as_f64(), condition.value.as_f64()) {
+                    if let (Some(num_val), Some(condition_num)) =
+                        (field_value.as_f64(), condition.value.as_f64())
+                    {
                         num_val > condition_num
                     } else {
                         false
                     }
-                },
+                }
                 ConditionOperator::LessThan => {
-                    if let (Some(num_val), Some(condition_num)) = (field_value.as_f64(), condition.value.as_f64()) {
+                    if let (Some(num_val), Some(condition_num)) =
+                        (field_value.as_f64(), condition.value.as_f64())
+                    {
                         num_val < condition_num
                     } else {
                         false
                     }
-                },
+                }
             };
 
             if !matches {
@@ -378,7 +393,11 @@ impl EventNormalizer {
 
     /// Create base OCSF event
     fn create_base_event(&self, class_uid: ClassUid) -> Value {
-        let base_event = BaseEvent::new(CategoryUid::Uncategorized, class_uid.clone(), SeverityId::Unknown);
+        let base_event = BaseEvent::new(
+            CategoryUid::Uncategorized,
+            class_uid.clone(),
+            SeverityId::Unknown,
+        );
 
         // Convert to JSON value
         match serde_json::to_value(base_event) {
@@ -393,7 +412,12 @@ impl EventNormalizer {
     }
 
     /// Apply field transformation
-    fn apply_transformation(&self, transformation: &FieldTransformation, source_event: &Value, target_event: &mut Value) -> Result<(), String> {
+    fn apply_transformation(
+        &self,
+        transformation: &FieldTransformation,
+        source_event: &Value,
+        target_event: &mut Value,
+    ) -> Result<(), String> {
         let source_value = self.get_field_value(source_event, &transformation.source_path)?;
 
         let transformed_value = match transformation.transformation_type {
@@ -412,7 +436,7 @@ impl EventNormalizer {
                 } else {
                     source_value
                 }
-            },
+            }
             TransformationType::RegexExtract => {
                 if let Some(params) = &transformation.parameters {
                     if let Some(pattern) = params.get("pattern").and_then(|v| v.as_str()) {
@@ -436,10 +460,14 @@ impl EventNormalizer {
                 } else {
                     source_value
                 }
-            },
+            }
             TransformationType::TypeConvert => {
                 // Simple type conversion (string to number, etc.)
-                if let Some(target_type) = transformation.parameters.as_ref().and_then(|p| p.get("target_type").and_then(|v| v.as_str())) {
+                if let Some(target_type) = transformation
+                    .parameters
+                    .as_ref()
+                    .and_then(|p| p.get("target_type").and_then(|v| v.as_str()))
+                {
                     match target_type {
                         "integer" => {
                             if let Some(str_val) = source_value.as_str() {
@@ -451,7 +479,7 @@ impl EventNormalizer {
                             } else {
                                 source_value
                             }
-                        },
+                        }
                         "float" => {
                             if let Some(str_val) = source_value.as_str() {
                                 if let Ok(float_val) = str_val.parse::<f64>() {
@@ -462,20 +490,22 @@ impl EventNormalizer {
                             } else {
                                 source_value
                             }
-                        },
+                        }
                         _ => source_value,
                     }
                 } else {
                     source_value
                 }
-            },
+            }
             TransformationType::Concatenate => {
                 if let Some(params) = &transformation.parameters {
                     if let Some(fields) = params.get("fields").and_then(|v| v.as_array()) {
                         let mut concatenated = String::new();
                         for field_path in fields {
                             if let Some(field_str) = field_path.as_str() {
-                                if let Ok(field_value) = self.get_field_value(source_event, field_str) {
+                                if let Ok(field_value) =
+                                    self.get_field_value(source_event, field_str)
+                                {
                                     if let Some(str_val) = field_value.as_str() {
                                         concatenated.push_str(str_val);
                                         concatenated.push(' ');
@@ -490,11 +520,11 @@ impl EventNormalizer {
                 } else {
                     source_value
                 }
-            },
+            }
             TransformationType::Custom => {
                 // Custom transformation would require a function registry
                 source_value
-            },
+            }
         };
 
         self.set_field_value(target_event, &transformation.target_path, transformed_value);
@@ -514,7 +544,7 @@ impl EventNormalizer {
                     } else {
                         return Err(format!("Field '{}' not found", part));
                     }
-                },
+                }
                 _ => return Err(format!("Cannot access field '{}' on non-object", part)),
             }
         }
@@ -537,7 +567,7 @@ impl EventNormalizer {
 
         // Navigate to the target location and set the value
         let mut current = event;
-        
+
         for (i, part) in parts.iter().enumerate() {
             if i == parts.len() - 1 {
                 // Last part - set the value
@@ -551,10 +581,10 @@ impl EventNormalizer {
                     if !obj.contains_key(*part) {
                         obj.insert(part.to_string(), json!({}));
                     }
-                    
+
                     // Move to the next level
                     current = obj.get_mut(*part).unwrap();
-                    
+
                     // Ensure it's an object
                     if !current.is_object() {
                         *current = json!({});
@@ -588,7 +618,7 @@ impl SchemaValidator {
 
         for rule in &self.validation_rules {
             match self.check_validation_rule(rule, event) {
-                Ok(_) => {},
+                Ok(_) => {}
                 Err(error) => errors.push(error),
             }
         }
@@ -609,9 +639,13 @@ impl SchemaValidator {
                 if field_value.is_null() {
                     return Err(format!("Required field '{}' is missing", rule.field_path));
                 }
-            },
+            }
             ValidationType::DataType => {
-                if let Some(expected_type) = rule.parameters.as_ref().and_then(|p| p.get("type").and_then(|v| v.as_str())) {
+                if let Some(expected_type) = rule
+                    .parameters
+                    .as_ref()
+                    .and_then(|p| p.get("type").and_then(|v| v.as_str()))
+                {
                     let actual_type_matches = match expected_type {
                         "string" => field_value.is_string(),
                         "number" => field_value.is_number(),
@@ -622,35 +656,52 @@ impl SchemaValidator {
                     };
 
                     if !actual_type_matches {
-                        return Err(format!("Field '{}' has wrong type, expected {}", rule.field_path, expected_type));
+                        return Err(format!(
+                            "Field '{}' has wrong type, expected {}",
+                            rule.field_path, expected_type
+                        ));
                     }
                 }
-            },
+            }
             ValidationType::ValueRange => {
                 if let (Some(min), Some(max)) = (
-                    rule.parameters.as_ref().and_then(|p| p.get("min").and_then(|v| v.as_f64())),
-                    rule.parameters.as_ref().and_then(|p| p.get("max").and_then(|v| v.as_f64())),
+                    rule.parameters
+                        .as_ref()
+                        .and_then(|p| p.get("min").and_then(|v| v.as_f64())),
+                    rule.parameters
+                        .as_ref()
+                        .and_then(|p| p.get("max").and_then(|v| v.as_f64())),
                 ) {
                     if let Some(num_val) = field_value.as_f64() {
                         if num_val < min || num_val > max {
-                            return Err(format!("Field '{}' value {} is out of range [{}, {}]", rule.field_path, num_val, min, max));
+                            return Err(format!(
+                                "Field '{}' value {} is out of range [{}, {}]",
+                                rule.field_path, num_val, min, max
+                            ));
                         }
                     }
                 }
-            },
+            }
             ValidationType::RegexPattern => {
-                if let Some(pattern) = rule.parameters.as_ref().and_then(|p| p.get("pattern").and_then(|v| v.as_str())) {
+                if let Some(pattern) = rule
+                    .parameters
+                    .as_ref()
+                    .and_then(|p| p.get("pattern").and_then(|v| v.as_str()))
+                {
                     if let Some(str_val) = field_value.as_str() {
                         let regex = Regex::new(pattern).map_err(|e| e.to_string())?;
                         if !regex.is_match(str_val) {
-                            return Err(format!("Field '{}' value '{}' does not match pattern '{}'", rule.field_path, str_val, pattern));
+                            return Err(format!(
+                                "Field '{}' value '{}' does not match pattern '{}'",
+                                rule.field_path, str_val, pattern
+                            ));
                         }
                     }
                 }
-            },
+            }
             ValidationType::Custom => {
                 // Custom validation would require a function registry
-            },
+            }
         }
 
         Ok(())
@@ -669,7 +720,7 @@ impl SchemaValidator {
                     } else {
                         return Ok(Value::Null); // Return null for missing fields
                     }
-                },
+                }
                 _ => return Err(format!("Cannot access field '{}' on non-object", part)),
             }
         }
@@ -696,7 +747,10 @@ impl EventSerializer {
 
         if self.include_metadata {
             if let Value::Object(ref mut obj) = output {
-                obj.insert("metadata".to_string(), serde_json::to_value(&normalized_event.metadata).unwrap());
+                obj.insert(
+                    "metadata".to_string(),
+                    serde_json::to_value(&normalized_event.metadata).unwrap(),
+                );
                 obj.insert("warnings".to_string(), json!(normalized_event.warnings));
                 obj.insert("errors".to_string(), json!(normalized_event.errors));
             }
@@ -726,14 +780,16 @@ impl EventSerializer {
             }
         };
 
-        let warnings = value.get("warnings")
+        let warnings = value
+            .get("warnings")
             .and_then(|v| v.as_array())
             .unwrap_or(&vec![])
             .iter()
             .filter_map(|v| v.as_str().map(|s| s.to_string()))
             .collect();
 
-        let errors = value.get("errors")
+        let errors = value
+            .get("errors")
             .and_then(|v| v.as_array())
             .unwrap_or(&vec![])
             .iter()
@@ -780,10 +836,10 @@ impl BatchNormalizer {
                         self.stats.warnings += normalized.warnings.len() as u64;
                     }
                     results.push(normalized);
-                },
+                }
                 Err(_) => {
                     self.stats.failed += 1;
-                },
+                }
             }
         }
 
@@ -933,21 +989,17 @@ mod tests {
             name: "test_rule".to_string(),
             source_type: "test_event".to_string(),
             target_class: ClassUid::SecurityFinding,
-            transformations: vec![
-                FieldTransformation {
-                    source_path: "message".to_string(),
-                    target_path: "message".to_string(),
-                    transformation_type: TransformationType::Copy,
-                    parameters: None,
-                },
-            ],
-            conditions: vec![
-                NormalizationCondition {
-                    field_path: "event_type".to_string(),
-                    operator: ConditionOperator::Equals,
-                    value: json!("test_event"),
-                },
-            ],
+            transformations: vec![FieldTransformation {
+                source_path: "message".to_string(),
+                target_path: "message".to_string(),
+                transformation_type: TransformationType::Copy,
+                parameters: None,
+            }],
+            conditions: vec![NormalizationCondition {
+                field_path: "event_type".to_string(),
+                operator: ConditionOperator::Equals,
+                value: json!("test_event"),
+            }],
         };
 
         assert_eq!(rule.name, "test_rule");

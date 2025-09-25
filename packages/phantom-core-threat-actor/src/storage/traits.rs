@@ -1,9 +1,9 @@
 // phantom-threat-actor-core/src/storage/traits.rs
 // Storage traits and interfaces for Threat Actor Core
 
-use async_trait::async_trait;
-use serde::{Serialize, Deserialize};
 use crate::models::*;
+use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// Storage error types
@@ -71,10 +71,16 @@ pub trait ThreatActorStorage: Send + Sync {
     async fn get_threat_actor(&self, id: &str) -> Result<Option<ThreatActor>, StorageError>;
 
     /// Retrieve multiple threat actors by IDs
-    async fn get_threat_actor_batch(&self, ids: &[String]) -> Result<Vec<ThreatActor>, StorageError>;
+    async fn get_threat_actor_batch(
+        &self,
+        ids: &[String],
+    ) -> Result<Vec<ThreatActor>, StorageError>;
 
     /// Search for threat actors based on criteria
-    async fn search_threat_actors(&self, criteria: &ThreatActorSearchCriteria) -> Result<Vec<ThreatActor>, StorageError>;
+    async fn search_threat_actors(
+        &self,
+        criteria: &ThreatActorSearchCriteria,
+    ) -> Result<Vec<ThreatActor>, StorageError>;
 
     /// List all threat actor IDs
     async fn list_threat_actor_ids(&self) -> Result<Vec<String>, StorageError>;
@@ -89,40 +95,74 @@ pub trait ThreatActorStorage: Send + Sync {
     async fn get_campaign(&self, id: &str) -> Result<Option<Campaign>, StorageError>;
 
     /// Search for campaigns
-    async fn search_campaigns(&self, actor_id: Option<&str>, status: Option<CampaignStatus>) -> Result<Vec<Campaign>, StorageError>;
+    async fn search_campaigns(
+        &self,
+        actor_id: Option<&str>,
+        status: Option<CampaignStatus>,
+    ) -> Result<Vec<Campaign>, StorageError>;
 
     /// Store attribution analysis
-    async fn store_attribution_analysis(&self, analysis: &AttributionAnalysis) -> Result<(), StorageError>;
+    async fn store_attribution_analysis(
+        &self,
+        analysis: &AttributionAnalysis,
+    ) -> Result<(), StorageError>;
 
     /// Retrieve attribution analysis
-    async fn get_attribution_analysis(&self, actor_id: &str) -> Result<Vec<AttributionAnalysis>, StorageError>;
+    async fn get_attribution_analysis(
+        &self,
+        actor_id: &str,
+    ) -> Result<Vec<AttributionAnalysis>, StorageError>;
 
     /// Store behavioral analysis
-    async fn store_behavioral_analysis(&self, analysis: &BehavioralAnalysis) -> Result<(), StorageError>;
+    async fn store_behavioral_analysis(
+        &self,
+        analysis: &BehavioralAnalysis,
+    ) -> Result<(), StorageError>;
 
     /// Retrieve behavioral analysis
-    async fn get_behavioral_analysis(&self, actor_id: &str) -> Result<Option<BehavioralAnalysis>, StorageError>;
+    async fn get_behavioral_analysis(
+        &self,
+        actor_id: &str,
+    ) -> Result<Option<BehavioralAnalysis>, StorageError>;
 
     /// Store actor relationships
-    async fn store_relationships(&self, actor_id: &str, relationships: &[ActorRelationship]) -> Result<(), StorageError>;
+    async fn store_relationships(
+        &self,
+        actor_id: &str,
+        relationships: &[ActorRelationship],
+    ) -> Result<(), StorageError>;
 
     /// Get related actors
     async fn get_related_actors(&self, actor_id: &str) -> Result<Vec<String>, StorageError>;
 
     /// Store evidence
-    async fn store_evidence(&self, actor_id: &str, evidence: &[Evidence]) -> Result<(), StorageError>;
+    async fn store_evidence(
+        &self,
+        actor_id: &str,
+        evidence: &[Evidence],
+    ) -> Result<(), StorageError>;
 
     /// Get evidence for an actor
     async fn get_evidence(&self, actor_id: &str) -> Result<Vec<Evidence>, StorageError>;
 
     /// Update actor confidence score
-    async fn update_actor_confidence(&self, actor_id: &str, confidence: f64) -> Result<(), StorageError>;
+    async fn update_actor_confidence(
+        &self,
+        actor_id: &str,
+        confidence: f64,
+    ) -> Result<(), StorageError>;
 
     /// Get actors by type
-    async fn get_actors_by_type(&self, actor_type: ActorType) -> Result<Vec<ThreatActor>, StorageError>;
+    async fn get_actors_by_type(
+        &self,
+        actor_type: ActorType,
+    ) -> Result<Vec<ThreatActor>, StorageError>;
 
     /// Get actors by sophistication level
-    async fn get_actors_by_sophistication(&self, level: SophisticationLevel) -> Result<Vec<ThreatActor>, StorageError>;
+    async fn get_actors_by_sophistication(
+        &self,
+        level: SophisticationLevel,
+    ) -> Result<Vec<ThreatActor>, StorageError>;
 
     /// Get actors by country
     async fn get_actors_by_country(&self, country: &str) -> Result<Vec<ThreatActor>, StorageError>;
@@ -185,9 +225,9 @@ impl ThreatActorSearchCriteriaBuilder {
     }
 
     pub fn first_observed_range(
-        mut self, 
-        after: chrono::DateTime<chrono::Utc>, 
-        before: chrono::DateTime<chrono::Utc>
+        mut self,
+        after: chrono::DateTime<chrono::Utc>,
+        before: chrono::DateTime<chrono::Utc>,
     ) -> Self {
         self.criteria.first_observed_after = Some(after);
         self.criteria.first_observed_before = Some(before);
@@ -195,9 +235,9 @@ impl ThreatActorSearchCriteriaBuilder {
     }
 
     pub fn last_activity_range(
-        mut self, 
-        after: chrono::DateTime<chrono::Utc>, 
-        before: chrono::DateTime<chrono::Utc>
+        mut self,
+        after: chrono::DateTime<chrono::Utc>,
+        before: chrono::DateTime<chrono::Utc>,
     ) -> Self {
         self.criteria.last_activity_after = Some(after);
         self.criteria.last_activity_before = Some(before);

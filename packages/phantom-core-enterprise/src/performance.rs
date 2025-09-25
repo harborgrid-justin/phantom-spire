@@ -4,9 +4,9 @@
 //! for Fortune 100 deployment requirements.
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 
 /// Performance benchmark result
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -24,9 +24,9 @@ pub struct PerformanceBenchmark {
 /// Performance tiers
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum PerformanceTier {
-    Standard,    // Up to 1,000 ops/sec
-    High,        // Up to 10,000 ops/sec  
-    Enterprise,  // 100,000+ ops/sec
+    Standard,   // Up to 1,000 ops/sec
+    High,       // Up to 10,000 ops/sec
+    Enterprise, // 100,000+ ops/sec
 }
 
 /// Comprehensive performance metrics
@@ -93,13 +93,13 @@ pub struct PerformanceRecommendation {
 pub trait PerformanceMonitor: Send + Sync {
     /// Execute performance benchmark
     async fn benchmark_performance(&self) -> PerformanceBenchmark;
-    
+
     /// Get real-time metrics
     async fn get_real_time_metrics(&self) -> PerformanceMetrics;
-    
+
     /// Identify performance bottlenecks
     async fn identify_bottlenecks(&self) -> Vec<PerformanceBottleneck>;
-    
+
     /// Get performance history
     async fn get_performance_history(&self, hours: u32) -> Vec<PerformanceSnapshot>;
 }

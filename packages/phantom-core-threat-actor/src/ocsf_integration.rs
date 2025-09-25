@@ -1,10 +1,10 @@
-use crate::ocsf::{ClassUid, SeverityId, Observable, Enrichment};
+use crate::ocsf::{ClassUid, Enrichment, Observable, SeverityId};
 use crate::ocsf_categories::*;
 use crate::ocsf_event_classes::*;
-use crate::ocsf_observables::*;
 use crate::ocsf_normalization::*;
+use crate::ocsf_observables::*;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
-use chrono::{Utc};
 use std::collections::HashMap;
 
 /// OCSF Integration with Threat Actor Analysis Modules
@@ -67,7 +67,10 @@ pub mod behavioral_ocsf {
             };
 
             let mut event = security_finding_class::create_malware_finding(
-                format!("Suspicious behavioral pattern detected: {}", pattern.pattern_type),
+                format!(
+                    "Suspicious behavioral pattern detected: {}",
+                    pattern.pattern_type
+                ),
                 pattern.pattern_type.clone().to_string(),
                 "unknown".to_string(),
                 pattern.confidence,
@@ -144,7 +147,7 @@ pub mod geographic_ocsf {
                 name: format!("geographic_location_{}", location.country.as_str()),
                 value: location.country.clone(),
                 observable_type: "geolocation".to_string(),
-                type_id: 15, // Geolocation type ID
+                type_id: 15,           // Geolocation type ID
                 reputation: Some(0.5), // Default risk score since field not available
                 data: Some(serde_json::json!({
                     "country": location.country,
@@ -186,7 +189,10 @@ pub mod incident_response_ocsf {
 
             let mut event = security_finding_class::create_unauthorized_access_finding(
                 format!("Security incident: {}", incident.title),
-                incident.assigned_to.clone().unwrap_or_else(|| "unassigned".to_string()),
+                incident
+                    .assigned_to
+                    .clone()
+                    .unwrap_or_else(|| "unassigned".to_string()),
                 incident.description.clone(),
                 "unauthorized_access".to_string(),
                 severity,
@@ -246,7 +252,7 @@ pub mod intelligence_sharing_ocsf {
                 name: "intelligence_unknown".to_string(),
                 value: "Unknown Report".to_string(),
                 observable_type: "intelligence".to_string(),
-                type_id: 101, // Custom type for intelligence
+                type_id: 101,          // Custom type for intelligence
                 reputation: Some(0.5), // Default reputation
                 data: Some(serde_json::json!({
                     "report_id": "unknown",
@@ -268,8 +274,8 @@ pub mod intelligence_sharing_ocsf {
 
 /// Real-time Alerts OCSF Events
 pub mod realtime_alerts_ocsf {
-    use std::error::Error;
     use super::*;
+    use std::error::Error;
 
     /// Generate OCSF events from real-time alerts
     pub fn generate_alert_events(
@@ -300,7 +306,7 @@ pub mod realtime_alerts_ocsf {
                 name: format!("alert_{}", alert.alert_id),
                 value: alert.title.clone(),
                 observable_type: "alert".to_string(),
-                type_id: 102, // Custom type for alerts
+                type_id: 102,          // Custom type for alerts
                 reputation: Some(0.5), // confidence field is (), use default
                 data: Some(serde_json::json!({
                     "alert_id": alert.alert_id,
@@ -344,7 +350,10 @@ pub mod risk_assessment_ocsf {
             let mut event = security_finding_class::create_unauthorized_access_finding(
                 format!("Risk assessment: {:?}", assessment.target_entity),
                 "system".to_string(),
-                format!("Risk assessment completed with score {:.1} and level {:?}", assessment.risk_scores.overall_score, assessment.overall_risk_level),
+                format!(
+                    "Risk assessment completed with score {:.1} and level {:?}",
+                    assessment.risk_scores.overall_score, assessment.overall_risk_level
+                ),
                 "risk_assessment".to_string(),
                 severity,
             );
@@ -390,11 +399,15 @@ impl ThreatActorOcsfIntegration {
 
     /// Add an integration mapping
     pub fn add_mapping(&mut self, mapping: IntegrationMapping) {
-        self.integration_mappings.insert(mapping.module_name.clone(), mapping);
+        self.integration_mappings
+            .insert(mapping.module_name.clone(), mapping);
     }
 
     /// Generate OCSF events from threat actor analysis data
-    pub fn generate_events_from_analysis(&mut self, analysis_data: serde_json::Value) -> Vec<security_finding::SecurityFindingEvent> {
+    pub fn generate_events_from_analysis(
+        &mut self,
+        analysis_data: serde_json::Value,
+    ) -> Vec<security_finding::SecurityFindingEvent> {
         let mut events = Vec::new();
 
         // This would be expanded to handle different types of analysis data
@@ -404,10 +417,12 @@ impl ThreatActorOcsfIntegration {
             match analysis_type {
                 "behavioral_pattern" => {
                     // Generate behavioral pattern events
-                    if let Some(patterns) = analysis_data.get("patterns").and_then(|v| v.as_array()) {
+                    if let Some(patterns) = analysis_data.get("patterns").and_then(|v| v.as_array())
+                    {
                         for pattern in patterns {
                             if let Some(pattern_obj) = pattern.as_object() {
-                                let severity = pattern_obj.get("confidence")
+                                let severity = pattern_obj
+                                    .get("confidence")
                                     .and_then(|v| v.as_f64())
                                     .map(|c| match c {
                                         c if c >= 0.9 => SeverityId::Critical,
@@ -417,7 +432,8 @@ impl ThreatActorOcsfIntegration {
                                     })
                                     .unwrap_or(SeverityId::Medium);
 
-                                let title = pattern_obj.get("pattern_type")
+                                let title = pattern_obj
+                                    .get("pattern_type")
                                     .and_then(|v| v.as_str())
                                     .unwrap_or("Unknown Pattern")
                                     .to_string();
@@ -426,7 +442,10 @@ impl ThreatActorOcsfIntegration {
                                     format!("Analysis detected: {}", title),
                                     title.clone(),
                                     "analysis_result".to_string(),
-                                    pattern_obj.get("confidence").and_then(|v| v.as_f64()).unwrap_or(0.5),
+                                    pattern_obj
+                                        .get("confidence")
+                                        .and_then(|v| v.as_f64())
+                                        .unwrap_or(0.5),
                                     severity,
                                 );
 
@@ -434,13 +453,16 @@ impl ThreatActorOcsfIntegration {
                             }
                         }
                     }
-                },
+                }
                 "network_anomaly" => {
                     // Generate network anomaly events
-                    if let Some(anomalies) = analysis_data.get("anomalies").and_then(|v| v.as_array()) {
+                    if let Some(anomalies) =
+                        analysis_data.get("anomalies").and_then(|v| v.as_array())
+                    {
                         for anomaly in anomalies {
                             if let Some(anomaly_obj) = anomaly.as_object() {
-                                let severity = anomaly_obj.get("severity")
+                                let severity = anomaly_obj
+                                    .get("severity")
                                     .and_then(|v| v.as_str())
                                     .map(|s| match s {
                                         "critical" => SeverityId::Critical,
@@ -450,17 +472,33 @@ impl ThreatActorOcsfIntegration {
                                     })
                                     .unwrap_or(SeverityId::Medium);
 
-                                let title = anomaly_obj.get("description")
+                                let title = anomaly_obj
+                                    .get("description")
                                     .and_then(|v| v.as_str())
                                     .unwrap_or("Network Anomaly")
                                     .to_string();
 
                                 let event = security_finding_class::create_network_anomaly_finding(
                                     title,
-                                    anomaly_obj.get("src_ip").and_then(|v| v.as_str()).unwrap_or("unknown").to_string(),
-                                    anomaly_obj.get("dst_ip").and_then(|v| v.as_str()).unwrap_or("unknown").to_string(),
-                                    anomaly_obj.get("dst_port").and_then(|v| v.as_i64()).unwrap_or(80) as i32,
-                                    anomaly_obj.get("anomaly_type").and_then(|v| v.as_str()).unwrap_or("unknown").to_string(),
+                                    anomaly_obj
+                                        .get("src_ip")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("unknown")
+                                        .to_string(),
+                                    anomaly_obj
+                                        .get("dst_ip")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("unknown")
+                                        .to_string(),
+                                    anomaly_obj
+                                        .get("dst_port")
+                                        .and_then(|v| v.as_i64())
+                                        .unwrap_or(80) as i32,
+                                    anomaly_obj
+                                        .get("anomaly_type")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("unknown")
+                                        .to_string(),
                                     severity,
                                 );
 
@@ -468,7 +506,7 @@ impl ThreatActorOcsfIntegration {
                             }
                         }
                     }
-                },
+                }
                 _ => {
                     // Generic security finding for unknown analysis types
                     let event = security_finding_class::create_malware_finding(
@@ -501,11 +539,15 @@ impl ThreatActorOcsfIntegration {
             0.8,
         );
 
-        self.observable_manager.add_correlation_rule(correlation_rule);
+        self.observable_manager
+            .add_correlation_rule(correlation_rule);
     }
 
     /// Generate threat intelligence report in OCSF format
-    pub fn generate_threat_intel_report(&self, threat_data: serde_json::Value) -> Result<String, String> {
+    pub fn generate_threat_intel_report(
+        &self,
+        threat_data: serde_json::Value,
+    ) -> Result<String, String> {
         let normalized_event = NormalizedEvent {
             event: threat_data,
             metadata: NormalizationMetadata {
@@ -527,10 +569,13 @@ impl ThreatActorOcsfIntegration {
         let mut events = Vec::new();
 
         for observable in &self.observable_manager.observables {
-            let severity = match observable.data.as_ref()
+            let severity = match observable
+                .data
+                .as_ref()
                 .and_then(|d| d.get("reputation"))
                 .and_then(|r| r.as_f64())
-                .unwrap_or(0.5) {
+                .unwrap_or(0.5)
+            {
                 r if r >= 0.9 => SeverityId::Critical,
                 r if r >= 0.7 => SeverityId::High,
                 r if r >= 0.5 => SeverityId::Medium,
@@ -541,7 +586,9 @@ impl ThreatActorOcsfIntegration {
                 format!("Observable: {}", observable.name),
                 observable.observable_type.clone(),
                 observable.value.clone(),
-                observable.data.as_ref()
+                observable
+                    .data
+                    .as_ref()
                     .and_then(|d| d.get("reputation"))
                     .and_then(|r| r.as_f64())
                     .unwrap_or(0.5),
@@ -568,19 +615,29 @@ impl ThreatIntelEventGenerator {
     }
 
     /// Generate events from behavioral patterns
-    pub fn generate_from_behavioral_patterns(&mut self, patterns: &[crate::behavioral_patterns::BehavioralPattern]) {
+    pub fn generate_from_behavioral_patterns(
+        &mut self,
+        patterns: &[crate::behavioral_patterns::BehavioralPattern],
+    ) {
         let events = behavioral_ocsf::generate_behavioral_events(patterns, &mut self.integration);
         self.generated_events.extend(events);
     }
 
     /// Generate events from geographic analysis
-    pub fn generate_from_geographic_analysis(&mut self, locations: &[crate::infrastructure_analysis::GeographicLocation]) {
+    pub fn generate_from_geographic_analysis(
+        &mut self,
+        locations: &[crate::infrastructure_analysis::GeographicLocation],
+    ) {
         // Note: This would create network activity events, but we're collecting them as security findings for consistency
-        let network_events = geographic_ocsf::generate_geographic_events(locations, &mut self.integration);
+        let network_events =
+            geographic_ocsf::generate_geographic_events(locations, &mut self.integration);
         // Convert network events to security findings for unified collection
         for network_event in network_events {
             let finding_event = security_finding_class::create_network_anomaly_finding(
-                network_event.base.message.unwrap_or_else(|| "Geographic threat detected".to_string()),
+                network_event
+                    .base
+                    .message
+                    .unwrap_or_else(|| "Geographic threat detected".to_string()),
                 "unknown".to_string(),
                 "unknown".to_string(),
                 80,
@@ -593,13 +650,18 @@ impl ThreatIntelEventGenerator {
 
     /// Generate events from incident response
     pub fn generate_from_incidents(&mut self, incidents: &[crate::incident_response::Incident]) {
-        let events = incident_response_ocsf::generate_incident_events(incidents, &mut self.integration);
+        let events =
+            incident_response_ocsf::generate_incident_events(incidents, &mut self.integration);
         self.generated_events.extend(events);
     }
 
     /// Generate events from intelligence reports
-    pub fn generate_from_intelligence(&mut self, reports: &[crate::reputation_system::UpdateEventType]) {
-        let events = intelligence_sharing_ocsf::generate_intelligence_events(reports, &mut self.integration);
+    pub fn generate_from_intelligence(
+        &mut self,
+        reports: &[crate::reputation_system::UpdateEventType],
+    ) {
+        let events =
+            intelligence_sharing_ocsf::generate_intelligence_events(reports, &mut self.integration);
         self.generated_events.extend(events);
     }
 
@@ -610,7 +672,10 @@ impl ThreatIntelEventGenerator {
     }
 
     /// Generate events from risk assessments
-    pub fn generate_from_risk_assessments(&mut self, assessments: &[crate::risk_assessment::RiskAssessment]) {
+    pub fn generate_from_risk_assessments(
+        &mut self,
+        assessments: &[crate::risk_assessment::RiskAssessment],
+    ) {
         let events = risk_assessment_ocsf::generate_risk_events(assessments, &mut self.integration);
         self.generated_events.extend(events);
     }
@@ -752,7 +817,9 @@ mod tests {
             "confidence": 0.9
         });
 
-        let report = integration.generate_threat_intel_report(threat_data).unwrap();
+        let report = integration
+            .generate_threat_intel_report(threat_data)
+            .unwrap();
         assert!(report.contains("APT-123"));
         assert!(report.contains("threat_intelligence"));
     }

@@ -1,13 +1,13 @@
 //! Advanced Attribution Engine
-//! 
+//!
 //! Sophisticated machine learning-based threat actor attribution system
 //! with enhanced confidence scoring and multi-factor analysis.
 
+use anyhow::Result;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
-use anyhow::Result;
 
 /// Advanced attribution analysis with machine learning capabilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -160,18 +160,28 @@ impl AdvancedAttributionEngine {
     }
 
     /// Perform advanced attribution analysis
-    pub async fn analyze_attribution(&self, indicators: &[String], context: &HashMap<String, String>) -> Result<AdvancedAttributionResult> {
+    pub async fn analyze_attribution(
+        &self,
+        indicators: &[String],
+        context: &HashMap<String, String>,
+    ) -> Result<AdvancedAttributionResult> {
         let analysis_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
         // Simulate advanced ML-based attribution analysis
         let primary_candidate = self.generate_primary_candidate(indicators, context).await?;
-        let alternative_candidates = self.generate_alternative_candidates(indicators, context).await?;
-        let confidence_breakdown = self.calculate_confidence_breakdown(&primary_candidate, indicators).await?;
+        let alternative_candidates = self
+            .generate_alternative_candidates(indicators, context)
+            .await?;
+        let confidence_breakdown = self
+            .calculate_confidence_breakdown(&primary_candidate, indicators)
+            .await?;
         let evidence_analysis = self.analyze_evidence(indicators).await?;
         let ml_predictions = self.generate_ml_predictions(indicators, context).await?;
         let attribution_timeline = self.build_attribution_timeline(indicators).await?;
-        let recommendation = self.generate_recommendation(&primary_candidate, &confidence_breakdown).await?;
+        let recommendation = self
+            .generate_recommendation(&primary_candidate, &confidence_breakdown)
+            .await?;
 
         Ok(AdvancedAttributionResult {
             analysis_id,
@@ -187,11 +197,15 @@ impl AdvancedAttributionEngine {
     }
 
     /// Generate primary attribution candidate
-    async fn generate_primary_candidate(&self, indicators: &[String], _context: &HashMap<String, String>) -> Result<AttributionCandidate> {
+    async fn generate_primary_candidate(
+        &self,
+        indicators: &[String],
+        _context: &HashMap<String, String>,
+    ) -> Result<AttributionCandidate> {
         // Simulate sophisticated attribution logic
         let actor_id = Uuid::new_v4().to_string();
         let base_confidence = 0.75 + (rand::random::<f64>() * 0.2);
-        
+
         Ok(AttributionCandidate {
             actor_id: actor_id.clone(),
             actor_name: "APT-Advanced-29".to_string(),
@@ -203,19 +217,27 @@ impl AdvancedAttributionEngine {
             technical_overlap: 0.88,
             geopolitical_context: 0.65,
             temporal_correlation: 0.73,
-            supporting_indicators: indicators.iter().take(indicators.len() / 2).cloned().collect(),
+            supporting_indicators: indicators
+                .iter()
+                .take(indicators.len() / 2)
+                .cloned()
+                .collect(),
             contradicting_indicators: vec![],
         })
     }
 
     /// Generate alternative attribution candidates
-    async fn generate_alternative_candidates(&self, indicators: &[String], _context: &HashMap<String, String>) -> Result<Vec<AttributionCandidate>> {
+    async fn generate_alternative_candidates(
+        &self,
+        indicators: &[String],
+        _context: &HashMap<String, String>,
+    ) -> Result<Vec<AttributionCandidate>> {
         let mut candidates = Vec::new();
-        
+
         for i in 0..3 {
             let actor_id = Uuid::new_v4().to_string();
             let base_confidence = 0.45 + (rand::random::<f64>() * 0.25);
-            
+
             let candidate = AttributionCandidate {
                 actor_id: actor_id.clone(),
                 actor_name: format!("APT-Alternative-{}", 30 + i),
@@ -227,24 +249,48 @@ impl AdvancedAttributionEngine {
                 technical_overlap: 0.65 + (rand::random::<f64>() * 0.2),
                 geopolitical_context: 0.40 + (rand::random::<f64>() * 0.3),
                 temporal_correlation: 0.45 + (rand::random::<f64>() * 0.25),
-                supporting_indicators: indicators.iter().skip(i).take(indicators.len() / 4).cloned().collect(),
+                supporting_indicators: indicators
+                    .iter()
+                    .skip(i)
+                    .take(indicators.len() / 4)
+                    .cloned()
+                    .collect(),
                 contradicting_indicators: vec![format!("contradictory_indicator_{}", i)],
             };
-            
+
             candidates.push(candidate);
         }
-        
+
         Ok(candidates)
     }
 
     /// Calculate detailed confidence breakdown
-    async fn calculate_confidence_breakdown(&self, candidate: &AttributionCandidate, _indicators: &[String]) -> Result<ConfidenceBreakdown> {
+    async fn calculate_confidence_breakdown(
+        &self,
+        candidate: &AttributionCandidate,
+        _indicators: &[String],
+    ) -> Result<ConfidenceBreakdown> {
         let mut confidence_factors = HashMap::new();
-        confidence_factors.insert("technical_evidence".to_string(), candidate.technical_overlap);
-        confidence_factors.insert("behavioral_analysis".to_string(), candidate.behavioral_match);
-        confidence_factors.insert("historical_context".to_string(), candidate.historical_precedent);
-        confidence_factors.insert("geopolitical_alignment".to_string(), candidate.geopolitical_context);
-        confidence_factors.insert("temporal_patterns".to_string(), candidate.temporal_correlation);
+        confidence_factors.insert(
+            "technical_evidence".to_string(),
+            candidate.technical_overlap,
+        );
+        confidence_factors.insert(
+            "behavioral_analysis".to_string(),
+            candidate.behavioral_match,
+        );
+        confidence_factors.insert(
+            "historical_context".to_string(),
+            candidate.historical_precedent,
+        );
+        confidence_factors.insert(
+            "geopolitical_alignment".to_string(),
+            candidate.geopolitical_context,
+        );
+        confidence_factors.insert(
+            "temporal_patterns".to_string(),
+            candidate.temporal_correlation,
+        );
 
         Ok(ConfidenceBreakdown {
             overall_confidence: candidate.confidence_score,
@@ -287,7 +333,11 @@ impl AdvancedAttributionEngine {
     }
 
     /// Generate ML predictions
-    async fn generate_ml_predictions(&self, indicators: &[String], _context: &HashMap<String, String>) -> Result<MLPredictions> {
+    async fn generate_ml_predictions(
+        &self,
+        indicators: &[String],
+        _context: &HashMap<String, String>,
+    ) -> Result<MLPredictions> {
         let mut attribution_predictions = Vec::new();
         let mut behavior_predictions = Vec::new();
         let mut campaign_predictions = Vec::new();
@@ -303,7 +353,11 @@ impl AdvancedAttributionEngine {
                 model_name: model.clone(),
                 prediction: "APT-Advanced-29".to_string(),
                 confidence: 0.75 + (rand::random::<f64>() * 0.2),
-                features_used: vec!["ttps".to_string(), "infrastructure".to_string(), "timing".to_string()],
+                features_used: vec![
+                    "ttps".to_string(),
+                    "infrastructure".to_string(),
+                    "timing".to_string(),
+                ],
                 feature_importance: features,
             };
             attribution_predictions.push(prediction);
@@ -335,7 +389,10 @@ impl AdvancedAttributionEngine {
     }
 
     /// Build attribution timeline
-    async fn build_attribution_timeline(&self, _indicators: &[String]) -> Result<Vec<AttributionEvent>> {
+    async fn build_attribution_timeline(
+        &self,
+        _indicators: &[String],
+    ) -> Result<Vec<AttributionEvent>> {
         let now = Utc::now();
         let mut timeline = Vec::new();
 
@@ -367,14 +424,19 @@ impl AdvancedAttributionEngine {
     }
 
     /// Generate actionable recommendation
-    async fn generate_recommendation(&self, _candidate: &AttributionCandidate, confidence: &ConfidenceBreakdown) -> Result<AttributionRecommendation> {
+    async fn generate_recommendation(
+        &self,
+        _candidate: &AttributionCandidate,
+        confidence: &ConfidenceBreakdown,
+    ) -> Result<AttributionRecommendation> {
         let recommended_action = if confidence.overall_confidence > 0.8 {
             "High confidence attribution - proceed with defensive measures"
         } else if confidence.overall_confidence > 0.6 {
             "Moderate confidence - continue monitoring and analysis"
         } else {
             "Low confidence - collect additional intelligence"
-        }.to_string();
+        }
+        .to_string();
 
         let confidence_level = if confidence.overall_confidence > 0.8 {
             "High"
@@ -382,7 +444,8 @@ impl AdvancedAttributionEngine {
             "Medium"
         } else {
             "Low"
-        }.to_string();
+        }
+        .to_string();
 
         Ok(AttributionRecommendation {
             recommended_action,

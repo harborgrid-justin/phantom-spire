@@ -1,6 +1,6 @@
 use crate::ocsf::{BaseEvent, Enrichment, Observable};
+use chrono::{DateTime, Datelike, Timelike, Utc};
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc, Timelike, Datelike};
 use std::collections::HashMap;
 
 /// OCSF Enrichment Module
@@ -305,16 +305,22 @@ pub mod behavioral {
         /// Create a new behavioral provider
         pub fn new() -> Self {
             let mut patterns = HashMap::new();
-            patterns.insert("lateral_movement".to_string(), vec![
-                "remote_execution".to_string(),
-                "credential_access".to_string(),
-                "network_scanning".to_string(),
-            ]);
-            patterns.insert("data_exfiltration".to_string(), vec![
-                "large_file_transfer".to_string(),
-                "encrypted_traffic".to_string(),
-                "unusual_destination".to_string(),
-            ]);
+            patterns.insert(
+                "lateral_movement".to_string(),
+                vec![
+                    "remote_execution".to_string(),
+                    "credential_access".to_string(),
+                    "network_scanning".to_string(),
+                ],
+            );
+            patterns.insert(
+                "data_exfiltration".to_string(),
+                vec![
+                    "large_file_transfer".to_string(),
+                    "encrypted_traffic".to_string(),
+                    "unusual_destination".to_string(),
+                ],
+            );
 
             Self { patterns }
         }
@@ -478,8 +484,14 @@ pub mod contextual {
             let day = now.weekday();
 
             // Monday to Friday, 9 AM to 5 PM
-            matches!(day, chrono::Weekday::Mon | chrono::Weekday::Tue | chrono::Weekday::Wed | chrono::Weekday::Thu | chrono::Weekday::Fri)
-                && (9..=17).contains(&hour)
+            matches!(
+                day,
+                chrono::Weekday::Mon
+                    | chrono::Weekday::Tue
+                    | chrono::Weekday::Wed
+                    | chrono::Weekday::Thu
+                    | chrono::Weekday::Fri
+            ) && (9..=17).contains(&hour)
         }
     }
 }
@@ -533,7 +545,10 @@ impl EnrichmentEngine {
     }
 
     /// Enrich a single observable
-    pub async fn enrich_observable(&mut self, observable: &Observable) -> Result<Vec<Enrichment>, String> {
+    pub async fn enrich_observable(
+        &mut self,
+        observable: &Observable,
+    ) -> Result<Vec<Enrichment>, String> {
         let cache_key = format!("{}_{}", observable.observable_type, observable.value);
 
         // Check cache first
@@ -587,11 +602,11 @@ impl EnrichmentEngine {
             "severity_id" => {
                 let event_severity = format!("{:?}", event.severity_id);
                 self.compare_values(&event_severity, &condition.value, &condition.operator)
-            },
+            }
             "category_uid" => {
                 let event_category = format!("{:?}", event.category_uid);
                 self.compare_values(&event_category, &condition.value, &condition.operator)
-            },
+            }
             _ => false,
         }
     }

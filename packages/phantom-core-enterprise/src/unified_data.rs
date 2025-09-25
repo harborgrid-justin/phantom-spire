@@ -4,9 +4,9 @@
 //! enabling seamless data exchange and unified querying capabilities.
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 
 /// Universal data record for cross-module compatibility
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -40,24 +40,37 @@ pub struct DataRelationship {
 pub trait UnifiedDataStore: Send + Sync {
     /// Store a universal data record
     async fn store(&self, record: &UniversalDataRecord) -> Result<String, UnifiedDataError>;
-    
+
     /// Retrieve a record by ID
     async fn get(&self, id: &str) -> Result<Option<UniversalDataRecord>, UnifiedDataError>;
-    
+
     /// Query records with filters
-    async fn query(&self, query: &UnifiedQuery) -> Result<Vec<UniversalDataRecord>, UnifiedDataError>;
-    
+    async fn query(
+        &self,
+        query: &UnifiedQuery,
+    ) -> Result<Vec<UniversalDataRecord>, UnifiedDataError>;
+
     /// Update a record
-    async fn update(&self, id: &str, updates: &HashMap<String, serde_json::Value>) -> Result<(), UnifiedDataError>;
-    
+    async fn update(
+        &self,
+        id: &str,
+        updates: &HashMap<String, serde_json::Value>,
+    ) -> Result<(), UnifiedDataError>;
+
     /// Delete a record
     async fn delete(&self, id: &str) -> Result<(), UnifiedDataError>;
-    
+
     /// Create relationship between records
-    async fn create_relationship(&self, relationship: &DataRelationship) -> Result<String, UnifiedDataError>;
-    
+    async fn create_relationship(
+        &self,
+        relationship: &DataRelationship,
+    ) -> Result<String, UnifiedDataError>;
+
     /// Get relationships for a record
-    async fn get_relationships(&self, record_id: &str) -> Result<Vec<DataRelationship>, UnifiedDataError>;
+    async fn get_relationships(
+        &self,
+        record_id: &str,
+    ) -> Result<Vec<DataRelationship>, UnifiedDataError>;
 }
 
 /// Unified query interface
@@ -86,16 +99,16 @@ pub struct TimeRange {
 pub enum UnifiedDataError {
     #[error("Connection error: {0}")]
     Connection(String),
-    
+
     #[error("Not found: {0}")]
     NotFound(String),
-    
+
     #[error("Serialization error: {0}")]
     Serialization(String),
-    
+
     #[error("Query error: {0}")]
     Query(String),
-    
+
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
 }

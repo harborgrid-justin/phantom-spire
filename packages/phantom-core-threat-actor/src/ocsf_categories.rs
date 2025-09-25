@@ -1,6 +1,6 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId};
-use serde::{Deserialize, Serialize};
+use crate::ocsf::{ActivityId, BaseEvent, CategoryUid, ClassUid, SeverityId};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 /// Security Finding Category (Category UID: 2)
 /// Events related to security findings and detections
@@ -143,7 +143,8 @@ pub mod security_finding {
     impl SecurityFindingEvent {
         /// Create a new security finding event
         pub fn new(title: String, severity: SeverityId) -> Self {
-            let mut base = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, severity);
+            let mut base =
+                BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, severity);
             base.activity_id = ActivityId::Other;
             base.activity_name = Some("Security Finding".to_string());
             base.category_name = Some("Findings".to_string());
@@ -402,7 +403,11 @@ pub mod network_activity {
     impl NetworkActivityEvent {
         /// Create a new network activity event
         pub fn new(activity_name: String, severity: SeverityId) -> Self {
-            let mut base = BaseEvent::new(CategoryUid::NetworkActivity, ClassUid::NetworkActivity, severity);
+            let mut base = BaseEvent::new(
+                CategoryUid::NetworkActivity,
+                ClassUid::NetworkActivity,
+                severity,
+            );
             base.activity_id = ActivityId::Other;
             base.activity_name = Some(activity_name);
             base.category_name = Some("Network Activity".to_string());
@@ -626,7 +631,11 @@ pub mod system_activity {
     impl FileActivityEvent {
         /// Create a new file activity event
         pub fn new(activity_name: String, severity: SeverityId) -> Self {
-            let mut base = BaseEvent::new(CategoryUid::SystemActivity, ClassUid::FileActivity, severity);
+            let mut base = BaseEvent::new(
+                CategoryUid::SystemActivity,
+                ClassUid::FileActivity,
+                severity,
+            );
             base.activity_id = ActivityId::Other;
             base.activity_name = Some(activity_name);
             base.category_name = Some("System Activity".to_string());
@@ -662,7 +671,11 @@ pub mod system_activity {
     impl ProcessActivityEvent {
         /// Create a new process activity event
         pub fn new(activity_name: String, severity: SeverityId) -> Self {
-            let mut base = BaseEvent::new(CategoryUid::SystemActivity, ClassUid::ProcessActivity, severity);
+            let mut base = BaseEvent::new(
+                CategoryUid::SystemActivity,
+                ClassUid::ProcessActivity,
+                severity,
+            );
             base.activity_id = ActivityId::Other;
             base.activity_name = Some(activity_name);
             base.category_name = Some("System Activity".to_string());
@@ -705,7 +718,11 @@ pub mod system_activity {
     impl AuthenticationEvent {
         /// Create a new authentication event
         pub fn new(activity_name: String, severity: SeverityId) -> Self {
-            let mut base = BaseEvent::new(CategoryUid::IdentityAndAccessManagement, ClassUid::Authentication, severity);
+            let mut base = BaseEvent::new(
+                CategoryUid::IdentityAndAccessManagement,
+                ClassUid::Authentication,
+                severity,
+            );
             base.activity_id = ActivityId::Other;
             base.activity_name = Some(activity_name);
             base.category_name = Some("Identity & Access Management".to_string());
@@ -773,27 +790,28 @@ mod tests {
             direction_id: Some(1),
         });
 
-        assert_eq!(event.connection_info.as_ref().unwrap().protocol_name, Some("TCP".to_string()));
+        assert_eq!(
+            event.connection_info.as_ref().unwrap().protocol_name,
+            Some("TCP".to_string())
+        );
         assert_eq!(event.base.category_uid as i32, 4);
     }
 
     #[test]
     fn test_file_activity_event() {
-        let event = system_activity::FileActivityEvent::new(
-            "File Created".to_string(),
-            SeverityId::Low,
-        )
-        .with_file(system_activity::File {
-            name: Some("suspicious.exe".to_string()),
-            path: Some("/tmp/suspicious.exe".to_string()),
-            size: Some(1024),
-            r#type: Some("executable".to_string()),
-            uid: Some("file_456".to_string()),
-            hashes: vec![system_activity::FileHash {
-                algorithm: "SHA256".to_string(),
-                value: "abc123...".to_string(),
-            }],
-        });
+        let event =
+            system_activity::FileActivityEvent::new("File Created".to_string(), SeverityId::Low)
+                .with_file(system_activity::File {
+                    name: Some("suspicious.exe".to_string()),
+                    path: Some("/tmp/suspicious.exe".to_string()),
+                    size: Some(1024),
+                    r#type: Some("executable".to_string()),
+                    uid: Some("file_456".to_string()),
+                    hashes: vec![system_activity::FileHash {
+                        algorithm: "SHA256".to_string(),
+                        value: "abc123...".to_string(),
+                    }],
+                });
 
         assert_eq!(event.file.name, Some("suspicious.exe".to_string()));
         assert_eq!(event.file.hashes.len(), 1);
@@ -836,7 +854,10 @@ mod tests {
             }],
         });
 
-        assert_eq!(event.user.as_ref().unwrap().name, Some("attacker".to_string()));
+        assert_eq!(
+            event.user.as_ref().unwrap().name,
+            Some("attacker".to_string())
+        );
         assert_eq!(event.user.as_ref().unwrap().groups.len(), 1);
         assert_eq!(event.base.category_uid as i32, 3);
     }

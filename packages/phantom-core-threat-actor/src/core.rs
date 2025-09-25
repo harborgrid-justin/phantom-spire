@@ -1,14 +1,14 @@
 // phantom-threat-actor-core/src/core.rs
 // Core business logic for threat actor intelligence
 
-use std::sync::Arc;
-use uuid::Uuid;
 use chrono::Utc;
 use std::collections::HashMap;
+use std::sync::Arc;
+use uuid::Uuid;
 
-use crate::models::*;
 use crate::config::ThreatActorCoreConfig;
-use crate::storage::{ThreatActorStorage, StorageFactory};
+use crate::models::*;
+use crate::storage::{StorageFactory, ThreatActorStorage};
 
 /// Main threat actor intelligence core
 pub struct ThreatActorCore {
@@ -25,7 +25,8 @@ impl ThreatActorCore {
         let storage = StorageFactory::create_storage(
             config.storage.backend.clone(),
             config.storage.connection_string.clone(),
-        ).await?;
+        )
+        .await?;
 
         storage.initialize().await?;
 
@@ -53,7 +54,10 @@ impl ThreatActorCore {
     }
 
     /// Analyze threat actor from indicators
-    pub async fn analyze_threat_actor(&self, indicators: &[String]) -> Result<ThreatActor, ThreatActorError> {
+    pub async fn analyze_threat_actor(
+        &self,
+        indicators: &[String],
+    ) -> Result<ThreatActor, ThreatActorError> {
         let actor_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
@@ -85,7 +89,9 @@ impl ThreatActorCore {
         };
 
         // Store the threat actor
-        self.storage.store_threat_actor(&actor).await
+        self.storage
+            .store_threat_actor(&actor)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))?;
 
         Ok(actor)
@@ -93,31 +99,47 @@ impl ThreatActorCore {
 
     /// Store a threat actor
     pub async fn store_threat_actor(&self, actor: &ThreatActor) -> Result<(), ThreatActorError> {
-        self.storage.store_threat_actor(actor).await
+        self.storage
+            .store_threat_actor(actor)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))
     }
 
     /// Get a threat actor by ID
-    pub async fn get_threat_actor(&self, id: &str) -> Result<Option<ThreatActor>, ThreatActorError> {
-        self.storage.get_threat_actor(id).await
+    pub async fn get_threat_actor(
+        &self,
+        id: &str,
+    ) -> Result<Option<ThreatActor>, ThreatActorError> {
+        self.storage
+            .get_threat_actor(id)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))
     }
 
     /// Search for threat actors
-    pub async fn search_threat_actors(&self, criteria: &ThreatActorSearchCriteria) -> Result<Vec<ThreatActor>, ThreatActorError> {
-        self.storage.search_threat_actors(criteria).await
+    pub async fn search_threat_actors(
+        &self,
+        criteria: &ThreatActorSearchCriteria,
+    ) -> Result<Vec<ThreatActor>, ThreatActorError> {
+        self.storage
+            .search_threat_actors(criteria)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))
     }
 
     /// Perform attribution analysis
-    pub async fn perform_attribution(&self, indicators: &[String]) -> Result<AttributionAnalysis, ThreatActorError> {
+    pub async fn perform_attribution(
+        &self,
+        indicators: &[String],
+    ) -> Result<AttributionAnalysis, ThreatActorError> {
         let now = Utc::now();
-        
+
         // Simulate attribution analysis
         let evidence = self.collect_evidence(indicators);
         let confidence_score = self.calculate_attribution_confidence(&evidence);
-        
-        let primary_attribution = if confidence_score > self.config.attribution.confidence_threshold {
+
+        let primary_attribution = if confidence_score > self.config.attribution.confidence_threshold
+        {
             Some(Uuid::new_v4().to_string())
         } else {
             None
@@ -132,14 +154,19 @@ impl ThreatActorCore {
         };
 
         // Store attribution analysis
-        self.storage.store_attribution_analysis(&analysis).await
+        self.storage
+            .store_attribution_analysis(&analysis)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))?;
 
         Ok(analysis)
     }
 
     /// Track campaign activities
-    pub async fn track_campaign(&self, campaign_indicators: &[String]) -> Result<Campaign, ThreatActorError> {
+    pub async fn track_campaign(
+        &self,
+        campaign_indicators: &[String],
+    ) -> Result<Campaign, ThreatActorError> {
         let campaign_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
@@ -168,65 +195,75 @@ impl ThreatActorCore {
         };
 
         // Store the campaign
-        self.storage.store_campaign(&campaign).await
+        self.storage
+            .store_campaign(&campaign)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))?;
 
         Ok(campaign)
     }
 
     /// Analyze behavioral patterns
-    pub async fn analyze_behavior(&self, actor_id: &str, activities: &[String]) -> Result<BehavioralAnalysis, ThreatActorError> {
+    pub async fn analyze_behavior(
+        &self,
+        actor_id: &str,
+        activities: &[String],
+    ) -> Result<BehavioralAnalysis, ThreatActorError> {
         let analysis = BehavioralAnalysis {
             actor_id: actor_id.to_string(),
-            behavioral_patterns: vec![
-                BehavioralPattern {
-                    pattern_type: "Operational Timing".to_string(),
-                    description: "Consistent activity during business hours".to_string(),
-                    frequency: 0.8,
-                    consistency: 0.9,
-                    examples: activities.to_vec(),
-                },
-            ],
-            operational_patterns: vec![
-                OperationalPattern {
-                    phase: "Initial Access".to_string(),
-                    typical_duration: Some(7),
-                    common_techniques: vec!["Spear phishing".to_string()],
-                    success_rate: 0.7,
-                },
-            ],
+            behavioral_patterns: vec![BehavioralPattern {
+                pattern_type: "Operational Timing".to_string(),
+                description: "Consistent activity during business hours".to_string(),
+                frequency: 0.8,
+                consistency: 0.9,
+                examples: activities.to_vec(),
+            }],
+            operational_patterns: vec![OperationalPattern {
+                phase: "Initial Access".to_string(),
+                typical_duration: Some(7),
+                common_techniques: vec!["Spear phishing".to_string()],
+                success_rate: 0.7,
+            }],
             evolution_analysis: EvolutionAnalysis {
                 capability_progression: vec![],
                 tactic_evolution: vec![],
                 infrastructure_evolution: vec![],
                 target_evolution: vec![],
             },
-            predictive_indicators: vec![
-                PredictiveIndicator {
-                    indicator_type: "Next Target".to_string(),
-                    description: "Likely to target financial sector next".to_string(),
-                    probability: 0.75,
-                    timeframe: "30 days".to_string(),
-                },
-            ],
+            predictive_indicators: vec![PredictiveIndicator {
+                indicator_type: "Next Target".to_string(),
+                description: "Likely to target financial sector next".to_string(),
+                probability: 0.75,
+                timeframe: "30 days".to_string(),
+            }],
         };
 
         // Store behavioral analysis
-        self.storage.store_behavioral_analysis(&analysis).await
+        self.storage
+            .store_behavioral_analysis(&analysis)
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))?;
 
         Ok(analysis)
     }
 
     /// Get system health status
-    pub async fn get_health_status(&self) -> Result<crate::storage::HealthStatus, ThreatActorError> {
-        self.storage.health_check().await
+    pub async fn get_health_status(
+        &self,
+    ) -> Result<crate::storage::HealthStatus, ThreatActorError> {
+        self.storage
+            .health_check()
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))
     }
 
     /// Get storage statistics
-    pub async fn get_storage_statistics(&self) -> Result<crate::storage::StorageStatistics, ThreatActorError> {
-        self.storage.get_statistics().await
+    pub async fn get_storage_statistics(
+        &self,
+    ) -> Result<crate::storage::StorageStatistics, ThreatActorError> {
+        self.storage
+            .get_statistics()
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))
     }
 
@@ -234,10 +271,10 @@ impl ThreatActorCore {
     pub fn generate_actor_name(&self, _indicators: &[String]) -> String {
         let prefixes = ["APT", "Group", "Team", "Actor"];
         let numbers = [28, 29, 30, 31, 32, 33, 34, 35];
-        
+
         let prefix = prefixes[simple_random() as usize % prefixes.len()];
         let number = numbers[simple_random() as usize % numbers.len()];
-        
+
         format!("{}-{}", prefix, number)
     }
 
@@ -300,10 +337,7 @@ impl ThreatActorCore {
                 "malicious-domain.com".to_string(),
                 "c2-server.net".to_string(),
             ],
-            ip_addresses: vec![
-                "192.168.1.100".to_string(),
-                "10.0.0.50".to_string(),
-            ],
+            ip_addresses: vec!["192.168.1.100".to_string(), "10.0.0.50".to_string()],
             hosting_providers: vec!["Unknown Provider".to_string()],
             registrars: vec!["Anonymous Registrar".to_string()],
             certificates: vec![],
@@ -370,19 +404,17 @@ impl ThreatActorCore {
     }
 
     fn identify_relationships(&self, _actor_id: &str) -> Vec<ActorRelationship> {
-        vec![
-            ActorRelationship {
-                related_actor_id: Uuid::new_v4().to_string(),
-                relationship_type: RelationshipType::Subgroup,
-                confidence: 0.8,
-                evidence: vec!["Shared infrastructure".to_string()],
-            },
-        ]
+        vec![ActorRelationship {
+            related_actor_id: Uuid::new_v4().to_string(),
+            relationship_type: RelationshipType::Subgroup,
+            confidence: 0.8,
+            evidence: vec!["Shared infrastructure".to_string()],
+        }]
     }
 
     fn collect_evidence(&self, _indicators: &[String]) -> Vec<Evidence> {
         let now = Utc::now();
-        
+
         vec![
             Evidence {
                 evidence_type: EvidenceType::TechnicalIndicator,
@@ -406,11 +438,15 @@ impl ThreatActorCore {
             return 0.0;
         }
 
-        let total_weight: f64 = evidence.iter()
+        let total_weight: f64 = evidence
+            .iter()
             .map(|e| {
-                self.config.attribution.evidence_weights
+                self.config
+                    .attribution
+                    .evidence_weights
                     .get(&e.evidence_type)
-                    .unwrap_or(&0.5) * e.weight
+                    .unwrap_or(&0.5)
+                    * e.weight
             })
             .sum();
 
@@ -419,9 +455,11 @@ impl ThreatActorCore {
 
     /// Shutdown the core and cleanup resources
     pub async fn shutdown(self) -> Result<(), ThreatActorError> {
-        self.storage.close().await
+        self.storage
+            .close()
+            .await
             .map_err(|e| ThreatActorError::Storage(e.to_string()))?;
-        
+
         Ok(())
     }
 }

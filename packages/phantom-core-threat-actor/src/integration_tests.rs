@@ -8,8 +8,8 @@ mod integration_tests {
     use diesel::prelude::*;
     use std::env;
 
-    use crate::database::{DatabaseManager, DatabaseService, models::*};
-    use crate::web_api::{ApiState, create_app_data};
+    use crate::database::{models::*, DatabaseManager, DatabaseService};
+    use crate::web_api::{create_app_data, ApiState};
 
     /// Setup test database connection
     async fn setup_test_db() -> DatabaseManager {
@@ -42,10 +42,8 @@ mod integration_tests {
         let service = DatabaseService::new();
 
         // Test threat actor creation
-        let new_actor = models::ThreatActor::new(
-            Some("Test Actor".to_string()),
-            Some("APT".to_string())
-        );
+        let new_actor =
+            models::ThreatActor::new(Some("Test Actor".to_string()), Some("APT".to_string()));
 
         let created_actor = service.threat_actors.create(&mut conn, &new_actor).await;
         assert!(created_actor.is_ok(), "Failed to create threat actor");
@@ -61,7 +59,7 @@ mod integration_tests {
         let new_incident = models::Incident::new(
             "Test Incident".to_string(),
             "Test incident description".to_string(),
-            "high".to_string()
+            "high".to_string(),
         );
 
         let created_incident = service.incidents.create(&mut conn, &new_incident).await;
@@ -85,8 +83,9 @@ mod integration_tests {
         let app = test::init_service(
             App::new()
                 .app_data(app_data)
-                .configure(crate::web_api::configure_routes)
-        ).await;
+                .configure(crate::web_api::configure_routes),
+        )
+        .await;
 
         // Test health check endpoint
         let req = test::TestRequest::get().uri("/api/v1/health").to_request();
@@ -111,8 +110,10 @@ mod integration_tests {
         let service = DatabaseService::new();
 
         let api_state = ApiState::new(manager, service).await;
-        assert!(api_state.database.is_some() || api_state.database_url.is_some(),
-                "API state should have database configuration");
+        assert!(
+            api_state.database.is_some() || api_state.database_url.is_some(),
+            "API state should have database configuration"
+        );
     }
 }
 

@@ -3,14 +3,14 @@
 //! High-level executive dashboard for threat actor intelligence with key metrics,
 //! risk visualizations, and strategic insights for decision makers.
 
-use std::cmp::PartialEq;
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, VecDeque};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::collections::{HashMap, VecDeque};
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Executive dashboard engine
 #[derive(Debug)]
@@ -81,7 +81,10 @@ impl ExecutiveDashboardModule {
                 // Process metric update
             }
             DashboardEvent::RiskThresholdExceeded(indicator) => {
-                println!("Processing risk threshold exceeded: {}", indicator.indicator_name);
+                println!(
+                    "Processing risk threshold exceeded: {}",
+                    indicator.indicator_name
+                );
                 // Process risk threshold
             }
             DashboardEvent::StrategicInsightGenerated(insight) => {
@@ -92,23 +95,37 @@ impl ExecutiveDashboardModule {
     }
 
     /// Generate executive dashboard
-    pub async fn generate_dashboard(&mut self, time_range: DateRange) -> Result<ExecutiveDashboard> {
+    pub async fn generate_dashboard(
+        &mut self,
+        time_range: DateRange,
+    ) -> Result<ExecutiveDashboard> {
         let dashboard_id = Uuid::new_v4().to_string();
 
         // Aggregate key metrics
-        let key_metrics = self.metric_aggregator.aggregate_key_metrics(&time_range).await?;
+        let key_metrics = self
+            .metric_aggregator
+            .aggregate_key_metrics(&time_range)
+            .await?;
 
         // Generate risk indicators
         let risk_indicators = self.generate_risk_indicators(&time_range).await?;
 
         // Generate strategic insights
-        let strategic_insights = self.insight_generator.generate_insights(&time_range).await?;
+        let strategic_insights = self
+            .insight_generator
+            .generate_insights(&time_range)
+            .await?;
 
         // Generate visualizations
-        let visualizations = self.visualization_engine.generate_visualizations(&key_metrics, &risk_indicators).await?;
+        let visualizations = self
+            .visualization_engine
+            .generate_visualizations(&key_metrics, &risk_indicators)
+            .await?;
 
         // Generate executive summary
-        let executive_summary = self.generate_executive_summary(&key_metrics, &risk_indicators).await?;
+        let executive_summary = self
+            .generate_executive_summary(&key_metrics, &risk_indicators)
+            .await?;
 
         let dashboard = ExecutiveDashboard {
             dashboard_id,
@@ -128,7 +145,12 @@ impl ExecutiveDashboardModule {
     }
 
     /// Update key metric
-    pub async fn update_metric(&mut self, metric_name: &str, value: f64, metadata: HashMap<String, String>) -> Result<()> {
+    pub async fn update_metric(
+        &mut self,
+        metric_name: &str,
+        value: f64,
+        metadata: HashMap<String, String>,
+    ) -> Result<()> {
         let metric = KeyMetric {
             metric_id: Uuid::new_v4().to_string(),
             metric_name: metric_name.to_string(),
@@ -137,15 +159,23 @@ impl ExecutiveDashboardModule {
             change_percentage: self.calculate_change_percentage(metric_name, value),
             trend: self.determine_trend(metric_name, value),
             last_updated: Utc::now(),
-            data_source: metadata.get("source").cloned().unwrap_or_else(|| "Unknown".to_string()),
-            confidence_level: metadata.get("confidence").and_then(|c| c.parse().ok()).unwrap_or(0.8),
+            data_source: metadata
+                .get("source")
+                .cloned()
+                .unwrap_or_else(|| "Unknown".to_string()),
+            confidence_level: metadata
+                .get("confidence")
+                .and_then(|c| c.parse().ok())
+                .unwrap_or(0.8),
             metadata,
         };
 
-        self.key_metrics.insert(metric_name.to_string(), metric.clone());
+        self.key_metrics
+            .insert(metric_name.to_string(), metric.clone());
 
         // Send dashboard event
-        self.send_dashboard_event(DashboardEvent::MetricUpdated(metric)).await?;
+        self.send_dashboard_event(DashboardEvent::MetricUpdated(metric))
+            .await?;
 
         Ok(())
     }
@@ -260,12 +290,20 @@ impl ExecutiveDashboardModule {
     }
 
     /// Generate executive summary
-    async fn generate_executive_summary(&self, metrics: &[KeyMetric], indicators: &[RiskIndicator]) -> Result<String> {
-        let high_risk_indicators = indicators.iter()
-            .filter(|i| i.status == IndicatorStatus::Critical || i.status == IndicatorStatus::Elevated)
+    async fn generate_executive_summary(
+        &self,
+        metrics: &[KeyMetric],
+        indicators: &[RiskIndicator],
+    ) -> Result<String> {
+        let high_risk_indicators = indicators
+            .iter()
+            .filter(|i| {
+                i.status == IndicatorStatus::Critical || i.status == IndicatorStatus::Elevated
+            })
             .count();
 
-        let improving_metrics = metrics.iter()
+        let improving_metrics = metrics
+            .iter()
             .filter(|m| m.trend == MetricTrend::Decreasing) // Assuming decreasing is better for risk metrics
             .count();
 
@@ -286,7 +324,10 @@ impl ExecutiveDashboardModule {
     }
 
     /// Generate strategic insights
-    pub async fn generate_insights(&mut self, time_range: &DateRange) -> Result<Vec<StrategicInsight>> {
+    pub async fn generate_insights(
+        &mut self,
+        time_range: &DateRange,
+    ) -> Result<Vec<StrategicInsight>> {
         let insights = self.insight_generator.generate_insights(time_range).await?;
         self.strategic_insights = insights.clone();
         Ok(insights)
@@ -314,17 +355,20 @@ impl ExecutiveDashboardModule {
         self.executive_alerts.push_back(alert.clone());
 
         // Send dashboard event
-        self.send_dashboard_event(DashboardEvent::StrategicInsightGenerated(StrategicInsight {
-            insight_id: alert_id.clone(),
-            title: alert.title.clone(),
-            insight_type: InsightType::RiskAlert,
-            description: alert.description.clone(),
-            confidence: 0.9,
-            impact: alert.impact_assessment.clone(),
-            recommendations: alert.recommended_actions.clone(),
-            generated_at: Utc::now(),
-            expires_at: Some(Utc::now() + Duration::days(7)),
-        })).await?;
+        self.send_dashboard_event(DashboardEvent::StrategicInsightGenerated(
+            StrategicInsight {
+                insight_id: alert_id.clone(),
+                title: alert.title.clone(),
+                insight_type: InsightType::RiskAlert,
+                description: alert.description.clone(),
+                confidence: 0.9,
+                impact: alert.impact_assessment.clone(),
+                recommendations: alert.recommended_actions.clone(),
+                generated_at: Utc::now(),
+                expires_at: Some(Utc::now() + Duration::days(7)),
+            },
+        ))
+        .await?;
 
         Ok(alert_id)
     }
@@ -340,13 +384,15 @@ impl ExecutiveDashboardModule {
     }
 
     /// Export dashboard data
-    pub async fn export_dashboard(&self, dashboard: &ExecutiveDashboard, format: ExportFormat) -> Result<Vec<u8>> {
+    pub async fn export_dashboard(
+        &self,
+        dashboard: &ExecutiveDashboard,
+        format: ExportFormat,
+    ) -> Result<Vec<u8>> {
         // Export dashboard data in specified format
         match format {
-            ExportFormat::JSON => {
-                serde_json::to_vec(dashboard)
-                    .map_err(|e| anyhow::anyhow!("Failed to export dashboard as JSON: {}", e))
-            }
+            ExportFormat::JSON => serde_json::to_vec(dashboard)
+                .map_err(|e| anyhow::anyhow!("Failed to export dashboard as JSON: {}", e)),
             ExportFormat::PDF => {
                 // Would generate PDF report
                 Ok(vec![1, 2, 3, 4, 5]) // Placeholder
@@ -360,7 +406,9 @@ impl ExecutiveDashboardModule {
 
     /// Send dashboard event
     pub async fn send_dashboard_event(&self, event: DashboardEvent) -> Result<()> {
-        self.dashboard_sender.send(event).await
+        self.dashboard_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send dashboard event: {}", e))
     }
 
@@ -811,7 +859,11 @@ impl VisualizationEngine {
         }
     }
 
-    async fn generate_visualizations(&self, metrics: &[KeyMetric], indicators: &[RiskIndicator]) -> Result<Vec<Visualization>> {
+    async fn generate_visualizations(
+        &self,
+        metrics: &[KeyMetric],
+        indicators: &[RiskIndicator],
+    ) -> Result<Vec<Visualization>> {
         let mut visualizations = Vec::new();
 
         // Generate risk trend visualization

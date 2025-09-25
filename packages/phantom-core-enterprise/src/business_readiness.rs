@@ -3,11 +3,11 @@
 //! Provides comprehensive assessment of enterprise deployment readiness
 //! including configuration scoring, capability analysis, and recommendations.
 
-use crate::{ReadinessLevel, DatabaseSupport, PerformanceTier, ValidationResult};
+use crate::{DatabaseSupport, PerformanceTier, ReadinessLevel, ValidationResult};
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 
 /// Comprehensive business readiness assessment
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -111,13 +111,13 @@ pub enum BusinessImpact {
 pub trait BusinessReadinessAssessor: Send + Sync {
     /// Perform comprehensive business readiness assessment
     async fn assess(&self) -> BusinessReadinessAssessment;
-    
+
     /// Get current configuration status
     async fn get_configuration_status(&self) -> ConfigurationStatus;
-    
+
     /// Validate enterprise deployment readiness
     async fn validate_enterprise_readiness(&self) -> ValidationResult;
-    
+
     /// Generate improvement roadmap
     async fn generate_improvement_roadmap(&self) -> ImprovementRoadmap;
 }
@@ -267,7 +267,7 @@ impl DefaultBusinessReadinessAssessor {
             },
         }
     }
-    
+
     /// Calculate category score based on configuration
     fn calculate_category_score(&self, category: AssessmentCategory) -> CategoryScore {
         match category {
@@ -281,30 +281,34 @@ impl DefaultBusinessReadinessAssessor {
             AssessmentCategory::Testing => self.assess_testing(),
         }
     }
-    
+
     fn assess_data_storage(&self) -> CategoryScore {
         let mut score = 0u32;
         let max_score = 100u32;
         let mut details = Vec::new();
         let mut improvements = Vec::new();
-        
+
         // Check database connections
         let db_count = self.configuration.database_connections.len();
         if db_count >= 4 {
             score += 30;
             details.push("Multi-database support enabled".to_string());
         } else {
-            improvements.push("Enable support for all 4 databases (PostgreSQL, MongoDB, Redis, Elasticsearch)".to_string());
+            improvements.push(
+                "Enable support for all 4 databases (PostgreSQL, MongoDB, Redis, Elasticsearch)"
+                    .to_string(),
+            );
         }
-        
+
         // Check advanced features
         if self.configuration.performance_config.connection_pooling {
             score += 20;
             details.push("Connection pooling enabled".to_string());
         } else {
-            improvements.push("Enable database connection pooling for enterprise scalability".to_string());
+            improvements
+                .push("Enable database connection pooling for enterprise scalability".to_string());
         }
-        
+
         CategoryScore {
             category: AssessmentCategory::DataStorage,
             score,
@@ -314,30 +318,50 @@ impl DefaultBusinessReadinessAssessor {
             improvements,
         }
     }
-    
+
     fn assess_security(&self) -> CategoryScore {
         let mut score = 0u32;
         let max_score = 100u32;
         let mut details = Vec::new();
         let mut improvements = Vec::new();
-        
+
         let sec = &self.configuration.security_features;
-        
-        if sec.encryption_at_rest { score += 15; details.push("Encryption at rest enabled".to_string()); }
-        else { improvements.push("Enable encryption at rest for data security".to_string()); }
-        
-        if sec.encryption_in_transit { score += 15; details.push("Encryption in transit enabled".to_string()); }
-        else { improvements.push("Enable TLS/SSL for all communications".to_string()); }
-        
-        if sec.jwt_authentication { score += 15; details.push("JWT authentication enabled".to_string()); }
-        else { improvements.push("Implement JWT-based authentication".to_string()); }
-        
-        if sec.rbac_authorization { score += 20; details.push("RBAC authorization enabled".to_string()); }
-        else { improvements.push("Implement Role-Based Access Control (RBAC)".to_string()); }
-        
-        if sec.audit_logging { score += 20; details.push("Audit logging enabled".to_string()); }
-        else { improvements.push("Enable comprehensive audit logging".to_string()); }
-        
+
+        if sec.encryption_at_rest {
+            score += 15;
+            details.push("Encryption at rest enabled".to_string());
+        } else {
+            improvements.push("Enable encryption at rest for data security".to_string());
+        }
+
+        if sec.encryption_in_transit {
+            score += 15;
+            details.push("Encryption in transit enabled".to_string());
+        } else {
+            improvements.push("Enable TLS/SSL for all communications".to_string());
+        }
+
+        if sec.jwt_authentication {
+            score += 15;
+            details.push("JWT authentication enabled".to_string());
+        } else {
+            improvements.push("Implement JWT-based authentication".to_string());
+        }
+
+        if sec.rbac_authorization {
+            score += 20;
+            details.push("RBAC authorization enabled".to_string());
+        } else {
+            improvements.push("Implement Role-Based Access Control (RBAC)".to_string());
+        }
+
+        if sec.audit_logging {
+            score += 20;
+            details.push("Audit logging enabled".to_string());
+        } else {
+            improvements.push("Enable comprehensive audit logging".to_string());
+        }
+
         CategoryScore {
             category: AssessmentCategory::Security,
             score,
@@ -347,28 +371,40 @@ impl DefaultBusinessReadinessAssessor {
             improvements,
         }
     }
-    
+
     fn assess_performance(&self) -> CategoryScore {
         let mut score = 0u32;
         let max_score = 100u32;
         let mut details = Vec::new();
         let mut improvements = Vec::new();
-        
+
         let perf = &self.configuration.performance_config;
-        
-        if perf.caching_enabled { score += 20; details.push("Caching enabled".to_string()); }
-        else { improvements.push("Enable Redis caching for performance".to_string()); }
-        
-        if perf.async_processing { score += 25; details.push("Async processing enabled".to_string()); }
-        else { improvements.push("Enable asynchronous request processing".to_string()); }
-        
-        if perf.concurrent_operations > 10 { 
-            score += 25; 
-            details.push(format!("High concurrency support ({} operations)", perf.concurrent_operations));
-        } else { 
-            improvements.push("Increase concurrent operation capacity for enterprise load".to_string()); 
+
+        if perf.caching_enabled {
+            score += 20;
+            details.push("Caching enabled".to_string());
+        } else {
+            improvements.push("Enable Redis caching for performance".to_string());
         }
-        
+
+        if perf.async_processing {
+            score += 25;
+            details.push("Async processing enabled".to_string());
+        } else {
+            improvements.push("Enable asynchronous request processing".to_string());
+        }
+
+        if perf.concurrent_operations > 10 {
+            score += 25;
+            details.push(format!(
+                "High concurrency support ({} operations)",
+                perf.concurrent_operations
+            ));
+        } else {
+            improvements
+                .push("Increase concurrent operation capacity for enterprise load".to_string());
+        }
+
         CategoryScore {
             category: AssessmentCategory::Performance,
             score,
@@ -378,7 +414,7 @@ impl DefaultBusinessReadinessAssessor {
             improvements,
         }
     }
-    
+
     fn assess_multi_tenancy(&self) -> CategoryScore {
         CategoryScore {
             category: AssessmentCategory::MultiTenancy,
@@ -389,7 +425,7 @@ impl DefaultBusinessReadinessAssessor {
             improvements: vec!["Implement enterprise multi-tenancy support".to_string()],
         }
     }
-    
+
     fn assess_integration(&self) -> CategoryScore {
         CategoryScore {
             category: AssessmentCategory::Integration,
@@ -397,24 +433,35 @@ impl DefaultBusinessReadinessAssessor {
             max_score: 100,
             weight: 0.05,
             details: vec!["REST API available".to_string()],
-            improvements: vec!["Add GraphQL support".to_string(), "Implement webhook integrations".to_string()],
+            improvements: vec![
+                "Add GraphQL support".to_string(),
+                "Implement webhook integrations".to_string(),
+            ],
         }
     }
-    
+
     fn assess_monitoring(&self) -> CategoryScore {
         let mut score = 0u32;
         let max_score = 100u32;
         let mut details = Vec::new();
         let mut improvements = Vec::new();
-        
+
         let mon = &self.configuration.monitoring_config;
-        
-        if mon.metrics_collection { score += 25; details.push("Metrics collection enabled".to_string()); }
-        else { improvements.push("Enable Prometheus metrics collection".to_string()); }
-        
-        if mon.health_checks { score += 25; details.push("Health checks enabled".to_string()); }
-        else { improvements.push("Implement comprehensive health checks".to_string()); }
-        
+
+        if mon.metrics_collection {
+            score += 25;
+            details.push("Metrics collection enabled".to_string());
+        } else {
+            improvements.push("Enable Prometheus metrics collection".to_string());
+        }
+
+        if mon.health_checks {
+            score += 25;
+            details.push("Health checks enabled".to_string());
+        } else {
+            improvements.push("Implement comprehensive health checks".to_string());
+        }
+
         CategoryScore {
             category: AssessmentCategory::Monitoring,
             score,
@@ -424,7 +471,7 @@ impl DefaultBusinessReadinessAssessor {
             improvements,
         }
     }
-    
+
     fn assess_documentation(&self) -> CategoryScore {
         CategoryScore {
             category: AssessmentCategory::Documentation,
@@ -434,11 +481,11 @@ impl DefaultBusinessReadinessAssessor {
             details: vec!["Basic API documentation available".to_string()],
             improvements: vec![
                 "Add enterprise deployment guides".to_string(),
-                "Create configuration best practices documentation".to_string()
+                "Create configuration best practices documentation".to_string(),
             ],
         }
     }
-    
+
     fn assess_testing(&self) -> CategoryScore {
         CategoryScore {
             category: AssessmentCategory::Testing,
@@ -448,7 +495,7 @@ impl DefaultBusinessReadinessAssessor {
             details: vec!["Unit tests implemented".to_string()],
             improvements: vec![
                 "Add comprehensive integration tests".to_string(),
-                "Implement enterprise deployment validation tests".to_string()
+                "Implement enterprise deployment validation tests".to_string(),
             ],
         }
     }
@@ -460,7 +507,7 @@ impl BusinessReadinessAssessor for DefaultBusinessReadinessAssessor {
         let mut category_scores = HashMap::new();
         let mut total_weighted_score = 0.0;
         let mut total_weight = 0.0;
-        
+
         // Assess each category
         for category in [
             AssessmentCategory::DataStorage,
@@ -473,33 +520,41 @@ impl BusinessReadinessAssessor for DefaultBusinessReadinessAssessor {
             AssessmentCategory::Testing,
         ] {
             let category_score = self.calculate_category_score(category.clone());
-            let weighted_score = (category_score.score as f32 / category_score.max_score as f32) * category_score.weight;
+            let weighted_score = (category_score.score as f32 / category_score.max_score as f32)
+                * category_score.weight;
             total_weighted_score += weighted_score;
             total_weight += category_score.weight;
             category_scores.insert(format!("{:?}", category), category_score);
         }
-        
+
         let overall_score = ((total_weighted_score / total_weight) * 100.0) as u32;
         let readiness_level = ReadinessLevel::from_score(overall_score);
-        
+
         // Generate recommendations
         let mut recommendations = Vec::new();
         for category_score in category_scores.values() {
             for improvement in &category_score.improvements {
                 recommendations.push(Recommendation {
                     category: category_score.category.clone(),
-                    priority: if category_score.score < 30 { RecommendationPriority::Critical } 
-                             else if category_score.score < 60 { RecommendationPriority::High }
-                             else { RecommendationPriority::Medium },
+                    priority: if category_score.score < 30 {
+                        RecommendationPriority::Critical
+                    } else if category_score.score < 60 {
+                        RecommendationPriority::High
+                    } else {
+                        RecommendationPriority::Medium
+                    },
                     title: improvement.clone(),
-                    description: format!("Implement {} to improve enterprise readiness", improvement),
+                    description: format!(
+                        "Implement {} to improve enterprise readiness",
+                        improvement
+                    ),
                     implementation_effort: ImplementationEffort::Medium,
                     business_impact: BusinessImpact::High,
                     expected_score_improvement: 10,
                 });
             }
         }
-        
+
         BusinessReadinessAssessment {
             module_name: self.module_name.clone(),
             assessment_id: uuid::Uuid::new_v4().to_string(),
@@ -510,10 +565,13 @@ impl BusinessReadinessAssessor for DefaultBusinessReadinessAssessor {
             capabilities: self.capabilities.clone(),
             recommendations,
             next_assessment_date: chrono::Utc::now() + chrono::Duration::days(30),
-            enterprise_blockers: if overall_score < 70 { 
-                vec!["Multi-tenancy support required".to_string(), "Enhanced security features needed".to_string()] 
-            } else { 
-                Vec::new() 
+            enterprise_blockers: if overall_score < 70 {
+                vec![
+                    "Multi-tenancy support required".to_string(),
+                    "Enhanced security features needed".to_string(),
+                ]
+            } else {
+                Vec::new()
             },
             competitive_advantages: vec![
                 "NAPI-RS high-performance Rust implementation".to_string(),
@@ -522,28 +580,31 @@ impl BusinessReadinessAssessor for DefaultBusinessReadinessAssessor {
             ],
         }
     }
-    
+
     async fn get_configuration_status(&self) -> ConfigurationStatus {
         self.configuration.clone()
     }
-    
+
     async fn validate_enterprise_readiness(&self) -> ValidationResult {
         let assessment = self.assess().await;
-        
+
         if assessment.overall_score >= 70 {
             ValidationResult::success()
         } else {
-            ValidationResult::failure(assessment.enterprise_blockers)
-                .with_recommendations(assessment.recommendations.iter()
+            ValidationResult::failure(assessment.enterprise_blockers).with_recommendations(
+                assessment
+                    .recommendations
+                    .iter()
                     .filter(|r| r.priority == RecommendationPriority::Critical)
                     .map(|r| r.title.clone())
-                    .collect())
+                    .collect(),
+            )
         }
     }
-    
+
     async fn generate_improvement_roadmap(&self) -> ImprovementRoadmap {
         let assessment = self.assess().await;
-        
+
         ImprovementRoadmap {
             current_score: assessment.overall_score,
             target_score: 85,

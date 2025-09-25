@@ -3,11 +3,11 @@
 //! Secure intelligence sharing platform for threat actor information
 //! with privacy protection, trust scoring, and automated dissemination.
 
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use uuid::Uuid;
 
 /// Intelligence sharing platform
 #[derive(Debug, Clone)]
@@ -36,7 +36,10 @@ impl IntelligenceSharingModule {
     }
 
     /// Register a new sharing partner
-    pub async fn register_sharing_partner(&mut self, partner_config: SharingPartnerConfig) -> Result<String> {
+    pub async fn register_sharing_partner(
+        &mut self,
+        partner_config: SharingPartnerConfig,
+    ) -> Result<String> {
         let partner_id = Uuid::new_v4().to_string();
 
         let partner = SharingPartner {
@@ -57,16 +60,19 @@ impl IntelligenceSharingModule {
         self.sharing_partners.insert(partner_id.clone(), partner);
 
         // Initialize trust score
-        self.trust_scores.insert(partner_id.clone(), TrustScore {
-            partner_id: partner_id.clone(),
-            overall_score: 0.5,
-            reliability_score: 0.5,
-            timeliness_score: 0.5,
-            quality_score: 0.5,
-            collaboration_score: 0.5,
-            last_updated: Utc::now(),
-            score_history: Vec::new(),
-        });
+        self.trust_scores.insert(
+            partner_id.clone(),
+            TrustScore {
+                partner_id: partner_id.clone(),
+                overall_score: 0.5,
+                reliability_score: 0.5,
+                timeliness_score: 0.5,
+                quality_score: 0.5,
+                collaboration_score: 0.5,
+                last_updated: Utc::now(),
+                score_history: Vec::new(),
+            },
+        );
 
         Ok(partner_id)
     }
@@ -82,10 +88,16 @@ impl IntelligenceSharingModule {
 
         // Find eligible partners
         let eligible_partners = self.find_eligible_partners(sharing_criteria)?;
-        let partner_ids: Vec<String> = eligible_partners.iter().map(|p| p.partner_id.clone()).collect();
+        let partner_ids: Vec<String> = eligible_partners
+            .iter()
+            .map(|p| p.partner_id.clone())
+            .collect();
 
         for partner in eligible_partners {
-            match self.share_with_partner(intelligence, &partner, sharing_criteria).await {
+            match self
+                .share_with_partner(intelligence, &partner, sharing_criteria)
+                .await
+            {
                 Ok(_) => {
                     shared_with.push(partner.partner_id.clone());
                 }
@@ -175,10 +187,16 @@ impl IntelligenceSharingModule {
     }
 
     /// Check sharing level compatibility
-    fn is_sharing_level_compatible(&self, partner_level: &SharingLevel, required_level: &SharingLevel) -> bool {
+    fn is_sharing_level_compatible(
+        &self,
+        partner_level: &SharingLevel,
+        required_level: &SharingLevel,
+    ) -> bool {
         match (partner_level, required_level) {
             (SharingLevel::Full, _) => true,
-            (SharingLevel::High, SharingLevel::High | SharingLevel::Medium | SharingLevel::Low) => true,
+            (SharingLevel::High, SharingLevel::High | SharingLevel::Medium | SharingLevel::Low) => {
+                true
+            }
             (SharingLevel::Medium, SharingLevel::Medium | SharingLevel::Low) => true,
             (SharingLevel::Low, SharingLevel::Low) => true,
             _ => false,
@@ -193,14 +211,20 @@ impl IntelligenceSharingModule {
         criteria: &SharingCriteria,
     ) -> Result<()> {
         // Apply privacy measures
-        let _sanitized_intelligence = self.privacy_engine.sanitize_intelligence(intelligence, &partner.capabilities)?;
+        let _sanitized_intelligence = self
+            .privacy_engine
+            .sanitize_intelligence(intelligence, &partner.capabilities)?;
 
         // Determine dissemination channel
-        let channel = self.dissemination_engine.select_channel(&partner.capabilities)?;
+        let channel = self
+            .dissemination_engine
+            .select_channel(&partner.capabilities)?;
 
         // Simulate sharing (in real implementation, this would send to partner's endpoint)
-        println!("Sharing intelligence {} with partner {} via {}", 
-                intelligence.intelligence_id, partner.name, channel);
+        println!(
+            "Sharing intelligence {} with partner {} via {}",
+            intelligence.intelligence_id, partner.name, channel
+        );
 
         Ok(())
     }
@@ -268,22 +292,34 @@ impl IntelligenceSharingModule {
     }
 
     /// Update trust score for a partner
-    fn update_trust_score(&mut self, partner_id: &str, intelligence: &ThreatIntelligence) -> Result<()> {
+    fn update_trust_score(
+        &mut self,
+        partner_id: &str,
+        intelligence: &ThreatIntelligence,
+    ) -> Result<()> {
         if let Some(trust_score) = self.trust_scores.get_mut(partner_id) {
             // Update quality score based on intelligence quality
             let quality_boost = intelligence.confidence_score * 0.1;
             trust_score.quality_score = (trust_score.quality_score + quality_boost).min(1.0);
 
             // Update timeliness score based on how recent the intelligence is
-            let age_hours = Utc::now().signed_duration_since(intelligence.created_at).num_hours() as f64;
-            let timeliness_score = if age_hours < 24.0 { 1.0 } else { (1.0 / age_hours).max(0.1) };
-            trust_score.timeliness_score = (trust_score.timeliness_score + timeliness_score * 0.1).min(1.0);
+            let age_hours = Utc::now()
+                .signed_duration_since(intelligence.created_at)
+                .num_hours() as f64;
+            let timeliness_score = if age_hours < 24.0 {
+                1.0
+            } else {
+                (1.0 / age_hours).max(0.1)
+            };
+            trust_score.timeliness_score =
+                (trust_score.timeliness_score + timeliness_score * 0.1).min(1.0);
 
             // Recalculate overall score
-            trust_score.overall_score = (trust_score.reliability_score +
-                                        trust_score.timeliness_score +
-                                        trust_score.quality_score +
-                                        trust_score.collaboration_score) / 4.0;
+            trust_score.overall_score = (trust_score.reliability_score
+                + trust_score.timeliness_score
+                + trust_score.quality_score
+                + trust_score.collaboration_score)
+                / 4.0;
 
             trust_score.last_updated = Utc::now();
 
@@ -297,7 +333,10 @@ impl IntelligenceSharingModule {
     }
 
     /// Create a sharing policy
-    pub async fn create_sharing_policy(&mut self, policy_config: SharingPolicyConfig) -> Result<String> {
+    pub async fn create_sharing_policy(
+        &mut self,
+        policy_config: SharingPolicyConfig,
+    ) -> Result<String> {
         let policy_id = Uuid::new_v4().to_string();
 
         let policy = SharingPolicy {
@@ -321,12 +360,18 @@ impl IntelligenceSharingModule {
     /// Get sharing statistics
     pub fn get_sharing_statistics(&self) -> SharingStatistics {
         let total_partners = self.sharing_partners.len();
-        let active_partners = self.sharing_partners.values()
+        let active_partners = self
+            .sharing_partners
+            .values()
             .filter(|p| p.partnership_status == PartnershipStatus::Active)
             .count();
         let total_shared = self.shared_intelligence.len();
         let average_trust_score = if !self.trust_scores.is_empty() {
-            self.trust_scores.values().map(|t| t.overall_score).sum::<f64>() / self.trust_scores.len() as f64
+            self.trust_scores
+                .values()
+                .map(|t| t.overall_score)
+                .sum::<f64>()
+                / self.trust_scores.len() as f64
         } else {
             0.0
         };
@@ -379,7 +424,10 @@ impl IntelligenceSharingModule {
     }
 
     /// Subscribe to an intelligence feed
-    pub async fn subscribe_to_feed(&mut self, feed_config: FeedSubscriptionConfig) -> Result<String> {
+    pub async fn subscribe_to_feed(
+        &mut self,
+        feed_config: FeedSubscriptionConfig,
+    ) -> Result<String> {
         let feed_id = Uuid::new_v4().to_string();
 
         let feed = IntelligenceFeed {
@@ -403,7 +451,11 @@ impl IntelligenceSharingModule {
     }
 
     /// Process intelligence from feeds
-    pub async fn process_feed_intelligence(&mut self, feed_id: &str, intelligence_items: Vec<ThreatIntelligence>) -> Result<FeedProcessingResult> {
+    pub async fn process_feed_intelligence(
+        &mut self,
+        feed_id: &str,
+        intelligence_items: Vec<ThreatIntelligence>,
+    ) -> Result<FeedProcessingResult> {
         let mut processed = 0;
         let mut duplicates = 0;
         let mut errors = 0;
@@ -758,7 +810,11 @@ impl PrivacyEngine {
         }
     }
 
-    fn sanitize_intelligence(&self, intelligence: &ThreatIntelligence, capabilities: &[String]) -> Result<ThreatIntelligence> {
+    fn sanitize_intelligence(
+        &self,
+        intelligence: &ThreatIntelligence,
+        capabilities: &[String],
+    ) -> Result<ThreatIntelligence> {
         let mut sanitized = intelligence.clone();
 
         // Apply privacy rules based on partner capabilities
@@ -775,7 +831,11 @@ impl PrivacyEngine {
         Ok(sanitized)
     }
 
-    fn apply_privacy_rule(&self, mut intelligence: ThreatIntelligence, rule: &PrivacyRule) -> ThreatIntelligence {
+    fn apply_privacy_rule(
+        &self,
+        mut intelligence: ThreatIntelligence,
+        rule: &PrivacyRule,
+    ) -> ThreatIntelligence {
         // Apply masking to indicators
         for indicator in &mut intelligence.indicators {
             if rule.applies_to.iter().any(|t| indicator.contains(t)) {
@@ -881,7 +941,11 @@ impl DisseminationEngine {
     fn select_channel(&self, partner_capabilities: &[String]) -> Result<String> {
         // Find the best channel based on partner capabilities and our preferences
         for channel in &self.available_channels {
-            if channel.capabilities_required.iter().all(|cap| partner_capabilities.contains(cap)) {
+            if channel
+                .capabilities_required
+                .iter()
+                .all(|cap| partner_capabilities.contains(cap))
+            {
                 return Ok(channel.channel_id.clone());
             }
         }
@@ -890,7 +954,9 @@ impl DisseminationEngine {
         if let Some(channel) = self.available_channels.first() {
             Ok(channel.channel_id.clone())
         } else {
-            Err(anyhow::anyhow!("No suitable dissemination channel available"))
+            Err(anyhow::anyhow!(
+                "No suitable dissemination channel available"
+            ))
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::ocsf::{SeverityId, ActivityId, Observable, Enrichment};
+use crate::ocsf::{ActivityId, Enrichment, Observable, SeverityId};
 use crate::ocsf_categories::*;
 use serde::{Deserialize, Serialize};
 
@@ -43,7 +43,10 @@ pub mod security_finding_class {
     ) -> security_finding::SecurityFindingEvent {
         let mut event = security_finding::SecurityFindingEvent::new(title, severity)
             .with_finding_type("malware".to_string())
-            .with_description(format!("Malware '{}' detected in file '{}'", malware_name, file_path))
+            .with_description(format!(
+                "Malware '{}' detected in file '{}'",
+                malware_name, file_path
+            ))
             .with_confidence(confidence);
 
         // Add observables
@@ -89,7 +92,10 @@ pub mod security_finding_class {
     ) -> security_finding::SecurityFindingEvent {
         let mut event = security_finding::SecurityFindingEvent::new(title, severity)
             .with_finding_type("network_anomaly".to_string())
-            .with_description(format!("Suspicious network activity detected: {} -> {}:{}", src_ip, dst_ip, dst_port))
+            .with_description(format!(
+                "Suspicious network activity detected: {} -> {}:{}",
+                src_ip, dst_ip, dst_port
+            ))
             .with_confidence(0.75);
 
         // Add observables
@@ -150,7 +156,10 @@ pub mod security_finding_class {
     ) -> security_finding::SecurityFindingEvent {
         let mut event = security_finding::SecurityFindingEvent::new(title, severity)
             .with_finding_type("unauthorized_access".to_string())
-            .with_description(format!("Unauthorized {} access to {} by user {}", access_type, resource, user))
+            .with_description(format!(
+                "Unauthorized {} access to {} by user {}",
+                access_type, resource, user
+            ))
             .with_confidence(0.9);
 
         // Add observables
@@ -516,12 +525,10 @@ pub mod system_activity_class {
             size: Some(file_size),
             r#type: Some("executable".to_string()),
             uid: Some(format!("file_{}", uuid::Uuid::new_v4())),
-            hashes: vec![
-                system_activity::FileHash {
-                    algorithm: "SHA256".to_string(),
-                    value: "suspicious_hash_1234567890abcdef".to_string(),
-                },
-            ],
+            hashes: vec![system_activity::FileHash {
+                algorithm: "SHA256".to_string(),
+                value: "suspicious_hash_1234567890abcdef".to_string(),
+            }],
         };
 
         let actor = system_activity::Actor {
@@ -665,7 +672,10 @@ pub mod system_activity_class {
         event.add_auth_factor(auth_factor);
 
         // Set status to failure
-        event.base = event.base.with_status(crate::ocsf::StatusId::Failure, Some("Authentication Failed".to_string()));
+        event.base = event.base.with_status(
+            crate::ocsf::StatusId::Failure,
+            Some("Authentication Failed".to_string()),
+        );
 
         // Add observables
         let user_observable = Observable {
@@ -720,8 +730,14 @@ mod tests {
             SeverityId::High,
         );
 
-        assert_eq!(event.connection_info.as_ref().unwrap().protocol_name, Some("TCP".to_string()));
-        assert_eq!(event.http_request.as_ref().unwrap().http_method, Some("GET".to_string()));
+        assert_eq!(
+            event.connection_info.as_ref().unwrap().protocol_name,
+            Some("TCP".to_string())
+        );
+        assert_eq!(
+            event.http_request.as_ref().unwrap().http_method,
+            Some("GET".to_string())
+        );
         assert_eq!(event.base.observables.len(), 1);
         assert_eq!(event.base.enrichments.len(), 0); // No enrichments added in this test
     }
@@ -736,7 +752,10 @@ mod tests {
             SeverityId::Medium,
         );
 
-        assert_eq!(event.dns_query.as_ref().unwrap().domain, Some("suspicious-domain-with-high-entropy.com".to_string()));
+        assert_eq!(
+            event.dns_query.as_ref().unwrap().domain,
+            Some("suspicious-domain-with-high-entropy.com".to_string())
+        );
         assert_eq!(event.base.observables.len(), 1);
         assert_eq!(event.base.observables[0].observable_type, "domain");
     }
@@ -751,7 +770,10 @@ mod tests {
             SeverityId::High,
         );
 
-        assert_eq!(event.connection_info.as_ref().unwrap().protocol_name, Some("TCP".to_string()));
+        assert_eq!(
+            event.connection_info.as_ref().unwrap().protocol_name,
+            Some("TCP".to_string())
+        );
         assert_eq!(event.traffic.as_ref().unwrap().bytes_in, Some(1024));
         assert_eq!(event.base.observables.len(), 1);
         assert_eq!(event.base.enrichments.len(), 1);
@@ -769,7 +791,10 @@ mod tests {
 
         assert_eq!(event.file.name, Some("suspicious.exe".to_string()));
         assert_eq!(event.file.size, Some(1048576));
-        assert_eq!(event.actor.as_ref().unwrap().name, Some("attacker".to_string()));
+        assert_eq!(
+            event.actor.as_ref().unwrap().name,
+            Some("attacker".to_string())
+        );
         assert_eq!(event.base.observables.len(), 1);
     }
 
@@ -785,8 +810,14 @@ mod tests {
         );
 
         assert_eq!(event.process.name, Some("powershell.exe".to_string()));
-        assert_eq!(event.parent_process.as_ref().unwrap().name, Some("explorer.exe".to_string()));
-        assert_eq!(event.actor.as_ref().unwrap().name, Some("attacker".to_string()));
+        assert_eq!(
+            event.parent_process.as_ref().unwrap().name,
+            Some("explorer.exe".to_string())
+        );
+        assert_eq!(
+            event.actor.as_ref().unwrap().name,
+            Some("attacker".to_string())
+        );
         assert_eq!(event.base.observables.len(), 1);
     }
 
@@ -800,7 +831,10 @@ mod tests {
         );
 
         assert_eq!(event.user.as_ref().unwrap().name, Some("admin".to_string()));
-        assert_eq!(event.service.as_ref().unwrap().name, Some("ssh".to_string()));
+        assert_eq!(
+            event.service.as_ref().unwrap().name,
+            Some("ssh".to_string())
+        );
         assert_eq!(event.base.status_id, Some(crate::ocsf::StatusId::Failure));
         assert_eq!(event.base.observables.len(), 1);
     }

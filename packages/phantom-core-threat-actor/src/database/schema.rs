@@ -1,9 +1,9 @@
 //! Database schema definitions for Diesel ORM
 
 #[cfg(feature = "diesel-orm")]
-use diesel::prelude::*;
-#[cfg(feature = "diesel-orm")]
 use chrono::{DateTime, Utc};
+#[cfg(feature = "diesel-orm")]
+use diesel::prelude::*;
 
 #[cfg(feature = "diesel-orm")]
 table! {

@@ -3,11 +3,11 @@
 //! Advanced behavioral pattern recognition and analysis system for threat actors.
 //! Identifies patterns in tactics, techniques, procedures, and operational behaviors.
 
+use anyhow::Result;
+use chrono::{DateTime, Datelike, Duration, Timelike, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use chrono::{DateTime, Utc, Duration, Timelike, Datelike};
 use uuid::Uuid;
-use anyhow::Result;
 
 /// Behavioral patterns analysis engine
 #[derive(Debug, Clone)]
@@ -50,18 +50,26 @@ impl BehavioralPatternsModule {
 
         // Detect anomalies
         for activity in activities {
-            if let Some(anomaly) = self.anomaly_detector.detect_anomaly(activity, context).await? {
+            if let Some(anomaly) = self
+                .anomaly_detector
+                .detect_anomaly(activity, context)
+                .await?
+            {
                 anomalies.push(anomaly);
             }
         }
 
         // Generate predictions
         if let Some(actor_profile) = self.actor_behaviors.get(actor_id) {
-            predictions = self.temporal_analyzer.predict_future_behavior(actor_profile, context).await?;
+            predictions = self
+                .temporal_analyzer
+                .predict_future_behavior(actor_profile, context)
+                .await?;
         }
 
         // Update actor behavioral profile
-        self.update_actor_profile(actor_id, &patterns, &anomalies).await?;
+        self.update_actor_profile(actor_id, &patterns, &anomalies)
+            .await?;
 
         Ok(BehavioralAnalysisResult {
             actor_id: actor_id.to_string(),
@@ -75,7 +83,10 @@ impl BehavioralPatternsModule {
     }
 
     /// Extract patterns from a single activity
-    fn extract_patterns_from_activity(&self, activity: &Activity) -> Result<Vec<BehavioralPattern>> {
+    fn extract_patterns_from_activity(
+        &self,
+        activity: &Activity,
+    ) -> Result<Vec<BehavioralPattern>> {
         let mut patterns = Vec::new();
 
         // Time-based patterns
@@ -168,7 +179,8 @@ impl BehavioralPatternsModule {
         let targets = &activity.targets;
 
         // Check for high-value target patterns
-        let high_value_targets = targets.iter()
+        let high_value_targets = targets
+            .iter()
             .filter(|target| target.value_score > 0.8)
             .count();
 
@@ -201,7 +213,8 @@ impl BehavioralPatternsModule {
         let infrastructure = &activity.infrastructure_used;
 
         // Check for C2 server patterns
-        let c2_servers = infrastructure.iter()
+        let c2_servers = infrastructure
+            .iter()
             .filter(|infra| infra.infrastructure_type == InfrastructureType::CommandAndControl)
             .count();
 
@@ -236,7 +249,8 @@ impl BehavioralPatternsModule {
         patterns: &[BehavioralPattern],
         anomalies: &[Anomaly],
     ) -> Result<()> {
-        let profile = self.actor_behaviors
+        let profile = self
+            .actor_behaviors
             .entry(actor_id.to_string())
             .or_insert_with(|| ActorBehavioralProfile {
                 actor_id: actor_id.to_string(),
@@ -248,12 +262,19 @@ impl BehavioralPatternsModule {
 
         // Add new patterns
         for pattern in patterns {
-            if !profile.patterns.iter().any(|p| p.pattern_name == pattern.pattern_name) {
+            if !profile
+                .patterns
+                .iter()
+                .any(|p| p.pattern_name == pattern.pattern_name)
+            {
                 profile.patterns.push(pattern.clone());
             } else {
                 // Update existing pattern
-                if let Some(existing) = profile.patterns.iter_mut()
-                    .find(|p| p.pattern_name == pattern.pattern_name) {
+                if let Some(existing) = profile
+                    .patterns
+                    .iter_mut()
+                    .find(|p| p.pattern_name == pattern.pattern_name)
+                {
                     existing.frequency += 1;
                     existing.last_observed = pattern.last_observed;
                     existing.confidence = (existing.confidence + pattern.confidence) / 2.0;
@@ -270,7 +291,11 @@ impl BehavioralPatternsModule {
     }
 
     /// Calculate confidence score for analysis
-    fn calculate_confidence_score(&self, patterns: &[BehavioralPattern], anomalies: &[Anomaly]) -> f64 {
+    fn calculate_confidence_score(
+        &self,
+        patterns: &[BehavioralPattern],
+        anomalies: &[Anomaly],
+    ) -> f64 {
         let pattern_confidence = if patterns.is_empty() {
             0.0
         } else {
@@ -294,19 +319,20 @@ impl BehavioralPatternsModule {
                 PatternType::Infrastructure => "infrastructure",
             };
 
-            clusters.entry(cluster_key.to_string())
+            clusters
+                .entry(cluster_key.to_string())
                 .or_insert_with(Vec::new)
                 .push(pattern.clone());
         }
 
-        clusters.into_iter()
+        clusters
+            .into_iter()
             .map(|(cluster_type, cluster_patterns)| PatternCluster {
                 cluster_type,
                 patterns: cluster_patterns.clone(),
                 cluster_size: cluster_patterns.len(),
-                average_confidence: cluster_patterns.iter()
-                    .map(|p| p.confidence)
-                    .sum::<f64>() / cluster_patterns.len() as f64,
+                average_confidence: cluster_patterns.iter().map(|p| p.confidence).sum::<f64>()
+                    / cluster_patterns.len() as f64,
             })
             .collect()
     }
@@ -321,8 +347,10 @@ impl BehavioralPatternsModule {
         let profile1 = self.actor_behaviors.get(actor1_id)?;
         let profile2 = self.actor_behaviors.get(actor2_id)?;
 
-        let pattern_similarity = self.calculate_pattern_similarity(&profile1.patterns, &profile2.patterns);
-        let anomaly_similarity = self.calculate_anomaly_similarity(&profile1.anomalies, &profile2.anomalies);
+        let pattern_similarity =
+            self.calculate_pattern_similarity(&profile1.patterns, &profile2.patterns);
+        let anomaly_similarity =
+            self.calculate_anomaly_similarity(&profile1.anomalies, &profile2.anomalies);
 
         Some(ProfileComparison {
             actor1_id: actor1_id.to_string(),
@@ -331,13 +359,19 @@ impl BehavioralPatternsModule {
             anomaly_similarity_score: anomaly_similarity,
             overall_similarity: (pattern_similarity + anomaly_similarity) / 2.0,
             shared_patterns: self.find_shared_patterns(&profile1.patterns, &profile2.patterns),
-            unique_patterns_actor1: self.find_unique_patterns(&profile1.patterns, &profile2.patterns),
-            unique_patterns_actor2: self.find_unique_patterns(&profile2.patterns, &profile1.patterns),
+            unique_patterns_actor1: self
+                .find_unique_patterns(&profile1.patterns, &profile2.patterns),
+            unique_patterns_actor2: self
+                .find_unique_patterns(&profile2.patterns, &profile1.patterns),
         })
     }
 
     /// Calculate pattern similarity between two pattern sets
-    fn calculate_pattern_similarity(&self, patterns1: &[BehavioralPattern], patterns2: &[BehavioralPattern]) -> f64 {
+    fn calculate_pattern_similarity(
+        &self,
+        patterns1: &[BehavioralPattern],
+        patterns2: &[BehavioralPattern],
+    ) -> f64 {
         if patterns1.is_empty() && patterns2.is_empty() {
             return 1.0;
         }
@@ -349,7 +383,11 @@ impl BehavioralPatternsModule {
             for pattern2 in patterns2 {
                 if pattern1.pattern_type == pattern2.pattern_type {
                     total_comparisons += 1;
-                    let name_similarity = if pattern1.pattern_name == pattern2.pattern_name { 1.0 } else { 0.0 };
+                    let name_similarity = if pattern1.pattern_name == pattern2.pattern_name {
+                        1.0
+                    } else {
+                        0.0
+                    };
                     let confidence_diff = 1.0 - (pattern1.confidence - pattern2.confidence).abs();
                     similarity_score += (name_similarity + confidence_diff) / 2.0;
                 }
@@ -390,10 +428,16 @@ impl BehavioralPatternsModule {
     }
 
     /// Find shared patterns between two pattern sets
-    fn find_shared_patterns(&self, patterns1: &[BehavioralPattern], patterns2: &[BehavioralPattern]) -> Vec<String> {
-        patterns1.iter()
+    fn find_shared_patterns(
+        &self,
+        patterns1: &[BehavioralPattern],
+        patterns2: &[BehavioralPattern],
+    ) -> Vec<String> {
+        patterns1
+            .iter()
             .filter_map(|p1| {
-                patterns2.iter()
+                patterns2
+                    .iter()
                     .find(|p2| p1.pattern_name == p2.pattern_name)
                     .map(|_| p1.pattern_name.clone())
             })
@@ -401,10 +445,18 @@ impl BehavioralPatternsModule {
     }
 
     /// Find unique patterns in first set compared to second
-    fn find_unique_patterns(&self, patterns1: &[BehavioralPattern], patterns2: &[BehavioralPattern]) -> Vec<String> {
-        patterns1.iter()
+    fn find_unique_patterns(
+        &self,
+        patterns1: &[BehavioralPattern],
+        patterns2: &[BehavioralPattern],
+    ) -> Vec<String> {
+        patterns1
+            .iter()
             .filter_map(|p1| {
-                if patterns2.iter().any(|p2| p1.pattern_name == p2.pattern_name) {
+                if patterns2
+                    .iter()
+                    .any(|p2| p1.pattern_name == p2.pattern_name)
+                {
                     None
                 } else {
                     Some(p1.pattern_name.clone())
@@ -446,7 +498,11 @@ impl AnomalyDetector {
         }
     }
 
-    async fn detect_anomaly(&self, activity: &Activity, _context: &AnalysisContext) -> Result<Option<Anomaly>> {
+    async fn detect_anomaly(
+        &self,
+        activity: &Activity,
+        _context: &AnalysisContext,
+    ) -> Result<Option<Anomaly>> {
         // Check for deviations from baseline
         let baseline = self.baseline_behaviors.get(&activity.actor_id);
 

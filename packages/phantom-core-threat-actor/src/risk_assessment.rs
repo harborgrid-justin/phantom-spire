@@ -3,13 +3,13 @@
 //! Advanced risk assessment and quantification system for threat actors,
 //! including risk scoring, impact analysis, and mitigation strategies.
 
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Risk assessment engine
 #[derive(Debug)]
@@ -60,7 +60,10 @@ impl RiskAssessmentModule {
     async fn process_risk_event(event: RiskEvent) {
         match event {
             RiskEvent::AssessmentRequested(assessment) => {
-                println!("Processing risk assessment request: {}", assessment.assessment_id);
+                println!(
+                    "Processing risk assessment request: {}",
+                    assessment.assessment_id
+                );
                 // Process assessment request
             }
             RiskEvent::RiskThresholdExceeded(risk) => {
@@ -68,7 +71,10 @@ impl RiskAssessmentModule {
                 // Process risk threshold
             }
             RiskEvent::MitigationApplied(mitigation) => {
-                println!("Processing mitigation applied: {}", mitigation.mitigation_id);
+                println!(
+                    "Processing mitigation applied: {}",
+                    mitigation.mitigation_id
+                );
                 // Process mitigation
             }
         }
@@ -98,31 +104,41 @@ impl RiskAssessmentModule {
     }
 
     /// Perform risk assessment
-    pub async fn perform_assessment(&mut self, assessment_config: AssessmentConfig) -> Result<String> {
+    pub async fn perform_assessment(
+        &mut self,
+        assessment_config: AssessmentConfig,
+    ) -> Result<String> {
         let assessment_id = Uuid::new_v4().to_string();
 
         // Get the risk model
-        let model = self.risk_models.get(&assessment_config.model_id)
-            .ok_or_else(|| anyhow::anyhow!("Risk model not found: {}", assessment_config.model_id))?;
+        let model = self
+            .risk_models
+            .get(&assessment_config.model_id)
+            .ok_or_else(|| {
+                anyhow::anyhow!("Risk model not found: {}", assessment_config.model_id)
+            })?;
 
         // Calculate risk scores
-        let risk_scores = self.risk_scoring_engine.calculate_scores(
-            &assessment_config.target_entity,
-            &model.risk_factors,
-            &assessment_config.context_data
-        ).await?;
+        let risk_scores = self
+            .risk_scoring_engine
+            .calculate_scores(
+                &assessment_config.target_entity,
+                &model.risk_factors,
+                &assessment_config.context_data,
+            )
+            .await?;
 
         // Analyze impact
-        let impact_analysis = self.impact_analyzer.analyze_impact(
-            &assessment_config.target_entity,
-            &risk_scores
-        ).await?;
+        let impact_analysis = self
+            .impact_analyzer
+            .analyze_impact(&assessment_config.target_entity, &risk_scores)
+            .await?;
 
         // Generate mitigation recommendations
-        let mitigation_plan = self.mitigation_planner.generate_plan(
-            &risk_scores,
-            &impact_analysis
-        ).await?;
+        let mitigation_plan = self
+            .mitigation_planner
+            .generate_plan(&risk_scores, &impact_analysis)
+            .await?;
 
         let assessment = RiskAssessment {
             assessment_id: assessment_id.clone(),
@@ -150,18 +166,21 @@ impl RiskAssessmentModule {
             context_data: assessment_config.context_data,
         };
 
-        self.active_assessments.insert(assessment_id.clone(), assessment.clone());
+        self.active_assessments
+            .insert(assessment_id.clone(), assessment.clone());
         self.historical_data.push(assessment.clone());
 
         // Send risk event
-        self.send_risk_event(RiskEvent::AssessmentRequested(assessment)).await?;
+        self.send_risk_event(RiskEvent::AssessmentRequested(assessment))
+            .await?;
 
         Ok(assessment_id)
     }
 
     /// Calculate overall risk level
     fn calculate_overall_risk(&self, risk_scores: &RiskScores) -> RiskLevel {
-        let total_score = risk_scores.category_scores.values().sum::<f64>() / risk_scores.category_scores.len() as f64;
+        let total_score = risk_scores.category_scores.values().sum::<f64>()
+            / risk_scores.category_scores.len() as f64;
 
         match total_score {
             score if score >= 8.0 => RiskLevel::Critical,
@@ -174,12 +193,19 @@ impl RiskAssessmentModule {
 
     /// Check if assessment requires review
     fn requires_review(&self, risk_scores: &RiskScores) -> bool {
-        risk_scores.overall_score >= 7.0 ||
-        risk_scores.category_scores.values().any(|&score| score >= 9.0)
+        risk_scores.overall_score >= 7.0
+            || risk_scores
+                .category_scores
+                .values()
+                .any(|&score| score >= 9.0)
     }
 
     /// Update risk assessment
-    pub async fn update_assessment(&mut self, assessment_id: &str, updates: AssessmentUpdate) -> Result<()> {
+    pub async fn update_assessment(
+        &mut self,
+        assessment_id: &str,
+        updates: AssessmentUpdate,
+    ) -> Result<()> {
         // Calculate values before getting mutable reference
         let overall_risk_level = if let Some(ref new_scores) = updates.risk_scores {
             Some(self.calculate_overall_risk(new_scores))
@@ -187,7 +213,9 @@ impl RiskAssessmentModule {
             None
         };
 
-        let assessment = self.active_assessments.get_mut(assessment_id)
+        let assessment = self
+            .active_assessments
+            .get_mut(assessment_id)
             .ok_or_else(|| anyhow::anyhow!("Assessment not found: {}", assessment_id))?;
 
         // Apply updates
@@ -216,11 +244,13 @@ impl RiskAssessmentModule {
         // Separate the borrows by dropping the mutable borrow first
         let risk_scores_copy = assessment.risk_scores.clone();
         drop(assessment); // Drop the mutable borrow
-        
+
         let review_required = self.requires_review(&risk_scores_copy);
-        
+
         // Get a new mutable borrow to update the review_required field
-        let assessment = self.active_assessments.get_mut(assessment_id)
+        let assessment = self
+            .active_assessments
+            .get_mut(assessment_id)
             .ok_or_else(|| anyhow::anyhow!("Assessment not found: {}", assessment_id))?;
         assessment.review_required = review_required;
 
@@ -229,7 +259,8 @@ impl RiskAssessmentModule {
 
     /// Get risk assessment results
     pub fn get_assessment_results(&self, assessment_id: &str) -> Result<&RiskAssessment> {
-        self.active_assessments.get(assessment_id)
+        self.active_assessments
+            .get(assessment_id)
             .ok_or_else(|| anyhow::anyhow!("Assessment not found: {}", assessment_id))
     }
 
@@ -249,7 +280,10 @@ impl RiskAssessmentModule {
         }
 
         // Check for emerging risks
-        let emerging_alerts = self.risk_monitor.detect_emerging_risks(&self.historical_data).await?;
+        let emerging_alerts = self
+            .risk_monitor
+            .detect_emerging_risks(&self.historical_data)
+            .await?;
         alerts.extend(emerging_alerts);
 
         Ok(alerts)
@@ -283,7 +317,8 @@ impl RiskAssessmentModule {
 
     /// Filter assessments based on criteria
     fn filter_assessments(&self, filters: &ReportFilters) -> Vec<&RiskAssessment> {
-        self.historical_data.iter()
+        self.historical_data
+            .iter()
             .filter(|assessment| {
                 // Apply filters
                 if let Some(min_risk) = &filters.min_risk_level {
@@ -299,7 +334,9 @@ impl RiskAssessmentModule {
                 }
 
                 if let Some(time_range) = &filters.time_range {
-                    if assessment.created_at < time_range.start || assessment.created_at > time_range.end {
+                    if assessment.created_at < time_range.start
+                        || assessment.created_at > time_range.end
+                    {
                         return false;
                     }
                 }
@@ -312,14 +349,17 @@ impl RiskAssessmentModule {
     /// Generate report summary
     fn generate_report_summary(&self, assessments: &[&RiskAssessment]) -> RiskReportSummary {
         let total_assessments = assessments.len();
-        let high_risk_count = assessments.iter()
+        let high_risk_count = assessments
+            .iter()
             .filter(|a| matches!(a.overall_risk_level, RiskLevel::High | RiskLevel::Critical))
             .count();
 
         let average_risk_score = if !assessments.is_empty() {
-            assessments.iter()
+            assessments
+                .iter()
                 .map(|a| a.risk_scores.overall_score)
-                .sum::<f64>() / assessments.len() as f64
+                .sum::<f64>()
+                / assessments.len() as f64
         } else {
             0.0
         };
@@ -336,7 +376,10 @@ impl RiskAssessmentModule {
     }
 
     /// Calculate risk distribution
-    fn calculate_risk_distribution(&self, assessments: &[&RiskAssessment]) -> HashMap<String, usize> {
+    fn calculate_risk_distribution(
+        &self,
+        assessments: &[&RiskAssessment],
+    ) -> HashMap<String, usize> {
         let mut distribution = HashMap::new();
 
         for assessment in assessments {
@@ -364,7 +407,8 @@ impl RiskAssessmentModule {
             }
         }
 
-        let mut factors: Vec<_> = factor_scores.into_iter()
+        let mut factors: Vec<_> = factor_scores
+            .into_iter()
             .map(|(factor, total_score)| RiskFactorSummary {
                 factor,
                 average_score: total_score / assessments.len() as f64,
@@ -405,13 +449,17 @@ impl RiskAssessmentModule {
         let first_half = &assessments[..assessments.len() / 2];
         let second_half = &assessments[assessments.len() / 2..];
 
-        let first_avg = first_half.iter()
+        let first_avg = first_half
+            .iter()
             .map(|a| a.risk_scores.overall_score)
-            .sum::<f64>() / first_half.len() as f64;
+            .sum::<f64>()
+            / first_half.len() as f64;
 
-        let second_avg = second_half.iter()
+        let second_avg = second_half
+            .iter()
             .map(|a| a.risk_scores.overall_score)
-            .sum::<f64>() / second_half.len() as f64;
+            .sum::<f64>()
+            / second_half.len() as f64;
 
         let change = second_avg - first_avg;
 
@@ -428,20 +476,26 @@ impl RiskAssessmentModule {
             return 0.0;
         }
 
-        let scores: Vec<f64> = assessments.iter()
+        let scores: Vec<f64> = assessments
+            .iter()
             .map(|a| a.risk_scores.overall_score)
             .collect();
 
         let mean = scores.iter().sum::<f64>() / scores.len() as f64;
-        let variance = scores.iter()
+        let variance = scores
+            .iter()
             .map(|score| (score - mean).powi(2))
-            .sum::<f64>() / scores.len() as f64;
+            .sum::<f64>()
+            / scores.len() as f64;
 
         variance.sqrt()
     }
 
     /// Predict future risks
-    async fn predict_future_risks(&self, assessments: &[&RiskAssessment]) -> Result<RiskPredictions> {
+    async fn predict_future_risks(
+        &self,
+        assessments: &[&RiskAssessment],
+    ) -> Result<RiskPredictions> {
         // Simple linear regression for prediction
         if assessments.len() < 3 {
             return Ok(RiskPredictions {
@@ -453,9 +507,11 @@ impl RiskAssessmentModule {
         }
 
         let recent_assessments = &assessments[assessments.len().saturating_sub(5)..];
-        let avg_recent_risk = recent_assessments.iter()
+        let avg_recent_risk = recent_assessments
+            .iter()
             .map(|a| a.risk_scores.overall_score)
-            .sum::<f64>() / recent_assessments.len() as f64;
+            .sum::<f64>()
+            / recent_assessments.len() as f64;
 
         let predicted_level = match avg_recent_risk {
             score if score >= 7.0 => RiskLevel::High,
@@ -484,7 +540,11 @@ impl RiskAssessmentModule {
             if change.abs() >= 2.0 {
                 changes.push(RiskChange {
                     timestamp: current.created_at,
-                    change_type: if change > 0.0 { ChangeType::Increase } else { ChangeType::Decrease },
+                    change_type: if change > 0.0 {
+                        ChangeType::Increase
+                    } else {
+                        ChangeType::Decrease
+                    },
                     magnitude: change.abs(),
                     factors: vec!["multiple_factors".to_string()],
                 });
@@ -495,11 +555,15 @@ impl RiskAssessmentModule {
     }
 
     /// Generate recommendations
-    async fn generate_recommendations(&self, assessments: &[&RiskAssessment]) -> Result<Vec<RiskRecommendation>> {
+    async fn generate_recommendations(
+        &self,
+        assessments: &[&RiskAssessment],
+    ) -> Result<Vec<RiskRecommendation>> {
         let mut recommendations = Vec::new();
 
         // Analyze high-risk assessments
-        let high_risk = assessments.iter()
+        let high_risk = assessments
+            .iter()
             .filter(|a| matches!(a.overall_risk_level, RiskLevel::High | RiskLevel::Critical))
             .collect::<Vec<_>>();
 
@@ -528,7 +592,10 @@ impl RiskAssessmentModule {
                 description: "New risk patterns detected requiring monitoring".to_string(),
                 priority: RecommendationPriority::Medium,
                 category: "monitoring".to_string(),
-                actions: emerging_patterns.into_iter().map(|p| format!("Monitor {}", p)).collect(),
+                actions: emerging_patterns
+                    .into_iter()
+                    .map(|p| format!("Monitor {}", p))
+                    .collect(),
                 expected_impact: "Early detection of risk escalation".to_string(),
             });
         }
@@ -542,8 +609,9 @@ impl RiskAssessmentModule {
         let recent = &assessments[assessments.len().saturating_sub(10)..];
         let mut patterns = Vec::new();
 
-        let increasing_trend = recent.windows(3)
-            .all(|window| window[2].risk_scores.overall_score > window[0].risk_scores.overall_score);
+        let increasing_trend = recent.windows(3).all(|window| {
+            window[2].risk_scores.overall_score > window[0].risk_scores.overall_score
+        });
 
         if increasing_trend {
             patterns.push("increasing_risk_trend".to_string());
@@ -567,7 +635,9 @@ impl RiskAssessmentModule {
 
     /// Send risk event
     pub async fn send_risk_event(&self, event: RiskEvent) -> Result<()> {
-        self.risk_sender.send(event).await
+        self.risk_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send risk event: {}", e))
     }
 
@@ -1019,7 +1089,12 @@ impl RiskScoringEngine {
         }
     }
 
-    async fn calculate_scores(&self, entity: &TargetEntity, factors: &[RiskFactor], context: &HashMap<String, serde_json::Value>) -> Result<RiskScores> {
+    async fn calculate_scores(
+        &self,
+        entity: &TargetEntity,
+        factors: &[RiskFactor],
+        context: &HashMap<String, serde_json::Value>,
+    ) -> Result<RiskScores> {
         let mut factor_scores = HashMap::new();
         let mut category_scores = HashMap::new();
 
@@ -1029,7 +1104,9 @@ impl RiskScoringEngine {
             factor_scores.insert(factor.name.clone(), score);
 
             // Aggregate by category
-            *category_scores.entry(factor.category.clone()).or_insert(0.0) += score * factor.weight;
+            *category_scores
+                .entry(factor.category.clone())
+                .or_insert(0.0) += score * factor.weight;
         }
 
         // Normalize category scores
@@ -1047,7 +1124,12 @@ impl RiskScoringEngine {
         })
     }
 
-    async fn calculate_factor_score(&self, factor: &RiskFactor, entity: &TargetEntity, context: &HashMap<String, serde_json::Value>) -> Result<f64> {
+    async fn calculate_factor_score(
+        &self,
+        factor: &RiskFactor,
+        entity: &TargetEntity,
+        context: &HashMap<String, serde_json::Value>,
+    ) -> Result<f64> {
         // Simple scoring logic - in a real implementation, this would be more sophisticated
         let mut score = 5.0; // Base score
 
@@ -1086,7 +1168,11 @@ impl ImpactAnalyzer {
         }
     }
 
-    async fn analyze_impact(&self, entity: &TargetEntity, risk_scores: &RiskScores) -> Result<ImpactAnalysis> {
+    async fn analyze_impact(
+        &self,
+        entity: &TargetEntity,
+        risk_scores: &RiskScores,
+    ) -> Result<ImpactAnalysis> {
         let potential_impacts = self.identify_potential_impacts(entity, risk_scores).await?;
         let business_impact = self.calculate_business_impact(&potential_impacts);
         let operational_impact = self.calculate_operational_impact(&potential_impacts);
@@ -1102,7 +1188,11 @@ impl ImpactAnalyzer {
         })
     }
 
-    async fn identify_potential_impacts(&self, entity: &TargetEntity, risk_scores: &RiskScores) -> Result<Vec<PotentialImpact>> {
+    async fn identify_potential_impacts(
+        &self,
+        entity: &TargetEntity,
+        risk_scores: &RiskScores,
+    ) -> Result<Vec<PotentialImpact>> {
         let mut impacts = Vec::new();
 
         // Identify impacts based on risk scores
@@ -1115,7 +1205,12 @@ impl ImpactAnalyzer {
             });
         }
 
-        if *risk_scores.category_scores.get("operational").unwrap_or(&0.0) > 6.0 {
+        if *risk_scores
+            .category_scores
+            .get("operational")
+            .unwrap_or(&0.0)
+            > 6.0
+        {
             impacts.push(PotentialImpact {
                 impact_type: "service_disruption".to_string(),
                 severity: ImpactSeverity::High,
@@ -1186,8 +1281,14 @@ impl MitigationPlanner {
         }
     }
 
-    async fn generate_plan(&self, risk_scores: &RiskScores, impact_analysis: &ImpactAnalysis) -> Result<MitigationPlan> {
-        let recommendations = self.generate_recommendations(risk_scores, impact_analysis).await?;
+    async fn generate_plan(
+        &self,
+        risk_scores: &RiskScores,
+        impact_analysis: &ImpactAnalysis,
+    ) -> Result<MitigationPlan> {
+        let recommendations = self
+            .generate_recommendations(risk_scores, impact_analysis)
+            .await?;
         let priority_actions = self.identify_priority_actions(&recommendations);
         let timeline = self.create_mitigation_timeline(&recommendations);
         let resource_requirements = self.identify_resource_requirements(&recommendations);
@@ -1202,7 +1303,11 @@ impl MitigationPlanner {
         })
     }
 
-    async fn generate_recommendations(&self, risk_scores: &RiskScores, impact_analysis: &ImpactAnalysis) -> Result<Vec<MitigationRecommendation>> {
+    async fn generate_recommendations(
+        &self,
+        risk_scores: &RiskScores,
+        impact_analysis: &ImpactAnalysis,
+    ) -> Result<Vec<MitigationRecommendation>> {
         let mut recommendations = Vec::new();
 
         // Generate recommendations based on high-risk factors
@@ -1211,7 +1316,10 @@ impl MitigationPlanner {
                 recommendations.push(MitigationRecommendation {
                     recommendation_id: Uuid::new_v4().to_string(),
                     title: format!("Address {}", factor),
-                    description: format!("High risk factor '{}' requires immediate attention", factor),
+                    description: format!(
+                        "High risk factor '{}' requires immediate attention",
+                        factor
+                    ),
                     priority: MitigationPriority::High,
                     estimated_effort: Duration::days(7),
                     expected_impact: 2.0,
@@ -1236,14 +1344,26 @@ impl MitigationPlanner {
         Ok(recommendations)
     }
 
-    fn identify_priority_actions(&self, recommendations: &[MitigationRecommendation]) -> Vec<String> {
-        recommendations.iter()
-            .filter(|r| matches!(r.priority, MitigationPriority::High | MitigationPriority::Critical))
+    fn identify_priority_actions(
+        &self,
+        recommendations: &[MitigationRecommendation],
+    ) -> Vec<String> {
+        recommendations
+            .iter()
+            .filter(|r| {
+                matches!(
+                    r.priority,
+                    MitigationPriority::High | MitigationPriority::Critical
+                )
+            })
             .map(|r| r.title.clone())
             .collect()
     }
 
-    fn create_mitigation_timeline(&self, recommendations: &[MitigationRecommendation]) -> Vec<MitigationMilestone> {
+    fn create_mitigation_timeline(
+        &self,
+        recommendations: &[MitigationRecommendation],
+    ) -> Vec<MitigationMilestone> {
         let mut milestones = Vec::new();
         let mut current_date = Utc::now();
 
@@ -1261,10 +1381,16 @@ impl MitigationPlanner {
         milestones
     }
 
-    fn identify_resource_requirements(&self, recommendations: &[MitigationRecommendation]) -> Vec<String> {
+    fn identify_resource_requirements(
+        &self,
+        recommendations: &[MitigationRecommendation],
+    ) -> Vec<String> {
         let mut requirements = Vec::new();
 
-        if recommendations.iter().any(|r| matches!(r.priority, MitigationPriority::Critical)) {
+        if recommendations
+            .iter()
+            .any(|r| matches!(r.priority, MitigationPriority::Critical))
+        {
             requirements.push("Security team".to_string());
             requirements.push("Management approval".to_string());
         }
@@ -1277,7 +1403,8 @@ impl MitigationPlanner {
     }
 
     fn calculate_expected_reduction(&self, recommendations: &[MitigationRecommendation]) -> f64 {
-        recommendations.iter()
+        recommendations
+            .iter()
             .map(|r| r.expected_impact)
             .sum::<f64>()
             .min(5.0) // Cap at 5.0 points reduction
@@ -1313,7 +1440,10 @@ impl RiskMonitor {
                 assessment_id: assessment.assessment_id.clone(),
                 alert_type: AlertType::ThresholdExceeded,
                 severity: AlertSeverity::Critical,
-                message: format!("Critical risk threshold exceeded: {:.1}", assessment.risk_scores.overall_score),
+                message: format!(
+                    "Critical risk threshold exceeded: {:.1}",
+                    assessment.risk_scores.overall_score
+                ),
                 triggered_at: Utc::now(),
                 threshold_breached: 8.0,
                 current_value: assessment.risk_scores.overall_score,
@@ -1323,13 +1453,17 @@ impl RiskMonitor {
         }
     }
 
-    async fn detect_emerging_risks(&self, historical_data: &[RiskAssessment]) -> Result<Vec<RiskAlert>> {
+    async fn detect_emerging_risks(
+        &self,
+        historical_data: &[RiskAssessment],
+    ) -> Result<Vec<RiskAlert>> {
         let mut alerts = Vec::new();
 
         if historical_data.len() >= 3 {
             let recent = &historical_data[historical_data.len().saturating_sub(3)..];
-            let increasing = recent.windows(2)
-                .all(|window| window[1].risk_scores.overall_score > window[0].risk_scores.overall_score);
+            let increasing = recent.windows(2).all(|window| {
+                window[1].risk_scores.overall_score > window[0].risk_scores.overall_score
+            });
 
             if increasing {
                 alerts.push(RiskAlert {
@@ -1337,7 +1471,8 @@ impl RiskMonitor {
                     assessment_id: recent.last().unwrap().assessment_id.clone(),
                     alert_type: AlertType::TrendAlert,
                     severity: AlertSeverity::Medium,
-                    message: "Emerging risk trend detected - risk levels are increasing".to_string(),
+                    message: "Emerging risk trend detected - risk levels are increasing"
+                        .to_string(),
                     triggered_at: Utc::now(),
                     threshold_breached: 0.0,
                     current_value: recent.last().unwrap().risk_scores.overall_score,

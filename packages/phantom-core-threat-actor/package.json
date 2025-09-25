@@ -1,6 +1,6 @@
 {
   "name": "@phantom-core/threat-actor",
-  "version": "1.0.8",
+  "version": "1.0.16",
   "description": "Enterprise-Grade Threat Intelligence & Attribution Platform - Advanced threat actor analysis with 94.2% attribution accuracy, OCSF compliance, and real-time security operations support",
   "main": "index.js",
   "types": "index.d.ts",
@@ -18,11 +18,7 @@
       "x86_64-pc-windows-msvc",
       "x86_64-pc-windows-gnu",
       "x86_64-apple-darwin",
-      "aarch64-apple-darwin",
-      "x86_64-unknown-linux-gnu",
-      "x86_64-unknown-linux-musl",
-      "aarch64-unknown-linux-gnu",
-      "aarch64-pc-windows-msvc"
+      "x86_64-unknown-linux-gnu"
     ]
   },
   "files": [
@@ -36,17 +32,16 @@
     "ENTERPRISE_GUIDE.md"
   ],
   "scripts": {
-    "artifacts": "napi artifacts",
-    "build": "napi build --platform --release --features napi",
-    "build:debug": "napi build --platform --features napi",
-    "build:enterprise": "napi build --platform --release --features enterprise",
-    "build:full": "napi build --platform --release --features full",
-    "clean": "rimraf dist",
-    "prepublishOnly": "napi pre-publish -t npm",
+    "artifacts": "npx @napi-rs/cli artifacts",
+    "build": "npx @napi-rs/cli build --platform --release --features napi",
+    "build:debug": "npx @napi-rs/cli build --platform --features napi",
+    "build:enterprise": "npx @napi-rs/cli build --platform --release --features enterprise",
+    "build:full": "npx @napi-rs/cli build --platform --release --features full",
+    "clean": "npx rimraf dist",
+    "prepublishOnly": "echo 'Skipping prepublishOnly - handled by CI/CD'",
     "test": "cargo test --features enterprise",
     "test:native": "cargo test --all-features",
-    "universal": "napi universal",
-    "version": "napi version",
+    "universal": "npx @napi-rs/cli universal",
     "lint": "cargo clippy --features enterprise",
     "fmt": "cargo fmt"
   },
@@ -90,13 +85,9 @@
     "url": "https://github.com/defendr-ai/phantom.core-threat-actor"
   },
   "optionalDependencies": {
-    "@phantom-core/threat-actor-darwin-arm64": "1.0.6",
     "@phantom-core/threat-actor-darwin-x64": "1.0.6",
-    "@phantom-core/threat-actor-linux-arm64-gnu": "1.0.6",
     "@phantom-core/threat-actor-linux-x64-gnu": "1.0.6",
-    "@phantom-core/threat-actor-linux-x64-musl": "1.0.6",
-    "@phantom-core/threat-actor-win32-arm64-msvc": "1.0.6",
-    "@phantom-core/threat-actor-win32-x64-gnu": "1.0.6",
-    "@phantom-core/threat-actor-win32-x64-msvc": "1.0.6"
+    "@phantom-core/threat-actor-win32-x64-msvc": "1.0.6",
+    "@phantom-core/threat-actor-win32-x64-gnu": "1.0.6"
   }
 }

@@ -3,11 +3,11 @@
 //! Provides unified intelligence correlation across all phantom-*-core security modules
 //! enabling Palantir Foundry-competitive analytical capabilities.
 
-use crate::{ValidationResult, unified_data::*};
+use crate::{unified_data::*, ValidationResult};
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 /// Cross-plugin query for unified threat intelligence
@@ -222,25 +222,47 @@ pub struct DataCoverage {
 #[async_trait]
 pub trait CrossPluginIntelligence: Send + Sync {
     /// Execute unified query across multiple security modules
-    async fn execute_query(&self, query: &CrossPluginQuery) -> Result<QueryResult, IntelligenceError>;
-    
+    async fn execute_query(
+        &self,
+        query: &CrossPluginQuery,
+    ) -> Result<QueryResult, IntelligenceError>;
+
     /// Correlate threat indicators across modules
-    async fn correlate_threats(&self, indicators: &[ThreatIndicator]) -> Result<Vec<ThreatCorrelation>, IntelligenceError>;
-    
+    async fn correlate_threats(
+        &self,
+        indicators: &[ThreatIndicator],
+    ) -> Result<Vec<ThreatCorrelation>, IntelligenceError>;
+
     /// Enrich IOC with context from multiple modules
-    async fn enrich_ioc(&self, ioc: &IOCData, enrichment_types: &[EnrichmentType]) -> Result<EnrichedIOC, IntelligenceError>;
-    
+    async fn enrich_ioc(
+        &self,
+        ioc: &IOCData,
+        enrichment_types: &[EnrichmentType],
+    ) -> Result<EnrichedIOC, IntelligenceError>;
+
     /// Generate attack path analysis
-    async fn analyze_attack_path(&self, initial_indicators: &[ThreatIndicator]) -> Result<AttackPathAnalysis, IntelligenceError>;
-    
+    async fn analyze_attack_path(
+        &self,
+        initial_indicators: &[ThreatIndicator],
+    ) -> Result<AttackPathAnalysis, IntelligenceError>;
+
     /// Execute threat hunting across modules
-    async fn hunt_threats(&self, hunt_hypothesis: &HuntHypothesis) -> Result<HuntResults, IntelligenceError>;
-    
+    async fn hunt_threats(
+        &self,
+        hunt_hypothesis: &HuntHypothesis,
+    ) -> Result<HuntResults, IntelligenceError>;
+
     /// Generate cross-module compliance report
-    async fn assess_compliance_posture(&self, frameworks: &[String]) -> Result<CompliancePosture, IntelligenceError>;
-    
+    async fn assess_compliance_posture(
+        &self,
+        frameworks: &[String],
+    ) -> Result<CompliancePosture, IntelligenceError>;
+
     /// Analyze attribution across threat data
-    async fn analyze_attribution(&self, indicators: &[ThreatIndicator]) -> Result<AttributionAnalysis, IntelligenceError>;
+    async fn analyze_attribution(
+        &self,
+        indicators: &[ThreatIndicator],
+    ) -> Result<AttributionAnalysis, IntelligenceError>;
 }
 
 /// Threat indicator for correlation
@@ -639,19 +661,19 @@ pub struct AttributionEvent {
 pub enum IntelligenceError {
     #[error("Query execution failed: {0}")]
     QueryExecutionFailed(String),
-    
+
     #[error("Module not available: {0}")]
     ModuleUnavailable(String),
-    
+
     #[error("Insufficient data for analysis: {0}")]
     InsufficientData(String),
-    
+
     #[error("Correlation failed: {0}")]
     CorrelationFailed(String),
-    
+
     #[error("Enrichment failed: {0}")]
     EnrichmentFailed(String),
-    
+
     #[error("Permission denied: {0}")]
     PermissionDenied(String),
 }
@@ -691,32 +713,33 @@ impl DefaultCrossPluginIntelligence {
 
 #[async_trait]
 impl CrossPluginIntelligence for DefaultCrossPluginIntelligence {
-    async fn execute_query(&self, query: &CrossPluginQuery) -> Result<QueryResult, IntelligenceError> {
+    async fn execute_query(
+        &self,
+        query: &CrossPluginQuery,
+    ) -> Result<QueryResult, IntelligenceError> {
         // Simulate cross-plugin query execution
         let start_time = std::time::Instant::now();
-        
+
         // Mock results for demonstration
-        let mock_records = vec![
-            UniversalDataRecord {
-                id: "mock-record-1".to_string(),
-                record_type: "ioc".to_string(),
-                source_plugin: "phantom-ioc-core".to_string(),
-                data: serde_json::json!({
-                    "ioc_type": "ip",
-                    "value": "192.168.1.100",
-                    "confidence": 0.85
-                }),
-                metadata: HashMap::new(),
-                relationships: Vec::new(),
-                tags: vec!["malicious".to_string()],
-                created_at: Utc::now(),
-                updated_at: Utc::now(),
-                tenant_id: Some(query.tenant_id.clone()),
-            }
-        ];
-        
+        let mock_records = vec![UniversalDataRecord {
+            id: "mock-record-1".to_string(),
+            record_type: "ioc".to_string(),
+            source_plugin: "phantom-ioc-core".to_string(),
+            data: serde_json::json!({
+                "ioc_type": "ip",
+                "value": "192.168.1.100",
+                "confidence": 0.85
+            }),
+            metadata: HashMap::new(),
+            relationships: Vec::new(),
+            tags: vec!["malicious".to_string()],
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+            tenant_id: Some(query.tenant_id.clone()),
+        }];
+
         let execution_time = start_time.elapsed().as_millis() as u64;
-        
+
         Ok(QueryResult {
             query_id: query.query_id.clone(),
             execution_time_ms: execution_time,
@@ -750,34 +773,63 @@ impl CrossPluginIntelligence for DefaultCrossPluginIntelligence {
             ],
         })
     }
-    
-    async fn correlate_threats(&self, _indicators: &[ThreatIndicator]) -> Result<Vec<ThreatCorrelation>, IntelligenceError> {
+
+    async fn correlate_threats(
+        &self,
+        _indicators: &[ThreatIndicator],
+    ) -> Result<Vec<ThreatCorrelation>, IntelligenceError> {
         // Implementation would perform actual threat correlation
         Ok(Vec::new())
     }
-    
-    async fn enrich_ioc(&self, _ioc: &IOCData, _enrichment_types: &[EnrichmentType]) -> Result<EnrichedIOC, IntelligenceError> {
+
+    async fn enrich_ioc(
+        &self,
+        _ioc: &IOCData,
+        _enrichment_types: &[EnrichmentType],
+    ) -> Result<EnrichedIOC, IntelligenceError> {
         // Implementation would perform actual IOC enrichment
-        Err(IntelligenceError::EnrichmentFailed("Not implemented".to_string()))
+        Err(IntelligenceError::EnrichmentFailed(
+            "Not implemented".to_string(),
+        ))
     }
-    
-    async fn analyze_attack_path(&self, _initial_indicators: &[ThreatIndicator]) -> Result<AttackPathAnalysis, IntelligenceError> {
+
+    async fn analyze_attack_path(
+        &self,
+        _initial_indicators: &[ThreatIndicator],
+    ) -> Result<AttackPathAnalysis, IntelligenceError> {
         // Implementation would perform attack path analysis
-        Err(IntelligenceError::QueryExecutionFailed("Not implemented".to_string()))
+        Err(IntelligenceError::QueryExecutionFailed(
+            "Not implemented".to_string(),
+        ))
     }
-    
-    async fn hunt_threats(&self, _hunt_hypothesis: &HuntHypothesis) -> Result<HuntResults, IntelligenceError> {
+
+    async fn hunt_threats(
+        &self,
+        _hunt_hypothesis: &HuntHypothesis,
+    ) -> Result<HuntResults, IntelligenceError> {
         // Implementation would perform threat hunting
-        Err(IntelligenceError::QueryExecutionFailed("Not implemented".to_string()))
+        Err(IntelligenceError::QueryExecutionFailed(
+            "Not implemented".to_string(),
+        ))
     }
-    
-    async fn assess_compliance_posture(&self, _frameworks: &[String]) -> Result<CompliancePosture, IntelligenceError> {
+
+    async fn assess_compliance_posture(
+        &self,
+        _frameworks: &[String],
+    ) -> Result<CompliancePosture, IntelligenceError> {
         // Implementation would assess compliance posture
-        Err(IntelligenceError::QueryExecutionFailed("Not implemented".to_string()))
+        Err(IntelligenceError::QueryExecutionFailed(
+            "Not implemented".to_string(),
+        ))
     }
-    
-    async fn analyze_attribution(&self, _indicators: &[ThreatIndicator]) -> Result<AttributionAnalysis, IntelligenceError> {
+
+    async fn analyze_attribution(
+        &self,
+        _indicators: &[ThreatIndicator],
+    ) -> Result<AttributionAnalysis, IntelligenceError> {
         // Implementation would perform attribution analysis
-        Err(IntelligenceError::QueryExecutionFailed("Not implemented".to_string()))
+        Err(IntelligenceError::QueryExecutionFailed(
+            "Not implemented".to_string(),
+        ))
     }
 }

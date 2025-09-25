@@ -4,20 +4,20 @@
 //! for PostgreSQL, SQLite, and MySQL databases.
 
 #[cfg(feature = "diesel-orm")]
+use chrono::{DateTime, Utc};
+#[cfg(feature = "diesel-orm")]
 use diesel::prelude::*;
 #[cfg(feature = "diesel-orm")]
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 #[cfg(feature = "diesel-orm")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "diesel-orm")]
-use chrono::{DateTime, Utc};
-#[cfg(feature = "diesel-orm")]
 use std::collections::HashMap;
 
 #[cfg(feature = "diesel-orm")]
-pub mod schema;
-#[cfg(feature = "diesel-orm")]
 pub mod models;
+#[cfg(feature = "diesel-orm")]
+pub mod schema;
 
 #[cfg(feature = "diesel-orm")]
 /// Database connection type
@@ -64,19 +64,36 @@ pub trait DatabaseOperations<T> {
     async fn create(&self, conn: &mut DbConnection, item: &T) -> Result<T, diesel::result::Error>;
 
     /// Find by ID
-    async fn find_by_id(&self, conn: &mut DbConnection, id: &str) -> Result<Option<T>, diesel::result::Error>;
+    async fn find_by_id(
+        &self,
+        conn: &mut DbConnection,
+        id: &str,
+    ) -> Result<Option<T>, diesel::result::Error>;
 
     /// Update a record
-    async fn update(&self, conn: &mut DbConnection, id: &str, item: &T) -> Result<T, diesel::result::Error>;
+    async fn update(
+        &self,
+        conn: &mut DbConnection,
+        id: &str,
+        item: &T,
+    ) -> Result<T, diesel::result::Error>;
 
     /// Delete a record
-    async fn delete(&self, conn: &mut DbConnection, id: &str) -> Result<bool, diesel::result::Error>;
+    async fn delete(
+        &self,
+        conn: &mut DbConnection,
+        id: &str,
+    ) -> Result<bool, diesel::result::Error>;
 
     /// List all records
     async fn list(&self, conn: &mut DbConnection) -> Result<Vec<T>, diesel::result::Error>;
 
     /// Search records
-    async fn search(&self, conn: &mut DbConnection, query: &str) -> Result<Vec<T>, diesel::result::Error>;
+    async fn search(
+        &self,
+        conn: &mut DbConnection,
+        query: &str,
+    ) -> Result<Vec<T>, diesel::result::Error>;
 }
 
 /// Threat actor database operations
@@ -86,7 +103,11 @@ pub struct ThreatActorRepository;
 #[cfg(feature = "diesel-orm")]
 #[async_trait::async_trait]
 impl DatabaseOperations<models::ThreatActor> for ThreatActorRepository {
-    async fn create(&self, conn: &mut DbConnection, item: &models::ThreatActor) -> Result<models::ThreatActor, diesel::result::Error> {
+    async fn create(
+        &self,
+        conn: &mut DbConnection,
+        item: &models::ThreatActor,
+    ) -> Result<models::ThreatActor, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         let new_actor = models::NewThreatActor {
@@ -112,7 +133,11 @@ impl DatabaseOperations<models::ThreatActor> for ThreatActorRepository {
             .get_result(conn)
     }
 
-    async fn find_by_id(&self, conn: &mut DbConnection, actor_id: &str) -> Result<Option<models::ThreatActor>, diesel::result::Error> {
+    async fn find_by_id(
+        &self,
+        conn: &mut DbConnection,
+        actor_id: &str,
+    ) -> Result<Option<models::ThreatActor>, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         threat_actors
@@ -122,7 +147,12 @@ impl DatabaseOperations<models::ThreatActor> for ThreatActorRepository {
             .optional()
     }
 
-    async fn update(&self, conn: &mut DbConnection, actor_id: &str, item: &models::ThreatActor) -> Result<models::ThreatActor, diesel::result::Error> {
+    async fn update(
+        &self,
+        conn: &mut DbConnection,
+        actor_id: &str,
+        item: &models::ThreatActor,
+    ) -> Result<models::ThreatActor, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         diesel::update(threat_actors.filter(id.eq(actor_id)))
@@ -144,16 +174,22 @@ impl DatabaseOperations<models::ThreatActor> for ThreatActorRepository {
             .get_result(conn)
     }
 
-    async fn delete(&self, conn: &mut DbConnection, actor_id: &str) -> Result<bool, diesel::result::Error> {
+    async fn delete(
+        &self,
+        conn: &mut DbConnection,
+        actor_id: &str,
+    ) -> Result<bool, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
-        let deleted_rows = diesel::delete(threat_actors.filter(id.eq(actor_id)))
-            .execute(conn)?;
+        let deleted_rows = diesel::delete(threat_actors.filter(id.eq(actor_id))).execute(conn)?;
 
         Ok(deleted_rows > 0)
     }
 
-    async fn list(&self, conn: &mut DbConnection) -> Result<Vec<models::ThreatActor>, diesel::result::Error> {
+    async fn list(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<Vec<models::ThreatActor>, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         threat_actors
@@ -161,7 +197,11 @@ impl DatabaseOperations<models::ThreatActor> for ThreatActorRepository {
             .load(conn)
     }
 
-    async fn search(&self, conn: &mut DbConnection, query: &str) -> Result<Vec<models::ThreatActor>, diesel::result::Error> {
+    async fn search(
+        &self,
+        conn: &mut DbConnection,
+        query: &str,
+    ) -> Result<Vec<models::ThreatActor>, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         threat_actors
@@ -179,7 +219,11 @@ pub struct IncidentRepository;
 #[cfg(feature = "diesel-orm")]
 #[async_trait::async_trait]
 impl DatabaseOperations<models::Incident> for IncidentRepository {
-    async fn create(&self, conn: &mut DbConnection, item: &models::Incident) -> Result<models::Incident, diesel::result::Error> {
+    async fn create(
+        &self,
+        conn: &mut DbConnection,
+        item: &models::Incident,
+    ) -> Result<models::Incident, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         let new_incident = models::NewIncident {
@@ -204,7 +248,11 @@ impl DatabaseOperations<models::Incident> for IncidentRepository {
             .get_result(conn)
     }
 
-    async fn find_by_id(&self, conn: &mut DbConnection, incident_id: &str) -> Result<Option<models::Incident>, diesel::result::Error> {
+    async fn find_by_id(
+        &self,
+        conn: &mut DbConnection,
+        incident_id: &str,
+    ) -> Result<Option<models::Incident>, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         incidents
@@ -214,7 +262,12 @@ impl DatabaseOperations<models::Incident> for IncidentRepository {
             .optional()
     }
 
-    async fn update(&self, conn: &mut DbConnection, incident_id: &str, item: &models::Incident) -> Result<models::Incident, diesel::result::Error> {
+    async fn update(
+        &self,
+        conn: &mut DbConnection,
+        incident_id: &str,
+        item: &models::Incident,
+    ) -> Result<models::Incident, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         diesel::update(incidents.filter(id.eq(incident_id)))
@@ -235,16 +288,22 @@ impl DatabaseOperations<models::Incident> for IncidentRepository {
             .get_result(conn)
     }
 
-    async fn delete(&self, conn: &mut DbConnection, incident_id: &str) -> Result<bool, diesel::result::Error> {
+    async fn delete(
+        &self,
+        conn: &mut DbConnection,
+        incident_id: &str,
+    ) -> Result<bool, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
-        let deleted_rows = diesel::delete(incidents.filter(id.eq(incident_id)))
-            .execute(conn)?;
+        let deleted_rows = diesel::delete(incidents.filter(id.eq(incident_id))).execute(conn)?;
 
         Ok(deleted_rows > 0)
     }
 
-    async fn list(&self, conn: &mut DbConnection) -> Result<Vec<models::Incident>, diesel::result::Error> {
+    async fn list(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<Vec<models::Incident>, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         incidents
@@ -253,7 +312,11 @@ impl DatabaseOperations<models::Incident> for IncidentRepository {
             .load(conn)
     }
 
-    async fn search(&self, conn: &mut DbConnection, query: &str) -> Result<Vec<models::Incident>, diesel::result::Error> {
+    async fn search(
+        &self,
+        conn: &mut DbConnection,
+        query: &str,
+    ) -> Result<Vec<models::Incident>, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         incidents
@@ -272,7 +335,11 @@ pub struct AlertRepository;
 #[cfg(feature = "diesel-orm")]
 #[async_trait::async_trait]
 impl DatabaseOperations<models::Alert> for AlertRepository {
-    async fn create(&self, conn: &mut DbConnection, item: &models::Alert) -> Result<models::Alert, diesel::result::Error> {
+    async fn create(
+        &self,
+        conn: &mut DbConnection,
+        item: &models::Alert,
+    ) -> Result<models::Alert, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         let new_alert = models::NewAlert {
@@ -298,7 +365,11 @@ impl DatabaseOperations<models::Alert> for AlertRepository {
             .get_result(conn)
     }
 
-    async fn find_by_id(&self, conn: &mut DbConnection, alert_id: &str) -> Result<Option<models::Alert>, diesel::result::Error> {
+    async fn find_by_id(
+        &self,
+        conn: &mut DbConnection,
+        alert_id: &str,
+    ) -> Result<Option<models::Alert>, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         alerts
@@ -308,7 +379,12 @@ impl DatabaseOperations<models::Alert> for AlertRepository {
             .optional()
     }
 
-    async fn update(&self, conn: &mut DbConnection, alert_id: &str, item: &models::Alert) -> Result<models::Alert, diesel::result::Error> {
+    async fn update(
+        &self,
+        conn: &mut DbConnection,
+        alert_id: &str,
+        item: &models::Alert,
+    ) -> Result<models::Alert, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         diesel::update(alerts.filter(id.eq(alert_id)))
@@ -330,16 +406,22 @@ impl DatabaseOperations<models::Alert> for AlertRepository {
             .get_result(conn)
     }
 
-    async fn delete(&self, conn: &mut DbConnection, alert_id: &str) -> Result<bool, diesel::result::Error> {
+    async fn delete(
+        &self,
+        conn: &mut DbConnection,
+        alert_id: &str,
+    ) -> Result<bool, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
-        let deleted_rows = diesel::delete(alerts.filter(id.eq(alert_id)))
-            .execute(conn)?;
+        let deleted_rows = diesel::delete(alerts.filter(id.eq(alert_id))).execute(conn)?;
 
         Ok(deleted_rows > 0)
     }
 
-    async fn list(&self, conn: &mut DbConnection) -> Result<Vec<models::Alert>, diesel::result::Error> {
+    async fn list(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<Vec<models::Alert>, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         alerts
@@ -349,7 +431,11 @@ impl DatabaseOperations<models::Alert> for AlertRepository {
             .load(conn)
     }
 
-    async fn search(&self, conn: &mut DbConnection, query: &str) -> Result<Vec<models::Alert>, diesel::result::Error> {
+    async fn search(
+        &self,
+        conn: &mut DbConnection,
+        query: &str,
+    ) -> Result<Vec<models::Alert>, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         alerts
@@ -381,7 +467,10 @@ impl DatabaseService {
     }
 
     /// Get threat actor statistics
-    pub async fn get_threat_actor_stats(&self, conn: &mut DbConnection) -> Result<serde_json::Value, diesel::result::Error> {
+    pub async fn get_threat_actor_stats(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<serde_json::Value, diesel::result::Error> {
         use schema::threat_actors::dsl::*;
 
         let total_count = threat_actors.count().get_result::<i64>(conn)?;
@@ -398,7 +487,10 @@ impl DatabaseService {
     }
 
     /// Get incident statistics
-    pub async fn get_incident_stats(&self, conn: &mut DbConnection) -> Result<serde_json::Value, diesel::result::Error> {
+    pub async fn get_incident_stats(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<serde_json::Value, diesel::result::Error> {
         use schema::incidents::dsl::*;
 
         let total_count = incidents.count().get_result::<i64>(conn)?;
@@ -415,7 +507,10 @@ impl DatabaseService {
     }
 
     /// Get alert statistics
-    pub async fn get_alert_stats(&self, conn: &mut DbConnection) -> Result<serde_json::Value, diesel::result::Error> {
+    pub async fn get_alert_stats(
+        &self,
+        conn: &mut DbConnection,
+    ) -> Result<serde_json::Value, diesel::result::Error> {
         use schema::alerts::dsl::*;
 
         let total_count = alerts.count().get_result::<i64>(conn)?;
@@ -462,15 +557,24 @@ impl DatabaseService {
         Self
     }
 
-    pub async fn get_threat_actor_stats(&self, _conn: &mut ()) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn get_threat_actor_stats(
+        &self,
+        _conn: &mut (),
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         Err("Diesel ORM feature not enabled. Use --features diesel-orm to enable.".into())
     }
 
-    pub async fn get_incident_stats(&self, _conn: &mut ()) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn get_incident_stats(
+        &self,
+        _conn: &mut (),
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         Err("Diesel ORM feature not enabled. Use --features diesel-orm to enable.".into())
     }
 
-    pub async fn get_alert_stats(&self, _conn: &mut ()) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
+    pub async fn get_alert_stats(
+        &self,
+        _conn: &mut (),
+    ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         Err("Diesel ORM feature not enabled. Use --features diesel-orm to enable.".into())
     }
 }

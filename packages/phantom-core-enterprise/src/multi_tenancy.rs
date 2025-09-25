@@ -4,9 +4,9 @@
 //! tenant-specific configurations, and scalable resource management.
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 /// Enterprise tenant context with strict isolation
@@ -150,23 +150,38 @@ pub enum TenantStatus {
 #[async_trait]
 pub trait MultiTenantSecurityModule: Send + Sync {
     /// Create new tenant with enterprise configuration
-    async fn create_tenant(&self, config: TenantConfig) -> Result<EnterpriseTenantContext, TenantError>;
-    
+    async fn create_tenant(
+        &self,
+        config: TenantConfig,
+    ) -> Result<EnterpriseTenantContext, TenantError>;
+
     /// Validate tenant access and permissions
-    async fn validate_tenant_access(&self, tenant_id: &str, operation: &str) -> Result<bool, TenantError>;
-    
+    async fn validate_tenant_access(
+        &self,
+        tenant_id: &str,
+        operation: &str,
+    ) -> Result<bool, TenantError>;
+
     /// Get tenant-specific configuration
     async fn get_tenant_config(&self, tenant_id: &str) -> Result<TenantConfiguration, TenantError>;
-    
+
     /// Update tenant settings
-    async fn update_tenant(&self, tenant_id: &str, updates: TenantUpdate) -> Result<(), TenantError>;
-    
+    async fn update_tenant(
+        &self,
+        tenant_id: &str,
+        updates: TenantUpdate,
+    ) -> Result<(), TenantError>;
+
     /// Archive or delete tenant data
-    async fn archive_tenant(&self, tenant_id: &str, retention_policy: RetentionPolicy) -> Result<(), TenantError>;
-    
+    async fn archive_tenant(
+        &self,
+        tenant_id: &str,
+        retention_policy: RetentionPolicy,
+    ) -> Result<(), TenantError>;
+
     /// Get tenant usage metrics
     async fn get_tenant_metrics(&self, tenant_id: &str) -> Result<TenantMetrics, TenantError>;
-    
+
     /// List all tenants (admin operation)
     async fn list_tenants(&self, filter: TenantFilter) -> Result<Vec<TenantSummary>, TenantError>;
 }
@@ -388,19 +403,19 @@ pub struct ResourceUsageSummary {
 pub enum TenantError {
     #[error("Tenant not found: {0}")]
     NotFound(String),
-    
+
     #[error("Tenant access denied: {0}")]
     AccessDenied(String),
-    
+
     #[error("Tenant resource limit exceeded: {0}")]
     ResourceLimitExceeded(String),
-    
+
     #[error("Tenant configuration error: {0}")]
     ConfigurationError(String),
-    
+
     #[error("Tenant database error: {0}")]
     DatabaseError(String),
-    
+
     #[error("Tenant already exists: {0}")]
     AlreadyExists(String),
 }
@@ -418,12 +433,12 @@ impl DefaultMultiTenantModule {
             tenants: HashMap::new(),
         }
     }
-    
+
     /// Generate default tenant context for enterprise deployment
     pub fn create_default_enterprise_tenant(organization: &str) -> EnterpriseTenantContext {
         let tenant_id = Uuid::new_v4().to_string();
         let now = Utc::now();
-        
+
         EnterpriseTenantContext {
             tenant_id,
             organization_name: organization.to_string(),
@@ -440,11 +455,7 @@ impl DefaultMultiTenantModule {
                     encryption_algorithm: "AES-256-GCM".to_string(),
                 },
             },
-            permissions: vec![
-                "read".to_string(),
-                "write".to_string(),
-                "admin".to_string(),
-            ],
+            permissions: vec!["read".to_string(), "write".to_string(), "admin".to_string()],
             resource_limits: ResourceLimits {
                 max_storage_gb: 1000,
                 max_requests_per_hour: 100_000,
@@ -494,10 +505,13 @@ impl DefaultMultiTenantModule {
 
 #[async_trait]
 impl MultiTenantSecurityModule for DefaultMultiTenantModule {
-    async fn create_tenant(&self, config: TenantConfig) -> Result<EnterpriseTenantContext, TenantError> {
+    async fn create_tenant(
+        &self,
+        config: TenantConfig,
+    ) -> Result<EnterpriseTenantContext, TenantError> {
         let tenant_id = Uuid::new_v4().to_string();
         let now = Utc::now();
-        
+
         let tenant_context = EnterpriseTenantContext {
             tenant_id: tenant_id.clone(),
             organization_name: config.organization_name,
@@ -518,24 +532,28 @@ impl MultiTenantSecurityModule for DefaultMultiTenantModule {
             last_accessed: now,
             status: TenantStatus::Provisioning,
         };
-        
+
         Ok(tenant_context)
     }
-    
-    async fn validate_tenant_access(&self, tenant_id: &str, operation: &str) -> Result<bool, TenantError> {
+
+    async fn validate_tenant_access(
+        &self,
+        tenant_id: &str,
+        operation: &str,
+    ) -> Result<bool, TenantError> {
         if let Some(tenant) = self.tenants.get(tenant_id) {
             if tenant.status != TenantStatus::Active {
                 return Ok(false);
             }
-            
+
             // Check if operation is permitted
-            Ok(tenant.permissions.contains(&operation.to_string()) || 
-               tenant.permissions.contains(&"admin".to_string()))
+            Ok(tenant.permissions.contains(&operation.to_string())
+                || tenant.permissions.contains(&"admin".to_string()))
         } else {
             Err(TenantError::NotFound(tenant_id.to_string()))
         }
     }
-    
+
     async fn get_tenant_config(&self, tenant_id: &str) -> Result<TenantConfiguration, TenantError> {
         if let Some(tenant_context) = self.tenants.get(tenant_id) {
             Ok(TenantConfiguration {
@@ -581,22 +599,30 @@ impl MultiTenantSecurityModule for DefaultMultiTenantModule {
             Err(TenantError::NotFound(tenant_id.to_string()))
         }
     }
-    
-    async fn update_tenant(&self, _tenant_id: &str, _updates: TenantUpdate) -> Result<(), TenantError> {
+
+    async fn update_tenant(
+        &self,
+        _tenant_id: &str,
+        _updates: TenantUpdate,
+    ) -> Result<(), TenantError> {
         // Implementation would update tenant configuration
         Ok(())
     }
-    
-    async fn archive_tenant(&self, _tenant_id: &str, _retention_policy: RetentionPolicy) -> Result<(), TenantError> {
+
+    async fn archive_tenant(
+        &self,
+        _tenant_id: &str,
+        _retention_policy: RetentionPolicy,
+    ) -> Result<(), TenantError> {
         // Implementation would archive tenant data according to retention policy
         Ok(())
     }
-    
+
     async fn get_tenant_metrics(&self, tenant_id: &str) -> Result<TenantMetrics, TenantError> {
         if self.tenants.contains_key(tenant_id) {
             let now = Utc::now();
             let period_start = now - chrono::Duration::days(30);
-            
+
             Ok(TenantMetrics {
                 tenant_id: tenant_id.to_string(),
                 period_start,
@@ -625,23 +651,27 @@ impl MultiTenantSecurityModule for DefaultMultiTenantModule {
             Err(TenantError::NotFound(tenant_id.to_string()))
         }
     }
-    
+
     async fn list_tenants(&self, _filter: TenantFilter) -> Result<Vec<TenantSummary>, TenantError> {
-        let summaries = self.tenants.values().map(|tenant| TenantSummary {
-            tenant_id: tenant.tenant_id.clone(),
-            organization_name: tenant.organization_name.clone(),
-            status: tenant.status.clone(),
-            created_at: tenant.created_at,
-            last_accessed: tenant.last_accessed,
-            isolation_level: tenant.isolation_level.clone(),
-            resource_usage: ResourceUsageSummary {
-                storage_used_percent: 5.0,
-                requests_used_percent: 10.0,
-                connections_used_percent: 15.0,
-                api_calls_used_percent: 8.0,
-            },
-        }).collect();
-        
+        let summaries = self
+            .tenants
+            .values()
+            .map(|tenant| TenantSummary {
+                tenant_id: tenant.tenant_id.clone(),
+                organization_name: tenant.organization_name.clone(),
+                status: tenant.status.clone(),
+                created_at: tenant.created_at,
+                last_accessed: tenant.last_accessed,
+                isolation_level: tenant.isolation_level.clone(),
+                resource_usage: ResourceUsageSummary {
+                    storage_used_percent: 5.0,
+                    requests_used_percent: 10.0,
+                    connections_used_percent: 15.0,
+                    api_calls_used_percent: 8.0,
+                },
+            })
+            .collect();
+
         Ok(summaries)
     }
 }

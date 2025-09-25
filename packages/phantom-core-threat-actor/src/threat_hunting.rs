@@ -3,11 +3,11 @@
 //! Advanced threat hunting capabilities for proactive threat actor detection
 //! and investigation using machine learning and behavioral analysis.
 
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use uuid::Uuid;
 
 /// Threat hunting engine with ML-powered detection
 #[derive(Debug, Clone)]
@@ -98,10 +98,15 @@ impl ThreatHuntingModule {
     }
 
     /// Execute hunting queries across all active campaigns
-    pub async fn execute_hunting_queries(&mut self, data_sources: &[DataSource]) -> Result<Vec<HuntingFinding>> {
+    pub async fn execute_hunting_queries(
+        &mut self,
+        data_sources: &[DataSource],
+    ) -> Result<Vec<HuntingFinding>> {
         let mut all_findings = Vec::new();
 
-        let campaign_ids: Vec<String> = self.hunting_campaigns.iter()
+        let campaign_ids: Vec<String> = self
+            .hunting_campaigns
+            .iter()
             .filter(|(_, campaign)| campaign.status == CampaignStatus::Active)
             .map(|(id, _)| id.clone())
             .collect();
@@ -109,23 +114,29 @@ impl ThreatHuntingModule {
         for campaign_id in campaign_ids {
             // Get campaign data for execution (clone what we need)
             let campaign_copy = {
-                let campaign = self.hunting_campaigns.get(&campaign_id)
+                let campaign = self
+                    .hunting_campaigns
+                    .get(&campaign_id)
                     .ok_or_else(|| anyhow::anyhow!("Campaign not found: {}", campaign_id))?;
                 campaign.clone()
             };
-            
-            let findings = self.execute_campaign_queries(&campaign_copy, data_sources).await?;
-            
+
+            let findings = self
+                .execute_campaign_queries(&campaign_copy, data_sources)
+                .await?;
+
             // Update the actual campaign with findings
             if let Some(campaign) = self.hunting_campaigns.get_mut(&campaign_id) {
                 campaign.findings.extend(findings.clone());
             }
-            
+
             all_findings.extend(findings);
         }
 
         // Correlate findings across campaigns
-        self.correlation_engine.correlate_findings(&mut all_findings).await?;
+        self.correlation_engine
+            .correlate_findings(&mut all_findings)
+            .await?;
 
         Ok(all_findings)
     }
@@ -139,9 +150,14 @@ impl ThreatHuntingModule {
         let mut findings = Vec::new();
 
         for technique_id in &campaign.techniques {
-            if let Some(technique) = self.hunting_techniques.iter().find(|t| t.technique_id == *technique_id) {
+            if let Some(technique) = self
+                .hunting_techniques
+                .iter()
+                .find(|t| t.technique_id == *technique_id)
+            {
                 for data_source in data_sources {
-                    let technique_findings = self.execute_technique_query(technique, data_source).await?;
+                    let technique_findings =
+                        self.execute_technique_query(technique, data_source).await?;
                     findings.extend(technique_findings);
                 }
             }
@@ -248,7 +264,10 @@ impl ThreatHuntingModule {
     }
 
     /// Generate threat hypotheses based on findings
-    pub async fn generate_hypotheses(&mut self, findings: &[HuntingFinding]) -> Result<Vec<ThreatHypothesis>> {
+    pub async fn generate_hypotheses(
+        &mut self,
+        findings: &[HuntingFinding],
+    ) -> Result<Vec<ThreatHypothesis>> {
         let mut hypotheses = Vec::new();
 
         // Group findings by indicators
@@ -256,7 +275,8 @@ impl ThreatHuntingModule {
 
         for finding in findings {
             for indicator in &finding.indicators {
-                indicator_groups.entry(indicator.clone())
+                indicator_groups
+                    .entry(indicator.clone())
                     .or_insert_with(Vec::new)
                     .push(finding);
             }
@@ -268,11 +288,17 @@ impl ThreatHuntingModule {
                 let hypothesis = ThreatHypothesis {
                     hypothesis_id: Uuid::new_v4().to_string(),
                     title: format!("Coordinated attack using {}", indicator),
-                    description: format!("Multiple findings indicate coordinated activity involving {}", indicator),
+                    description: format!(
+                        "Multiple findings indicate coordinated activity involving {}",
+                        indicator
+                    ),
                     confidence: 0.75,
                     severity: Severity::High,
                     indicators: vec![indicator],
-                    supporting_findings: group_findings.iter().map(|f| f.finding_id.clone()).collect(),
+                    supporting_findings: group_findings
+                        .iter()
+                        .map(|f| f.finding_id.clone())
+                        .collect(),
                     predicted_techniques: vec![
                         "T1078".to_string(), // Valid Accounts
                         "T1059".to_string(), // Command and Scripting Interpreter
@@ -294,7 +320,8 @@ impl ThreatHuntingModule {
 
         // Store hypotheses
         for hypothesis in &hypotheses {
-            self.threat_hypotheses.insert(hypothesis.hypothesis_id.clone(), hypothesis.clone());
+            self.threat_hypotheses
+                .insert(hypothesis.hypothesis_id.clone(), hypothesis.clone());
         }
 
         Ok(hypotheses)
@@ -310,7 +337,11 @@ impl ThreatHuntingModule {
     ) -> Result<()> {
         // Find and update the finding in all campaigns
         for campaign in self.hunting_campaigns.values_mut() {
-            if let Some(finding) = campaign.findings.iter_mut().find(|f| f.finding_id == finding_id) {
+            if let Some(finding) = campaign
+                .findings
+                .iter_mut()
+                .find(|f| f.finding_id == finding_id)
+            {
                 finding.triage_status = status.clone();
                 finding.assigned_to = assigned_to.clone();
 
@@ -332,20 +363,27 @@ impl ThreatHuntingModule {
 
     /// Get all active hypotheses
     pub fn get_active_hypotheses(&self) -> Vec<&ThreatHypothesis> {
-        self.threat_hypotheses.values()
+        self.threat_hypotheses
+            .values()
             .filter(|h| h.status == HypothesisStatus::Active)
             .collect()
     }
 
     /// End a hunting campaign
-    pub async fn end_hunting_campaign(&mut self, campaign_id: &str, _conclusion: CampaignConclusion) -> Result<()> {
+    pub async fn end_hunting_campaign(
+        &mut self,
+        campaign_id: &str,
+        _conclusion: CampaignConclusion,
+    ) -> Result<()> {
         if let Some(campaign) = self.hunting_campaigns.get_mut(campaign_id) {
             campaign.status = CampaignStatus::Completed;
             campaign.end_time = Some(Utc::now());
 
             // Update final metrics
             campaign.metrics.total_findings = campaign.findings.len();
-            campaign.metrics.campaign_duration_hours = campaign.end_time.unwrap()
+            campaign.metrics.campaign_duration_hours = campaign
+                .end_time
+                .unwrap()
                 .signed_duration_since(campaign.start_time)
                 .num_hours() as f64;
 
@@ -358,13 +396,19 @@ impl ThreatHuntingModule {
     /// Get threat hunting statistics
     pub fn get_hunting_statistics(&self) -> HuntingStatistics {
         let total_campaigns = self.hunting_campaigns.len();
-        let active_campaigns = self.hunting_campaigns.values()
+        let active_campaigns = self
+            .hunting_campaigns
+            .values()
             .filter(|c| c.status == CampaignStatus::Active)
             .count();
-        let total_findings = self.hunting_campaigns.values()
+        let total_findings = self
+            .hunting_campaigns
+            .values()
             .map(|c| c.findings.len())
             .sum::<usize>();
-        let active_hypotheses = self.threat_hypotheses.values()
+        let active_hypotheses = self
+            .threat_hypotheses
+            .values()
             .filter(|h| h.status == HypothesisStatus::Active)
             .count();
 
@@ -401,7 +445,9 @@ impl ThreatHuntingModule {
 
     /// Calculate average campaign duration
     fn calculate_average_campaign_duration(&self) -> f64 {
-        let completed_campaigns: Vec<_> = self.hunting_campaigns.values()
+        let completed_campaigns: Vec<_> = self
+            .hunting_campaigns
+            .values()
             .filter(|c| c.status == CampaignStatus::Completed && c.end_time.is_some())
             .collect();
 
@@ -409,8 +455,14 @@ impl ThreatHuntingModule {
             return 0.0;
         }
 
-        let total_duration: f64 = completed_campaigns.iter()
-            .map(|c| c.end_time.unwrap().signed_duration_since(c.start_time).num_hours() as f64)
+        let total_duration: f64 = completed_campaigns
+            .iter()
+            .map(|c| {
+                c.end_time
+                    .unwrap()
+                    .signed_duration_since(c.start_time)
+                    .num_hours() as f64
+            })
             .sum();
 
         total_duration / completed_campaigns.len() as f64
@@ -418,7 +470,9 @@ impl ThreatHuntingModule {
 
     /// Calculate detection effectiveness
     fn calculate_detection_effectiveness(&self) -> f64 {
-        let total_findings: usize = self.hunting_campaigns.values()
+        let total_findings: usize = self
+            .hunting_campaigns
+            .values()
             .map(|c| c.findings.len())
             .sum();
 
@@ -426,7 +480,9 @@ impl ThreatHuntingModule {
             return 0.0;
         }
 
-        let high_confidence_findings: usize = self.hunting_campaigns.values()
+        let high_confidence_findings: usize = self
+            .hunting_campaigns
+            .values()
             .flat_map(|c| &c.findings)
             .filter(|f| f.confidence > 0.8)
             .count();
@@ -623,19 +679,17 @@ struct CorrelationEngine {
 impl CorrelationEngine {
     fn new() -> Self {
         Self {
-            correlation_rules: vec![
-                CorrelationRule {
-                    rule_id: "CR001".to_string(),
-                    name: "Multi-stage attack correlation".to_string(),
-                    conditions: vec![
-                        "initial_access".to_string(),
-                        "privilege_escalation".to_string(),
-                        "data_exfiltration".to_string(),
-                    ],
-                    time_window: Duration::hours(24),
-                    confidence_boost: 0.3,
-                },
-            ],
+            correlation_rules: vec![CorrelationRule {
+                rule_id: "CR001".to_string(),
+                name: "Multi-stage attack correlation".to_string(),
+                conditions: vec![
+                    "initial_access".to_string(),
+                    "privilege_escalation".to_string(),
+                    "data_exfiltration".to_string(),
+                ],
+                time_window: Duration::hours(24),
+                confidence_boost: 0.3,
+            }],
         }
     }
 
@@ -654,15 +708,20 @@ impl CorrelationEngine {
         Ok(())
     }
 
-    fn matches_correlation_rule(&self, finding: &HuntingFinding, rule: &CorrelationRule, all_findings: &[HuntingFinding]) -> bool {
+    fn matches_correlation_rule(
+        &self,
+        finding: &HuntingFinding,
+        rule: &CorrelationRule,
+        all_findings: &[HuntingFinding],
+    ) -> bool {
         let finding_time = finding.timestamp;
 
         // Check if other conditions are met within time window
         for condition in &rule.conditions {
             let has_matching_finding = all_findings.iter().any(|f| {
-                f.finding_id != finding.finding_id &&
-                f.indicators.contains(condition) &&
-                (f.timestamp - finding_time).abs() < rule.time_window
+                f.finding_id != finding.finding_id
+                    && f.indicators.contains(condition)
+                    && (f.timestamp - finding_time).abs() < rule.time_window
             });
 
             if !has_matching_finding {
@@ -719,7 +778,10 @@ impl AnomalyDetector {
             if let Some(baseline_value) = self.baseline_metrics.get(metric_name) {
                 let deviation = (current_value - baseline_value).abs() / baseline_value.sqrt();
                 if deviation > self.detection_threshold {
-                    anomalies.push(format!("Anomaly in {}: deviation {}", metric_name, deviation));
+                    anomalies.push(format!(
+                        "Anomaly in {}: deviation {}",
+                        metric_name, deviation
+                    ));
                 }
             }
         }

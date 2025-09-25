@@ -11,26 +11,26 @@
 //! - Performance and scalability benchmarks
 
 pub mod business_readiness;
-pub mod multi_tenancy;
-pub mod cross_plugin;
 pub mod compliance;
+pub mod cross_plugin;
+pub mod multi_tenancy;
 pub mod performance;
 pub mod testing;
 pub mod unified_data;
 
 // Re-export core traits and types
 pub use business_readiness::*;
-pub use multi_tenancy::*;
-pub use cross_plugin::*;
 pub use compliance::*;
+pub use cross_plugin::*;
+pub use multi_tenancy::*;
 pub use performance::*;
 pub use testing::*;
 pub use unified_data::*;
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 /// Core enterprise capabilities that all phantom-*-core packages must implement
@@ -38,19 +38,19 @@ use uuid::Uuid;
 pub trait EnterpriseSecurityModule: Send + Sync {
     /// Assess business readiness for enterprise deployment
     async fn assess_business_readiness(&self) -> BusinessReadinessAssessment;
-    
+
     /// Get enterprise configuration status
     async fn get_enterprise_status(&self) -> EnterpriseStatus;
-    
+
     /// Validate multi-tenant capabilities
     async fn validate_multi_tenancy(&self, context: &EnterpriseTenantContext) -> ValidationResult;
-    
+
     /// Execute cross-plugin intelligence queries
     async fn execute_cross_plugin_query(&self, query: &CrossPluginQuery) -> QueryResult;
-    
+
     /// Generate compliance report
     async fn generate_compliance_report(&self) -> ComplianceReport;
-    
+
     /// Execute performance benchmark
     async fn benchmark_performance(&self) -> PerformanceBenchmark;
 }
@@ -76,7 +76,7 @@ pub enum ReadinessLevel {
     /// Basic functionality - suitable for development and testing
     Starter,
     /// Business-ready with essential enterprise features
-    Professional, 
+    Professional,
     /// Full enterprise grade - Fortune 100 deployment ready
     Enterprise,
 }
@@ -90,7 +90,7 @@ impl ReadinessLevel {
             _ => ReadinessLevel::Starter,
         }
     }
-    
+
     pub fn to_score_range(&self) -> (u32, u32) {
         match self {
             ReadinessLevel::Starter => (0, 40),
@@ -143,7 +143,7 @@ impl ValidationResult {
             score: 100,
         }
     }
-    
+
     pub fn failure(errors: Vec<String>) -> Self {
         Self {
             is_valid: false,
@@ -153,12 +153,12 @@ impl ValidationResult {
             score: 0,
         }
     }
-    
+
     pub fn with_warnings(mut self, warnings: Vec<String>) -> Self {
         self.warnings = warnings;
         self
     }
-    
+
     pub fn with_recommendations(mut self, recommendations: Vec<String>) -> Self {
         self.recommendations = recommendations;
         self

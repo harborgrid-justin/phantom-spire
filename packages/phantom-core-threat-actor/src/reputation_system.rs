@@ -1,13 +1,13 @@
 //! Threat Actor Reputation System
-//! 
+//!
 //! Advanced reputation scoring and tracking system for threat actors
 //! with dynamic scoring, historical analysis, and peer comparison.
 
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
-use anyhow::Result;
 
 /// Comprehensive threat actor reputation system
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -345,28 +345,35 @@ impl ThreatActorReputationSystem {
     }
 
     /// Calculate reputation for an actor
-    pub async fn calculate_actor_reputation(&mut self, actor_id: &str, actor_data: &HashMap<String, f64>) -> Result<ActorReputation> {
+    pub async fn calculate_actor_reputation(
+        &mut self,
+        actor_id: &str,
+        actor_data: &HashMap<String, f64>,
+    ) -> Result<ActorReputation> {
         let now = Utc::now();
-        
+
         // Calculate component scores
         let component_scores = self.calculate_component_scores(actor_data)?;
-        
+
         // Calculate overall reputation score
         let overall_score = self.calculate_overall_score(&component_scores)?;
-        
+
         // Determine reputation category
         let reputation_category = self.determine_reputation_category(overall_score);
-        
+
         // Calculate trend
         let reputation_trend = self.calculate_reputation_trend(actor_id, overall_score)?;
-        
+
         // Get historical data
-        let (historical_peak, historical_low, volatility, consistency) = 
+        let (historical_peak, historical_low, volatility, consistency) =
             self.calculate_historical_metrics(actor_id, overall_score)?;
-        
+
         let reputation = ActorReputation {
             actor_id: actor_id.to_string(),
-            actor_name: actor_data.get("name").map(|_| format!("Actor-{}", actor_id)).unwrap_or_else(|| "Unknown".to_string()),
+            actor_name: actor_data
+                .get("name")
+                .map(|_| format!("Actor-{}", actor_id))
+                .unwrap_or_else(|| "Unknown".to_string()),
             overall_reputation_score: overall_score,
             reputation_trend,
             reputation_category,
@@ -379,7 +386,10 @@ impl ThreatActorReputationSystem {
             last_updated: now,
             calculation_metadata: CalculationMetadata {
                 calculation_version: "2.1.0".to_string(),
-                data_sources_used: vec!["internal_intelligence".to_string(), "external_feeds".to_string()],
+                data_sources_used: vec![
+                    "internal_intelligence".to_string(),
+                    "external_feeds".to_string(),
+                ],
                 confidence_level: 0.85,
                 last_calculation_duration_ms: 125,
                 factors_considered: actor_data.len() as u32,
@@ -388,14 +398,18 @@ impl ThreatActorReputationSystem {
         };
 
         // Store reputation and create snapshot
-        self.reputation_scores.insert(actor_id.to_string(), reputation.clone());
+        self.reputation_scores
+            .insert(actor_id.to_string(), reputation.clone());
         self.add_reputation_snapshot(actor_id, &reputation)?;
 
         Ok(reputation)
     }
 
     /// Calculate component scores
-    fn calculate_component_scores(&self, actor_data: &HashMap<String, f64>) -> Result<ComponentScores> {
+    fn calculate_component_scores(
+        &self,
+        actor_data: &HashMap<String, f64>,
+    ) -> Result<ComponentScores> {
         Ok(ComponentScores {
             sophistication_score: actor_data.get("sophistication").cloned().unwrap_or(0.5) * 100.0,
             activity_score: actor_data.get("activity_frequency").cloned().unwrap_or(0.5) * 100.0,
@@ -404,27 +418,33 @@ impl ThreatActorReputationSystem {
             stealth_score: actor_data.get("stealth_capability").cloned().unwrap_or(0.5) * 100.0,
             innovation_score: actor_data.get("innovation").cloned().unwrap_or(0.5) * 100.0,
             persistence_score: actor_data.get("persistence").cloned().unwrap_or(0.5) * 100.0,
-            attribution_confidence_score: actor_data.get("attribution_confidence").cloned().unwrap_or(0.5) * 100.0,
+            attribution_confidence_score: actor_data
+                .get("attribution_confidence")
+                .cloned()
+                .unwrap_or(0.5)
+                * 100.0,
             threat_level_score: actor_data.get("threat_level").cloned().unwrap_or(0.5) * 100.0,
-            operational_scope_score: actor_data.get("operational_scope").cloned().unwrap_or(0.5) * 100.0,
+            operational_scope_score: actor_data.get("operational_scope").cloned().unwrap_or(0.5)
+                * 100.0,
         })
     }
 
     /// Calculate overall reputation score
     fn calculate_overall_score(&self, component_scores: &ComponentScores) -> Result<f64> {
         let factors = &self.reputation_factors;
-        
-        let weighted_score = 
-            (component_scores.sophistication_score / 100.0) * factors.sophistication_weight +
-            (component_scores.activity_score / 100.0) * factors.activity_frequency_weight +
-            (component_scores.success_rate_score / 100.0) * factors.success_rate_weight +
-            (component_scores.impact_score / 100.0) * factors.impact_magnitude_weight +
-            (component_scores.stealth_score / 100.0) * factors.stealth_capability_weight +
-            (component_scores.innovation_score / 100.0) * factors.innovation_weight +
-            (component_scores.persistence_score / 100.0) * factors.persistence_weight +
-            (component_scores.attribution_confidence_score / 100.0) * factors.attribution_confidence_weight +
-            (component_scores.threat_level_score / 100.0) * factors.threat_level_weight +
-            (component_scores.operational_scope_score / 100.0) * factors.operational_scope_weight;
+
+        let weighted_score = (component_scores.sophistication_score / 100.0)
+            * factors.sophistication_weight
+            + (component_scores.activity_score / 100.0) * factors.activity_frequency_weight
+            + (component_scores.success_rate_score / 100.0) * factors.success_rate_weight
+            + (component_scores.impact_score / 100.0) * factors.impact_magnitude_weight
+            + (component_scores.stealth_score / 100.0) * factors.stealth_capability_weight
+            + (component_scores.innovation_score / 100.0) * factors.innovation_weight
+            + (component_scores.persistence_score / 100.0) * factors.persistence_weight
+            + (component_scores.attribution_confidence_score / 100.0)
+                * factors.attribution_confidence_weight
+            + (component_scores.threat_level_score / 100.0) * factors.threat_level_weight
+            + (component_scores.operational_scope_score / 100.0) * factors.operational_scope_weight;
 
         // Scale to 0-100 range
         Ok((weighted_score * 100.0).min(100.0).max(0.0))
@@ -443,19 +463,24 @@ impl ThreatActorReputationSystem {
     }
 
     /// Calculate reputation trend
-    fn calculate_reputation_trend(&self, actor_id: &str, _current_score: f64) -> Result<ReputationTrend> {
+    fn calculate_reputation_trend(
+        &self,
+        actor_id: &str,
+        _current_score: f64,
+    ) -> Result<ReputationTrend> {
         if let Some(history) = self.reputation_history.get(actor_id) {
             if history.len() >= 2 {
-                let recent_scores: Vec<f64> = history.iter()
+                let recent_scores: Vec<f64> = history
+                    .iter()
                     .rev()
                     .take(5)
                     .map(|snapshot| snapshot.reputation_score)
                     .collect();
-                
+
                 if recent_scores.len() >= 2 {
                     let trend_slope = self.calculate_trend_slope(&recent_scores);
                     let volatility = self.calculate_volatility(&recent_scores);
-                    
+
                     return Ok(match (trend_slope, volatility) {
                         (_slope, vol) if vol > 0.15 => ReputationTrend::Volatile,
                         (slope, _) if slope > 0.05 => ReputationTrend::Increasing,
@@ -465,7 +490,7 @@ impl ThreatActorReputationSystem {
                 }
             }
         }
-        
+
         Ok(ReputationTrend::Stable)
     }
 
@@ -474,13 +499,13 @@ impl ThreatActorReputationSystem {
         if scores.len() < 2 {
             return 0.0;
         }
-        
+
         let n = scores.len() as f64;
         let sum_x: f64 = (0..scores.len()).map(|i| i as f64).sum();
         let sum_y: f64 = scores.iter().sum();
         let sum_xy: f64 = scores.iter().enumerate().map(|(i, &y)| i as f64 * y).sum();
         let sum_x2: f64 = (0..scores.len()).map(|i| (i as f64).powi(2)).sum();
-        
+
         (n * sum_xy - sum_x * sum_y) / (n * sum_x2 - sum_x.powi(2))
     }
 
@@ -489,17 +514,23 @@ impl ThreatActorReputationSystem {
         if scores.len() < 2 {
             return 0.0;
         }
-        
+
         let mean = scores.iter().sum::<f64>() / scores.len() as f64;
-        let variance = scores.iter()
+        let variance = scores
+            .iter()
             .map(|score| (score - mean).powi(2))
-            .sum::<f64>() / scores.len() as f64;
-        
+            .sum::<f64>()
+            / scores.len() as f64;
+
         variance.sqrt() / mean
     }
 
     /// Calculate historical metrics
-    fn calculate_historical_metrics(&self, actor_id: &str, current_score: f64) -> Result<(f64, f64, f64, f64)> {
+    fn calculate_historical_metrics(
+        &self,
+        actor_id: &str,
+        current_score: f64,
+    ) -> Result<(f64, f64, f64, f64)> {
         if let Some(history) = self.reputation_history.get(actor_id) {
             if !history.is_empty() {
                 let scores: Vec<f64> = history.iter().map(|s| s.reputation_score).collect();
@@ -507,16 +538,20 @@ impl ThreatActorReputationSystem {
                 let low = scores.iter().fold(current_score, |a, &b| a.min(b));
                 let volatility = self.calculate_volatility(&scores);
                 let consistency = 1.0 - volatility;
-                
+
                 return Ok((peak, low, volatility, consistency));
             }
         }
-        
+
         Ok((current_score, current_score, 0.0, 1.0))
     }
 
     /// Add reputation snapshot to history
-    fn add_reputation_snapshot(&mut self, actor_id: &str, reputation: &ActorReputation) -> Result<()> {
+    fn add_reputation_snapshot(
+        &mut self,
+        actor_id: &str,
+        reputation: &ActorReputation,
+    ) -> Result<()> {
         let snapshot = ReputationSnapshot {
             timestamp: Utc::now(),
             reputation_score: reputation.overall_reputation_score,
@@ -543,10 +578,13 @@ impl ThreatActorReputationSystem {
     }
 
     /// Update reputation based on new event
-    pub async fn update_reputation_from_event(&mut self, event: &ReputationUpdateEvent) -> Result<()> {
+    pub async fn update_reputation_from_event(
+        &mut self,
+        event: &ReputationUpdateEvent,
+    ) -> Result<()> {
         let new_reputation_score;
         let score_adjustment;
-        
+
         // First, check if actor exists and calculate the new score
         if let Some(reputation) = self.reputation_scores.get(&event.actor_id) {
             let impact_multiplier = match event.event_type {
@@ -560,7 +598,9 @@ impl ThreatActorReputationSystem {
             };
 
             score_adjustment = event.impact_score * impact_multiplier * event.confidence;
-            new_reputation_score = (reputation.overall_reputation_score + score_adjustment).min(100.0).max(0.0);
+            new_reputation_score = (reputation.overall_reputation_score + score_adjustment)
+                .min(100.0)
+                .max(0.0);
         } else {
             return Ok(()); // Actor not found
         }
@@ -570,7 +610,7 @@ impl ThreatActorReputationSystem {
             reputation.overall_reputation_score = new_reputation_score;
             reputation.last_updated = Utc::now();
         }
-        
+
         // Calculate the new reputation category after mutation
         let new_reputation_category = self.determine_reputation_category(new_reputation_score);
 
@@ -595,7 +635,9 @@ impl ThreatActorReputationSystem {
 
     /// Generate actor rankings
     pub async fn generate_actor_rankings(&mut self) -> Result<Vec<ActorRanking>> {
-        let mut rankings: Vec<_> = self.reputation_scores.iter()
+        let mut rankings: Vec<_> = self
+            .reputation_scores
+            .iter()
             .map(|(actor_id, reputation)| {
                 let score_change_7d = self.calculate_score_change(actor_id, Duration::days(7));
                 let score_change_30d = self.calculate_score_change(actor_id, Duration::days(30));
@@ -630,14 +672,17 @@ impl ThreatActorReputationSystem {
     fn calculate_score_change(&self, actor_id: &str, period: Duration) -> f64 {
         if let Some(history) = self.reputation_history.get(actor_id) {
             let cutoff_time = Utc::now() - period;
-            let historical_score = history.iter()
+            let historical_score = history
+                .iter()
                 .filter(|snapshot| snapshot.timestamp >= cutoff_time)
                 .next()
                 .map(|snapshot| snapshot.reputation_score);
 
             if let (Some(current), Some(historical)) = (
-                self.reputation_scores.get(actor_id).map(|r| r.overall_reputation_score),
-                historical_score
+                self.reputation_scores
+                    .get(actor_id)
+                    .map(|r| r.overall_reputation_score),
+                historical_score,
             ) {
                 return current - historical;
             }
@@ -647,7 +692,9 @@ impl ThreatActorReputationSystem {
 
     /// Calculate percentile position
     fn calculate_percentile(&self, score: f64) -> f64 {
-        let scores: Vec<f64> = self.reputation_scores.values()
+        let scores: Vec<f64> = self
+            .reputation_scores
+            .values()
             .map(|r| r.overall_reputation_score)
             .collect();
 
@@ -689,7 +736,10 @@ impl ThreatActorReputationSystem {
                             } else {
                                 AnomalySeverity::Medium
                             },
-                            description: format!("Reputation score changed by {:.1} points", recent_change),
+                            description: format!(
+                                "Reputation score changed by {:.1} points",
+                                recent_change
+                            ),
                             detected_at: Utc::now(),
                             expected_score: reputation.overall_reputation_score - recent_change,
                             actual_score: reputation.overall_reputation_score,
@@ -705,7 +755,9 @@ impl ThreatActorReputationSystem {
             }
         }
 
-        self.peer_comparison_data.comparative_analysis.anomaly_detections = anomalies.clone();
+        self.peer_comparison_data
+            .comparative_analysis
+            .anomaly_detections = anomalies.clone();
         Ok(anomalies)
     }
 }

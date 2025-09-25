@@ -3,14 +3,14 @@
 //! Analysis and tracking of threat actor targeting patterns across different industries,
 //! including sector-specific vulnerabilities, attack motivations, and industry risk profiles.
 
-use std::cmp::PartialEq;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::RwLock;
-use futures::stream::{Stream, StreamExt};
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::{Stream, StreamExt};
+use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::collections::HashMap;
+use tokio::sync::RwLock;
+use uuid::Uuid;
 
 /// Industry targeting analysis engine
 #[derive(Debug)]
@@ -57,7 +57,11 @@ impl IndustryTargetingModule {
     }
 
     /// Analyze industry targeting patterns
-    pub async fn analyze_industry_targeting(&self, industry: &str, time_range: DateRange) -> Result<IndustryTargetingAnalysis> {
+    pub async fn analyze_industry_targeting(
+        &self,
+        industry: &str,
+        time_range: DateRange,
+    ) -> Result<IndustryTargetingAnalysis> {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
@@ -72,22 +76,41 @@ impl IndustryTargetingModule {
         let industry_profile = self.get_or_create_industry_profile(industry).await?;
 
         // Analyze targeting patterns
-        let targeting_patterns = self.analyze_targeting_patterns(industry, &time_range).await?;
+        let targeting_patterns = self
+            .analyze_targeting_patterns(industry, &time_range)
+            .await?;
 
         // Assess industry vulnerabilities
-        let vulnerabilities = self.vulnerability_correlator.analyze_industry_vulnerabilities(industry, &time_range).await?;
+        let vulnerabilities = self
+            .vulnerability_correlator
+            .analyze_industry_vulnerabilities(industry, &time_range)
+            .await?;
 
         // Analyze threat actor motivations
-        let motivations = self.motivation_analyzer.analyze_motivations(industry, &targeting_patterns).await?;
+        let motivations = self
+            .motivation_analyzer
+            .analyze_motivations(industry, &targeting_patterns)
+            .await?;
 
         // Calculate risk scores
-        let risk_scores = self.risk_assessor.calculate_industry_risk_scores(&industry_profile, &targeting_patterns, &vulnerabilities).await?;
+        let risk_scores = self
+            .risk_assessor
+            .calculate_industry_risk_scores(
+                &industry_profile,
+                &targeting_patterns,
+                &vulnerabilities,
+            )
+            .await?;
 
         // Generate targeting insights
-        let insights = self.generate_targeting_insights(&targeting_patterns, &motivations, &risk_scores).await?;
+        let insights = self
+            .generate_targeting_insights(&targeting_patterns, &motivations, &risk_scores)
+            .await?;
 
         // Identify emerging threats
-        let emerging_threats = self.identify_emerging_threats(industry, &time_range).await?;
+        let emerging_threats = self
+            .identify_emerging_threats(industry, &time_range)
+            .await?;
 
         let analysis = IndustryTargetingAnalysis {
             analysis_id,
@@ -117,7 +140,8 @@ impl IndustryTargetingModule {
         self.analysis_cache.write().await.insert(cache_key, cached);
 
         // Send targeting event
-        self.send_targeting_event(TargetingEvent::AnalysisCompleted(analysis.clone())).await?;
+        self.send_targeting_event(TargetingEvent::AnalysisCompleted(analysis.clone()))
+            .await?;
 
         Ok(analysis)
     }
@@ -143,12 +167,19 @@ impl IndustryTargetingModule {
             profile_version: "1.0".to_string(),
         };
 
-        self.industry_profiles.write().await.insert(industry.to_string(), profile.clone());
+        self.industry_profiles
+            .write()
+            .await
+            .insert(industry.to_string(), profile.clone());
         Ok(profile)
     }
 
     /// Analyze targeting patterns
-    async fn analyze_targeting_patterns(&self, industry: &str, time_range: &DateRange) -> Result<Vec<TargetingPattern>> {
+    async fn analyze_targeting_patterns(
+        &self,
+        industry: &str,
+        time_range: &DateRange,
+    ) -> Result<Vec<TargetingPattern>> {
         let mut patterns = Vec::new();
 
         // Financial sector patterns
@@ -233,7 +264,10 @@ impl IndustryTargetingModule {
         let mut insights = Vec::new();
 
         // High-risk pattern insight
-        if let Some(high_risk_pattern) = patterns.iter().find(|p| p.target_priority == TargetPriority::Critical) {
+        if let Some(high_risk_pattern) = patterns
+            .iter()
+            .find(|p| p.target_priority == TargetPriority::Critical)
+        {
             insights.push(TargetingInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::RiskAlert,
@@ -262,7 +296,10 @@ impl IndustryTargetingModule {
         }
 
         // Motivation-based insight
-        if let Some(financial_motivation) = motivations.iter().find(|m| m.primary_motivation == MotivationType::Financial) {
+        if let Some(financial_motivation) = motivations
+            .iter()
+            .find(|m| m.primary_motivation == MotivationType::Financial)
+        {
             insights.push(TargetingInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::TrendAnalysis,
@@ -323,14 +360,19 @@ impl IndustryTargetingModule {
     }
 
     /// Identify emerging threats
-    async fn identify_emerging_threats(&self, industry: &str, time_range: &DateRange) -> Result<Vec<EmergingThreat>> {
+    async fn identify_emerging_threats(
+        &self,
+        industry: &str,
+        time_range: &DateRange,
+    ) -> Result<Vec<EmergingThreat>> {
         let mut threats = Vec::new();
 
         // AI-powered attacks
         threats.push(EmergingThreat {
             threat_id: Uuid::new_v4().to_string(),
             threat_name: "AI-Enhanced Phishing".to_string(),
-            description: "AI-generated phishing emails with personalized content and timing".to_string(),
+            description: "AI-generated phishing emails with personalized content and timing"
+                .to_string(),
             industry_impact: industry.to_string(),
             likelihood: ThreatLikelihood::High,
             potential_impact: ThreatImpact::High,
@@ -354,7 +396,8 @@ impl IndustryTargetingModule {
         threats.push(EmergingThreat {
             threat_id: Uuid::new_v4().to_string(),
             threat_name: "Quantum Computing Cryptanalysis".to_string(),
-            description: "Emerging quantum computing capabilities threatening current encryption".to_string(),
+            description: "Emerging quantum computing capabilities threatening current encryption"
+                .to_string(),
             industry_impact: industry.to_string(),
             likelihood: ThreatLikelihood::Medium,
             potential_impact: ThreatImpact::Critical,
@@ -380,7 +423,9 @@ impl IndustryTargetingModule {
     /// Determine industry sector
     fn determine_sector(&self, industry: &str) -> IndustrySector {
         match industry.to_lowercase().as_str() {
-            i if i.contains("financial") || i.contains("banking") => IndustrySector::FinancialServices,
+            i if i.contains("financial") || i.contains("banking") => {
+                IndustrySector::FinancialServices
+            }
             i if i.contains("healthcare") || i.contains("medical") => IndustrySector::Healthcare,
             i if i.contains("technology") || i.contains("software") => IndustrySector::Technology,
             i if i.contains("retail") || i.contains("ecommerce") => IndustrySector::Retail,
@@ -396,9 +441,9 @@ impl IndustryTargetingModule {
         // Placeholder market size estimation
         match industry.to_lowercase().as_str() {
             i if i.contains("financial") => 25_000_000_000.0, // $25T
-            i if i.contains("healthcare") => 8_000_000_000.0,  // $8T
-            i if i.contains("technology") => 5_000_000_000.0,  // $5T
-            _ => 1_000_000_000.0, // $1T default
+            i if i.contains("healthcare") => 8_000_000_000.0, // $8T
+            i if i.contains("technology") => 5_000_000_000.0, // $5T
+            _ => 1_000_000_000.0,                             // $1T default
         }
     }
 
@@ -430,10 +475,7 @@ impl IndustryTargetingModule {
                 "CCPA".to_string(),
                 "ISO 27001".to_string(),
             ],
-            _ => vec![
-                "GDPR".to_string(),
-                "General Data Protection".to_string(),
-            ],
+            _ => vec!["GDPR".to_string(), "General Data Protection".to_string()],
         }
     }
 
@@ -477,7 +519,7 @@ impl IndustryTargetingModule {
     fn analyze_temporal_patterns(&self, _industry: &str) -> TemporalPattern {
         TemporalPattern {
             peak_hours: vec![9, 10, 11, 14, 15, 16], // Business hours
-            peak_days: vec![1, 2, 3, 4, 5], // Weekdays
+            peak_days: vec![1, 2, 3, 4, 5],          // Weekdays
             seasonal_patterns: vec![
                 "End of quarter".to_string(),
                 "Tax season".to_string(),
@@ -493,7 +535,8 @@ impl IndustryTargetingModule {
             return 0.5;
         }
 
-        let avg_success_rate = patterns.iter().map(|p| p.success_rate).sum::<f64>() / patterns.len() as f64;
+        let avg_success_rate =
+            patterns.iter().map(|p| p.success_rate).sum::<f64>() / patterns.len() as f64;
         let data_quality = 0.8; // Placeholder
         let pattern_consistency = 0.75; // Placeholder
 
@@ -502,26 +545,37 @@ impl IndustryTargetingModule {
 
     /// Send targeting event
     async fn send_targeting_event(&self, event: TargetingEvent) -> Result<()> {
-        self.targeting_sender.send(event).await
+        self.targeting_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send targeting event: {}", e))
     }
 
     /// Get industry risk profile
     pub async fn get_industry_risk_profile(&self, industry: &str) -> Result<IndustryRiskProfile> {
-        let analysis = self.analyze_industry_targeting(industry, DateRange {
-            start: Utc::now() - Duration::days(90),
-            end: Utc::now(),
-        }).await?;
+        let analysis = self
+            .analyze_industry_targeting(
+                industry,
+                DateRange {
+                    start: Utc::now() - Duration::days(90),
+                    end: Utc::now(),
+                },
+            )
+            .await?;
 
         Ok(IndustryRiskProfile {
             industry: industry.to_string(),
             overall_risk_level: self.determine_risk_level(&analysis.risk_scores),
-            primary_threats: analysis.targeting_patterns.iter()
+            primary_threats: analysis
+                .targeting_patterns
+                .iter()
                 .map(|p| p.attack_vector.to_string())
                 .collect(),
             vulnerability_score: analysis.vulnerabilities.overall_vulnerability_score,
             threat_actor_diversity: analysis.targeting_patterns.len(),
-            recommended_controls: analysis.insights.iter()
+            recommended_controls: analysis
+                .insights
+                .iter()
                 .flat_map(|i| i.recommendations.clone())
                 .collect(),
             last_assessed: analysis.analyzed_at,
@@ -945,7 +999,11 @@ impl VulnerabilityCorrelator {
         }
     }
 
-    async fn analyze_industry_vulnerabilities(&self, industry: &str, time_range: &DateRange) -> Result<IndustryVulnerabilities> {
+    async fn analyze_industry_vulnerabilities(
+        &self,
+        industry: &str,
+        time_range: &DateRange,
+    ) -> Result<IndustryVulnerabilities> {
         // Analyze industry-specific vulnerabilities
         Ok(IndustryVulnerabilities {
             vulnerability_id: Uuid::new_v4().to_string(),
@@ -990,7 +1048,11 @@ impl MotivationAnalyzer {
         }
     }
 
-    async fn analyze_motivations(&self, industry: &str, patterns: &[TargetingPattern]) -> Result<Vec<ThreatMotivation>> {
+    async fn analyze_motivations(
+        &self,
+        industry: &str,
+        patterns: &[TargetingPattern],
+    ) -> Result<Vec<ThreatMotivation>> {
         let mut motivations = Vec::new();
 
         motivations.push(ThreatMotivation {
@@ -999,8 +1061,14 @@ impl MotivationAnalyzer {
             secondary_motivations: vec![MotivationType::Espionage],
             prevalence: 0.65,
             average_impact: 2500000.0,
-            typical_actors: vec![ThreatActorType::CriminalSyndicate, ThreatActorType::Cybercrime],
-            industry_context: format!("{} industry represents high-value financial targets", industry),
+            typical_actors: vec![
+                ThreatActorType::CriminalSyndicate,
+                ThreatActorType::Cybercrime,
+            ],
+            industry_context: format!(
+                "{} industry represents high-value financial targets",
+                industry
+            ),
         });
 
         motivations.push(ThreatMotivation {
@@ -1010,7 +1078,10 @@ impl MotivationAnalyzer {
             prevalence: 0.25,
             average_impact: 500000.0,
             typical_actors: vec![ThreatActorType::NationState],
-            industry_context: format!("{} industry contains valuable intellectual property", industry),
+            industry_context: format!(
+                "{} industry contains valuable intellectual property",
+                industry
+            ),
         });
 
         Ok(motivations)
@@ -1036,14 +1107,16 @@ impl IndustryRiskAssessor {
         patterns: &[TargetingPattern],
         vulnerabilities: &IndustryVulnerabilities,
     ) -> Result<IndustryRiskScores> {
-        let targeting_risk = patterns.iter()
+        let targeting_risk = patterns
+            .iter()
             .map(|p| match p.target_priority {
                 TargetPriority::Critical => 5.0,
                 TargetPriority::High => 4.0,
                 TargetPriority::Medium => 3.0,
                 TargetPriority::Low => 2.0,
             })
-            .sum::<f64>() / patterns.len() as f64;
+            .sum::<f64>()
+            / patterns.len() as f64;
 
         let vulnerability_risk = vulnerabilities.overall_vulnerability_score / 2.0;
 
@@ -1059,14 +1132,12 @@ impl IndustryRiskAssessor {
                 "Legacy systems".to_string(),
                 "Supply chain dependencies".to_string(),
             ],
-            risk_trends: vec![
-                RiskTrend {
-                    factor: "Targeting frequency".to_string(),
-                    current_level: 7.5,
-                    trend_direction: TrendDirection::Increasing,
-                    confidence: 0.8,
-                },
-            ],
+            risk_trends: vec![RiskTrend {
+                factor: "Targeting frequency".to_string(),
+                current_level: 7.5,
+                trend_direction: TrendDirection::Increasing,
+                confidence: 0.8,
+            }],
             mitigation_effectiveness: 0.6,
         })
     }

@@ -3,14 +3,14 @@
 //! Comprehensive analysis of the evolving threat landscape including emerging threats,
 //! threat actor trends, attack pattern evolution, and strategic threat intelligence.
 
-use std::cmp::PartialEq;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::RwLock;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::collections::HashMap;
+use tokio::sync::RwLock;
+use uuid::Uuid;
 
 /// Threat landscape analysis engine
 #[derive(Debug)]
@@ -73,11 +73,20 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze current threat landscape
-    pub async fn analyze_threat_landscape(&self, time_range: DateRange, scope: LandscapeScope) -> Result<ThreatLandscapeAnalysis> {
+    pub async fn analyze_threat_landscape(
+        &self,
+        time_range: DateRange,
+        scope: LandscapeScope,
+    ) -> Result<ThreatLandscapeAnalysis> {
         let analysis_id = Uuid::new_v4().to_string();
 
         // Check cache first
-        let cache_key = format!("{}_{}_{}", time_range.start.timestamp(), time_range.end.timestamp(), serde_json::to_string(&scope)?);
+        let cache_key = format!(
+            "{}_{}_{}",
+            time_range.start.timestamp(),
+            time_range.end.timestamp(),
+            serde_json::to_string(&scope)?
+        );
         if let Some(cached) = self.analysis_cache.read().await.get(&cache_key) {
             if Utc::now().signed_duration_since(cached.created_at) < Duration::hours(2) {
                 return Ok(cached.analysis.clone());
@@ -85,7 +94,10 @@ impl ThreatLandscapeModule {
         }
 
         // Gather threat intelligence
-        let threat_intelligence = self.threat_intelligence.aggregate_intelligence(&time_range, &scope).await?;
+        let threat_intelligence = self
+            .threat_intelligence
+            .aggregate_intelligence(&time_range, &scope)
+            .await?;
 
         // Analyze current threats
         let current_threats = self.analyze_current_threats(&time_range, &scope).await?;
@@ -103,13 +115,21 @@ impl ThreatLandscapeModule {
         let landscape_evolution = self.assess_landscape_evolution(&time_range, &scope).await?;
 
         // Generate strategic insights
-        let strategic_insights = self.generate_strategic_insights(&current_threats, &emerging_threats, &landscape_trends).await?;
+        let strategic_insights = self
+            .generate_strategic_insights(&current_threats, &emerging_threats, &landscape_trends)
+            .await?;
 
         // Calculate threat landscape score
-        let landscape_score = self.calculate_landscape_score(&current_threats, &emerging_threats, &landscape_evolution);
+        let landscape_score = self.calculate_landscape_score(
+            &current_threats,
+            &emerging_threats,
+            &landscape_evolution,
+        );
 
         // Generate risk assessment
-        let risk_assessment = self.generate_risk_assessment(&landscape_score, &strategic_insights).await?;
+        let risk_assessment = self
+            .generate_risk_assessment(&landscape_score, &strategic_insights)
+            .await?;
 
         let analysis = ThreatLandscapeAnalysis {
             analysis_id,
@@ -143,31 +163,47 @@ impl ThreatLandscapeModule {
         self.analysis_cache.write().await.insert(cache_key, cached);
 
         // Send landscape event
-        self.send_landscape_event(LandscapeEvent::AnalysisCompleted(analysis.clone())).await?;
+        self.send_landscape_event(LandscapeEvent::AnalysisCompleted(analysis.clone()))
+            .await?;
 
         Ok(analysis)
     }
 
     /// Predict future threat landscape
-    pub async fn predict_threat_landscape(&self, prediction_horizon: Duration) -> Result<ThreatLandscapePrediction> {
+    pub async fn predict_threat_landscape(
+        &self,
+        prediction_horizon: Duration,
+    ) -> Result<ThreatLandscapePrediction> {
         let prediction_id = Uuid::new_v4().to_string();
 
         // Get current landscape
-        let current_analysis = self.analyze_threat_landscape(
-            DateRange {
-                start: Utc::now() - Duration::days(90),
-                end: Utc::now(),
-            },
-            LandscapeScope::Global,
-        ).await?;
+        let current_analysis = self
+            .analyze_threat_landscape(
+                DateRange {
+                    start: Utc::now() - Duration::days(90),
+                    end: Utc::now(),
+                },
+                LandscapeScope::Global,
+            )
+            .await?;
 
         // Generate predictions
-        let threat_evolution = self.predictive_analyzer.predict_threat_evolution(&current_analysis, prediction_horizon).await?;
-        let emerging_risks = self.predictive_analyzer.predict_emerging_risks(&current_analysis, prediction_horizon).await?;
-        let attack_trend_projections = self.predictive_analyzer.project_attack_trends(&current_analysis, prediction_horizon).await?;
+        let threat_evolution = self
+            .predictive_analyzer
+            .predict_threat_evolution(&current_analysis, prediction_horizon)
+            .await?;
+        let emerging_risks = self
+            .predictive_analyzer
+            .predict_emerging_risks(&current_analysis, prediction_horizon)
+            .await?;
+        let attack_trend_projections = self
+            .predictive_analyzer
+            .project_attack_trends(&current_analysis, prediction_horizon)
+            .await?;
 
         // Calculate prediction confidence
-        let prediction_confidence = self.calculate_prediction_confidence(&threat_evolution, &emerging_risks);
+        let prediction_confidence =
+            self.calculate_prediction_confidence(&threat_evolution, &emerging_risks);
 
         Ok(ThreatLandscapePrediction {
             prediction_id,
@@ -176,7 +212,9 @@ impl ThreatLandscapeModule {
             threat_evolution: threat_evolution.clone(),
             emerging_risks: emerging_risks.clone(),
             attack_trend_projections,
-            mitigation_recommendations: self.generate_mitigation_recommendations(&threat_evolution, &emerging_risks).await?,
+            mitigation_recommendations: self
+                .generate_mitigation_recommendations(&threat_evolution, &emerging_risks)
+                .await?,
             prediction_confidence,
             generated_at: Utc::now(),
             valid_until: Utc::now() + prediction_horizon,
@@ -184,17 +222,22 @@ impl ThreatLandscapeModule {
     }
 
     /// Monitor threat landscape changes
-    pub async fn monitor_landscape_changes(&self, monitoring_config: MonitoringConfig) -> Result<LandscapeMonitoring> {
+    pub async fn monitor_landscape_changes(
+        &self,
+        monitoring_config: MonitoringConfig,
+    ) -> Result<LandscapeMonitoring> {
         let monitoring_id = Uuid::new_v4().to_string();
 
         // Set up monitoring
-        let baseline_analysis = self.analyze_threat_landscape(
-            DateRange {
-                start: Utc::now() - monitoring_config.baseline_period,
-                end: Utc::now(),
-            },
-            monitoring_config.scope.clone(),
-        ).await?;
+        let baseline_analysis = self
+            .analyze_threat_landscape(
+                DateRange {
+                    start: Utc::now() - monitoring_config.baseline_period,
+                    end: Utc::now(),
+                },
+                monitoring_config.scope.clone(),
+            )
+            .await?;
 
         Ok(LandscapeMonitoring {
             monitoring_id,
@@ -208,20 +251,27 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze threat actor ecosystem
-    pub async fn analyze_threat_ecosystem(&self, time_range: DateRange) -> Result<ThreatEcosystemAnalysis> {
+    pub async fn analyze_threat_ecosystem(
+        &self,
+        time_range: DateRange,
+    ) -> Result<ThreatEcosystemAnalysis> {
         let ecosystem_id = Uuid::new_v4().to_string();
 
         // Analyze threat actor relationships
         let actor_relationships = self.analyze_actor_relationships(&time_range).await?;
 
         // Identify collaboration patterns
-        let collaboration_patterns = self.identify_collaboration_patterns(&actor_relationships).await?;
+        let collaboration_patterns = self
+            .identify_collaboration_patterns(&actor_relationships)
+            .await?;
 
         // Assess ecosystem evolution
         let ecosystem_evolution = self.assess_ecosystem_evolution(&time_range).await?;
 
         // Generate ecosystem insights
-        let ecosystem_insights = self.generate_ecosystem_insights(&actor_relationships, &collaboration_patterns).await?;
+        let ecosystem_insights = self
+            .generate_ecosystem_insights(&actor_relationships, &collaboration_patterns)
+            .await?;
 
         Ok(ThreatEcosystemAnalysis {
             ecosystem_id,
@@ -235,23 +285,32 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate threat intelligence report
-    pub async fn generate_threat_report(&self, report_config: ReportConfig) -> Result<ThreatIntelligenceReport> {
+    pub async fn generate_threat_report(
+        &self,
+        report_config: ReportConfig,
+    ) -> Result<ThreatIntelligenceReport> {
         let report_id = Uuid::new_v4().to_string();
 
         // Gather data for the report
-        let landscape_analysis = self.analyze_threat_landscape(
-            report_config.time_range.clone(),
-            report_config.scope.clone(),
-        ).await?;
+        let landscape_analysis = self
+            .analyze_threat_landscape(
+                report_config.time_range.clone(),
+                report_config.scope.clone(),
+            )
+            .await?;
 
         // Generate report sections
         let executive_summary = self.generate_executive_summary(&landscape_analysis).await?;
         let threat_analysis = self.generate_threat_analysis(&landscape_analysis).await?;
-        let risk_assessment = self.generate_risk_assessment_section(&landscape_analysis).await?;
+        let risk_assessment = self
+            .generate_risk_assessment_section(&landscape_analysis)
+            .await?;
         let recommendations = self.generate_recommendations(&landscape_analysis).await?;
 
         // Generate visualizations
-        let visualizations = self.generate_report_visualizations(&landscape_analysis).await?;
+        let visualizations = self
+            .generate_report_visualizations(&landscape_analysis)
+            .await?;
 
         Ok(ThreatIntelligenceReport {
             report_id,
@@ -272,15 +331,23 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze current threats
-    async fn analyze_current_threats(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<CurrentThreatAnalysis> {
+    async fn analyze_current_threats(
+        &self,
+        time_range: &DateRange,
+        scope: &LandscapeScope,
+    ) -> Result<CurrentThreatAnalysis> {
         // Analyze active threat actors
-        let active_threat_actors = self.identify_active_threat_actors(time_range, scope).await?;
+        let active_threat_actors = self
+            .identify_active_threat_actors(time_range, scope)
+            .await?;
 
         // Analyze prevalent attack vectors
         let prevalent_attack_vectors = self.analyze_prevalent_vectors(time_range, scope).await?;
 
         // Assess threat actor capabilities
-        let threat_capabilities = self.assess_threat_capabilities(&active_threat_actors).await?;
+        let threat_capabilities = self
+            .assess_threat_capabilities(&active_threat_actors)
+            .await?;
 
         // Calculate threat severity distribution
         let severity_distribution = self.calculate_severity_distribution(&active_threat_actors);
@@ -291,19 +358,27 @@ impl ThreatLandscapeModule {
             threat_capabilities,
             severity_distribution,
             threat_volume_trend: self.calculate_threat_volume_trend(time_range),
-            geographic_threat_distribution: self.analyze_geographic_distribution(time_range, scope).await?,
+            geographic_threat_distribution: self
+                .analyze_geographic_distribution(time_range, scope)
+                .await?,
         })
     }
 
     /// Identify emerging threats
-    async fn identify_emerging_threats(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<EmergingThreatAnalysis>> {
+    async fn identify_emerging_threats(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<EmergingThreatAnalysis>> {
         let mut emerging_threats = Vec::new();
 
         // AI-powered attacks
         emerging_threats.push(EmergingThreatAnalysis {
             threat_id: Uuid::new_v4().to_string(),
             threat_name: "AI-Enhanced Social Engineering".to_string(),
-            description: "AI-generated personalized phishing campaigns with advanced evasion techniques".to_string(),
+            description:
+                "AI-generated personalized phishing campaigns with advanced evasion techniques"
+                    .to_string(),
             likelihood: ThreatLikelihood::High,
             potential_impact: ThreatImpact::High,
             time_to_mainstream: Duration::days(180),
@@ -331,7 +406,8 @@ impl ThreatLandscapeModule {
         emerging_threats.push(EmergingThreatAnalysis {
             threat_id: Uuid::new_v4().to_string(),
             threat_name: "Quantum Computing Cryptanalysis".to_string(),
-            description: "Emerging quantum capabilities threatening current cryptographic systems".to_string(),
+            description: "Emerging quantum capabilities threatening current cryptographic systems"
+                .to_string(),
             likelihood: ThreatLikelihood::Medium,
             potential_impact: ThreatImpact::Critical,
             time_to_mainstream: Duration::days(730),
@@ -357,7 +433,9 @@ impl ThreatLandscapeModule {
         emerging_threats.push(EmergingThreatAnalysis {
             threat_id: Uuid::new_v4().to_string(),
             threat_name: "Advanced Supply Chain Compromise".to_string(),
-            description: "Sophisticated attacks targeting software development and deployment pipelines".to_string(),
+            description:
+                "Sophisticated attacks targeting software development and deployment pipelines"
+                    .to_string(),
             likelihood: ThreatLikelihood::High,
             potential_impact: ThreatImpact::Critical,
             time_to_mainstream: Duration::days(90),
@@ -384,12 +462,20 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze attack patterns
-    async fn analyze_attack_patterns(&self, time_range: &DateRange, scope: &LandscapeScope) -> Result<AttackPatternAnalysis> {
+    async fn analyze_attack_patterns(
+        &self,
+        time_range: &DateRange,
+        scope: &LandscapeScope,
+    ) -> Result<AttackPatternAnalysis> {
         // Analyze common attack patterns
         let common_patterns = self.identify_common_patterns(time_range, scope).await?;
         let pattern_evolution = self.analyze_pattern_evolution(time_range).await?;
-        let success_rates = self.calculate_pattern_success_rates(&common_patterns).await?;
-        let detection_rates = self.calculate_pattern_detection_rates(&common_patterns).await?;
+        let success_rates = self
+            .calculate_pattern_success_rates(&common_patterns)
+            .await?;
+        let detection_rates = self
+            .calculate_pattern_detection_rates(&common_patterns)
+            .await?;
 
         Ok(AttackPatternAnalysis {
             common_patterns,
@@ -401,7 +487,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate landscape trends
-    async fn generate_landscape_trends(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<LandscapeTrend>> {
+    async fn generate_landscape_trends(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<LandscapeTrend>> {
         let mut trends = Vec::new();
 
         // Ransomware trend
@@ -409,12 +499,17 @@ impl ThreatLandscapeModule {
             trend_id: Uuid::new_v4().to_string(),
             trend_name: "Ransomware Proliferation".to_string(),
             trend_type: TrendType::Increasing,
-            description: "Ransomware attacks continue to increase in frequency and sophistication".to_string(),
+            description: "Ransomware attacks continue to increase in frequency and sophistication"
+                .to_string(),
             time_range: time_range.clone(),
             data_points: self.generate_trend_data_points(time_range, "ransomware"),
             growth_rate: 0.25, // 25% growth
             confidence_level: 0.85,
-            affected_sectors: vec!["Healthcare".to_string(), "Finance".to_string(), "Government".to_string()],
+            affected_sectors: vec![
+                "Healthcare".to_string(),
+                "Finance".to_string(),
+                "Government".to_string(),
+            ],
             key_drivers: vec![
                 "High profitability".to_string(),
                 "Easy monetization".to_string(),
@@ -432,7 +527,8 @@ impl ThreatLandscapeModule {
             trend_id: Uuid::new_v4().to_string(),
             trend_name: "Supply Chain Attack Sophistication".to_string(),
             trend_type: TrendType::Increasing,
-            description: "Supply chain attacks becoming more sophisticated and harder to detect".to_string(),
+            description: "Supply chain attacks becoming more sophisticated and harder to detect"
+                .to_string(),
             time_range: time_range.clone(),
             data_points: self.generate_trend_data_points(time_range, "supply_chain"),
             growth_rate: 0.35,
@@ -454,7 +550,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Assess landscape evolution
-    async fn assess_landscape_evolution(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<LandscapeEvolution> {
+    async fn assess_landscape_evolution(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<LandscapeEvolution> {
         let evolution_patterns = self.identify_evolution_patterns(time_range).await?;
         let technology_adoption = self.analyze_technology_adoption(time_range).await?;
         let threat_actor_adaptation = self.analyze_threat_adaptation(time_range).await?;
@@ -482,12 +582,16 @@ impl ThreatLandscapeModule {
         let mut insights = Vec::new();
 
         // High-risk emerging threat insight
-        if let Some(high_impact_threat) = emerging_threats.iter()
-            .find(|t| t.potential_impact == ThreatImpact::Critical && t.likelihood == ThreatLikelihood::High) {
+        if let Some(high_impact_threat) = emerging_threats.iter().find(|t| {
+            t.potential_impact == ThreatImpact::Critical && t.likelihood == ThreatLikelihood::High
+        }) {
             insights.push(StrategicInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::CriticalRisk,
-                title: format!("Critical Emerging Threat: {}", high_impact_threat.threat_name),
+                title: format!(
+                    "Critical Emerging Threat: {}",
+                    high_impact_threat.threat_name
+                ),
                 description: format!(
                     "{} poses critical risk with high likelihood of occurrence within {} days",
                     high_impact_threat.threat_name,
@@ -499,7 +603,10 @@ impl ThreatLandscapeModule {
                 affected_stakeholders: high_impact_threat.affected_industries.clone(),
                 recommended_actions: high_impact_threat.mitigation_strategies.clone(),
                 evidence: vec![
-                    format!("First observed: {}", high_impact_threat.first_observed.format("%Y-%m-%d")),
+                    format!(
+                        "First observed: {}",
+                        high_impact_threat.first_observed.format("%Y-%m-%d")
+                    ),
                     "High technical sophistication".to_string(),
                     "Broad industry impact potential".to_string(),
                 ],
@@ -508,12 +615,17 @@ impl ThreatLandscapeModule {
         }
 
         // Trend acceleration insight
-        if let Some(accelerating_trend) = trends.iter()
-            .find(|t| t.growth_rate > 0.3 && t.trend_type == TrendType::Increasing) {
+        if let Some(accelerating_trend) = trends
+            .iter()
+            .find(|t| t.growth_rate > 0.3 && t.trend_type == TrendType::Increasing)
+        {
             insights.push(StrategicInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::TrendAnalysis,
-                title: format!("Accelerating Threat Trend: {}", accelerating_trend.trend_name),
+                title: format!(
+                    "Accelerating Threat Trend: {}",
+                    accelerating_trend.trend_name
+                ),
                 description: format!(
                     "{} is accelerating at {:.1}% growth rate, requiring immediate attention",
                     accelerating_trend.trend_name,
@@ -531,19 +643,28 @@ impl ThreatLandscapeModule {
                 evidence: vec![
                     format!("{:.1}% growth rate", accelerating_trend.growth_rate * 100.0),
                     "Consistent upward trend".to_string(),
-                    format!("{} data points analyzed", accelerating_trend.data_points.len()),
+                    format!(
+                        "{} data points analyzed",
+                        accelerating_trend.data_points.len()
+                    ),
                 ],
                 generated_at: Utc::now(),
             });
         }
 
         // Capability gap insight
-        if current_threats.threat_capabilities.iter().any(|c| c.sophistication_level > 8.0) {
+        if current_threats
+            .threat_capabilities
+            .iter()
+            .any(|c| c.sophistication_level > 8.0)
+        {
             insights.push(StrategicInsight {
                 insight_id: Uuid::new_v4().to_string(),
                 insight_type: InsightType::CapabilityGap,
                 title: "Threat Actor Capability Gap".to_string(),
-                description: "Advanced threat actors possess capabilities exceeding typical defense measures".to_string(),
+                description:
+                    "Advanced threat actors possess capabilities exceeding typical defense measures"
+                        .to_string(),
                 confidence: 0.82,
                 impact_assessment: "High - Current defenses may be insufficient".to_string(),
                 time_horizon: Duration::days(180),
@@ -573,19 +694,24 @@ impl ThreatLandscapeModule {
         emerging_threats: &[EmergingThreatAnalysis],
         evolution: &LandscapeEvolution,
     ) -> LandscapeScore {
-        let current_threat_score = current_threats.severity_distribution.values()
+        let current_threat_score = current_threats
+            .severity_distribution
+            .values()
             .zip(&[1.0, 2.0, 3.0, 4.0, 5.0]) // Weights for severity levels
             .map(|(count, weight)| *count as f64 * weight)
-            .sum::<f64>() / current_threats.active_threat_actors.len() as f64;
+            .sum::<f64>()
+            / current_threats.active_threat_actors.len() as f64;
 
-        let emerging_threat_score = emerging_threats.iter()
+        let emerging_threat_score = emerging_threats
+            .iter()
             .map(|t| match t.potential_impact {
                 ThreatImpact::Low => 1.0,
                 ThreatImpact::Medium => 2.0,
                 ThreatImpact::High => 3.0,
                 ThreatImpact::Critical => 4.0,
             })
-            .sum::<f64>() / emerging_threats.len() as f64;
+            .sum::<f64>()
+            / emerging_threats.len() as f64;
 
         let evolution_score = evolution.evolution_rate * 10.0;
 
@@ -626,12 +752,19 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate risk assessment
-    async fn generate_risk_assessment(&self, landscape_score: &LandscapeScore, insights: &[StrategicInsight]) -> Result<RiskAssessment> {
-        let _critical_insights = insights.iter()
+    async fn generate_risk_assessment(
+        &self,
+        landscape_score: &LandscapeScore,
+        insights: &[StrategicInsight],
+    ) -> Result<RiskAssessment> {
+        let _critical_insights = insights
+            .iter()
             .filter(|i| i.insight_type == InsightType::CriticalRisk)
             .count();
 
-        let risk_factors = self.identify_risk_factors(landscape_score, insights).await?;
+        let risk_factors = self
+            .identify_risk_factors(landscape_score, insights)
+            .await?;
         let mitigation_priorities = self.calculate_mitigation_priorities(&risk_factors).await?;
 
         Ok(RiskAssessment {
@@ -647,7 +780,11 @@ impl ThreatLandscapeModule {
 
     /// Calculate analysis confidence
     fn calculate_analysis_confidence(&self, intelligence: &ThreatIntelligence) -> f64 {
-        let data_completeness = if intelligence.sources.is_empty() { 0.3 } else { 0.8 };
+        let data_completeness = if intelligence.sources.is_empty() {
+            0.3
+        } else {
+            0.8
+        };
         let source_quality = 0.75; // Placeholder
         let temporal_coverage = 0.85; // Placeholder
 
@@ -655,7 +792,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate prediction confidence
-    fn calculate_prediction_confidence(&self, evolution: &ThreatEvolution, _risks: &[EmergingRisk]) -> f64 {
+    fn calculate_prediction_confidence(
+        &self,
+        evolution: &ThreatEvolution,
+        _risks: &[EmergingRisk],
+    ) -> f64 {
         let historical_accuracy = 0.75; // Placeholder
         let data_quality = 0.8; // Placeholder
         let model_robustness = 0.7; // Placeholder
@@ -664,7 +805,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate mitigation recommendations
-    async fn generate_mitigation_recommendations(&self, evolution: &ThreatEvolution, _risks: &[EmergingRisk]) -> Result<Vec<MitigationRecommendation>> {
+    async fn generate_mitigation_recommendations(
+        &self,
+        evolution: &ThreatEvolution,
+        _risks: &[EmergingRisk],
+    ) -> Result<Vec<MitigationRecommendation>> {
         let mut recommendations = Vec::new();
 
         recommendations.push(MitigationRecommendation {
@@ -709,7 +854,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify active threat actors
-    async fn identify_active_threat_actors(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<ActiveThreatActor>> {
+    async fn identify_active_threat_actors(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<ActiveThreatActor>> {
         // Mock active threat actors
         Ok(vec![
             ActiveThreatActor {
@@ -719,7 +868,10 @@ impl ThreatLandscapeModule {
                 activity_level: ActivityLevel::High,
                 primary_motivation: MotivationType::Espionage,
                 target_industries: vec!["Government".to_string(), "Defense".to_string()],
-                attack_techniques: vec!["Spear Phishing".to_string(), "Zero Day Exploits".to_string()],
+                attack_techniques: vec![
+                    "Spear Phishing".to_string(),
+                    "Zero Day Exploits".to_string(),
+                ],
                 last_activity: Utc::now() - Duration::days(7),
                 attribution_confidence: 0.9,
             },
@@ -738,7 +890,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze prevalent attack vectors
-    async fn analyze_prevalent_vectors(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<PrevalentAttackVector>> {
+    async fn analyze_prevalent_vectors(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<PrevalentAttackVector>> {
         Ok(vec![
             PrevalentAttackVector {
                 vector_name: "Ransomware".to_string(),
@@ -762,27 +918,39 @@ impl ThreatLandscapeModule {
     }
 
     /// Assess threat capabilities
-    async fn assess_threat_capabilities(&self, actors: &[ActiveThreatActor]) -> Result<Vec<ThreatCapability>> {
+    async fn assess_threat_capabilities(
+        &self,
+        actors: &[ActiveThreatActor],
+    ) -> Result<Vec<ThreatCapability>> {
         Ok(vec![
             ThreatCapability {
                 capability_type: "Technical Sophistication".to_string(),
                 average_level: 7.5,
                 sophistication_level: 8.0,
-                key_techniques: vec!["Zero Day Exploits".to_string(), "Advanced Evasion".to_string()],
+                key_techniques: vec![
+                    "Zero Day Exploits".to_string(),
+                    "Advanced Evasion".to_string(),
+                ],
                 capability_trends: vec!["Increasing".to_string()],
             },
             ThreatCapability {
                 capability_type: "Operational Security".to_string(),
                 average_level: 8.0,
                 sophistication_level: 8.5,
-                key_techniques: vec!["Anti-Forensic Techniques".to_string(), "Lateral Movement".to_string()],
+                key_techniques: vec![
+                    "Anti-Forensic Techniques".to_string(),
+                    "Lateral Movement".to_string(),
+                ],
                 capability_trends: vec!["Stable".to_string()],
             },
         ])
     }
 
     /// Calculate severity distribution
-    fn calculate_severity_distribution(&self, actors: &[ActiveThreatActor]) -> HashMap<ThreatSeverity, u32> {
+    fn calculate_severity_distribution(
+        &self,
+        actors: &[ActiveThreatActor],
+    ) -> HashMap<ThreatSeverity, u32> {
         let mut distribution = HashMap::new();
         distribution.insert(ThreatSeverity::Critical, 2);
         distribution.insert(ThreatSeverity::High, 5);
@@ -798,7 +966,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze geographic distribution
-    async fn analyze_geographic_distribution(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<GeographicThreatDistribution>> {
+    async fn analyze_geographic_distribution(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<GeographicThreatDistribution>> {
         Ok(vec![
             GeographicThreatDistribution {
                 country: "Russia".to_string(),
@@ -818,7 +990,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify common patterns
-    async fn identify_common_patterns(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<Vec<CommonAttackPattern>> {
+    async fn identify_common_patterns(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<Vec<CommonAttackPattern>> {
         Ok(vec![
             CommonAttackPattern {
                 pattern_name: "Initial Access via Phishing".to_string(),
@@ -826,7 +1002,10 @@ impl ThreatLandscapeModule {
                 success_rate: 0.12,
                 detection_rate: 0.78,
                 affected_industries: vec!["All".to_string()],
-                typical_techniques: vec!["Spear Phishing".to_string(), "Credential Stuffing".to_string()],
+                typical_techniques: vec![
+                    "Spear Phishing".to_string(),
+                    "Credential Stuffing".to_string(),
+                ],
             },
             CommonAttackPattern {
                 pattern_name: "Lateral Movement".to_string(),
@@ -855,7 +1034,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate pattern success rates
-    async fn calculate_pattern_success_rates(&self, patterns: &[CommonAttackPattern]) -> Result<HashMap<String, f64>> {
+    async fn calculate_pattern_success_rates(
+        &self,
+        patterns: &[CommonAttackPattern],
+    ) -> Result<HashMap<String, f64>> {
         let mut success_rates = HashMap::new();
         for pattern in patterns {
             success_rates.insert(pattern.pattern_name.clone(), pattern.success_rate);
@@ -864,7 +1046,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate pattern detection rates
-    async fn calculate_pattern_detection_rates(&self, patterns: &[CommonAttackPattern]) -> Result<HashMap<String, f64>> {
+    async fn calculate_pattern_detection_rates(
+        &self,
+        patterns: &[CommonAttackPattern],
+    ) -> Result<HashMap<String, f64>> {
         let mut detection_rates = HashMap::new();
         for pattern in patterns {
             detection_rates.insert(pattern.pattern_name.clone(), pattern.detection_rate);
@@ -891,7 +1076,11 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate trend data points
-    fn generate_trend_data_points(&self, time_range: &DateRange, trend_type: &str) -> Vec<TrendDataPoint> {
+    fn generate_trend_data_points(
+        &self,
+        time_range: &DateRange,
+        trend_type: &str,
+    ) -> Vec<TrendDataPoint> {
         let mut data_points = Vec::new();
         let duration = time_range.end.signed_duration_since(time_range.start);
         let days = duration.num_days();
@@ -915,25 +1104,37 @@ impl ThreatLandscapeModule {
     }
 
     /// Identify evolution patterns
-    async fn identify_evolution_patterns(&self, time_range: &DateRange) -> Result<Vec<EvolutionPattern>> {
+    async fn identify_evolution_patterns(
+        &self,
+        time_range: &DateRange,
+    ) -> Result<Vec<EvolutionPattern>> {
         Ok(vec![
             EvolutionPattern {
                 pattern_type: "Technique Sophistication".to_string(),
                 evolution_rate: 0.2,
-                key_changes: vec!["AI integration".to_string(), "Automation increase".to_string()],
+                key_changes: vec![
+                    "AI integration".to_string(),
+                    "Automation increase".to_string(),
+                ],
                 drivers: vec!["Technology advancement".to_string()],
             },
             EvolutionPattern {
                 pattern_type: "Attack Speed".to_string(),
                 evolution_rate: 0.15,
-                key_changes: vec!["Faster reconnaissance".to_string(), "Automated exploitation".to_string()],
+                key_changes: vec![
+                    "Faster reconnaissance".to_string(),
+                    "Automated exploitation".to_string(),
+                ],
                 drivers: vec!["Tool improvement".to_string()],
             },
         ])
     }
 
     /// Analyze technology adoption
-    async fn analyze_technology_adoption(&self, time_range: &DateRange) -> Result<TechnologyAdoption> {
+    async fn analyze_technology_adoption(
+        &self,
+        time_range: &DateRange,
+    ) -> Result<TechnologyAdoption> {
         Ok(TechnologyAdoption {
             emerging_technologies: vec!["AI/ML".to_string(), "Quantum Computing".to_string()],
             adoption_rates: HashMap::from([
@@ -943,7 +1144,10 @@ impl ThreatLandscapeModule {
             ]),
             technology_maturity: HashMap::from([
                 ("AI attacks".to_string(), TechnologyMaturity::Emerging),
-                ("Quantum threats".to_string(), TechnologyMaturity::Experimental),
+                (
+                    "Quantum threats".to_string(),
+                    TechnologyMaturity::Experimental,
+                ),
             ]),
         })
     }
@@ -971,7 +1175,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate executive summary
-    async fn generate_executive_summary(&self, analysis: &ThreatLandscapeAnalysis) -> Result<String> {
+    async fn generate_executive_summary(
+        &self,
+        analysis: &ThreatLandscapeAnalysis,
+    ) -> Result<String> {
         Ok(format!(
             "The current threat landscape shows {} active threat actors with {} emerging threats requiring attention. Overall risk level is {:?} with primary concerns in {} and {}. Key recommendations include {} and {}.",
             analysis.current_threats.active_threat_actors.len(),
@@ -998,7 +1205,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate risk assessment section
-    async fn generate_risk_assessment_section(&self, analysis: &ThreatLandscapeAnalysis) -> Result<String> {
+    async fn generate_risk_assessment_section(
+        &self,
+        analysis: &ThreatLandscapeAnalysis,
+    ) -> Result<String> {
         Ok(format!(
             "Risk assessment indicates {:?} overall risk level with landscape score of {:.1}. Critical risk factors include {} and {}. Mitigation priorities focus on {} and {}.",
             analysis.risk_assessment.overall_risk_level,
@@ -1011,7 +1221,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate recommendations
-    async fn generate_recommendations(&self, analysis: &ThreatLandscapeAnalysis) -> Result<Vec<String>> {
+    async fn generate_recommendations(
+        &self,
+        analysis: &ThreatLandscapeAnalysis,
+    ) -> Result<Vec<String>> {
         Ok(vec![
             "Implement advanced threat detection systems".to_string(),
             "Enhance incident response capabilities".to_string(),
@@ -1023,7 +1236,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate report visualizations
-    async fn generate_report_visualizations(&self, analysis: &ThreatLandscapeAnalysis) -> Result<Vec<Visualization>> {
+    async fn generate_report_visualizations(
+        &self,
+        analysis: &ThreatLandscapeAnalysis,
+    ) -> Result<Vec<Visualization>> {
         Ok(vec![
             Visualization {
                 visualization_id: Uuid::new_v4().to_string(),
@@ -1052,37 +1268,45 @@ impl ThreatLandscapeModule {
     }
 
     /// Analyze actor relationships
-    async fn analyze_actor_relationships(&self, time_range: &DateRange) -> Result<Vec<ActorRelationship>> {
-        Ok(vec![
-            ActorRelationship {
-                relationship_id: Uuid::new_v4().to_string(),
-                actor1: "APT-001".to_string(),
-                actor2: "CRIME-001".to_string(),
-                relationship_type: RelationshipType::Collaboration,
-                strength: 0.7,
-                evidence: vec!["Shared infrastructure".to_string(), "Similar techniques".to_string()],
-                first_observed: Utc::now() - Duration::days(60),
-                last_observed: Utc::now() - Duration::days(5),
-            },
-        ])
+    async fn analyze_actor_relationships(
+        &self,
+        time_range: &DateRange,
+    ) -> Result<Vec<ActorRelationship>> {
+        Ok(vec![ActorRelationship {
+            relationship_id: Uuid::new_v4().to_string(),
+            actor1: "APT-001".to_string(),
+            actor2: "CRIME-001".to_string(),
+            relationship_type: RelationshipType::Collaboration,
+            strength: 0.7,
+            evidence: vec![
+                "Shared infrastructure".to_string(),
+                "Similar techniques".to_string(),
+            ],
+            first_observed: Utc::now() - Duration::days(60),
+            last_observed: Utc::now() - Duration::days(5),
+        }])
     }
 
     /// Identify collaboration patterns
-    async fn identify_collaboration_patterns(&self, relationships: &[ActorRelationship]) -> Result<Vec<CollaborationPattern>> {
-        Ok(vec![
-            CollaborationPattern {
-                pattern_id: Uuid::new_v4().to_string(),
-                pattern_type: "Infrastructure Sharing".to_string(),
-                frequency: 0.25,
-                involved_actors: vec!["APT-001".to_string(), "CRIME-001".to_string()],
-                benefits: vec!["Cost reduction".to_string(), "Resource sharing".to_string()],
-                risks: vec!["Increased exposure".to_string()],
-            },
-        ])
+    async fn identify_collaboration_patterns(
+        &self,
+        relationships: &[ActorRelationship],
+    ) -> Result<Vec<CollaborationPattern>> {
+        Ok(vec![CollaborationPattern {
+            pattern_id: Uuid::new_v4().to_string(),
+            pattern_type: "Infrastructure Sharing".to_string(),
+            frequency: 0.25,
+            involved_actors: vec!["APT-001".to_string(), "CRIME-001".to_string()],
+            benefits: vec!["Cost reduction".to_string(), "Resource sharing".to_string()],
+            risks: vec!["Increased exposure".to_string()],
+        }])
     }
 
     /// Assess ecosystem evolution
-    async fn assess_ecosystem_evolution(&self, time_range: &DateRange) -> Result<EcosystemEvolution> {
+    async fn assess_ecosystem_evolution(
+        &self,
+        time_range: &DateRange,
+    ) -> Result<EcosystemEvolution> {
         Ok(EcosystemEvolution {
             evolution_rate: 0.2,
             key_changes: vec![
@@ -1096,30 +1320,38 @@ impl ThreatLandscapeModule {
     }
 
     /// Generate ecosystem insights
-    async fn generate_ecosystem_insights(&self, relationships: &[ActorRelationship], patterns: &[CollaborationPattern]) -> Result<Vec<EcosystemInsight>> {
-        Ok(vec![
-            EcosystemInsight {
-                insight_id: Uuid::new_v4().to_string(),
-                insight_type: InsightType::CollaborationTrend,
-                title: "Increasing Threat Actor Collaboration".to_string(),
-                description: "Threat actors are increasingly collaborating, sharing tools and infrastructure".to_string(),
-                confidence: 0.8,
-                implications: vec![
-                    "More sophisticated attacks".to_string(),
-                    "Harder attribution".to_string(),
-                    "Increased resilience".to_string(),
-                ],
-                evidence: vec![
-                    format!("{} relationships identified", relationships.len()),
-                    format!("{} collaboration patterns", patterns.len()),
-                ],
-                generated_at: Utc::now(),
-            },
-        ])
+    async fn generate_ecosystem_insights(
+        &self,
+        relationships: &[ActorRelationship],
+        patterns: &[CollaborationPattern],
+    ) -> Result<Vec<EcosystemInsight>> {
+        Ok(vec![EcosystemInsight {
+            insight_id: Uuid::new_v4().to_string(),
+            insight_type: InsightType::CollaborationTrend,
+            title: "Increasing Threat Actor Collaboration".to_string(),
+            description:
+                "Threat actors are increasingly collaborating, sharing tools and infrastructure"
+                    .to_string(),
+            confidence: 0.8,
+            implications: vec![
+                "More sophisticated attacks".to_string(),
+                "Harder attribution".to_string(),
+                "Increased resilience".to_string(),
+            ],
+            evidence: vec![
+                format!("{} relationships identified", relationships.len()),
+                format!("{} collaboration patterns", patterns.len()),
+            ],
+            generated_at: Utc::now(),
+        }])
     }
 
     /// Identify risk factors
-    async fn identify_risk_factors(&self, _landscape_score: &LandscapeScore, _insights: &[StrategicInsight]) -> Result<Vec<RiskFactor>> {
+    async fn identify_risk_factors(
+        &self,
+        _landscape_score: &LandscapeScore,
+        _insights: &[StrategicInsight],
+    ) -> Result<Vec<RiskFactor>> {
         Ok(vec![
             RiskFactor {
                 factor_id: Uuid::new_v4().to_string(),
@@ -1143,7 +1375,10 @@ impl ThreatLandscapeModule {
     }
 
     /// Calculate mitigation priorities
-    async fn calculate_mitigation_priorities(&self, _risk_factors: &[RiskFactor]) -> Result<Vec<MitigationPriority>> {
+    async fn calculate_mitigation_priorities(
+        &self,
+        _risk_factors: &[RiskFactor],
+    ) -> Result<Vec<MitigationPriority>> {
         Ok(vec![
             MitigationPriority {
                 priority_id: Uuid::new_v4().to_string(),
@@ -1184,7 +1419,9 @@ impl ThreatLandscapeModule {
 
     /// Send landscape event
     async fn send_landscape_event(&self, event: LandscapeEvent) -> Result<()> {
-        self.landscape_sender.send(event).await
+        self.landscape_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send landscape event: {}", e))
     }
 
@@ -1994,28 +2231,28 @@ impl ThreatIntelligenceAggregator {
         }
     }
 
-    async fn aggregate_intelligence(&self, time_range: &DateRange, _scope: &LandscapeScope) -> Result<ThreatIntelligence> {
+    async fn aggregate_intelligence(
+        &self,
+        time_range: &DateRange,
+        _scope: &LandscapeScope,
+    ) -> Result<ThreatIntelligence> {
         Ok(ThreatIntelligence {
             sources: self.intelligence_sources.clone(),
-            indicators: vec![
-                ThreatIndicator {
-                    indicator_id: Uuid::new_v4().to_string(),
-                    indicator_type: "IP Address".to_string(),
-                    value: "192.168.1.100".to_string(),
-                    confidence: 0.8,
-                    first_seen: Utc::now() - Duration::days(30),
-                    last_seen: Utc::now(),
-                },
-            ],
-            reports: vec![
-                ThreatReport {
-                    report_id: Uuid::new_v4().to_string(),
-                    title: "Q4 Threat Landscape Review".to_string(),
-                    source: "Mandiant".to_string(),
-                    published_at: Utc::now() - Duration::days(15),
-                    severity: ThreatSeverity::High,
-                },
-            ],
+            indicators: vec![ThreatIndicator {
+                indicator_id: Uuid::new_v4().to_string(),
+                indicator_type: "IP Address".to_string(),
+                value: "192.168.1.100".to_string(),
+                confidence: 0.8,
+                first_seen: Utc::now() - Duration::days(30),
+                last_seen: Utc::now(),
+            }],
+            reports: vec![ThreatReport {
+                report_id: Uuid::new_v4().to_string(),
+                title: "Q4 Threat Landscape Review".to_string(),
+                source: "Mandiant".to_string(),
+                published_at: Utc::now() - Duration::days(15),
+                severity: ThreatSeverity::High,
+            }],
             last_updated: Utc::now(),
             quality_score: 0.85,
         })
@@ -2035,7 +2272,11 @@ impl PredictiveThreatAnalyzer {
         }
     }
 
-    async fn predict_threat_evolution(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<ThreatEvolution> {
+    async fn predict_threat_evolution(
+        &self,
+        _current_analysis: &ThreatLandscapeAnalysis,
+        _horizon: Duration,
+    ) -> Result<ThreatEvolution> {
         Ok(ThreatEvolution {
             evolution_id: Uuid::new_v4().to_string(),
             predicted_changes: vec![
@@ -2066,7 +2307,11 @@ impl PredictiveThreatAnalyzer {
         })
     }
 
-    async fn predict_emerging_risks(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<Vec<EmergingRisk>> {
+    async fn predict_emerging_risks(
+        &self,
+        _current_analysis: &ThreatLandscapeAnalysis,
+        _horizon: Duration,
+    ) -> Result<Vec<EmergingRisk>> {
         Ok(vec![
             EmergingRisk {
                 risk_id: Uuid::new_v4().to_string(),
@@ -2087,7 +2332,11 @@ impl PredictiveThreatAnalyzer {
         ])
     }
 
-    async fn project_attack_trends(&self, _current_analysis: &ThreatLandscapeAnalysis, _horizon: Duration) -> Result<Vec<AttackTrendProjection>> {
+    async fn project_attack_trends(
+        &self,
+        _current_analysis: &ThreatLandscapeAnalysis,
+        _horizon: Duration,
+    ) -> Result<Vec<AttackTrendProjection>> {
         Ok(vec![
             AttackTrendProjection {
                 attack_type: "Ransomware".to_string(),

@@ -2,66 +2,66 @@
 // Threat Actor intelligence library with modular architecture
 // Following phantom-cve-core pattern
 
-mod models;
 mod config;
-mod storage;
 mod core;
+mod models;
+mod storage;
 
 // Existing business modules (already modularized)
 pub mod advanced_attribution;
-pub mod campaign_lifecycle;
-pub mod reputation_system;
 pub mod behavioral_patterns;
-pub mod ttp_evolution;
-pub mod infrastructure_analysis;
-pub mod risk_assessment;
-pub mod impact_assessment;
-pub mod threat_landscape;
-pub mod industry_targeting;
-pub mod geographic_analysis;
-pub mod supply_chain_risk;
-pub mod executive_dashboard;
+pub mod campaign_lifecycle;
 pub mod compliance_reporting;
+pub mod executive_dashboard;
+pub mod geographic_analysis;
+pub mod impact_assessment;
 pub mod incident_response;
-pub mod threat_hunting;
+pub mod industry_targeting;
+pub mod infrastructure_analysis;
 pub mod intelligence_sharing;
 pub mod realtime_alerts;
+pub mod reputation_system;
+pub mod risk_assessment;
+pub mod supply_chain_risk;
+pub mod threat_hunting;
+pub mod threat_landscape;
+pub mod ttp_evolution;
 
 // OCSF (Open Cybersecurity Schema Framework) modules
 pub mod ocsf;
 pub mod ocsf_categories;
+pub mod ocsf_enrichment;
 pub mod ocsf_event_classes;
+pub mod ocsf_integration;
+pub mod ocsf_normalization;
 pub mod ocsf_objects;
 pub mod ocsf_observables;
-pub mod ocsf_normalization;
-pub mod ocsf_integration;
-pub mod ocsf_enrichment;
 pub mod ocsf_validation;
 
 // Web API and Database modules (optional features)
-#[cfg(feature = "web-api")]
-pub mod web_api;
 #[cfg(feature = "diesel-orm")]
 pub mod database;
+#[cfg(feature = "web-api")]
+pub mod web_api;
 
 // Integration tests module
 #[cfg(test)]
 mod integration_tests;
 // Removed lib_old_backup module reference
 
+use chrono::Utc;
 #[cfg(feature = "napi")]
 use napi::bindgen_prelude::*;
 #[cfg(feature = "napi")]
 use napi_derive::napi;
 use std::collections::HashMap;
-use chrono::Utc;
 use uuid::Uuid;
 
 // Re-export public types and components from new modular structure
-pub use models::*;
 pub use config::ThreatActorCoreConfig;
-pub use storage::{ThreatActorStorage, StorageFactory};
 pub use core::ThreatActorCore;
+pub use models::*;
+pub use storage::{StorageFactory, ThreatActorStorage};
 
 // Helper function to convert anyhow errors to napi errors
 #[cfg(feature = "napi")]
@@ -121,7 +121,7 @@ impl ThreatActorCoreNapi {
             "confidence": 0.85,
             "indicators": indicators.len()
         });
-        
+
         serde_json::to_string(&actor)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize actor: {}", e)))
     }
@@ -131,11 +131,11 @@ impl ThreatActorCoreNapi {
     pub async fn store_threat_actor(&self, actor_json: String) -> Result<()> {
         let actor: ThreatActor = serde_json::from_str(&actor_json)
             .map_err(|e| napi::Error::from_reason(format!("Failed to parse threat actor: {}", e)))?;
-        
+
         let core = self.inner.lock().await;
         core.store_threat_actor(&actor).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to store threat actor: {}", e)))?;
-        
+
         Ok(())
     }
 
@@ -145,7 +145,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let actor = core.get_threat_actor(&id).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to get threat actor: {}", e)))?;
-        
+
         match actor {
             Some(actor) => {
                 let json = serde_json::to_string(&actor)
@@ -161,11 +161,11 @@ impl ThreatActorCoreNapi {
     pub async fn search_threat_actors(&self, criteria_json: String) -> Result<String> {
         let criteria: ThreatActorSearchCriteria = serde_json::from_str(&criteria_json)
             .map_err(|e| napi::Error::from_reason(format!("Failed to parse search criteria: {}", e)))?;
-        
+
         let core = self.inner.lock().await;
         let actors = core.search_threat_actors(&criteria).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to search threat actors: {}", e)))?;
-        
+
         serde_json::to_string(&actors)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize actors: {}", e)))
     }
@@ -176,7 +176,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let analysis = core.perform_attribution(&indicators).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to perform attribution: {}", e)))?;
-        
+
         serde_json::to_string(&analysis)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize analysis: {}", e)))
     }
@@ -187,7 +187,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let campaign = core.track_campaign(&campaign_indicators).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to track campaign: {}", e)))?;
-        
+
         serde_json::to_string(&campaign)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize campaign: {}", e)))
     }
@@ -198,7 +198,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let analysis = core.analyze_behavior(&actor_id, &activities).await
             .map_err(|e| napi::Error::from_reason(format!("Failed to analyze behavior: {}", e)))?;
-        
+
         serde_json::to_string(&analysis)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize analysis: {}", e)))
     }
@@ -209,7 +209,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let health = core.get_health_status().await
             .map_err(|e| napi::Error::from_reason(format!("Failed to get health status: {}", e)))?;
-        
+
         serde_json::to_string(&health)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize health status: {}", e)))
     }
@@ -220,7 +220,7 @@ impl ThreatActorCoreNapi {
         let core = self.inner.lock().await;
         let stats = core.get_storage_statistics().await
             .map_err(|e| napi::Error::from_reason(format!("Failed to get storage statistics: {}", e)))?;
-        
+
         serde_json::to_string(&stats)
             .map_err(|e| napi::Error::from_reason(format!("Failed to serialize statistics: {}", e)))
     }
@@ -236,13 +236,13 @@ impl ThreatActorCoreNapi {
             "modules_count": 27,
             "capabilities": [
                 "Advanced Attribution Analysis",
-                "Campaign Lifecycle Tracking", 
+                "Campaign Lifecycle Tracking",
                 "Dynamic Reputation System",
                 "Behavioral Pattern Analysis",
                 "TTP Evolution Tracking",
                 "Infrastructure Analysis",
                 "Risk Assessment",
-                "Impact Assessment", 
+                "Impact Assessment",
                 "Threat Landscape Mapping",
                 "Industry Targeting Analysis",
                 "Geographic Analysis",
@@ -299,7 +299,7 @@ impl ThreatActorCoreNapi {
         status.insert("ocsf_integration".to_string(), "Active".to_string());
         status.insert("ocsf_enrichment".to_string(), "Active".to_string());
         status.insert("ocsf_validation".to_string(), "Active".to_string());
-        
+
         Ok(serde_json::to_string(&status).unwrap_or_else(|_| "{}".to_string()))
     }
 
@@ -342,11 +342,11 @@ impl ThreatActorCoreNapi {
         // Create a minimal async runtime for constructor
         let rt = tokio::runtime::Runtime::new()
             .map_err(|e| napi::Error::from_reason(format!("Failed to create runtime: {}", e)))?;
-        
-        let inner = rt.block_on(async {
-            ThreatActorCore::with_default_config().await
-        }).map_err(|e| napi::Error::from_reason(format!("Failed to create core: {}", e)))?;
-        
+
+        let inner = rt
+            .block_on(async { ThreatActorCore::with_default_config().await })
+            .map_err(|e| napi::Error::from_reason(format!("Failed to create core: {}", e)))?;
+
         Ok(Self {
             inner: tokio::sync::Mutex::new(inner),
         })
@@ -398,192 +398,198 @@ pub fn get_all_engines_status() -> Result<String> {
             "standardized_event_generation": true,
             "initialized_at": chrono::Utc::now().to_rfc3339()
         }
-    }).to_string())
+    })
+    .to_string())
 }
 
 /// Analyze threat infrastructure
 #[napi]
 pub fn analyze_infrastructure(infrastructure_data: String) -> napi::Result<String> {
     let analysis = serde_json::json!({
-            "analysis_id": Uuid::new_v4().to_string(),
-            "infrastructure_type": "c2_server",
-            "indicators": ["ip_addresses", "domains", "certificates"],
-            "attribution_score": 0.82,
-            "related_campaigns": ["campaign_001", "campaign_002"],
-            "hosting_providers": ["provider_a", "provider_b"],
-            "geographic_distribution": {
-                "primary_region": "Eastern Europe",
-                "secondary_regions": ["Southeast Asia", "North America"]
-            },
-            "analysis_timestamp": Utc::now().to_rfc3339()
-        });
+        "analysis_id": Uuid::new_v4().to_string(),
+        "infrastructure_type": "c2_server",
+        "indicators": ["ip_addresses", "domains", "certificates"],
+        "attribution_score": 0.82,
+        "related_campaigns": ["campaign_001", "campaign_002"],
+        "hosting_providers": ["provider_a", "provider_b"],
+        "geographic_distribution": {
+            "primary_region": "Eastern Europe",
+            "secondary_regions": ["Southeast Asia", "North America"]
+        },
+        "analysis_timestamp": Utc::now().to_rfc3339()
+    });
 
-    serde_json::to_string(&analysis)
-        .map_err(|e| napi::Error::from_reason(format!("Failed to serialize infrastructure analysis: {}", e)))
+    serde_json::to_string(&analysis).map_err(|e| {
+        napi::Error::from_reason(format!(
+            "Failed to serialize infrastructure analysis: {}",
+            e
+        ))
+    })
 }
 
 /// Generate executive threat report
 #[napi]
 pub fn generate_executive_report(time_period: String) -> napi::Result<String> {
     let report = serde_json::json!({
-            "report_id": Uuid::new_v4().to_string(),
-            "time_period": time_period,
-            "executive_summary": {
-                "total_threat_actors": 247,
-                "active_campaigns": 34,
-                "critical_threats": 12,
-                "attribution_confidence_avg": 0.78
-            },
-            "key_findings": [
-                "Increased APT activity targeting financial institutions",
-                "New ransomware group emerged with advanced techniques",
-                "Supply chain attacks trending upward"
-            ],
-            "risk_assessment": {
-                "overall_risk": "high",
-                "industry_risk": "critical",
-                "geographic_risk": "medium"
-            },
-            "recommendations": [
-                "Enhance monitoring of financial sector infrastructure",
-                "Implement additional supply chain security measures",
-                "Update threat hunting rules for new APT TTPs"
-            ],
-            "generated_date": Utc::now().to_rfc3339()
-        });
+        "report_id": Uuid::new_v4().to_string(),
+        "time_period": time_period,
+        "executive_summary": {
+            "total_threat_actors": 247,
+            "active_campaigns": 34,
+            "critical_threats": 12,
+            "attribution_confidence_avg": 0.78
+        },
+        "key_findings": [
+            "Increased APT activity targeting financial institutions",
+            "New ransomware group emerged with advanced techniques",
+            "Supply chain attacks trending upward"
+        ],
+        "risk_assessment": {
+            "overall_risk": "high",
+            "industry_risk": "critical",
+            "geographic_risk": "medium"
+        },
+        "recommendations": [
+            "Enhance monitoring of financial sector infrastructure",
+            "Implement additional supply chain security measures",
+            "Update threat hunting rules for new APT TTPs"
+        ],
+        "generated_date": Utc::now().to_rfc3339()
+    });
 
-        serde_json::to_string(&report)
-            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize executive report: {}", e)))
-    }
+    serde_json::to_string(&report).map_err(|e| {
+        napi::Error::from_reason(format!("Failed to serialize executive report: {}", e))
+    })
+}
 
 /// Perform TTP evolution analysis
 #[napi]
 pub fn analyze_ttp_evolution(actor_id: String, timeframe: String) -> napi::Result<String> {
-        let evolution = serde_json::json!({
-            "analysis_id": Uuid::new_v4().to_string(),
-            "actor_id": actor_id,
-            "timeframe": timeframe,
-            "ttp_changes": [
-                {
-                    "technique": "T1059.001",
-                    "change_type": "new_variant",
-                    "confidence": 0.85,
-                    "first_observed": "2024-01-15"
-                },
-                {
-                    "technique": "T1566.002",
-                    "change_type": "frequency_increase",
-                    "confidence": 0.92,
-                    "trend": "upward"
-                }
-            ],
-            "sophistication_trend": "increasing",
-            "tool_evolution": [
-                "custom_malware_v2",
-                "new_c2_framework",
-                "enhanced_evasion_techniques"
-            ],
-            "predictions": [
-                "Likely to adopt AI-enhanced techniques",
-                "Expected expansion to cloud infrastructure",
-                "Probable supply chain targeting increase"
-            ],
-            "analysis_timestamp": Utc::now().to_rfc3339()
-        });
+    let evolution = serde_json::json!({
+        "analysis_id": Uuid::new_v4().to_string(),
+        "actor_id": actor_id,
+        "timeframe": timeframe,
+        "ttp_changes": [
+            {
+                "technique": "T1059.001",
+                "change_type": "new_variant",
+                "confidence": 0.85,
+                "first_observed": "2024-01-15"
+            },
+            {
+                "technique": "T1566.002",
+                "change_type": "frequency_increase",
+                "confidence": 0.92,
+                "trend": "upward"
+            }
+        ],
+        "sophistication_trend": "increasing",
+        "tool_evolution": [
+            "custom_malware_v2",
+            "new_c2_framework",
+            "enhanced_evasion_techniques"
+        ],
+        "predictions": [
+            "Likely to adopt AI-enhanced techniques",
+            "Expected expansion to cloud infrastructure",
+            "Probable supply chain targeting increase"
+        ],
+        "analysis_timestamp": Utc::now().to_rfc3339()
+    });
 
-        serde_json::to_string(&evolution)
-            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize TTP evolution: {}", e)))
-    }
+    serde_json::to_string(&evolution)
+        .map_err(|e| napi::Error::from_reason(format!("Failed to serialize TTP evolution: {}", e)))
+}
 
 /// Generate OCSF-compliant threat event
 #[napi]
 pub fn generate_ocsf_event(event_type: String, threat_data: String) -> napi::Result<String> {
-        let ocsf_event = serde_json::json!({
-            "metadata": {
-                "version": "1.0.0",
-                "product": {
-                    "name": "Phantom Threat Actor Core",
-                    "version": "1.0.1",
-                    "vendor_name": "Phantom Spire"
-                },
-                "event_code": "threat_actor_detection",
-                "profiles": ["security_control"]
+    let ocsf_event = serde_json::json!({
+        "metadata": {
+            "version": "1.0.0",
+            "product": {
+                "name": "Phantom Threat Actor Core",
+                "version": "1.0.1",
+                "vendor_name": "Phantom Spire"
             },
-            "time": Utc::now().timestamp_millis(),
-            "category_uid": 3,
-            "class_uid": 3001,
-            "activity_id": 1,
-            "type_uid": 300101,
-            "severity_id": 3,
-            "message": format!("Threat actor activity detected: {}", event_type),
-            "threat": {
-                "actor": {
-                    "name": "APT-Unknown",
-                    "type": "nation_state",
-                    "sophistication": "advanced"
-                },
-                "campaign": {
-                    "name": "Operation-Alpha",
-                    "start_time": Utc::now().timestamp_millis()
-                }
+            "event_code": "threat_actor_detection",
+            "profiles": ["security_control"]
+        },
+        "time": Utc::now().timestamp_millis(),
+        "category_uid": 3,
+        "class_uid": 3001,
+        "activity_id": 1,
+        "type_uid": 300101,
+        "severity_id": 3,
+        "message": format!("Threat actor activity detected: {}", event_type),
+        "threat": {
+            "actor": {
+                "name": "APT-Unknown",
+                "type": "nation_state",
+                "sophistication": "advanced"
             },
-            "observables": [
-                {
-                    "name": "suspicious_ip",
-                    "type_id": 2,
-                    "value": "192.168.1.100"
-                }
-            ]
-        });
+            "campaign": {
+                "name": "Operation-Alpha",
+                "start_time": Utc::now().timestamp_millis()
+            }
+        },
+        "observables": [
+            {
+                "name": "suspicious_ip",
+                "type_id": 2,
+                "value": "192.168.1.100"
+            }
+        ]
+    });
 
-        serde_json::to_string(&ocsf_event)
-            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize OCSF event: {}", e)))
-    }
+    serde_json::to_string(&ocsf_event)
+        .map_err(|e| napi::Error::from_reason(format!("Failed to serialize OCSF event: {}", e)))
+}
 
 /// Get real-time threat intelligence feed
 #[napi]
 pub fn get_threat_intelligence_feed(feed_type: String) -> napi::Result<String> {
-        let feed = serde_json::json!({
-            "feed_id": Uuid::new_v4().to_string(),
-            "feed_type": feed_type,
-            "timestamp": Utc::now().to_rfc3339(),
-            "indicators": [
-                {
-                    "type": "ip",
-                    "value": "203.0.113.42",
-                    "confidence": 0.89,
-                    "threat_type": "c2_server",
-                    "attribution": "APT-29"
-                },
-                {
-                    "type": "domain",
-                    "value": "malicious-domain.com",
-                    "confidence": 0.95,
-                    "threat_type": "phishing",
-                    "attribution": "FIN7"
-                }
-            ],
-            "threat_actors": [
-                {
-                    "name": "APT-29",
-                    "activity_level": "high",
-                    "target_sectors": ["government", "defense"],
-                    "last_activity": "2024-01-20"
-                }
-            ],
-            "campaigns": [
-                {
-                    "name": "Operation-Midnight",
-                    "status": "active",
-                    "threat_actor": "APT-29",
-                    "targets": ["nato_countries"]
-                }
-            ]
-        });
+    let feed = serde_json::json!({
+        "feed_id": Uuid::new_v4().to_string(),
+        "feed_type": feed_type,
+        "timestamp": Utc::now().to_rfc3339(),
+        "indicators": [
+            {
+                "type": "ip",
+                "value": "203.0.113.42",
+                "confidence": 0.89,
+                "threat_type": "c2_server",
+                "attribution": "APT-29"
+            },
+            {
+                "type": "domain",
+                "value": "malicious-domain.com",
+                "confidence": 0.95,
+                "threat_type": "phishing",
+                "attribution": "FIN7"
+            }
+        ],
+        "threat_actors": [
+            {
+                "name": "APT-29",
+                "activity_level": "high",
+                "target_sectors": ["government", "defense"],
+                "last_activity": "2024-01-20"
+            }
+        ],
+        "campaigns": [
+            {
+                "name": "Operation-Midnight",
+                "status": "active",
+                "threat_actor": "APT-29",
+                "targets": ["nato_countries"]
+            }
+        ]
+    });
 
-        serde_json::to_string(&feed)
-            .map_err(|e| napi::Error::from_reason(format!("Failed to serialize threat feed: {}", e)))
-    }
+    serde_json::to_string(&feed)
+        .map_err(|e| napi::Error::from_reason(format!("Failed to serialize threat feed: {}", e)))
+}
 
 /// Simple hello function for testing
 #[napi]

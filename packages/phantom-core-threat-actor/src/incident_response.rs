@@ -3,14 +3,14 @@
 //! Comprehensive incident response coordination system with automated workflows,
 //! stakeholder communication, evidence collection, and remediation tracking.
 
-use std::cmp::PartialEq;
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::collections::HashMap;
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Incident response coordina/// Incident severity levels
 #[derive(Debug, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
@@ -142,20 +142,32 @@ impl IncidentResponseModule {
             sla_breach_time: None,
         };
 
-        self.active_incidents.insert(incident_id.clone(), incident.clone());
+        self.active_incidents
+            .insert(incident_id.clone(), incident.clone());
 
         // Notify stakeholders
-        self.communication_engine.notify_incident_creation(&incident).await?;
+        self.communication_engine
+            .notify_incident_creation(&incident)
+            .await?;
 
         // Start evidence collection
-        self.evidence_collector.start_collection(&incident_id).await?;
+        self.evidence_collector
+            .start_collection(&incident_id)
+            .await?;
 
         Ok(incident_id)
     }
 
     /// Update incident status
-    pub async fn update_incident_status(&mut self, incident_id: &str, status: IncidentStatus, updated_by: &str) -> Result<()> {
-        let incident = self.active_incidents.get_mut(incident_id)
+    pub async fn update_incident_status(
+        &mut self,
+        incident_id: &str,
+        status: IncidentStatus,
+        updated_by: &str,
+    ) -> Result<()> {
+        let incident = self
+            .active_incidents
+            .get_mut(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
 
         let old_status = incident.status.clone();
@@ -171,7 +183,9 @@ impl IncidentResponseModule {
         });
 
         // Notify stakeholders of status change
-        self.communication_engine.notify_status_change(incident, &old_status).await?;
+        self.communication_engine
+            .notify_status_change(incident, &old_status)
+            .await?;
 
         // Check for escalation
         self.escalation_matrix.check_escalation(incident).await?;
@@ -180,8 +194,15 @@ impl IncidentResponseModule {
     }
 
     /// Assign incident to responder
-    pub async fn assign_incident(&mut self, incident_id: &str, assigned_to: &str, assigned_by: &str) -> Result<()> {
-        let incident = self.active_incidents.get_mut(incident_id)
+    pub async fn assign_incident(
+        &mut self,
+        incident_id: &str,
+        assigned_to: &str,
+        assigned_by: &str,
+    ) -> Result<()> {
+        let incident = self
+            .active_incidents
+            .get_mut(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
 
         incident.assigned_to = Some(assigned_to.to_string());
@@ -196,14 +217,18 @@ impl IncidentResponseModule {
         });
 
         // Notify assignee
-        self.communication_engine.notify_assignment(incident, assigned_to).await?;
+        self.communication_engine
+            .notify_assignment(incident, assigned_to)
+            .await?;
 
         Ok(())
     }
 
     /// Add evidence to incident
     pub async fn add_evidence(&mut self, incident_id: &str, evidence: Evidence) -> Result<()> {
-        let incident = self.active_incidents.get_mut(incident_id)
+        let incident = self
+            .active_incidents
+            .get_mut(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
 
         incident.evidence.push(evidence.clone());
@@ -224,8 +249,14 @@ impl IncidentResponseModule {
     }
 
     /// Execute remediation action
-    pub async fn execute_remediation(&mut self, incident_id: &str, action: RemediationAction) -> Result<()> {
-        let incident = self.active_incidents.get_mut(incident_id)
+    pub async fn execute_remediation(
+        &mut self,
+        incident_id: &str,
+        action: RemediationAction,
+    ) -> Result<()> {
+        let incident = self
+            .active_incidents
+            .get_mut(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
 
         // Execute the remediation action
@@ -248,8 +279,14 @@ impl IncidentResponseModule {
         });
 
         // Update incident status if remediation is complete
-        if result == RemediationResult::Success && incident.status == IncidentStatus::Investigating {
-            self.update_incident_status(incident_id, IncidentStatus::Remediated, &action.executed_by).await?;
+        if result == RemediationResult::Success && incident.status == IncidentStatus::Investigating
+        {
+            self.update_incident_status(
+                incident_id,
+                IncidentStatus::Remediated,
+                &action.executed_by,
+            )
+            .await?;
         }
 
         Ok(())
@@ -274,28 +311,38 @@ impl IncidentResponseModule {
             usage_count: 0,
         };
 
-        self.response_playbooks.insert(playbook_id.clone(), playbook);
+        self.response_playbooks
+            .insert(playbook_id.clone(), playbook);
 
         Ok(playbook_id)
     }
 
     /// Apply playbook to incident
-    pub async fn apply_playbook(&mut self, incident_id: &str, playbook_id: &str, applied_by: &str) -> Result<()> {
+    pub async fn apply_playbook(
+        &mut self,
+        incident_id: &str,
+        playbook_id: &str,
+        applied_by: &str,
+    ) -> Result<()> {
         // Check incident exists first
         if !self.active_incidents.contains_key(incident_id) {
             return Err(anyhow::anyhow!("Incident not found: {}", incident_id));
         }
 
         let actions_to_execute: Vec<_> = {
-            let playbook = self.response_playbooks.get_mut(playbook_id)
+            let playbook = self
+                .response_playbooks
+                .get_mut(playbook_id)
                 .ok_or_else(|| anyhow::anyhow!("Playbook not found: {}", playbook_id))?;
-            
+
             // Update playbook usage
             playbook.last_used = Some(Utc::now());
             playbook.usage_count += 1;
 
             // Apply automated actions
-            playbook.automated_actions.iter()
+            playbook
+                .automated_actions
+                .iter()
                 .filter(|action| !action.requires_approval)
                 .cloned()
                 .collect()
@@ -312,11 +359,14 @@ impl IncidentResponseModule {
                 requires_approval: action.requires_approval,
             };
 
-            self.execute_remediation(incident_id, remediation_action).await?;
+            self.execute_remediation(incident_id, remediation_action)
+                .await?;
         }
 
         // Add timeline entry
-        let incident = self.active_incidents.get_mut(incident_id)
+        let incident = self
+            .active_incidents
+            .get_mut(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
         incident.timeline.push(IncidentTimelineEntry {
             timestamp: Utc::now(),
@@ -330,7 +380,9 @@ impl IncidentResponseModule {
 
     /// Get incident summary
     pub fn get_incident_summary(&self, incident_id: &str) -> Result<IncidentSummary> {
-        let incident = self.active_incidents.get(incident_id)
+        let incident = self
+            .active_incidents
+            .get(incident_id)
             .ok_or_else(|| anyhow::anyhow!("Incident not found: {}", incident_id))?;
 
         let summary = IncidentSummary {
@@ -397,8 +449,16 @@ impl IncidentResponseModule {
 
     /// Get active incidents
     pub fn get_active_incidents(&self) -> Vec<&Incident> {
-        self.active_incidents.values()
-            .filter(|incident| matches!(incident.status, IncidentStatus::New | IncidentStatus::Investigating | IncidentStatus::Remediating))
+        self.active_incidents
+            .values()
+            .filter(|incident| {
+                matches!(
+                    incident.status,
+                    IncidentStatus::New
+                        | IncidentStatus::Investigating
+                        | IncidentStatus::Remediating
+                )
+            })
             .collect()
     }
 
@@ -444,7 +504,9 @@ impl IncidentResponseModule {
         let mut type_counts = HashMap::new();
 
         for incident in self.active_incidents.values() {
-            *type_counts.entry(incident.incident_type.clone()).or_insert(0) += 1;
+            *type_counts
+                .entry(incident.incident_type.clone())
+                .or_insert(0) += 1;
         }
 
         type_counts
@@ -452,7 +514,9 @@ impl IncidentResponseModule {
 
     /// Send incident event
     pub async fn send_incident_event(&self, event: IncidentEvent) -> Result<()> {
-        self.incident_sender.send(event).await
+        self.incident_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send incident event: {}", e))
     }
 
@@ -506,7 +570,6 @@ pub struct Incident {
     pub updated_at: DateTime<Utc>,
     pub id: String,
 }
-
 
 /// Incident status
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -748,19 +811,32 @@ impl CommunicationEngine {
     }
 
     async fn notify_incident_creation(&self, incident: &Incident) -> Result<()> {
-        println!("Notifying stakeholders of incident creation: {}", incident.incident_id);
+        println!(
+            "Notifying stakeholders of incident creation: {}",
+            incident.incident_id
+        );
         // In a real implementation, this would send notifications
         Ok(())
     }
 
-    async fn notify_status_change(&self, incident: &Incident, _old_status: &IncidentStatus) -> Result<()> {
-        println!("Notifying stakeholders of status change for incident: {}", incident.incident_id);
+    async fn notify_status_change(
+        &self,
+        incident: &Incident,
+        _old_status: &IncidentStatus,
+    ) -> Result<()> {
+        println!(
+            "Notifying stakeholders of status change for incident: {}",
+            incident.incident_id
+        );
         // In a real implementation, this would send notifications
         Ok(())
     }
 
     async fn notify_assignment(&self, incident: &Incident, assigned_to: &str) -> Result<()> {
-        println!("Notifying {} of incident assignment: {}", assigned_to, incident.incident_id);
+        println!(
+            "Notifying {} of incident assignment: {}",
+            assigned_to, incident.incident_id
+        );
         // In a real implementation, this would send notifications
         Ok(())
     }

@@ -17,6 +17,31 @@ permissions:
   id-token: write
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      rust: ${{ steps.changes.outputs.rust }}
+      workflow: ${{ steps.changes.outputs.workflow }}
+      all: ${{ steps.changes.outputs.all }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            rust:
+              - 'src/**'
+              - 'examples/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'build.rs'
+              - '*.rs'
+            workflow:
+              - '.github/workflows/**'
+            all:
+              - '**'
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -52,31 +77,28 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-features --all-targets -- -D warnings
 
-  build:
+  build-core:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' || needs.changes.outputs.workflow == 'true' || github.event_name == 'push' }}
     strategy:
       fail-fast: false
       matrix:
         settings:
-          - host: macos-latest
-            target: x86_64-apple-darwin
-            build: npm run build --target x86_64-apple-darwin
+          # Core platforms - always build when needed
           - host: windows-latest
-            build: npm run build --target x86_64-pc-windows-msvc
+            build: npx @napi-rs/cli build --target x86_64-pc-windows-msvc --release --features napi
             target: x86_64-pc-windows-msvc
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
             build: |-
               set -e &&
-              npm run build --target x86_64-unknown-linux-gnu &&
+              npx @napi-rs/cli build --target x86_64-unknown-linux-gnu --release --features napi &&
               strip *.node
           - host: macos-latest
-            target: aarch64-apple-darwin
-            build: npm run build --target aarch64-apple-darwin
-          - host: windows-latest
-            target: aarch64-pc-windows-msvc
-            build: npm run build --target aarch64-pc-windows-msvc
-    name: stable - ${{ matrix.settings.target }} - node@18
+            target: x86_64-apple-darwin
+            build: npx @napi-rs/cli build --target x86_64-apple-darwin --release --features napi
+    name: Build Core - ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v4
@@ -103,39 +125,92 @@ jobs:
             .cargo-cache
             target/
           key: ${{ matrix.settings.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - uses: goto-bus-stop/setup-zig@v2
-        if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' }}
-        with:
-          version: 0.10.1
       - name: Setup toolchain
         run: ${{ matrix.settings.setup }}
         if: ${{ matrix.settings.setup }}
         shell: bash
-      - name: Setup node x86
-        if: matrix.settings.target == 'i686-pc-windows-msvc'
-        run: npm config set target_arch ia32
-        shell: bash
       - name: Install dependencies
-        run: npm cache clean --force
+        run: |
+          npm cache clean --force
           npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
           npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
-      - name: Setup node x86
-        uses: actions/setup-node@v4
-        if: matrix.settings.target == 'i686-pc-windows-msvc'
-        with:
-          node-version: 20
-          check-latest: true
-          cache: npm
-          architecture: x86
       - name: Build in docker
         uses: addnab/docker-run-action@v3
         if: ${{ matrix.settings.docker }}
         with:
           image: ${{ matrix.settings.docker }}
-          options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache:/root/.cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/root/.cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
-          run: ${{ matrix.settings.build }}
+          options: '--user 0:0 -v ${{ github.workspace }}:/build -w /build'
+          run: |
+            set -e
+            npm cache clean --force
+            npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
+            npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
+            npx @napi-rs/cli build --target ${{ matrix.settings.target }} --release --features napi
+            if [ "${{ matrix.settings.target }}" = "x86_64-unknown-linux-gnu" ]; then strip *.node; fi
       - name: Build
         run: ${{ matrix.settings.build }}
+        if: ${{ !matrix.settings.docker }}
+        shell: bash
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bindings-${{ matrix.settings.target }}
+          path: ${{ env.APP_NAME }}.*.node
+          if-no-files-found: error
+
+  build-extended:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' || github.event_name == 'push' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        settings:
+          # Extended platforms - only when Rust code changes
+          - host: ubuntu-latest
+            target: x86_64-pc-windows-gnu
+            docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+    name: Build Extended - ${{ matrix.settings.target }}
+    runs-on: ${{ matrix.settings.host }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
+        if: ${{ !matrix.settings.docker }}
+        with:
+          node-version: 20
+          check-latest: true
+          cache: npm
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        if: ${{ !matrix.settings.docker }}
+        with:
+          toolchain: stable
+          targets: ${{ matrix.settings.target }}
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            .cargo-cache
+            target/
+          key: ${{ matrix.settings.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Build in docker
+        uses: addnab/docker-run-action@v3
+        if: ${{ matrix.settings.docker }}
+        with:
+          image: ${{ matrix.settings.docker }}
+          options: '--user 0:0 -v ${{ github.workspace }}:/build -w /build'
+          run: |
+            set -e
+            npm cache clean --force
+            npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
+            npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
+            npx @napi-rs/cli build --target x86_64-pc-windows-gnu --release --features napi
+            strip *.node
+      - name: Build
+        run: npm run build --target ${{ matrix.settings.target }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
       - name: Upload artifact
@@ -148,7 +223,7 @@ jobs:
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.host }} - node@${{ matrix.node }}
     needs:
-      - build
+      - build-core
     strategy:
       fail-fast: false
       matrix:
@@ -185,7 +260,7 @@ jobs:
   test-linux-x64-gnu-binding:
     name: Test bindings on Linux-x64-gnu - node@${{ matrix.node }}
     needs:
-      - build
+      - build-core
     strategy:
       fail-fast: false
       matrix:

@@ -1,9 +1,9 @@
 // phantom-threat-actor-core/src/models.rs
 // Data models and structures for threat actor intelligence
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 
 /// Threat actor profile with comprehensive intelligence
 #[derive(Debug, Clone, Serialize, Deserialize)]

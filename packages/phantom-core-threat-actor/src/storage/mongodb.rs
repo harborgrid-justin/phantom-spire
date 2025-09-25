@@ -1,13 +1,16 @@
 // phantom-threat-actor-core/src/storage/mongodb.rs
 // MongoDB storage implementation for Threat Actor Core
 
-use async_trait::async_trait;
-use mongodb::{Client, Database, Collection, bson::{Document, doc, oid::ObjectId, DateTime as BsonDateTime}};
-use std::collections::HashMap;
-use chrono::Utc;
-use serde::{Deserialize, Serialize};
-use crate::models::*;
 use super::traits::*;
+use crate::models::*;
+use async_trait::async_trait;
+use chrono::Utc;
+use mongodb::{
+    bson::{doc, oid::ObjectId, DateTime as BsonDateTime, Document},
+    Client, Collection, Database,
+};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct MongoThreatActor {
@@ -97,31 +100,106 @@ pub struct MongoDBStorage {
 impl MongoDBStorage {
     /// Create a new MongoDB storage instance
     pub async fn new(connection_string: &str, database_name: &str) -> Result<Self, StorageError> {
-        let client = Client::with_uri_str(connection_string).await
-            .map_err(|e| StorageError::Connection(format!("Failed to create MongoDB client: {}", e)))?;
+        let client = Client::with_uri_str(connection_string).await.map_err(|e| {
+            StorageError::Connection(format!("Failed to create MongoDB client: {}", e))
+        })?;
 
         let database = client.database(database_name);
 
         // Test connection
-        database.run_command(doc! { "ping": 1 }, None).await
+        database
+            .run_command(doc! { "ping": 1 }, None)
+            .await
             .map_err(|e| StorageError::Connection(format!("Failed to ping MongoDB: {}", e)))?;
 
         let threat_actors = database.collection::<MongoThreatActor>("threat_actors");
         let campaigns = database.collection::<MongoCampaign>("campaigns");
-        let attribution_analyses = database.collection::<MongoAttributionAnalysis>("attribution_analyses");
-        let behavioral_analyses = database.collection::<MongoBehavioralAnalysis>("behavioral_analyses");
+        let attribution_analyses =
+            database.collection::<MongoAttributionAnalysis>("attribution_analyses");
+        let behavioral_analyses =
+            database.collection::<MongoBehavioralAnalysis>("behavioral_analyses");
 
         // Create indexes
-        threat_actors.create_index(mongodb::IndexModel::builder().keys(doc! { "actor_id": 1 }).build(), None).await?;
-        threat_actors.create_index(mongodb::IndexModel::builder().keys(doc! { "actor_type": 1 }).build(), None).await?;
-        threat_actors.create_index(mongodb::IndexModel::builder().keys(doc! { "origin_country": 1 }).build(), None).await?;
-        threat_actors.create_index(mongodb::IndexModel::builder().keys(doc! { "status": 1 }).build(), None).await?;
-        threat_actors.create_index(mongodb::IndexModel::builder().keys(doc! { "confidence_score": 1 }).build(), None).await?;
-        campaigns.create_index(mongodb::IndexModel::builder().keys(doc! { "campaign_id": 1 }).build(), None).await?;
-        campaigns.create_index(mongodb::IndexModel::builder().keys(doc! { "actor_id": 1 }).build(), None).await?;
-        campaigns.create_index(mongodb::IndexModel::builder().keys(doc! { "status": 1 }).build(), None).await?;
-        attribution_analyses.create_index(mongodb::IndexModel::builder().keys(doc! { "actor_id": 1 }).build(), None).await?;
-        behavioral_analyses.create_index(mongodb::IndexModel::builder().keys(doc! { "actor_id": 1 }).build(), None).await?;
+        threat_actors
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "actor_id": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        threat_actors
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "actor_type": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        threat_actors
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "origin_country": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        threat_actors
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "status": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        threat_actors
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "confidence_score": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        campaigns
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "campaign_id": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        campaigns
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "actor_id": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        campaigns
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "status": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        attribution_analyses
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "actor_id": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
+        behavioral_analyses
+            .create_index(
+                mongodb::IndexModel::builder()
+                    .keys(doc! { "actor_id": 1 })
+                    .build(),
+                None,
+            )
+            .await?;
 
         Ok(Self {
             database,
@@ -139,9 +217,15 @@ impl MongoDBStorage {
             actor_id: actor.id.clone(),
             name: actor.name.clone(),
             aliases: actor.aliases.clone(),
-            actor_type: serde_json::to_string(&actor.actor_type).unwrap_or_else(|_| "Unknown".to_string()),
-            sophistication_level: serde_json::to_string(&actor.sophistication_level).unwrap_or_else(|_| "Unknown".to_string()),
-            motivation: actor.motivation.iter().map(|m| serde_json::to_string(m).unwrap_or_else(|_| "Unknown".to_string())).collect(),
+            actor_type: serde_json::to_string(&actor.actor_type)
+                .unwrap_or_else(|_| "Unknown".to_string()),
+            sophistication_level: serde_json::to_string(&actor.sophistication_level)
+                .unwrap_or_else(|_| "Unknown".to_string()),
+            motivation: actor
+                .motivation
+                .iter()
+                .map(|m| serde_json::to_string(m).unwrap_or_else(|_| "Unknown".to_string()))
+                .collect(),
             origin_country: actor.origin_country.clone(),
             first_observed: BsonDateTime::from_chrono(actor.first_observed),
             last_activity: BsonDateTime::from_chrono(actor.last_activity),
@@ -170,16 +254,28 @@ impl MongoDBStorage {
             id: mongo.actor_id.clone(),
             name: mongo.name.clone(),
             aliases: mongo.aliases.clone(),
-            actor_type: serde_json::from_str(&mongo.actor_type)
-                .map_err(|e| StorageError::Serialization(format!("Failed to deserialize actor_type: {}", e)))?,
-            sophistication_level: serde_json::from_str(&mongo.sophistication_level)
-                .map_err(|e| StorageError::Serialization(format!("Failed to deserialize sophistication_level: {}", e)))?,
-            motivation: mongo.motivation.iter().filter_map(|m| serde_json::from_str(m).ok()).collect(),
+            actor_type: serde_json::from_str(&mongo.actor_type).map_err(|e| {
+                StorageError::Serialization(format!("Failed to deserialize actor_type: {}", e))
+            })?,
+            sophistication_level: serde_json::from_str(&mongo.sophistication_level).map_err(
+                |e| {
+                    StorageError::Serialization(format!(
+                        "Failed to deserialize sophistication_level: {}",
+                        e
+                    ))
+                },
+            )?,
+            motivation: mongo
+                .motivation
+                .iter()
+                .filter_map(|m| serde_json::from_str(m).ok())
+                .collect(),
             origin_country: mongo.origin_country.clone(),
             first_observed: mongo.first_observed.to_chrono(),
             last_activity: mongo.last_activity.to_chrono(),
-            status: serde_json::from_str(&mongo.status)
-                .map_err(|e| StorageError::Serialization(format!("Failed to deserialize status: {}", e)))?,
+            status: serde_json::from_str(&mongo.status).map_err(|e| {
+                StorageError::Serialization(format!("Failed to deserialize status: {}", e))
+            })?,
             confidence_score: mongo.confidence_score,
             attribution_confidence: mongo.attribution_confidence,
             capabilities: mongo.capabilities.clone(),
@@ -205,7 +301,8 @@ impl MongoDBStorage {
             actor_id: campaign.actor_id.clone(),
             start_date: BsonDateTime::from_chrono(campaign.start_date),
             end_date: campaign.end_date.map(BsonDateTime::from_chrono),
-            status: serde_json::to_string(&campaign.status).unwrap_or_else(|_| "Unknown".to_string()),
+            status: serde_json::to_string(&campaign.status)
+                .unwrap_or_else(|_| "Unknown".to_string()),
             objectives: campaign.objectives.clone(),
             targets: campaign.targets.clone(),
             ttps: campaign.ttps.clone(),
@@ -225,8 +322,9 @@ impl MongoDBStorage {
             actor_id: mongo.actor_id.clone(),
             start_date: mongo.start_date.to_chrono(),
             end_date: mongo.end_date.map(|dt| dt.to_chrono()),
-            status: serde_json::from_str(&mongo.status)
-                .map_err(|e| StorageError::Serialization(format!("Failed to deserialize status: {}", e)))?,
+            status: serde_json::from_str(&mongo.status).map_err(|e| {
+                StorageError::Serialization(format!("Failed to deserialize status: {}", e))
+            })?,
             objectives: mongo.objectives.clone(),
             targets: mongo.targets.clone(),
             ttps: mongo.ttps.clone(),
@@ -248,7 +346,10 @@ impl ThreatActorStorage for MongoDBStorage {
         let start = std::time::Instant::now();
 
         // Simple health check - count documents
-        let count = self.threat_actors.count_documents(doc! {}, None).await
+        let count = self
+            .threat_actors
+            .count_documents(doc! {}, None)
+            .await
             .map_err(|e| StorageError::Internal(format!("Health check failed: {}", e)))?;
 
         let response_time = start.elapsed().as_millis() as u64;
@@ -272,9 +373,13 @@ impl ThreatActorStorage for MongoDBStorage {
         // Use upsert to handle both insert and update
         let filter = doc! { "actor_id": &actor.id };
         let update = doc! { "$set": bson::to_document(&mongo_actor).map_err(|e| StorageError::Serialization(format!("Failed to serialize actor: {}", e)))? };
-        let options = mongodb::options::UpdateOptions::builder().upsert(true).build();
+        let options = mongodb::options::UpdateOptions::builder()
+            .upsert(true)
+            .build();
 
-        self.threat_actors.update_one(filter, update, options).await
+        self.threat_actors
+            .update_one(filter, update, options)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to store threat actor: {}", e)))?;
 
         Ok(())
@@ -288,31 +393,45 @@ impl ThreatActorStorage for MongoDBStorage {
         let mongo_actors: Vec<MongoThreatActor> = actors.iter().map(Self::actor_to_mongo).collect();
 
         // Convert to documents for bulk write
-        let documents: Vec<Document> = mongo_actors.into_iter()
+        let documents: Vec<Document> = mongo_actors
+            .into_iter()
             .map(|actor| bson::to_document(&actor))
             .collect::<Result<Vec<_>, _>>()
-            .map_err(|e| StorageError::Serialization(format!("Failed to serialize actors: {}", e)))?;
+            .map_err(|e| {
+                StorageError::Serialization(format!("Failed to serialize actors: {}", e))
+            })?;
 
         let mut operations = Vec::new();
         for doc in documents {
             let filter = doc! { "actor_id": doc.get_str("actor_id").unwrap_or("") };
-            operations.push(mongodb::options::UpdateOneModel::builder()
-                .filter(filter)
-                .update(doc! { "$set": doc })
-                .upsert(true)
-                .build());
+            operations.push(
+                mongodb::options::UpdateOneModel::builder()
+                    .filter(filter)
+                    .update(doc! { "$set": doc })
+                    .upsert(true)
+                    .build(),
+            );
         }
 
-        let options = mongodb::options::BulkWriteOptions::builder().ordered(false).build();
-        self.threat_actors.bulk_write(operations, options).await
-            .map_err(|e| StorageError::Internal(format!("Failed to bulk write threat actors: {}", e)))?;
+        let options = mongodb::options::BulkWriteOptions::builder()
+            .ordered(false)
+            .build();
+        self.threat_actors
+            .bulk_write(operations, options)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to bulk write threat actors: {}", e))
+            })?;
 
         Ok(())
     }
 
     async fn get_threat_actor(&self, id: &str) -> Result<Option<ThreatActor>, StorageError> {
         let filter = doc! { "actor_id": id };
-        let mongo_actor = self.threat_actors.find_one(filter, None).await
+        let mongo_actor = self
+            .threat_actors
+            .find_one(filter, None)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to get threat actor: {}", e)))?;
 
         match mongo_actor {
@@ -321,10 +440,14 @@ impl ThreatActorStorage for MongoDBStorage {
         }
     }
 
-    async fn get_threat_actor_batch(&self, ids: &[String]) -> Result<Vec<ThreatActor>, StorageError> {
+    async fn get_threat_actor_batch(
+        &self,
+        ids: &[String],
+    ) -> Result<Vec<ThreatActor>, StorageError> {
         let filter = doc! { "actor_id": { "$in": ids } };
-        let mut cursor = self.threat_actors.find(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get threat actors batch: {}", e)))?;
+        let mut cursor = self.threat_actors.find(filter, None).await.map_err(|e| {
+            StorageError::Internal(format!("Failed to get threat actors batch: {}", e))
+        })?;
 
         let mut actors = Vec::new();
         while let Ok(Some(mongo_actor)) = cursor.try_next().await {
@@ -334,17 +457,26 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(actors)
     }
 
-    async fn search_threat_actors(&self, criteria: &ThreatActorSearchCriteria) -> Result<Vec<ThreatActor>, StorageError> {
+    async fn search_threat_actors(
+        &self,
+        criteria: &ThreatActorSearchCriteria,
+    ) -> Result<Vec<ThreatActor>, StorageError> {
         let mut filter = Document::new();
 
         // Build filter based on criteria
         if let Some(ref actor_types) = criteria.actor_types {
-            let types: Vec<String> = actor_types.iter().map(|t| serde_json::to_string(t).unwrap_or_default()).collect();
+            let types: Vec<String> = actor_types
+                .iter()
+                .map(|t| serde_json::to_string(t).unwrap_or_default())
+                .collect();
             filter.insert("actor_type", doc! { "$in": types });
         }
 
         if let Some(ref sophistication_levels) = criteria.sophistication_levels {
-            let levels: Vec<String> = sophistication_levels.iter().map(|l| serde_json::to_string(l).unwrap_or_default()).collect();
+            let levels: Vec<String> = sophistication_levels
+                .iter()
+                .map(|l| serde_json::to_string(l).unwrap_or_default())
+                .collect();
             filter.insert("sophistication_level", doc! { "$in": levels });
         }
 
@@ -353,7 +485,10 @@ impl ThreatActorStorage for MongoDBStorage {
         }
 
         if let Some(ref activity_status) = criteria.activity_status {
-            let statuses: Vec<String> = activity_status.iter().map(|s| serde_json::to_string(s).unwrap_or_default()).collect();
+            let statuses: Vec<String> = activity_status
+                .iter()
+                .map(|s| serde_json::to_string(s).unwrap_or_default())
+                .collect();
             filter.insert("status", doc! { "$in": statuses });
         }
 
@@ -366,19 +501,31 @@ impl ThreatActorStorage for MongoDBStorage {
         }
 
         if let Some(after) = criteria.first_observed_after {
-            filter.insert("first_observed", doc! { "$gte": BsonDateTime::from_chrono(after) });
+            filter.insert(
+                "first_observed",
+                doc! { "$gte": BsonDateTime::from_chrono(after) },
+            );
         }
 
         if let Some(before) = criteria.first_observed_before {
-            filter.insert("first_observed", doc! { "$lte": BsonDateTime::from_chrono(before) });
+            filter.insert(
+                "first_observed",
+                doc! { "$lte": BsonDateTime::from_chrono(before) },
+            );
         }
 
         if let Some(after) = criteria.last_activity_after {
-            filter.insert("last_activity", doc! { "$gte": BsonDateTime::from_chrono(after) });
+            filter.insert(
+                "last_activity",
+                doc! { "$gte": BsonDateTime::from_chrono(after) },
+            );
         }
 
         if let Some(before) = criteria.last_activity_before {
-            filter.insert("last_activity", doc! { "$lte": BsonDateTime::from_chrono(before) });
+            filter.insert(
+                "last_activity",
+                doc! { "$lte": BsonDateTime::from_chrono(before) },
+            );
         }
 
         let mut options = mongodb::options::FindOptions::builder();
@@ -391,8 +538,13 @@ impl ThreatActorStorage for MongoDBStorage {
             options.skip(offset as u64);
         }
 
-        let mut cursor = self.threat_actors.find(filter, options.build()).await
-            .map_err(|e| StorageError::Internal(format!("Failed to search threat actors: {}", e)))?;
+        let mut cursor = self
+            .threat_actors
+            .find(filter, options.build())
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to search threat actors: {}", e))
+            })?;
 
         let mut actors = Vec::new();
         while let Ok(Some(mongo_actor)) = cursor.try_next().await {
@@ -408,8 +560,13 @@ impl ThreatActorStorage for MongoDBStorage {
             .projection(projection)
             .build();
 
-        let mut cursor = self.threat_actors.find(doc! {}, options).await
-            .map_err(|e| StorageError::Internal(format!("Failed to list threat actor ids: {}", e)))?;
+        let mut cursor = self
+            .threat_actors
+            .find(doc! {}, options)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to list threat actor ids: {}", e))
+            })?;
 
         let mut ids = Vec::new();
         while let Ok(Some(doc)) = cursor.try_next().await {
@@ -423,7 +580,10 @@ impl ThreatActorStorage for MongoDBStorage {
 
     async fn delete_threat_actor(&self, id: &str) -> Result<bool, StorageError> {
         let filter = doc! { "actor_id": id };
-        let result = self.threat_actors.delete_one(filter, None).await
+        let result = self
+            .threat_actors
+            .delete_one(filter, None)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to delete threat actor: {}", e)))?;
 
         Ok(result.deleted_count > 0)
@@ -434,9 +594,13 @@ impl ThreatActorStorage for MongoDBStorage {
 
         let filter = doc! { "campaign_id": &campaign.id };
         let update = doc! { "$set": bson::to_document(&mongo_campaign).map_err(|e| StorageError::Serialization(format!("Failed to serialize campaign: {}", e)))? };
-        let options = mongodb::options::UpdateOptions::builder().upsert(true).build();
+        let options = mongodb::options::UpdateOptions::builder()
+            .upsert(true)
+            .build();
 
-        self.campaigns.update_one(filter, update, options).await
+        self.campaigns
+            .update_one(filter, update, options)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to store campaign: {}", e)))?;
 
         Ok(())
@@ -444,7 +608,10 @@ impl ThreatActorStorage for MongoDBStorage {
 
     async fn get_campaign(&self, id: &str) -> Result<Option<Campaign>, StorageError> {
         let filter = doc! { "campaign_id": id };
-        let mongo_campaign = self.campaigns.find_one(filter, None).await
+        let mongo_campaign = self
+            .campaigns
+            .find_one(filter, None)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to get campaign: {}", e)))?;
 
         match mongo_campaign {
@@ -453,7 +620,11 @@ impl ThreatActorStorage for MongoDBStorage {
         }
     }
 
-    async fn search_campaigns(&self, actor_id: Option<&str>, status: Option<CampaignStatus>) -> Result<Vec<Campaign>, StorageError> {
+    async fn search_campaigns(
+        &self,
+        actor_id: Option<&str>,
+        status: Option<CampaignStatus>,
+    ) -> Result<Vec<Campaign>, StorageError> {
         let mut filter = Document::new();
 
         if let Some(actor_id) = actor_id {
@@ -461,13 +632,16 @@ impl ThreatActorStorage for MongoDBStorage {
         }
 
         if let Some(ref status) = status {
-            let status_str = serde_json::to_string(status)
-                .map_err(|e| StorageError::Serialization(format!("Failed to serialize status: {}", e)))?;
+            let status_str = serde_json::to_string(status).map_err(|e| {
+                StorageError::Serialization(format!("Failed to serialize status: {}", e))
+            })?;
             filter.insert("status", status_str);
         }
 
-        let mut cursor = self.campaigns.find(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to search campaigns: {}", e)))?;
+        let mut cursor =
+            self.campaigns.find(filter, None).await.map_err(|e| {
+                StorageError::Internal(format!("Failed to search campaigns: {}", e))
+            })?;
 
         let mut campaigns = Vec::new();
         while let Ok(Some(mongo_campaign)) = cursor.try_next().await {
@@ -477,8 +651,14 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(campaigns)
     }
 
-    async fn store_attribution_analysis(&self, analysis: &AttributionAnalysis) -> Result<(), StorageError> {
-        let actor_id = analysis.primary_attribution.as_ref().unwrap_or(&"unknown".to_string());
+    async fn store_attribution_analysis(
+        &self,
+        analysis: &AttributionAnalysis,
+    ) -> Result<(), StorageError> {
+        let actor_id = analysis
+            .primary_attribution
+            .as_ref()
+            .unwrap_or(&"unknown".to_string());
 
         let mongo_analysis = MongoAttributionAnalysis {
             id: None,
@@ -491,20 +671,32 @@ impl ThreatActorStorage for MongoDBStorage {
             created_at: BsonDateTime::from_chrono(Utc::now()),
         };
 
-        self.attribution_analyses.insert_one(mongo_analysis, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to store attribution analysis: {}", e)))?;
+        self.attribution_analyses
+            .insert_one(mongo_analysis, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to store attribution analysis: {}", e))
+            })?;
 
         Ok(())
     }
 
-    async fn get_attribution_analysis(&self, actor_id: &str) -> Result<Vec<AttributionAnalysis>, StorageError> {
+    async fn get_attribution_analysis(
+        &self,
+        actor_id: &str,
+    ) -> Result<Vec<AttributionAnalysis>, StorageError> {
         let filter = doc! { "actor_id": actor_id };
         let options = mongodb::options::FindOptions::builder()
             .sort(doc! { "analysis_timestamp": -1 })
             .build();
 
-        let mut cursor = self.attribution_analyses.find(filter, options).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get attribution analysis: {}", e)))?;
+        let mut cursor = self
+            .attribution_analyses
+            .find(filter, options)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to get attribution analysis: {}", e))
+            })?;
 
         let mut analyses = Vec::new();
         while let Ok(Some(mongo_analysis)) = cursor.try_next().await {
@@ -520,7 +712,10 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(analyses)
     }
 
-    async fn store_behavioral_analysis(&self, analysis: &BehavioralAnalysis) -> Result<(), StorageError> {
+    async fn store_behavioral_analysis(
+        &self,
+        analysis: &BehavioralAnalysis,
+    ) -> Result<(), StorageError> {
         let mongo_analysis = MongoBehavioralAnalysis {
             id: None,
             actor_id: analysis.actor_id.clone(),
@@ -534,18 +729,32 @@ impl ThreatActorStorage for MongoDBStorage {
 
         let filter = doc! { "actor_id": &analysis.actor_id };
         let update = doc! { "$set": bson::to_document(&mongo_analysis).map_err(|e| StorageError::Serialization(format!("Failed to serialize behavioral analysis: {}", e)))? };
-        let options = mongodb::options::UpdateOptions::builder().upsert(true).build();
+        let options = mongodb::options::UpdateOptions::builder()
+            .upsert(true)
+            .build();
 
-        self.behavioral_analyses.update_one(filter, update, options).await
-            .map_err(|e| StorageError::Internal(format!("Failed to store behavioral analysis: {}", e)))?;
+        self.behavioral_analyses
+            .update_one(filter, update, options)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to store behavioral analysis: {}", e))
+            })?;
 
         Ok(())
     }
 
-    async fn get_behavioral_analysis(&self, actor_id: &str) -> Result<Option<BehavioralAnalysis>, StorageError> {
+    async fn get_behavioral_analysis(
+        &self,
+        actor_id: &str,
+    ) -> Result<Option<BehavioralAnalysis>, StorageError> {
         let filter = doc! { "actor_id": actor_id };
-        let mongo_analysis = self.behavioral_analyses.find_one(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get behavioral analysis: {}", e)))?;
+        let mongo_analysis = self
+            .behavioral_analyses
+            .find_one(filter, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to get behavioral analysis: {}", e))
+            })?;
 
         match mongo_analysis {
             Some(analysis) => Ok(Some(BehavioralAnalysis {
@@ -560,7 +769,11 @@ impl ThreatActorStorage for MongoDBStorage {
     }
 
     // Simplified implementations for other methods
-    async fn store_relationships(&self, _actor_id: &str, _relationships: &[ActorRelationship]) -> Result<(), StorageError> {
+    async fn store_relationships(
+        &self,
+        _actor_id: &str,
+        _relationships: &[ActorRelationship],
+    ) -> Result<(), StorageError> {
         // TODO: Implement relationship storage
         Ok(())
     }
@@ -570,7 +783,11 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(vec![])
     }
 
-    async fn store_evidence(&self, _actor_id: &str, _evidence: &[Evidence]) -> Result<(), StorageError> {
+    async fn store_evidence(
+        &self,
+        _actor_id: &str,
+        _evidence: &[Evidence],
+    ) -> Result<(), StorageError> {
         // TODO: Implement evidence storage
         Ok(())
     }
@@ -580,23 +797,37 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(vec![])
     }
 
-    async fn update_actor_confidence(&self, actor_id: &str, confidence: f64) -> Result<(), StorageError> {
+    async fn update_actor_confidence(
+        &self,
+        actor_id: &str,
+        confidence: f64,
+    ) -> Result<(), StorageError> {
         let filter = doc! { "actor_id": actor_id };
         let update = doc! { "$set": { "confidence_score": confidence, "updated_at": BsonDateTime::from_chrono(Utc::now()) } };
 
-        self.threat_actors.update_one(filter, update, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to update actor confidence: {}", e)))?;
+        self.threat_actors
+            .update_one(filter, update, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to update actor confidence: {}", e))
+            })?;
 
         Ok(())
     }
 
-    async fn get_actors_by_type(&self, actor_type: ActorType) -> Result<Vec<ThreatActor>, StorageError> {
-        let type_str = serde_json::to_string(&actor_type)
-            .map_err(|e| StorageError::Serialization(format!("Failed to serialize actor_type: {}", e)))?;
+    async fn get_actors_by_type(
+        &self,
+        actor_type: ActorType,
+    ) -> Result<Vec<ThreatActor>, StorageError> {
+        let type_str = serde_json::to_string(&actor_type).map_err(|e| {
+            StorageError::Serialization(format!("Failed to serialize actor_type: {}", e))
+        })?;
 
         let filter = doc! { "actor_type": type_str };
-        let mut cursor = self.threat_actors.find(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get actors by type: {}", e)))?;
+        let mut cursor =
+            self.threat_actors.find(filter, None).await.map_err(|e| {
+                StorageError::Internal(format!("Failed to get actors by type: {}", e))
+            })?;
 
         let mut actors = Vec::new();
         while let Ok(Some(mongo_actor)) = cursor.try_next().await {
@@ -606,13 +837,18 @@ impl ThreatActorStorage for MongoDBStorage {
         Ok(actors)
     }
 
-    async fn get_actors_by_sophistication(&self, level: SophisticationLevel) -> Result<Vec<ThreatActor>, StorageError> {
-        let level_str = serde_json::to_string(&level)
-            .map_err(|e| StorageError::Serialization(format!("Failed to serialize sophistication_level: {}", e)))?;
+    async fn get_actors_by_sophistication(
+        &self,
+        level: SophisticationLevel,
+    ) -> Result<Vec<ThreatActor>, StorageError> {
+        let level_str = serde_json::to_string(&level).map_err(|e| {
+            StorageError::Serialization(format!("Failed to serialize sophistication_level: {}", e))
+        })?;
 
         let filter = doc! { "sophistication_level": level_str };
-        let mut cursor = self.threat_actors.find(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get actors by sophistication: {}", e)))?;
+        let mut cursor = self.threat_actors.find(filter, None).await.map_err(|e| {
+            StorageError::Internal(format!("Failed to get actors by sophistication: {}", e))
+        })?;
 
         let mut actors = Vec::new();
         while let Ok(Some(mongo_actor)) = cursor.try_next().await {
@@ -624,8 +860,9 @@ impl ThreatActorStorage for MongoDBStorage {
 
     async fn get_actors_by_country(&self, country: &str) -> Result<Vec<ThreatActor>, StorageError> {
         let filter = doc! { "origin_country": country };
-        let mut cursor = self.threat_actors.find(filter, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get actors by country: {}", e)))?;
+        let mut cursor = self.threat_actors.find(filter, None).await.map_err(|e| {
+            StorageError::Internal(format!("Failed to get actors by country: {}", e))
+        })?;
 
         let mut actors = Vec::new();
         while let Ok(Some(mongo_actor)) = cursor.try_next().await {
@@ -636,21 +873,40 @@ impl ThreatActorStorage for MongoDBStorage {
     }
 
     async fn get_active_campaigns(&self) -> Result<Vec<Campaign>, StorageError> {
-        self.search_campaigns(None, Some(CampaignStatus::Active)).await
+        self.search_campaigns(None, Some(CampaignStatus::Active))
+            .await
     }
 
     async fn get_statistics(&self) -> Result<StorageStatistics, StorageError> {
-        let threat_actor_count = self.threat_actors.count_documents(doc! {}, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get threat actor count: {}", e)))?;
+        let threat_actor_count = self
+            .threat_actors
+            .count_documents(doc! {}, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to get threat actor count: {}", e))
+            })?;
 
-        let campaign_count = self.campaigns.count_documents(doc! {}, None).await
+        let campaign_count = self
+            .campaigns
+            .count_documents(doc! {}, None)
+            .await
             .map_err(|e| StorageError::Internal(format!("Failed to get campaign count: {}", e)))?;
 
-        let attribution_count = self.attribution_analyses.count_documents(doc! {}, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get attribution count: {}", e)))?;
+        let attribution_count = self
+            .attribution_analyses
+            .count_documents(doc! {}, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to get attribution count: {}", e))
+            })?;
 
-        let behavioral_count = self.behavioral_analyses.count_documents(doc! {}, None).await
-            .map_err(|e| StorageError::Internal(format!("Failed to get behavioral count: {}", e)))?;
+        let behavioral_count = self
+            .behavioral_analyses
+            .count_documents(doc! {}, None)
+            .await
+            .map_err(|e| {
+                StorageError::Internal(format!("Failed to get behavioral count: {}", e))
+            })?;
 
         Ok(StorageStatistics {
             threat_actor_count,

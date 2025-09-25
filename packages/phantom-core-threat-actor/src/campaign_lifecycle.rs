@@ -1,13 +1,13 @@
 //! Campaign Lifecycle Tracker
-//! 
+//!
 //! Comprehensive campaign management and tracking system for threat actor operations.
 //! Provides end-to-end campaign analysis from initiation to completion.
 
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc, Duration};
 use uuid::Uuid;
-use anyhow::Result;
 
 /// Campaign lifecycle tracker with comprehensive monitoring
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -555,14 +555,23 @@ impl CampaignLifecycleTracker {
     }
 
     /// Start tracking a new campaign
-    pub async fn start_campaign_tracking(&mut self, campaign_data: &HashMap<String, String>) -> Result<String> {
+    pub async fn start_campaign_tracking(
+        &mut self,
+        campaign_data: &HashMap<String, String>,
+    ) -> Result<String> {
         let campaign_id = Uuid::new_v4().to_string();
         let now = Utc::now();
 
         let campaign_profile = CampaignProfile {
             campaign_id: campaign_id.clone(),
-            campaign_name: campaign_data.get("name").unwrap_or(&"Unknown Campaign".to_string()).clone(),
-            actor_id: campaign_data.get("actor_id").unwrap_or(&Uuid::new_v4().to_string()).clone(),
+            campaign_name: campaign_data
+                .get("name")
+                .unwrap_or(&"Unknown Campaign".to_string())
+                .clone(),
+            actor_id: campaign_data
+                .get("actor_id")
+                .unwrap_or(&Uuid::new_v4().to_string())
+                .clone(),
             campaign_type: CampaignType::Unknown,
             lifecycle_stage: LifecycleStage::Planning,
             start_date: now,
@@ -608,7 +617,8 @@ impl CampaignLifecycleTracker {
             related_campaigns: vec![],
         };
 
-        self.active_campaigns.insert(campaign_id.clone(), campaign_profile);
+        self.active_campaigns
+            .insert(campaign_id.clone(), campaign_profile);
         self.tracking_metrics.total_campaigns_tracked += 1;
         self.tracking_metrics.active_campaigns += 1;
 
@@ -616,10 +626,14 @@ impl CampaignLifecycleTracker {
     }
 
     /// Update campaign lifecycle stage
-    pub async fn update_lifecycle_stage(&mut self, campaign_id: &str, new_stage: LifecycleStage) -> Result<bool> {
+    pub async fn update_lifecycle_stage(
+        &mut self,
+        campaign_id: &str,
+        new_stage: LifecycleStage,
+    ) -> Result<bool> {
         if let Some(campaign) = self.active_campaigns.get_mut(campaign_id) {
             campaign.lifecycle_stage = new_stage;
-            
+
             // Add timeline event
             let event = CampaignEvent {
                 event_id: Uuid::new_v4().to_string(),
@@ -634,7 +648,7 @@ impl CampaignLifecycleTracker {
                 indicators: vec![],
                 response_actions: vec![],
             };
-            
+
             campaign.timeline.push(event);
             Ok(true)
         } else {
@@ -643,7 +657,10 @@ impl CampaignLifecycleTracker {
     }
 
     /// Get campaign analysis
-    pub async fn get_campaign_analysis(&self, campaign_id: &str) -> Result<Option<CampaignProfile>> {
+    pub async fn get_campaign_analysis(
+        &self,
+        campaign_id: &str,
+    ) -> Result<Option<CampaignProfile>> {
         Ok(self.active_campaigns.get(campaign_id).cloned())
     }
 

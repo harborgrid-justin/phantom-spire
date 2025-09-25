@@ -1,9 +1,9 @@
-use crate::ocsf::{BaseEvent, CategoryUid, ClassUid, SeverityId, ActivityId};
+use crate::ocsf::{ActivityId, BaseEvent, CategoryUid, ClassUid, SeverityId};
+use crate::ocsf_categories::security_finding::SecurityFindingEvent;
+use chrono::Utc;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use regex::Regex;
-use chrono::Utc;
-use crate::ocsf_categories::security_finding::SecurityFindingEvent;
 
 /// OCSF Validation Module
 /// Validates OCSF events against schema requirements
@@ -155,7 +155,9 @@ impl CustomValidator for BaseEventValidator {
         }
 
         // Validate class
-        if matches!(event.class_uid, ClassUid::BaseEvent) && matches!(event.category_uid, CategoryUid::Uncategorized) {
+        if matches!(event.class_uid, ClassUid::BaseEvent)
+            && matches!(event.category_uid, CategoryUid::Uncategorized)
+        {
             errors.push(ValidationError {
                 code: "INVALID_CLASS".to_string(),
                 message: "Event class must be valid for the category".to_string(),
@@ -351,7 +353,7 @@ impl SchemaValidator {
                 match field.as_str() {
                     "time" => {
                         // time is always present in BaseEvent
-                    },
+                    }
                     "category_uid" => {
                         if matches!(event.category_uid, CategoryUid::Uncategorized) {
                             errors.push(ValidationError {
@@ -362,7 +364,7 @@ impl SchemaValidator {
                                 actual: Some("uncategorized".to_string()),
                             });
                         }
-                    },
+                    }
                     "class_uid" => {
                         if matches!(event.class_uid, ClassUid::BaseEvent) {
                             errors.push(ValidationError {
@@ -373,7 +375,7 @@ impl SchemaValidator {
                                 actual: Some("base_event".to_string()),
                             });
                         }
-                    },
+                    }
                     _ => {}
                 }
             }
@@ -397,7 +399,9 @@ impl DataTypeValidator {
 
     /// Validate domain name
     pub fn validate_domain(domain: &str) -> bool {
-        let domain_regex = Regex::new(r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$").unwrap();
+        let domain_regex =
+            Regex::new(r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$")
+                .unwrap();
         domain_regex.is_match(domain)
     }
 
@@ -502,7 +506,7 @@ impl OcsfValidator {
                         actual: Some("missing".to_string()),
                     });
                 }
-            },
+            }
             ValidationType::Type(ref expected_type) => {
                 if let Some(actual_value) = self.get_field_value(event, &rule.field) {
                     if !self.validate_field_type(&actual_value, expected_type) {
@@ -515,7 +519,7 @@ impl OcsfValidator {
                         });
                     }
                 }
-            },
+            }
             ValidationType::Range { min, max } => {
                 if let Some(value_str) = self.get_field_value(event, &rule.field) {
                     if let Ok(value) = value_str.parse::<f64>() {
@@ -530,7 +534,7 @@ impl OcsfValidator {
                         }
                     }
                 }
-            },
+            }
             ValidationType::Pattern(ref pattern) => {
                 if let Some(value) = self.get_field_value(event, &rule.field) {
                     let regex = Regex::new(pattern).unwrap_or_else(|_| Regex::new("").unwrap());
@@ -544,7 +548,7 @@ impl OcsfValidator {
                         });
                     }
                 }
-            },
+            }
             ValidationType::Enum(ref allowed_values) => {
                 if let Some(value) = self.get_field_value(event, &rule.field) {
                     if !allowed_values.contains(&value) {
@@ -557,7 +561,7 @@ impl OcsfValidator {
                         });
                     }
                 }
-            },
+            }
             ValidationType::Custom(_) => {
                 // Custom validation would be handled by custom validators
             }
@@ -614,7 +618,10 @@ impl OcsfValidator {
         let mut stats = HashMap::new();
         stats.insert("rules_count".to_string(), self.rules.len());
         stats.insert("schemas_count".to_string(), self.schemas.len());
-        stats.insert("custom_validators_count".to_string(), self.custom_validators.len());
+        stats.insert(
+            "custom_validators_count".to_string(),
+            self.custom_validators.len(),
+        );
 
         stats
     }
@@ -659,7 +666,11 @@ mod tests {
     #[test]
     fn test_base_event_validator() {
         let validator = BaseEventValidator;
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
+        let event = BaseEvent::new(
+            CategoryUid::Findings,
+            ClassUid::SecurityFinding,
+            SeverityId::Unknown,
+        );
 
         // Valid event
         let errors = validator.validate(&event);
@@ -669,7 +680,11 @@ mod tests {
     #[test]
     fn test_observable_validator() {
         let validator = ObservableValidator;
-        let mut event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
+        let mut event = BaseEvent::new(
+            CategoryUid::Findings,
+            ClassUid::SecurityFinding,
+            SeverityId::Unknown,
+        );
 
         // Add invalid observable
         let invalid_observable = crate::ocsf::Observable {
@@ -696,7 +711,9 @@ mod tests {
         assert!(DataTypeValidator::validate_domain("example.com"));
         assert!(DataTypeValidator::validate_url("https://example.com"));
         assert!(DataTypeValidator::validate_email("user@example.com"));
-        assert!(DataTypeValidator::validate_file_hash("a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"));
+        assert!(DataTypeValidator::validate_file_hash(
+            "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3"
+        ));
 
         assert!(!DataTypeValidator::validate_ip("invalid"));
         assert!(!DataTypeValidator::validate_domain("invalid"));
@@ -707,7 +724,11 @@ mod tests {
     fn test_schema_validator() {
         let validator = SchemaValidator::new();
 
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
+        let event = BaseEvent::new(
+            CategoryUid::Findings,
+            ClassUid::SecurityFinding,
+            SeverityId::Unknown,
+        );
         let errors = validator.validate_schema(&event, "base_event");
 
         // Should have no errors for valid event
@@ -732,7 +753,11 @@ mod tests {
     #[test]
     fn test_validate_event() {
         let validator = OcsfValidator::new();
-        let event = BaseEvent::new(CategoryUid::Findings, ClassUid::SecurityFinding, SeverityId::Unknown);
+        let event = BaseEvent::new(
+            CategoryUid::Findings,
+            ClassUid::SecurityFinding,
+            SeverityId::Unknown,
+        );
 
         let result = validator.validate_event(&event);
         assert!(result.is_valid);

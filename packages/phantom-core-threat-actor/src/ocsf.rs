@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// OCSF Base Event Structure
@@ -261,7 +261,8 @@ impl BaseEvent {
     /// Create a new base event with default values
     pub fn new(category_uid: CategoryUid, class_uid: ClassUid, severity_id: SeverityId) -> Self {
         let now = Utc::now();
-        let type_uid = (class_uid.clone() as i32 as i64) * 100 + (ActivityId::Unknown as i32 as i64);
+        let type_uid =
+            (class_uid.clone() as i32 as i64) * 100 + (ActivityId::Unknown as i32 as i64);
 
         Self {
             activity_id: ActivityId::Unknown,
@@ -377,7 +378,11 @@ impl BaseEvent {
 
 impl Default for BaseEvent {
     fn default() -> Self {
-        Self::new(CategoryUid::Uncategorized, ClassUid::BaseEvent, SeverityId::Unknown)
+        Self::new(
+            CategoryUid::Uncategorized,
+            ClassUid::BaseEvent,
+            SeverityId::Unknown,
+        )
     }
 }
 
@@ -415,7 +420,8 @@ mod tests {
             CategoryUid::NetworkActivity,
             ClassUid::NetworkActivity,
             SeverityId::Medium,
-        ).with_message("Test network activity".to_string());
+        )
+        .with_message("Test network activity".to_string());
 
         let json = event.to_json().unwrap();
         let deserialized: BaseEvent = BaseEvent::from_json(&json).unwrap();

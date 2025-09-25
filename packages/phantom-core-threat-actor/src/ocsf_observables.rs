@@ -1,7 +1,7 @@
-use crate::ocsf::{Observable};
-use crate::ocsf_objects::{Ioc};
-use serde::{Deserialize, Serialize};
+use crate::ocsf::Observable;
+use crate::ocsf_objects::Ioc;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 /// OCSF Observables Implementation
@@ -242,21 +242,24 @@ impl ObservableManager {
 
     /// Find observables by type
     pub fn find_by_type(&self, type_id: i32) -> Vec<&Observable> {
-        self.observables.iter()
+        self.observables
+            .iter()
             .filter(|obs| obs.type_id == type_id)
             .collect()
     }
 
     /// Find observables by value
     pub fn find_by_value(&self, value: &str) -> Vec<&Observable> {
-        self.observables.iter()
+        self.observables
+            .iter()
             .filter(|obs| obs.value == value)
             .collect()
     }
 
     /// Find IOCs by type
     pub fn find_iocs_by_type(&self, ioc_type: &str) -> Vec<&Ioc> {
-        self.iocs.iter()
+        self.iocs
+            .iter()
             .filter(|ioc| ioc.ioc_type == ioc_type)
             .collect()
     }
@@ -269,7 +272,9 @@ impl ObservableManager {
             for source_obs in &self.observables {
                 if rule.source_types.contains(&source_obs.type_id) {
                     for target_obs in &self.observables {
-                        if rule.target_types.contains(&target_obs.type_id) && source_obs.name != target_obs.name {
+                        if rule.target_types.contains(&target_obs.type_id)
+                            && source_obs.name != target_obs.name
+                        {
                             if self.check_correlation(&rule.logic, source_obs, target_obs) {
                                 relationships.push(ObservableRelationship {
                                     source_id: source_obs.name.clone(),
@@ -278,7 +283,10 @@ impl ObservableManager {
                                     confidence: rule.confidence,
                                     metadata: Some(HashMap::from([
                                         ("rule".to_string(), serde_json::json!(rule.name)),
-                                        ("correlation_type".to_string(), serde_json::json!("rule_based")),
+                                        (
+                                            "correlation_type".to_string(),
+                                            serde_json::json!("rule_based"),
+                                        ),
                                     ])),
                                     timestamp: Utc::now(),
                                 });
@@ -293,32 +301,37 @@ impl ObservableManager {
     }
 
     /// Check correlation logic between two observables
-    fn check_correlation(&self, logic: &CorrelationLogic, source: &Observable, target: &Observable) -> bool {
+    fn check_correlation(
+        &self,
+        logic: &CorrelationLogic,
+        source: &Observable,
+        target: &Observable,
+    ) -> bool {
         match logic {
             CorrelationLogic::ExactMatch => {
                 // Simple exact match for demonstration
                 source.value == target.value
-            },
+            }
             CorrelationLogic::FuzzyMatch { threshold: _ } => {
                 // Fuzzy matching logic would go here
                 // For now, just check if values contain similar substrings
                 source.value.contains(&target.value) || target.value.contains(&source.value)
-            },
+            }
             CorrelationLogic::PatternMatch { pattern } => {
                 // Pattern matching logic
-                regex::Regex::new(pattern).unwrap().is_match(&source.value) ||
-                regex::Regex::new(pattern).unwrap().is_match(&target.value)
-            },
+                regex::Regex::new(pattern).unwrap().is_match(&source.value)
+                    || regex::Regex::new(pattern).unwrap().is_match(&target.value)
+            }
             CorrelationLogic::TimeBased { window_seconds: _ } => {
                 // Time-based correlation would require timestamp data
                 // For now, return false
                 false
-            },
+            }
             CorrelationLogic::GraphBased { max_hops: _ } => {
                 // Graph-based correlation would require graph traversal
                 // For now, return false
                 false
-            },
+            }
         }
     }
 
@@ -339,9 +352,10 @@ impl ObservableManager {
                         pivot_type: PivotType::DomainToIP,
                         related_observables: vec![(*ip).clone()],
                         confidence: 0.8,
-                        metadata: Some(HashMap::from([
-                            ("pivot_reason".to_string(), serde_json::json!("DNS_resolution")),
-                        ])),
+                        metadata: Some(HashMap::from([(
+                            "pivot_reason".to_string(),
+                            serde_json::json!("DNS_resolution"),
+                        )])),
                     });
                 }
             }
@@ -357,9 +371,10 @@ impl ObservableManager {
                     pivot_type: PivotType::HashToMalware,
                     related_observables: vec![],
                     confidence: 0.9,
-                    metadata: Some(HashMap::from([
-                        ("malware_family".to_string(), serde_json::json!(malware_info)),
-                    ])),
+                    metadata: Some(HashMap::from([(
+                        "malware_family".to_string(),
+                        serde_json::json!(malware_info),
+                    )])),
                 });
             }
         }
@@ -505,7 +520,13 @@ impl Observable {
 
 impl CorrelationRule {
     /// Create an exact match correlation rule
-    pub fn exact_match(name: String, description: String, source_types: Vec<i32>, target_types: Vec<i32>, confidence: f64) -> Self {
+    pub fn exact_match(
+        name: String,
+        description: String,
+        source_types: Vec<i32>,
+        target_types: Vec<i32>,
+        confidence: f64,
+    ) -> Self {
         Self {
             name,
             description,
@@ -518,7 +539,14 @@ impl CorrelationRule {
     }
 
     /// Create a fuzzy match correlation rule
-    pub fn fuzzy_match(name: String, description: String, source_types: Vec<i32>, target_types: Vec<i32>, threshold: f64, confidence: f64) -> Self {
+    pub fn fuzzy_match(
+        name: String,
+        description: String,
+        source_types: Vec<i32>,
+        target_types: Vec<i32>,
+        threshold: f64,
+        confidence: f64,
+    ) -> Self {
         Self {
             name,
             description,
@@ -531,7 +559,14 @@ impl CorrelationRule {
     }
 
     /// Create a pattern match correlation rule
-    pub fn pattern_match(name: String, description: String, source_types: Vec<i32>, target_types: Vec<i32>, pattern: String, confidence: f64) -> Self {
+    pub fn pattern_match(
+        name: String,
+        description: String,
+        source_types: Vec<i32>,
+        target_types: Vec<i32>,
+        pattern: String,
+        confidence: f64,
+    ) -> Self {
         Self {
             name,
             description,
@@ -623,7 +658,10 @@ mod tests {
 
     #[test]
     fn test_observable_creation() {
-        let file_obs = Observable::file("suspicious_file".to_string(), "/tmp/malware.exe".to_string());
+        let file_obs = Observable::file(
+            "suspicious_file".to_string(),
+            "/tmp/malware.exe".to_string(),
+        );
         assert_eq!(file_obs.observable_type, "file");
         assert_eq!(file_obs.type_id, ObservableTypeId::File as i32);
 
@@ -631,7 +669,10 @@ mod tests {
         assert_eq!(ip_obs.observable_type, "ipv4");
         assert_eq!(ip_obs.type_id, ObservableTypeId::IPv4 as i32);
 
-        let domain_obs = Observable::domain("suspicious_domain".to_string(), "malicious-site.com".to_string());
+        let domain_obs = Observable::domain(
+            "suspicious_domain".to_string(),
+            "malicious-site.com".to_string(),
+        );
         assert_eq!(domain_obs.observable_type, "domain");
         assert_eq!(domain_obs.type_id, ObservableTypeId::Domain as i32);
     }
@@ -690,7 +731,11 @@ mod tests {
             "json".to_string(),
         );
 
-        let observable = Observable::hash("test_hash".to_string(), "abc123".to_string(), "SHA256".to_string());
+        let observable = Observable::hash(
+            "test_hash".to_string(),
+            "abc123".to_string(),
+            "SHA256".to_string(),
+        );
         feed.add_observable(observable);
 
         assert_eq!(feed.observables.len(), 1);
@@ -703,7 +748,11 @@ mod tests {
 
         let domain_obs = Observable::domain("test_domain".to_string(), "example.com".to_string());
         let ip_obs = Observable::ip("test_ip".to_string(), "93.184.216.34".to_string());
-        let hash_obs = Observable::hash("test_hash".to_string(), "44d88612fea8a8f36de82e1278abb02f".to_string(), "MD5".to_string());
+        let hash_obs = Observable::hash(
+            "test_hash".to_string(),
+            "44d88612fea8a8f36de82e1278abb02f".to_string(),
+            "MD5".to_string(),
+        );
 
         manager.add_observable(domain_obs);
         manager.add_observable(ip_obs);
@@ -713,7 +762,10 @@ mod tests {
         assert!(!pivots.is_empty());
 
         // Should find at least one pivot (domain to IP)
-        let domain_ip_pivots: Vec<_> = pivots.iter().filter(|p| matches!(p.pivot_type, PivotType::DomainToIP)).collect();
+        let domain_ip_pivots: Vec<_> = pivots
+            .iter()
+            .filter(|p| matches!(p.pivot_type, PivotType::DomainToIP))
+            .collect();
         assert!(!domain_ip_pivots.is_empty());
     }
 

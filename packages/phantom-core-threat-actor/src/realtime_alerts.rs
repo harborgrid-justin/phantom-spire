@@ -3,13 +3,13 @@
 //! Real-time threat detection and alerting system with streaming analytics,
 //! instant notifications, and automated response capabilities.
 
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
 use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Real-time alerts engine
 #[derive(Debug)]
@@ -112,10 +112,12 @@ impl RealtimeAlertsModule {
                         if Utc::now().signed_duration_since(last_triggered) < rule.cooldown_period {
                             false
                         } else {
-                            self.evaluate_rule_conditions(&rule.conditions, &event).await?
+                            self.evaluate_rule_conditions(&rule.conditions, &event)
+                                .await?
                         }
                     } else {
-                        self.evaluate_rule_conditions(&rule.conditions, &event).await?
+                        self.evaluate_rule_conditions(&rule.conditions, &event)
+                            .await?
                     }
                 } else {
                     false
@@ -137,7 +139,10 @@ impl RealtimeAlertsModule {
         }
 
         // Correlate alerts
-        let correlated_alerts = self.alert_correlation_engine.correlate_alerts(triggered_alerts).await?;
+        let correlated_alerts = self
+            .alert_correlation_engine
+            .correlate_alerts(triggered_alerts)
+            .await?;
 
         // Send notifications
         for alert in &correlated_alerts {
@@ -148,7 +153,11 @@ impl RealtimeAlertsModule {
     }
 
     /// Evaluate rule conditions against a security event
-    async fn evaluate_rule_conditions(&self, conditions: &[AlertCondition], event: &SecurityEvent) -> Result<bool> {
+    async fn evaluate_rule_conditions(
+        &self,
+        conditions: &[AlertCondition],
+        event: &SecurityEvent,
+    ) -> Result<bool> {
         for condition in conditions {
             if !self.evaluate_condition(condition, event).await? {
                 return Ok(false);
@@ -159,14 +168,14 @@ impl RealtimeAlertsModule {
     }
 
     /// Evaluate a single condition
-    async fn evaluate_condition(&self, condition: &AlertCondition, event: &SecurityEvent) -> Result<bool> {
+    async fn evaluate_condition(
+        &self,
+        condition: &AlertCondition,
+        event: &SecurityEvent,
+    ) -> Result<bool> {
         match condition {
-            AlertCondition::EventType(event_type) => {
-                Ok(event.event_type == *event_type)
-            }
-            AlertCondition::Severity(min_severity) => {
-                Ok(event.severity >= *min_severity)
-            }
+            AlertCondition::EventType(event_type) => Ok(event.event_type == *event_type),
+            AlertCondition::Severity(min_severity) => Ok(event.severity >= *min_severity),
             AlertCondition::SourceIP(ip_pattern) => {
                 if let Some(source_ip) = &event.source_ip {
                     Ok(source_ip.contains(ip_pattern))
@@ -181,9 +190,10 @@ impl RealtimeAlertsModule {
                     Ok(false)
                 }
             }
-            AlertCondition::IndicatorMatch(indicator_type) => {
-                Ok(event.indicators.iter().any(|i| i.indicator_type == *indicator_type))
-            }
+            AlertCondition::IndicatorMatch(indicator_type) => Ok(event
+                .indicators
+                .iter()
+                .any(|i| i.indicator_type == *indicator_type)),
             AlertCondition::FrequencyThreshold { count, window } => {
                 // Check frequency within time window
                 let window_start = Utc::now() - *window;
@@ -198,13 +208,20 @@ impl RealtimeAlertsModule {
     }
 
     /// Get events within a time window (simplified implementation)
-    async fn get_events_in_window(&self, _window_start: DateTime<Utc>) -> Result<Vec<SecurityEvent>> {
+    async fn get_events_in_window(
+        &self,
+        _window_start: DateTime<Utc>,
+    ) -> Result<Vec<SecurityEvent>> {
         // In a real implementation, this would query the event store
         Ok(vec![])
     }
 
     /// Create an alert from a triggered rule
-    async fn create_alert_from_rule(&self, rule: &AlertRule, event: &SecurityEvent) -> Result<Alert> {
+    async fn create_alert_from_rule(
+        &self,
+        rule: &AlertRule,
+        event: &SecurityEvent,
+    ) -> Result<Alert> {
         let alert_id = Uuid::new_v4().to_string();
 
         let alert = Alert {
@@ -235,7 +252,10 @@ impl RealtimeAlertsModule {
     }
 
     /// Register an alert channel
-    pub async fn register_alert_channel(&mut self, channel_config: AlertChannelConfig) -> Result<String> {
+    pub async fn register_alert_channel(
+        &mut self,
+        channel_config: AlertChannelConfig,
+    ) -> Result<String> {
         let channel_id = Uuid::new_v4().to_string();
 
         let channel = AlertChannel {
@@ -254,7 +274,9 @@ impl RealtimeAlertsModule {
 
     /// Send alert event
     pub async fn send_alert_event(&self, event: AlertEvent) -> Result<()> {
-        self.alert_sender.send(event).await
+        self.alert_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send alert event: {}", e))
     }
 
@@ -265,16 +287,27 @@ impl RealtimeAlertsModule {
     }
 
     /// Update alert status
-    pub async fn update_alert_status(&mut self, alert_id: &str, status: AlertStatus, updated_by: &str) -> Result<()> {
+    pub async fn update_alert_status(
+        &mut self,
+        alert_id: &str,
+        status: AlertStatus,
+        updated_by: &str,
+    ) -> Result<()> {
         // Find and update alert
         // In a real implementation, this would update the alert in storage
 
-        println!("Updated alert {} status to {:?} by {}", alert_id, status, updated_by);
+        println!(
+            "Updated alert {} status to {:?} by {}",
+            alert_id, status, updated_by
+        );
         Ok(())
     }
 
     /// Create escalation policy
-    pub async fn create_escalation_policy(&mut self, policy_config: EscalationPolicyConfig) -> Result<String> {
+    pub async fn create_escalation_policy(
+        &mut self,
+        policy_config: EscalationPolicyConfig,
+    ) -> Result<String> {
         let policy_id = Uuid::new_v4().to_string();
 
         let policy = EscalationPolicy {
@@ -298,7 +331,9 @@ impl RealtimeAlertsModule {
                 for rule in &policy.escalation_rules {
                     if self.should_escalate_alert(alert, rule).await? {
                         alert.escalation_level = rule.escalation_level;
-                        self.notification_engine.send_escalation_notification(alert, rule).await?;
+                        self.notification_engine
+                            .send_escalation_notification(alert, rule)
+                            .await?;
                         break;
                     }
                 }
@@ -315,9 +350,7 @@ impl RealtimeAlertsModule {
                 let age = Utc::now().signed_duration_since(alert.triggered_at);
                 Ok(age > *duration && alert.status == AlertStatus::New)
             }
-            EscalationCondition::SeverityThreshold(severity) => {
-                Ok(alert.severity >= *severity)
-            }
+            EscalationCondition::SeverityThreshold(severity) => Ok(alert.severity >= *severity),
             EscalationCondition::RepeatedOffender => {
                 // Check if this is a repeated alert from same source
                 Ok(alert.event_details.source_ip.is_some())
@@ -330,7 +363,11 @@ impl RealtimeAlertsModule {
 
     /// Get alert statistics
     pub fn get_alert_statistics(&self) -> AlertStatistics {
-        let total_alerts = self.alert_rules.values().map(|r| r.trigger_count).sum::<u64>();
+        let total_alerts = self
+            .alert_rules
+            .values()
+            .map(|r| r.trigger_count)
+            .sum::<u64>();
         let active_rules = self.alert_rules.values().filter(|r| r.enabled).count();
         let alerts_by_severity = self.calculate_alerts_by_severity();
 
@@ -646,15 +683,13 @@ struct AlertCorrelationEngine {
 impl AlertCorrelationEngine {
     fn new() -> Self {
         Self {
-            correlation_rules: vec![
-                CorrelationRule {
-                    rule_id: "CR001".to_string(),
-                    name: "Multi-stage attack correlation".to_string(),
-                    conditions: vec!["reconnaissance".to_string(), "initial_access".to_string()],
-                    time_window: Duration::hours(24),
-                    correlation_score: 0.8,
-                },
-            ],
+            correlation_rules: vec![CorrelationRule {
+                rule_id: "CR001".to_string(),
+                name: "Multi-stage attack correlation".to_string(),
+                conditions: vec!["reconnaissance".to_string(), "initial_access".to_string()],
+                time_window: Duration::hours(24),
+                correlation_score: 0.8,
+            }],
         }
     }
 
@@ -669,19 +704,28 @@ impl AlertCorrelationEngine {
         Ok(correlated_alerts)
     }
 
-    async fn apply_correlation_rule(&self, alerts: Vec<Alert>, rule: &CorrelationRule) -> Result<Vec<Alert>> {
+    async fn apply_correlation_rule(
+        &self,
+        alerts: Vec<Alert>,
+        rule: &CorrelationRule,
+    ) -> Result<Vec<Alert>> {
         let mut correlated = Vec::new();
 
         for alert in alerts {
             let mut correlated_alert = alert.clone();
 
             // Check if alert matches correlation conditions
-            let matches_conditions = rule.conditions.iter().any(|condition|
-                correlated_alert.event_details.event_type.contains(condition)
-            );
+            let matches_conditions = rule.conditions.iter().any(|condition| {
+                correlated_alert
+                    .event_details
+                    .event_type
+                    .contains(condition)
+            });
 
             if matches_conditions {
-                correlated_alert.tags.push(format!("correlated:{}", rule.name));
+                correlated_alert
+                    .tags
+                    .push(format!("correlated:{}", rule.name));
                 // Boost severity if correlation is strong
                 if rule.correlation_score > 0.7 {
                     correlated_alert.severity = match correlated_alert.severity {
@@ -729,8 +773,15 @@ impl NotificationEngine {
         Ok(())
     }
 
-    async fn send_escalation_notification(&self, alert: &Alert, rule: &EscalationRule) -> Result<()> {
-        println!("Sending escalation notification for alert: {} to level {}", alert.alert_id, rule.escalation_level);
+    async fn send_escalation_notification(
+        &self,
+        alert: &Alert,
+        rule: &EscalationRule,
+    ) -> Result<()> {
+        println!(
+            "Sending escalation notification for alert: {} to level {}",
+            alert.alert_id, rule.escalation_level
+        );
         // In a real implementation, this would send escalation notifications
         Ok(())
     }

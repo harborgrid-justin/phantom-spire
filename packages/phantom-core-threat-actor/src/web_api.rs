@@ -4,9 +4,9 @@
 //! using the actix-web framework.
 
 #[cfg(feature = "web-api")]
-use actix_web::{web, App, HttpServer, HttpResponse, Result as ActixResult};
-#[cfg(feature = "web-api")]
 use actix_cors::Cors;
+#[cfg(feature = "web-api")]
+use actix_web::{web, App, HttpResponse, HttpServer, Result as ActixResult};
 #[cfg(feature = "web-api")]
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "web-api")]
@@ -120,10 +120,13 @@ async fn analyze_threat(
                 })),
                 Err(e) => ApiResponse::error(format!("Behavioral analysis failed: {}", e)),
             }
-        },
+        }
         "geographic" => {
             let mut module = state.geographic_module.lock().await;
-            match module.analyze_geographic_distribution(&request.target).await {
+            match module
+                .analyze_geographic_distribution(&request.target)
+                .await
+            {
                 Ok(analysis) => ApiResponse::success(serde_json::json!({
                     "analysis_type": "geographic",
                     "target": request.target,
@@ -131,7 +134,7 @@ async fn analyze_threat(
                 })),
                 Err(e) => ApiResponse::error(format!("Geographic analysis failed: {}", e)),
             }
-        },
+        }
         "risk" => {
             let mut module = state.risk_module.lock().await;
             match module.assess_risk(&request.target).await {
@@ -142,7 +145,7 @@ async fn analyze_threat(
                 })),
                 Err(e) => ApiResponse::error(format!("Risk assessment failed: {}", e)),
             }
-        },
+        }
         "intelligence" => {
             let mut module = state.intelligence_module.lock().await;
             match module.search_intelligence(&request.target).await {
@@ -154,7 +157,7 @@ async fn analyze_threat(
                 })),
                 Err(e) => ApiResponse::error(format!("Intelligence search failed: {}", e)),
             }
-        },
+        }
         _ => ApiResponse::error(format!("Unknown analysis type: {}", request.analysis_type)),
     };
 
@@ -172,11 +175,11 @@ async fn get_alerts(state: web::Data<ApiState>) -> ActixResult<HttpResponse> {
                 "alerts": alerts
             }));
             Ok(HttpResponse::Ok().json(response))
-        },
+        }
         Err(e) => {
             let response = ApiResponse::<()>::error(format!("Failed to get alerts: {}", e));
             Ok(HttpResponse::InternalServerError().json(response))
-        },
+        }
     }
 }
 
@@ -191,11 +194,11 @@ async fn get_incidents(state: web::Data<ApiState>) -> ActixResult<HttpResponse> 
                 "incidents": incidents
             }));
             Ok(HttpResponse::Ok().json(response))
-        },
+        }
         Err(e) => {
             let response = ApiResponse::<()>::error(format!("Failed to get incidents: {}", e));
             Ok(HttpResponse::InternalServerError().json(response))
-        },
+        }
     }
 }
 
@@ -205,7 +208,10 @@ async fn threat_hunt(
     query: web::Query<std::collections::HashMap<String, String>>,
     state: web::Data<ApiState>,
 ) -> ActixResult<HttpResponse> {
-    let hunt_type = query.get("type").unwrap_or(&"comprehensive".to_string()).clone();
+    let hunt_type = query
+        .get("type")
+        .unwrap_or(&"comprehensive".to_string())
+        .clone();
 
     let mut module = state.hunting_module.lock().await;
     match module.perform_threat_hunt(&hunt_type).await {
@@ -216,11 +222,11 @@ async fn threat_hunt(
                 "results": results
             }));
             Ok(HttpResponse::Ok().json(response))
-        },
+        }
         Err(e) => {
             let response = ApiResponse::<()>::error(format!("Threat hunt failed: {}", e));
             Ok(HttpResponse::InternalServerError().json(response))
-        },
+        }
     }
 }
 
@@ -233,7 +239,7 @@ pub fn configure_routes(cfg: &mut web::ServiceConfig) {
             .route("/analyze", web::post().to(analyze_threat))
             .route("/alerts", web::get().to(get_alerts))
             .route("/incidents", web::get().to(get_incidents))
-            .route("/threat-hunt", web::get().to(threat_hunt))
+            .route("/threat-hunt", web::get().to(threat_hunt)),
     );
 }
 
@@ -244,7 +250,10 @@ pub async fn start_server(
     port: u16,
     state: web::Data<ApiState>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("Starting Phantom Threat Actor API server on {}:{}", host, port);
+    println!(
+        "Starting Phantom Threat Actor API server on {}:{}",
+        host, port
+    );
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -257,16 +266,16 @@ pub async fn start_server(
             .wrap(cors)
             .app_data(state.clone())
             .configure(configure_routes)
-            .service(
-                web::scope("/api")
-                    .route("/status", web::get().to(|| async {
-                        HttpResponse::Ok().json(serde_json::json!({
-                            "service": "Phantom Threat Actor Core API",
-                            "version": env!("CARGO_PKG_VERSION"),
-                            "status": "running"
-                        }))
+            .service(web::scope("/api").route(
+                "/status",
+                web::get().to(|| async {
+                    HttpResponse::Ok().json(serde_json::json!({
+                        "service": "Phantom Threat Actor Core API",
+                        "version": env!("CARGO_PKG_VERSION"),
+                        "status": "running"
                     }))
-            )
+                }),
+            ))
     })
     .bind((host, port))?
     .run()
@@ -313,18 +322,16 @@ impl ApiClient {
             parameters: None,
         };
 
-        let response = self.client
-            .post(&url)
-            .json(&request)
-            .send()
-            .await?;
+        let response = self.client.post(&url).json(&request).send().await?;
 
         let result: ApiResponse<serde_json::Value> = response.json().await?;
         Ok(result)
     }
 
     /// Get alerts
-    pub async fn get_alerts(&self) -> Result<ApiResponse<serde_json::Value>, Box<dyn std::error::Error>> {
+    pub async fn get_alerts(
+        &self,
+    ) -> Result<ApiResponse<serde_json::Value>, Box<dyn std::error::Error>> {
         let url = format!("{}/api/v1/alerts", self.base_url);
         let response = self.client.get(&url).send().await?;
         let result: ApiResponse<serde_json::Value> = response.json().await?;

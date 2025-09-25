@@ -3,15 +3,15 @@
 //! Comprehensive supply chain risk analysis and management system,
 //! including vendor assessments, dependency analysis, and third-party risk monitoring.
 
-use std::cmp::PartialEq;
-use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, VecDeque};
-use chrono::{DateTime, Utc, Duration};
-use uuid::Uuid;
-use tokio::sync::mpsc;
-use futures::stream::Stream;
-use anyhow::Result;
 use crate::risk_assessment::AssessmentStatus;
+use anyhow::Result;
+use chrono::{DateTime, Duration, Utc};
+use futures::stream::Stream;
+use serde::{Deserialize, Serialize};
+use std::cmp::PartialEq;
+use std::collections::{HashMap, VecDeque};
+use tokio::sync::mpsc;
+use uuid::Uuid;
 
 /// Supply chain risk management engine
 #[derive(Debug)]
@@ -70,7 +70,10 @@ impl SupplyChainRiskModule {
                 // Process vendor risk update
             }
             SupplyChainEvent::DependencyVulnerability(vulnerability) => {
-                println!("Processing dependency vulnerability: {}", vulnerability.vulnerability_id);
+                println!(
+                    "Processing dependency vulnerability: {}",
+                    vulnerability.vulnerability_id
+                );
                 // Process dependency vulnerability
             }
             SupplyChainEvent::ComplianceBreach(breach) => {
@@ -111,7 +114,10 @@ impl SupplyChainRiskModule {
     }
 
     /// Register a dependency
-    pub async fn register_dependency(&mut self, dependency_config: DependencyConfig) -> Result<String> {
+    pub async fn register_dependency(
+        &mut self,
+        dependency_config: DependencyConfig,
+    ) -> Result<String> {
         let dependency_id = Uuid::new_v4().to_string();
 
         let dependency = Dependency {
@@ -130,7 +136,8 @@ impl SupplyChainRiskModule {
             created_at: Utc::now(),
         };
 
-        self.dependencies.insert(dependency_id.clone(), dependency.clone());
+        self.dependencies
+            .insert(dependency_id.clone(), dependency.clone());
 
         // Add to supply chain map
         self.supply_chain_map.add_dependency(&dependency);
@@ -142,16 +149,24 @@ impl SupplyChainRiskModule {
     }
 
     /// Perform vendor risk assessment
-    pub async fn assess_vendor_risk(&mut self, vendor_id: &str, assessment_config: VendorAssessmentConfig) -> Result<String> {
+    pub async fn assess_vendor_risk(
+        &mut self,
+        vendor_id: &str,
+        assessment_config: VendorAssessmentConfig,
+    ) -> Result<String> {
         let assessment_id = Uuid::new_v4().to_string();
-        
+
         // Perform assessment and calculate risk level before mutable borrows
         let assessment_result = {
-            let vendor = self.vendors.get_mut(vendor_id)
+            let vendor = self
+                .vendors
+                .get_mut(vendor_id)
                 .ok_or_else(|| anyhow::anyhow!("Vendor not found: {}", vendor_id))?;
-            self.vendor_assessment_engine.assess_vendor(vendor, &assessment_config).await?
+            self.vendor_assessment_engine
+                .assess_vendor(vendor, &assessment_config)
+                .await?
         };
-        
+
         let risk_level = self.calculate_risk_level(assessment_result.overall_score);
 
         let assessment = SupplyChainRiskAssessment {
@@ -170,26 +185,36 @@ impl SupplyChainRiskModule {
             status: AssessmentStatus::Completed,
         };
 
-        self.risk_assessments.insert(assessment_id.clone(), assessment.clone());
+        self.risk_assessments
+            .insert(assessment_id.clone(), assessment.clone());
 
         // Update vendor and propagate risk
         {
-            let vendor = self.vendors.get_mut(vendor_id)
+            let vendor = self
+                .vendors
+                .get_mut(vendor_id)
                 .ok_or_else(|| anyhow::anyhow!("Vendor not found: {}", vendor_id))?;
-            
+
             vendor.assessment_history.push(assessment.clone());
             vendor.last_assessment = Some(Utc::now());
             vendor.risk_profile.overall_score = assessment_result.overall_score;
 
-            self.risk_propagation_engine.propagate_vendor_risk(vendor).await?;
+            self.risk_propagation_engine
+                .propagate_vendor_risk(vendor)
+                .await?;
         }
 
         Ok(assessment_id)
     }
 
     /// Perform dependency security scan
-    pub async fn perform_dependency_scan(&mut self, dependency_id: &str) -> Result<SecurityScanResult> {
-        let dependency = self.dependencies.get_mut(dependency_id)
+    pub async fn perform_dependency_scan(
+        &mut self,
+        dependency_id: &str,
+    ) -> Result<SecurityScanResult> {
+        let dependency = self
+            .dependencies
+            .get_mut(dependency_id)
             .ok_or_else(|| anyhow::anyhow!("Dependency not found: {}", dependency_id))?;
 
         let scan_result = self.dependency_analyzer.scan_dependency(dependency).await?;
@@ -201,10 +226,13 @@ impl SupplyChainRiskModule {
         dependency.risk_score = scan_result.overall_risk_score;
 
         // Update supply chain map
-        self.supply_chain_map.update_dependency_risk(dependency_id, scan_result.overall_risk_score);
+        self.supply_chain_map
+            .update_dependency_risk(dependency_id, scan_result.overall_risk_score);
 
         // Check for critical vulnerabilities
-        let critical_vulnerabilities: Vec<_> = scan_result.vulnerabilities.iter()
+        let critical_vulnerabilities: Vec<_> = scan_result
+            .vulnerabilities
+            .iter()
             .filter(|v| v.severity == VulnerabilitySeverity::Critical)
             .cloned()
             .collect();
@@ -216,7 +244,8 @@ impl SupplyChainRiskModule {
         dependency.risk_score = scan_result.overall_risk_score;
 
         // Update supply chain map
-        self.supply_chain_map.update_dependency_risk(dependency_id, scan_result.overall_risk_score);
+        self.supply_chain_map
+            .update_dependency_risk(dependency_id, scan_result.overall_risk_score);
 
         // Create alerts for critical vulnerabilities
         for vulnerability in &critical_vulnerabilities {
@@ -224,7 +253,13 @@ impl SupplyChainRiskModule {
                 alert_id: Uuid::new_v4().to_string(),
                 alert_type: AlertType::Vulnerability,
                 title: "Critical Vulnerability Detected".to_string(),
-                description: format!("Critical vulnerability detected: {}", vulnerability.cve_id.as_ref().unwrap_or(&"Unknown CVE".to_string())),
+                description: format!(
+                    "Critical vulnerability detected: {}",
+                    vulnerability
+                        .cve_id
+                        .as_ref()
+                        .unwrap_or(&"Unknown CVE".to_string())
+                ),
                 affected_components: vec![vulnerability.title.clone()],
                 triggered_at: Utc::now(),
                 severity: AlertSeverity::Critical,
@@ -250,7 +285,11 @@ impl SupplyChainRiskModule {
     }
 
     /// Create vulnerability alert
-    async fn create_vulnerability_alert(&mut self, vulnerability: &Vulnerability, dependency: &Dependency) -> Result<()> {
+    async fn create_vulnerability_alert(
+        &mut self,
+        vulnerability: &Vulnerability,
+        dependency: &Dependency,
+    ) -> Result<()> {
         let alert = SupplyChainAlert {
             alert_id: Uuid::new_v4().to_string(),
             alert_type: AlertType::Vulnerability,
@@ -281,7 +320,11 @@ impl SupplyChainRiskModule {
 
         // Check vendor compliance
         for vendor in self.vendors.values() {
-            if let Some(alert) = self.compliance_monitor.check_vendor_compliance(vendor).await? {
+            if let Some(alert) = self
+                .compliance_monitor
+                .check_vendor_compliance(vendor)
+                .await?
+            {
                 new_alerts.push(alert);
             }
         }
@@ -294,7 +337,10 @@ impl SupplyChainRiskModule {
         }
 
         // Check supply chain propagation
-        let propagation_alerts = self.risk_propagation_engine.check_propagation_alerts().await?;
+        let propagation_alerts = self
+            .risk_propagation_engine
+            .check_propagation_alerts()
+            .await?;
         new_alerts.extend(propagation_alerts);
 
         // Add to monitoring alerts
@@ -306,8 +352,13 @@ impl SupplyChainRiskModule {
     }
 
     /// Check dependency vulnerabilities
-    async fn check_dependency_vulnerabilities(&self, dependency: &Dependency) -> Result<Option<SupplyChainAlert>> {
-        let critical_vulns = dependency.vulnerabilities.iter()
+    async fn check_dependency_vulnerabilities(
+        &self,
+        dependency: &Dependency,
+    ) -> Result<Option<SupplyChainAlert>> {
+        let critical_vulns = dependency
+            .vulnerabilities
+            .iter()
             .filter(|v| v.severity == VulnerabilitySeverity::Critical)
             .count();
 
@@ -317,7 +368,10 @@ impl SupplyChainRiskModule {
                 alert_type: AlertType::Vulnerability,
                 severity: AlertSeverity::Critical,
                 title: format!("Multiple critical vulnerabilities in {}", dependency.name),
-                description: format!("Found {} critical vulnerabilities requiring immediate attention", critical_vulns),
+                description: format!(
+                    "Found {} critical vulnerabilities requiring immediate attention",
+                    critical_vulns
+                ),
                 affected_components: vec![dependency.name.clone()],
                 triggered_at: Utc::now(),
                 status: AlertStatus::New,
@@ -330,13 +384,20 @@ impl SupplyChainRiskModule {
     }
 
     /// Generate supply chain risk report
-    pub async fn generate_risk_report(&self, report_config: SupplyChainReportConfig) -> Result<SupplyChainRiskReport> {
+    pub async fn generate_risk_report(
+        &self,
+        report_config: SupplyChainReportConfig,
+    ) -> Result<SupplyChainRiskReport> {
         let vendor_risks = self.analyze_vendor_risks().await?;
         let dependency_risks = self.analyze_dependency_risks().await?;
         let supply_chain_analysis = self.analyze_supply_chain().await?;
-        let compliance_status = self.compliance_monitor.generate_compliance_summary().await?;
+        let compliance_status = self
+            .compliance_monitor
+            .generate_compliance_summary()
+            .await?;
 
-        let overall_risk_score = self.calculate_overall_risk_score(&vendor_risks, &dependency_risks);
+        let overall_risk_score =
+            self.calculate_overall_risk_score(&vendor_risks, &dependency_risks);
 
         let report = SupplyChainRiskReport {
             report_id: Uuid::new_v4().to_string(),
@@ -350,7 +411,9 @@ impl SupplyChainRiskModule {
             dependency_risks,
             supply_chain_analysis,
             compliance_status,
-            recommendations: self.generate_risk_recommendations(overall_risk_score).await?,
+            recommendations: self
+                .generate_risk_recommendations(overall_risk_score)
+                .await?,
             executive_summary: self.generate_executive_summary(overall_risk_score),
         };
 
@@ -369,7 +432,9 @@ impl SupplyChainRiskModule {
                 risk_level: self.calculate_risk_level(vendor.risk_profile.overall_score),
                 criticality_level: vendor.criticality_level.clone(),
                 last_assessment: vendor.last_assessment,
-                open_findings: vendor.assessment_history.last()
+                open_findings: vendor
+                    .assessment_history
+                    .last()
                     .map(|a| a.findings.len())
                     .unwrap_or(0),
                 compliance_status: vendor.compliance_status.clone(),
@@ -396,7 +461,9 @@ impl SupplyChainRiskModule {
                 risk_score: dependency.risk_score,
                 risk_level: self.calculate_risk_level(dependency.risk_score),
                 vulnerability_count: dependency.vulnerabilities.len(),
-                critical_vulnerabilities: dependency.vulnerabilities.iter()
+                critical_vulnerabilities: dependency
+                    .vulnerabilities
+                    .iter()
                     .filter(|v| v.severity == VulnerabilitySeverity::Critical)
                     .count(),
                 last_scan: dependency.last_scan,
@@ -416,10 +483,14 @@ impl SupplyChainRiskModule {
     async fn analyze_supply_chain(&self) -> Result<SupplyChainAnalysis> {
         let total_vendors = self.vendors.len();
         let total_dependencies = self.dependencies.len();
-        let high_risk_vendors = self.vendors.values()
+        let high_risk_vendors = self
+            .vendors
+            .values()
             .filter(|v| v.risk_profile.overall_score >= 7.0)
             .count();
-        let vulnerable_dependencies = self.dependencies.values()
+        let vulnerable_dependencies = self
+            .dependencies
+            .values()
             .filter(|d| !d.vulnerabilities.is_empty())
             .count();
 
@@ -439,7 +510,11 @@ impl SupplyChainRiskModule {
     }
 
     /// Calculate overall risk score
-    fn calculate_overall_risk_score(&self, vendor_risks: &[VendorRiskSummary], dependency_risks: &[DependencyRiskSummary]) -> f64 {
+    fn calculate_overall_risk_score(
+        &self,
+        vendor_risks: &[VendorRiskSummary],
+        dependency_risks: &[DependencyRiskSummary],
+    ) -> f64 {
         let vendor_avg = if !vendor_risks.is_empty() {
             vendor_risks.iter().map(|v| v.risk_score).sum::<f64>() / vendor_risks.len() as f64
         } else {
@@ -447,7 +522,8 @@ impl SupplyChainRiskModule {
         };
 
         let dependency_avg = if !dependency_risks.is_empty() {
-            dependency_risks.iter().map(|d| d.risk_score).sum::<f64>() / dependency_risks.len() as f64
+            dependency_risks.iter().map(|d| d.risk_score).sum::<f64>()
+                / dependency_risks.len() as f64
         } else {
             0.0
         };
@@ -457,14 +533,19 @@ impl SupplyChainRiskModule {
     }
 
     /// Generate risk recommendations
-    async fn generate_risk_recommendations(&self, overall_risk_score: f64) -> Result<Vec<RiskRecommendation>> {
+    async fn generate_risk_recommendations(
+        &self,
+        overall_risk_score: f64,
+    ) -> Result<Vec<RiskRecommendation>> {
         let mut recommendations = Vec::new();
 
         if overall_risk_score >= 7.0 {
             recommendations.push(RiskRecommendation {
                 recommendation_id: Uuid::new_v4().to_string(),
                 title: "Implement Enhanced Vendor Due Diligence".to_string(),
-                description: "High overall risk score indicates need for more rigorous vendor assessments".to_string(),
+                description:
+                    "High overall risk score indicates need for more rigorous vendor assessments"
+                        .to_string(),
                 priority: RecommendationPriority::High,
                 category: "vendor_management".to_string(),
                 actions: vec![
@@ -476,7 +557,9 @@ impl SupplyChainRiskModule {
             });
         }
 
-        let vulnerable_deps = self.dependencies.values()
+        let vulnerable_deps = self
+            .dependencies
+            .values()
             .filter(|d| !d.vulnerabilities.is_empty())
             .count();
 
@@ -484,7 +567,10 @@ impl SupplyChainRiskModule {
             recommendations.push(RiskRecommendation {
                 recommendation_id: Uuid::new_v4().to_string(),
                 title: "Address Dependency Vulnerabilities".to_string(),
-                description: format!("{} dependencies have known vulnerabilities", vulnerable_deps),
+                description: format!(
+                    "{} dependencies have known vulnerabilities",
+                    vulnerable_deps
+                ),
                 priority: RecommendationPriority::High,
                 category: "dependency_management".to_string(),
                 actions: vec![
@@ -529,7 +615,9 @@ impl SupplyChainRiskModule {
 
     /// Send supply chain event
     pub async fn send_supply_chain_event(&self, event: SupplyChainEvent) -> Result<()> {
-        self.risk_sender.send(event).await
+        self.risk_sender
+            .send(event)
+            .await
             .map_err(|e| anyhow::anyhow!("Failed to send supply chain event: {}", e))
     }
 
@@ -1037,11 +1125,13 @@ impl SupplyChainMap {
     }
 
     fn add_vendor(&mut self, vendor: &Vendor) {
-        self.vendors.insert(vendor.vendor_id.clone(), vendor.clone());
+        self.vendors
+            .insert(vendor.vendor_id.clone(), vendor.clone());
     }
 
     fn add_dependency(&mut self, dependency: &Dependency) {
-        self.dependencies.insert(dependency.dependency_id.clone(), dependency.clone());
+        self.dependencies
+            .insert(dependency.dependency_id.clone(), dependency.clone());
     }
 
     fn update_dependency_risk(&mut self, dependency_id: &str, risk_score: f64) {
@@ -1052,8 +1142,14 @@ impl SupplyChainMap {
 
     fn calculate_risk_concentration(&self) -> f64 {
         // Calculate how concentrated risk is among vendors/suppliers
-        let total_risk: f64 = self.vendors.values().map(|v| v.risk_profile.overall_score).sum();
-        let max_risk = self.vendors.values()
+        let total_risk: f64 = self
+            .vendors
+            .values()
+            .map(|v| v.risk_profile.overall_score)
+            .sum();
+        let max_risk = self
+            .vendors
+            .values()
             .map(|v| v.risk_profile.overall_score)
             .fold(0.0, f64::max);
 
@@ -1071,7 +1167,9 @@ impl SupplyChainMap {
         for (_vendor_id, vendor) in &self.vendors {
             if vendor.criticality_level == CriticalityLevel::Critical {
                 // Check if this vendor has unique dependencies
-                let has_unique_deps = self.dependencies.values()
+                let has_unique_deps = self
+                    .dependencies
+                    .values()
                     .filter(|d| d.supplier == vendor.name)
                     .any(|d| d.criticality == CriticalityLevel::Critical);
 
@@ -1121,15 +1219,22 @@ impl VendorAssessmentEngine {
         }
     }
 
-    async fn assess_vendor(&self, vendor: &Vendor, config: &VendorAssessmentConfig) -> Result<VendorAssessmentResult> {
+    async fn assess_vendor(
+        &self,
+        vendor: &Vendor,
+        config: &VendorAssessmentConfig,
+    ) -> Result<VendorAssessmentResult> {
         // Perform comprehensive vendor assessment
         let security_score = self.assess_security_posture(vendor).await?;
         let financial_score = self.assess_financial_stability(vendor).await?;
         let operational_score = self.assess_operational_resilience(vendor).await?;
 
-        let overall_score = (security_score * 0.5) + (financial_score * 0.3) + (operational_score * 0.2);
+        let overall_score =
+            (security_score * 0.5) + (financial_score * 0.3) + (operational_score * 0.2);
 
-        let findings = self.generate_assessment_findings(vendor, overall_score).await?;
+        let findings = self
+            .generate_assessment_findings(vendor, overall_score)
+            .await?;
         let recommendations = self.generate_assessment_recommendations(&findings).await?;
         let mitigation_actions = self.generate_mitigation_actions(&recommendations).await?;
 
@@ -1168,25 +1273,37 @@ impl VendorAssessmentEngine {
         Ok(6.5) // Placeholder
     }
 
-    async fn generate_assessment_findings(&self, vendor: &Vendor, score: f64) -> Result<Vec<AssessmentFinding>> {
+    async fn generate_assessment_findings(
+        &self,
+        vendor: &Vendor,
+        score: f64,
+    ) -> Result<Vec<AssessmentFinding>> {
         let mut findings = Vec::new();
 
         if score < 7.0 {
             findings.push(AssessmentFinding {
                 finding_id: Uuid::new_v4().to_string(),
                 title: "Below Average Risk Score".to_string(),
-                description: format!("Vendor {} has a risk score of {:.1} which is below acceptable threshold", vendor.name, score),
+                description: format!(
+                    "Vendor {} has a risk score of {:.1} which is below acceptable threshold",
+                    vendor.name, score
+                ),
                 severity: FindingSeverity::High,
                 category: "risk_assessment".to_string(),
                 evidence: vec!["Assessment results".to_string()],
-                remediation: "Conduct detailed security assessment and implement recommended controls".to_string(),
+                remediation:
+                    "Conduct detailed security assessment and implement recommended controls"
+                        .to_string(),
             });
         }
 
         Ok(findings)
     }
 
-    async fn generate_assessment_recommendations(&self, findings: &[AssessmentFinding]) -> Result<Vec<RiskRecommendation>> {
+    async fn generate_assessment_recommendations(
+        &self,
+        findings: &[AssessmentFinding],
+    ) -> Result<Vec<RiskRecommendation>> {
         let mut recommendations = Vec::new();
 
         for finding in findings {
@@ -1206,7 +1323,10 @@ impl VendorAssessmentEngine {
         Ok(recommendations)
     }
 
-    async fn generate_mitigation_actions(&self, recommendations: &[RiskRecommendation]) -> Result<Vec<MitigationAction>> {
+    async fn generate_mitigation_actions(
+        &self,
+        recommendations: &[RiskRecommendation],
+    ) -> Result<Vec<MitigationAction>> {
         let mut actions = Vec::new();
 
         for recommendation in recommendations {
@@ -1281,7 +1401,8 @@ impl DependencyAnalyzer {
         let overall_risk_score = if vulnerabilities.is_empty() {
             2.0
         } else {
-            vulnerabilities.iter()
+            vulnerabilities
+                .iter()
                 .map(|v| match v.severity {
                     VulnerabilitySeverity::Critical => 9.0,
                     VulnerabilitySeverity::High => 7.0,
@@ -1320,7 +1441,9 @@ impl DependencyAnalyzer {
                 fixed_versions: vec!["2.0.0".to_string()],
                 published_at: Utc::now() - Duration::days(30),
                 last_modified: Utc::now() - Duration::days(7),
-                references: vec!["https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-12345".to_string()],
+                references: vec![
+                    "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-12345".to_string(),
+                ],
             });
         }
 
@@ -1383,7 +1506,10 @@ impl ComplianceMonitor {
                 alert_type: AlertType::ComplianceBreach,
                 severity: AlertSeverity::High,
                 title: format!("Compliance issues with vendor {}", vendor.name),
-                description: format!("Vendor compliance score is {:.1}, below acceptable threshold", vendor.compliance_status.compliance_score),
+                description: format!(
+                    "Vendor compliance score is {:.1}, below acceptable threshold",
+                    vendor.compliance_status.compliance_score
+                ),
                 affected_components: vec![vendor.name.clone()],
                 triggered_at: Utc::now(),
                 status: AlertStatus::New,

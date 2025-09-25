@@ -4,9 +4,9 @@
 //! for SOX, GDPR, HIPAA, NIST, and other regulatory frameworks.
 
 use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use chrono::{DateTime, Utc};
 
 /// Compliance frameworks supported
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -70,12 +70,16 @@ pub struct ComplianceRecommendation {
 pub trait ComplianceModule: Send + Sync {
     /// Generate compliance report
     async fn generate_compliance_report(&self, framework: ComplianceFramework) -> ComplianceReport;
-    
+
     /// Validate compliance controls
     async fn validate_controls(&self, framework: ComplianceFramework) -> Vec<ComplianceFinding>;
-    
+
     /// Get audit trail
-    async fn get_audit_trail(&self, start_date: DateTime<Utc>, end_date: DateTime<Utc>) -> Vec<AuditEvent>;
+    async fn get_audit_trail(
+        &self,
+        start_date: DateTime<Utc>,
+        end_date: DateTime<Utc>,
+    ) -> Vec<AuditEvent>;
 }
 
 /// Audit event
