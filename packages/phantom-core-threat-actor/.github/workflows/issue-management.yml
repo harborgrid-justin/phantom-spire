@@ -1,0 +1,298 @@
+name: 'Issue & PR Management'
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled]
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC for stale issue management
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  auto-label-issues:
+    name: Auto-label Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues' && github.event.action == 'opened'
+    steps:
+      - name: Auto-label based on content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body.toLowerCase();
+            
+            const labels = [];
+            
+            // Security-related
+            if (title.includes('security') || title.includes('vulnerability') || body.includes('cve-')) {
+              labels.push('security');
+              labels.push('priority: high');
+            }
+            
+            // Bug reports
+            if (title.includes('bug') || title.includes('error') || title.includes('crash') || 
+                body.includes('expected behavior') || body.includes('steps to reproduce')) {
+              labels.push('bug');
+              labels.push('needs-investigation');
+            }
+            
+            // Feature requests  
+            if (title.includes('feature') || title.includes('enhancement') || title.includes('request') ||
+                body.includes('would be nice') || body.includes('feature request')) {
+              labels.push('enhancement');
+              labels.push('needs-discussion');
+            }
+            
+            // Performance issues
+            if (title.includes('performance') || title.includes('slow') || title.includes('memory') ||
+                body.includes('performance') || body.includes('latency')) {
+              labels.push('performance');
+              labels.push('needs-investigation');
+            }
+            
+            // Documentation
+            if (title.includes('documentation') || title.includes('docs') || title.includes('readme') ||
+                body.includes('documentation')) {
+              labels.push('documentation');
+              labels.push('good first issue');
+            }
+            
+            // Enterprise features
+            if (title.includes('enterprise') || body.includes('enterprise') || 
+                body.includes('commercial') || body.includes('business')) {
+              labels.push('enterprise');
+              labels.push('priority: medium');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
+      
+      - name: Welcome new contributors
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            
+            // Check if this is the user's first issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              creator: issue.user.login,
+              state: 'all'
+            });
+            
+            if (issues.data.length === 1) {
+              const welcomeMessage = [
+                '👋 Welcome to **Phantom Core Threat Actor**! Thank you for opening your first issue.',
+                '',
+                '## 🎯 What happens next?',
+                '',
+                '1. **Auto-labeling**: Our bot has automatically labeled this issue based on its content',
+                '2. **Team review**: Our security team will review within 24-48 hours',
+                '3. **Enterprise support**: For critical issues, contact enterprise@defendr.ai',
+                '',
+                '## 📚 Helpful Resources',
+                '',
+                '- [🔧 API Documentation](https://github.com/defendr-ai/phantom.core-threat-actor/blob/main/API_DOCUMENTATION.md)',
+                '- [🏢 Enterprise Guide](https://github.com/defendr-ai/phantom.core-threat-actor/blob/main/ENTERPRISE_GUIDE.md)',
+                '- [💡 Contributing Guidelines](https://github.com/defendr-ai/phantom.core-threat-actor/blob/main/CONTRIBUTING.md)',
+                '',
+                'Thanks for helping make this project better! 🚀'
+              ].join('\n');
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: welcomeMessage
+              });
+            }
+
+  triage-issues:
+    name: Issue Triage
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+    steps:
+      - name: Assign to project board
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            // Add to appropriate project column based on labels
+            if (labels.includes('security') || labels.includes('priority: high')) {
+              // Add to security review column
+              console.log('High priority security issue - requires immediate attention');
+            } else if (labels.includes('bug')) {
+              // Add to bug triage column  
+              console.log('Bug reported - added to triage');
+            } else if (labels.includes('enhancement')) {
+              // Add to feature requests column
+              console.log('Feature request - added to backlog');
+            }
+      
+      - name: Set priority milestones
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+            
+            let milestone = null;
+            
+            if (labels.includes('security') || labels.includes('priority: high')) {
+              milestone = 'Security & Critical Fixes';
+            } else if (labels.includes('bug') && labels.includes('priority: medium')) {
+              milestone = 'Bug Fixes';
+            } else if (labels.includes('enhancement')) {
+              milestone = 'Feature Requests';
+            } else if (labels.includes('documentation')) {
+              milestone = 'Documentation Improvements';
+            }
+            
+            if (milestone) {
+              // Note: You'd need to create these milestones first
+              console.log(`Would assign to milestone: ${milestone}`);
+            }
+
+  stale-issue-management:
+    name: Manage Stale Issues
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Close stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          stale-issue-message: |
+            👋 This issue has been marked as stale because it has been open for 30 days with no activity.
+            
+            **What happens next?**
+            - If no activity occurs in the next 7 days, this issue will be automatically closed
+            - To keep this issue open, simply comment or add the `keep-open` label
+            - For enterprise support, contact enterprise@defendr.ai
+            
+            Thank you for your contribution! 🙏
+          stale-pr-message: |
+            👋 This pull request has been marked as stale because it has been open for 30 days with no activity.
+            
+            **What happens next?**
+            - If no activity occurs in the next 7 days, this PR will be automatically closed
+            - To keep this PR open, push new commits or add the `keep-open` label
+            - Please rebase if there are conflicts
+            
+            Thank you for your contribution! 🙏
+          close-issue-message: |
+            🔒 This issue has been automatically closed due to inactivity.
+            
+            If this issue is still relevant, please:
+            - Reopen the issue with updated information
+            - Contact enterprise@defendr.ai for priority support
+            - Join our community discussions
+            
+            Thanks for your understanding! 🚀
+          close-pr-message: |
+            🔒 This pull request has been automatically closed due to inactivity.
+            
+            If you'd like to continue this work:
+            - Reopen the PR with updated commits
+            - Create a new PR with the latest changes
+            - Contact the team if you need assistance
+            
+            Thanks for your contribution! 🚀
+          days-before-stale: 30
+          days-before-close: 7
+          exempt-issue-labels: 'keep-open,security,priority: high'
+          exempt-pr-labels: 'keep-open,security'
+          exempt-draft-pr: true
+
+  pr-automation:
+    name: PR Automation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Auto-label PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const title = pr.title.toLowerCase();
+            const body = pr.body ? pr.body.toLowerCase() : '';
+            
+            const labels = [];
+            
+            // Conventional commit types
+            if (title.startsWith('feat:') || title.includes('feature')) {
+              labels.push('enhancement');
+            } else if (title.startsWith('fix:') || title.includes('bug fix')) {
+              labels.push('bug');
+            } else if (title.startsWith('docs:') || title.includes('documentation')) {
+              labels.push('documentation');
+            } else if (title.startsWith('chore:') || title.includes('maintenance')) {
+              labels.push('maintenance');
+            } else if (title.startsWith('security:') || body.includes('security')) {
+              labels.push('security');
+            }
+            
+            // Size based on files changed
+            const filesChanged = pr.changed_files;
+            if (filesChanged <= 3) {
+              labels.push('size/small');
+            } else if (filesChanged <= 10) {
+              labels.push('size/medium');
+            } else {
+              labels.push('size/large');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: labels
+              });
+            }
+      
+      - name: Request reviews
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const labels = pr.labels.map(label => label.name);
+            
+            // Auto-assign reviewers based on labels
+            const reviewers = [];
+            
+            if (labels.includes('security')) {
+              reviewers.push('security-team'); // Replace with actual team/user
+            }
+            if (labels.includes('documentation')) {
+              reviewers.push('docs-team'); // Replace with actual team/user  
+            }
+            
+            // Note: Replace with actual GitHub usernames/teams
+            // if (reviewers.length > 0) {
+            //   await github.rest.pulls.requestReviewers({
+            //     owner: context.repo.owner,
+            //     repo: context.repo.repo,
+            //     pull_number: pr.number,
+            //     reviewers: reviewers
+            //   });
+            // }
+
+

@@ -1,7 +1,7 @@
 {
   "name": "@phantom-core/test-threat-actor-app",
-  "version": "1.0.0",
-  "description": "Comprehensive test application for Phantom Threat Actor Core APIs",
+  "version": "1.0.1",
+  "description": "Enterprise Test Suite & Demonstration Platform for Phantom Threat Actor Core - Complete API validation, interactive demos, and performance testing for security operations centers",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -17,23 +17,32 @@
     "intelligence": "node examples/intelligence-feed.js"
   },
   "dependencies": {
-    "@phantom-core/threat-actor-core": "file:../phantom-threat-actor-core",
+    "@phantom-core/threat-actor": "^1.0.3",
     "chalk": "^5.3.0",
-    "inquirer": "^9.2.0",
     "cli-table3": "^0.6.0",
     "figlet": "^1.7.0",
-    "ora": "^7.0.1"
+    "inquirer": "12.9.6",
+    "ora": "9.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"
   },
   "keywords": [
-    "phantom-core",
-    "threat-actor",
-    "test-app",
+    "phantom-spire",
+    "threat-intelligence-testing",
+    "enterprise-security-testing",
+    "soc-tools",
+    "threat-actor-analysis",
+    "attribution-testing",
+    "security-operations",
     "enterprise-cti",
-    "attribution",
-    "threat-intelligence"
+    "threat-hunting",
+    "cybersecurity-testing",
+    "api-testing",
+    "security-analytics",
+    "threat-attribution",
+    "enterprise-grade",
+    "ocsf-testing"
   ],
   "author": "Phantom Spire Security Team",
   "license": "MIT"

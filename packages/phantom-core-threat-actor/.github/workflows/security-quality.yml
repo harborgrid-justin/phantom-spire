@@ -1,0 +1,180 @@
+name: 'Security & Quality Checks'
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security checks daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm cache clean --force
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+      
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium
+        continue-on-error: true
+
+  rust-security:
+    name: Rust Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+      
+      - name: Run cargo audit
+        run: cargo audit
+        continue-on-error: true
+      
+      - name: Run cargo deny
+        run: |
+          cargo install cargo-deny
+          cargo deny check
+        continue-on-error: true
+
+  codeql-analysis:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: ['javascript', 'rust']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      
+      - name: Setup Node.js
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      
+      - name: Setup Rust
+        if: matrix.language == 'rust'
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Build JavaScript
+        if: matrix.language == 'javascript'
+        run: |
+          npm cache clean --force
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
+          npm run build:debug || true
+      
+      - name: Build Rust
+        if: matrix.language == 'rust'
+        run: |
+          cargo build --all-features
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          allow-dependencies-licenses: MIT, Apache-2.0, BSD-3-Clause, ISC
+
+  performance-benchmarks:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install dependencies
+        run: npm cache clean --force
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ @napi-rs/cli@3.2.0
+          npm install --no-save --no-package-lock --registry https://registry.npmjs.org/ rimraf@5.0.5
+      
+      - name: Build native module
+        run: npm run build
+      
+      - name: Run performance benchmarks
+        run: |
+          node -e "
+          const { PhantomThreatActorCore } = require('./index.js');
+          const core = new PhantomThreatActorCore('{}');
+          
+          console.log('🚀 Performance Benchmarks');
+          console.log('=' .repeat(50));
+          
+          const start = Date.now();
+          const iterations = 100;
+          
+          for (let i = 0; i < iterations; i++) {
+            core.getHealthStatus();
+          }
+          
+          const duration = Date.now() - start;
+          const avgTime = duration / iterations;
+          
+          console.log(\`Health Status Calls: \${iterations}\`);
+          console.log(\`Total Time: \${duration}ms\`);
+          console.log(\`Average Time: \${avgTime.toFixed(2)}ms per call\`);
+          console.log(\`Throughput: \${(1000/avgTime).toFixed(0)} calls/second\`);
+          
+          // Performance threshold check
+          if (avgTime > 50) {
+            console.error('❌ Performance regression detected!');
+            process.exit(1);
+          } else {
+            console.log('✅ Performance within acceptable limits');
+          }
+          "
+
+
