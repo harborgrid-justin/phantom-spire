@@ -5,7 +5,7 @@ use super::traits::*;
 use crate::models::*;
 use async_trait::async_trait;
 use chrono::Utc;
-use redis::{aio::MultiplexedConnection, AsyncCommands, Client, Commands, Connection};
+use redis::{aio::MultiplexedConnection, AsyncCommands, Client, Commands};
 use serde_json;
 use std::collections::HashMap;
 

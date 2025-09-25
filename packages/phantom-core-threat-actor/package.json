@@ -1,6 +1,6 @@
 {
   "name": "@phantom-core/threat-actor",
-  "version": "1.0.16",
+  "version": "1.0.20",
   "description": "Enterprise-Grade Threat Intelligence & Attribution Platform - Advanced threat actor analysis with 94.2% attribution accuracy, OCSF compliance, and real-time security operations support",
   "main": "index.js",
   "types": "index.d.ts",

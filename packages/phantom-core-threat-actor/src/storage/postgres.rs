@@ -5,7 +5,7 @@ use super::traits::*;
 use crate::models::*;
 use async_trait::async_trait;
 use chrono::Utc;
-use deadpool_postgres::{Config, Manager, ManagerConfig, Pool, RecyclingMethod};
+use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod};
 use std::collections::HashMap;
 use tokio_postgres::{NoTls, Row};
 

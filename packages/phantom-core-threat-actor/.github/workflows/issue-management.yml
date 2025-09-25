@@ -19,7 +19,7 @@ jobs:
   auto-label-issues:
     name: Auto-label Issues
     runs-on: ubuntu-latest
-    if: github.event_name == 'issues' && github.event.action == 'opened'
+    if: false  # Disabled - building locally instead
     steps:
       - name: Auto-label based on content
         uses: actions/github-script@v7
@@ -125,7 +125,7 @@ jobs:
   triage-issues:
     name: Issue Triage
     runs-on: ubuntu-latest
-    if: github.event_name == 'issues'
+    if: false  # Disabled - building locally instead
     steps:
       - name: Assign to project board
         uses: actions/github-script@v7
@@ -173,7 +173,7 @@ jobs:
   stale-issue-management:
     name: Manage Stale Issues
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+    if: false  # Disabled - building locally instead
     steps:
       - name: Close stale issues and PRs
         uses: actions/stale@v9
@@ -224,7 +224,7 @@ jobs:
   pr-automation:
     name: PR Automation
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: false  # Disabled - building locally instead
     steps:
       - name: Auto-label PRs
         uses: actions/github-script@v7

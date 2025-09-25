@@ -5,7 +5,6 @@ use std::collections::HashMap;
 
 /// OCSF Enrichment Module
 /// Provides additional context and intelligence to OCSF events
-
 /// Enrichment Provider
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnrichmentProvider {

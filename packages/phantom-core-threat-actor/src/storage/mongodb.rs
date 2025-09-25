@@ -6,7 +6,7 @@ use crate::models::*;
 use async_trait::async_trait;
 use chrono::Utc;
 use mongodb::{
-    bson::{doc, oid::ObjectId, DateTime as BsonDateTime, Document},
+    bson::{doc, oid::ObjectId, to_document, DateTime as BsonDateTime, Document},
     Client, Collection, Database,
 };
 use serde::{Deserialize, Serialize};
@@ -372,7 +372,7 @@ impl ThreatActorStorage for MongoDBStorage {
 
         // Use upsert to handle both insert and update
         let filter = doc! { "actor_id": &actor.id };
-        let update = doc! { "$set": bson::to_document(&mongo_actor).map_err(|e| StorageError::Serialization(format!("Failed to serialize actor: {}", e)))? };
+        let update = doc! { "$set": to_document(&mongo_actor).map_err(|e| StorageError::Serialization(format!("Failed to serialize actor: {}", e)))? };
         let options = mongodb::options::UpdateOptions::builder()
             .upsert(true)
             .build();
@@ -395,7 +395,7 @@ impl ThreatActorStorage for MongoDBStorage {
         // Convert to documents for bulk write
         let documents: Vec<Document> = mongo_actors
             .into_iter()
-            .map(|actor| bson::to_document(&actor))
+            .map(|actor| to_document(&actor))
             .collect::<Result<Vec<_>, _>>()
             .map_err(|e| {
                 StorageError::Serialization(format!("Failed to serialize actors: {}", e))
@@ -593,7 +593,7 @@ impl ThreatActorStorage for MongoDBStorage {
         let mongo_campaign = Self::campaign_to_mongo(campaign);
 
         let filter = doc! { "campaign_id": &campaign.id };
-        let update = doc! { "$set": bson::to_document(&mongo_campaign).map_err(|e| StorageError::Serialization(format!("Failed to serialize campaign: {}", e)))? };
+        let update = doc! { "$set": to_document(&mongo_campaign).map_err(|e| StorageError::Serialization(format!("Failed to serialize campaign: {}", e)))? };
         let options = mongodb::options::UpdateOptions::builder()
             .upsert(true)
             .build();
@@ -728,7 +728,7 @@ impl ThreatActorStorage for MongoDBStorage {
         };
 
         let filter = doc! { "actor_id": &analysis.actor_id };
-        let update = doc! { "$set": bson::to_document(&mongo_analysis).map_err(|e| StorageError::Serialization(format!("Failed to serialize behavioral analysis: {}", e)))? };
+        let update = doc! { "$set": to_document(&mongo_analysis).map_err(|e| StorageError::Serialization(format!("Failed to serialize behavioral analysis: {}", e)))? };
         let options = mongodb::options::UpdateOptions::builder()
             .upsert(true)
             .build();

@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   security-audit:
+    if: false  # Disabled - building locally instead
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
@@ -46,6 +47,7 @@ jobs:
         continue-on-error: true
 
   rust-security:
+    if: false  # Disabled - building locally instead
     name: Rust Security Audit
     runs-on: ubuntu-latest
     steps:
@@ -68,6 +70,7 @@ jobs:
         continue-on-error: true
 
   codeql-analysis:
+    if: false  # Disabled - building locally instead
     name: CodeQL Analysis
     runs-on: ubuntu-latest
     strategy:
@@ -111,7 +114,7 @@ jobs:
   dependency-review:
     name: Dependency Review
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: false  # Disabled - building locally instead
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -123,6 +126,7 @@ jobs:
           allow-dependencies-licenses: MIT, Apache-2.0, BSD-3-Clause, ISC
 
   performance-benchmarks:
+    if: false  # Disabled - building locally instead
     name: Performance Benchmarks
     runs-on: ubuntu-latest
     steps:

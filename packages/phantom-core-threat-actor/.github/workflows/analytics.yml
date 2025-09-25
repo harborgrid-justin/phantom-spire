@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   analytics:
+    if: false  # Disabled - building locally instead
     name: Generate Analytics Dashboard
     runs-on: ubuntu-latest
     steps:

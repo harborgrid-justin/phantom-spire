@@ -3,8 +3,8 @@
 //! This is a basic example demonstrating the phantom-threat-actor-core package
 //! with OCSF objects to show the core functionality.
 
-use phantom_threat_actor_core::ocsf_objects::ThreatActor;
 use chrono::Utc;
+use phantom_threat_actor_core::ocsf_objects::ThreatActor;
 
 fn main() {
     println!("🚀 Phantom Threat Actor Core - Simple OCSF Example");
