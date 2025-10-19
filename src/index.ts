@@ -25,7 +25,8 @@ import {
   initializeEnterpriseManagement,
   shutdownEnterpriseManagement,
 } from './services/index.js';
-// Unused imports kept for future integration
+// TODO: Re-enable these imports once enterprise integration is fully configured
+// These are temporarily disabled to pass linting checks during incremental development
 // import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
 // import { centralizedServiceCenter } from './centralized-service-center/index.js';
 // import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
