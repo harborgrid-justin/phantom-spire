@@ -5,10 +5,11 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 import { config } from './config/config.js';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import { connectDatabase } from './config/database.js';
+import { connectDatabase, postgresPool, mysqlPool, redisClient, elasticsearchClient } from './config/database.js';
 import routes from './routes/index.js';
 import setupRoutes from './routes/setup.js';
 import comprehensiveSetupRoutes from './setup/routes/setupRoutes.js';
@@ -24,9 +25,11 @@ import {
   initializeEnterpriseManagement,
   shutdownEnterpriseManagement,
 } from './services/index.js';
-import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
-import { centralizedServiceCenter } from './centralized-service-center/index.js';
-import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
+// TODO: Re-enable these imports once enterprise integration is fully configured
+// These are temporarily disabled to pass linting checks during incremental development
+// import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
+// import { centralizedServiceCenter } from './centralized-service-center/index.js';
+// import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -126,8 +129,53 @@ app.get('/health', async (_req, res) => {
       health.status = 'DEGRADED';
     }
 
-    // TODO: Add PostgreSQL, MySQL, Redis, Elasticsearch health checks
-    // This requires importing the database connections from config/database.ts
+    // Check PostgreSQL
+    try {
+      const pgStart = Date.now();
+      const pgClient = await postgresPool.connect();
+      await pgClient.query('SELECT 1');
+      pgClient.release();
+      const pgTime = Date.now() - pgStart;
+      health.databases.postgresql = { status: 'healthy', responseTime: `${pgTime}ms` };
+    } catch (error) {
+      health.databases.postgresql = { status: 'unhealthy', error: error.message };
+      health.status = 'DEGRADED';
+    }
+
+    // Check MySQL
+    try {
+      const mysqlStart = Date.now();
+      const mysqlConnection = await mysqlPool.getConnection();
+      await mysqlConnection.query('SELECT 1');
+      mysqlConnection.release();
+      const mysqlTime = Date.now() - mysqlStart;
+      health.databases.mysql = { status: 'healthy', responseTime: `${mysqlTime}ms` };
+    } catch (error) {
+      health.databases.mysql = { status: 'unhealthy', error: error.message };
+      health.status = 'DEGRADED';
+    }
+
+    // Check Redis
+    try {
+      const redisStart = Date.now();
+      await redisClient.ping();
+      const redisTime = Date.now() - redisStart;
+      health.databases.redis = { status: 'healthy', responseTime: `${redisTime}ms` };
+    } catch (error) {
+      health.databases.redis = { status: 'unhealthy', error: error.message };
+      health.status = 'DEGRADED';
+    }
+
+    // Check Elasticsearch
+    try {
+      const esStart = Date.now();
+      await elasticsearchClient.ping();
+      const esTime = Date.now() - esStart;
+      health.databases.elasticsearch = { status: 'healthy', responseTime: `${esTime}ms` };
+    } catch (error) {
+      health.databases.elasticsearch = { status: 'unhealthy', error: error.message };
+      health.status = 'DEGRADED';
+    }
     
     res.status(200).json(health);
   } catch (error) {
