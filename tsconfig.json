@@ -28,8 +28,6 @@
     "noImplicitOverride": true,
     "downlevelIteration": true,
     "allowImportingTsExtensions": false,
-    "composite": true,
-    "incremental": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
@@ -43,28 +41,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
-  "references": [
-    { "path": "./packages/phantom-attribution-core" },
-    { "path": "./packages/phantom-compliance-core" },
-    { "path": "./packages/phantom-crypto-core" },
-    { "path": "./packages/phantom-cve-core" },
-    { "path": "./packages/phantom-feeds-core" },
-    { "path": "./packages/phantom-forensics-core" },
-    { "path": "./packages/phantom-hunting-core" },
-    { "path": "./packages/phantom-incident-response-core" },
-    { "path": "./packages/phantom-intel-core" },
-    { "path": "./packages/phantom-ioc-core" },
-    { "path": "./packages/phantom-malware-core" },
-    { "path": "./packages/phantom-mitre-core" },
-    { "path": "./packages/phantom-ml-core" },
-    { "path": "./packages/phantom-ml-studio" },
-    { "path": "./packages/phantom-reputation-core" },
-    { "path": "./packages/phantom-risk-core" },
-    { "path": "./packages/phantom-sandbox-core" },
-    { "path": "./packages/phantom-secop-core" },
-    { "path": "./packages/phantom-threat-actor-core" },
-    { "path": "./packages/phantom-vulnerability-core" },
-    { "path": "./packages/phantom-xdr-core" }
-  ]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
