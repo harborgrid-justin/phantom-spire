@@ -25,9 +25,10 @@ import {
   initializeEnterpriseManagement,
   shutdownEnterpriseManagement,
 } from './services/index.js';
-import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
-import { centralizedServiceCenter } from './centralized-service-center/index.js';
-import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
+// Unused imports kept for future integration
+// import { EnterprisePlatformIntegration } from './enterprise-integration/index.js';
+// import { centralizedServiceCenter } from './centralized-service-center/index.js';
+// import unifiedAPIRouter from './centralized-service-center/services/UnifiedAPIRouter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
